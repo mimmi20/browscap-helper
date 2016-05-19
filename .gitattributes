@@ -1,3 +1,7 @@
+/examples export-ignore
+/tests export-ignore
+/.* export-ignore
+
 #Ensure every text file uses lf
 *.markdown text eol=lf diff
 *.md text eol=lf diff
