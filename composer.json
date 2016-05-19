@@ -1,0 +1,29 @@
+{
+    "name": "mimmi20/browscap-helper",
+    "description": "some small helper functions for working with Browscap",
+    "require": {
+        "symfony/yaml": "^2.0|^3.0",
+        "browscap/browscap": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8|^5.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Müller",
+            "homepage": "https://github.com/mimmi20",
+            "role": "Developer"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/mimmi20/browscap-helper/graphs/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BrowscapHelper\\": ""
+        }
+    }
+}
+

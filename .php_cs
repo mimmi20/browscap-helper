@@ -1,25 +1,33 @@
 <?php
-ini_set('memory_limit', '-1');
+$header = <<<EOF
+This file is part of the BrowserDetector package.
+
+(c) Thomas Mueller <mimmi20@live.de>
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+EOF;
 
 $finder = Symfony\CS\Finder\DefaultFinder::create()
     ->files()
     ->name('*.php')
-    //->in(__DIR__ . '/src')
-    //->in(__DIR__ . '/tests')
-    ->in(__DIR__ . '/tests/fixtures')
+    ->in(__DIR__ . '/src')
+    ->in(__DIR__ . '/tests')
 ;
+
+ini_set('memory_limit', '-1');
 
 return Symfony\CS\Config\Config::create()
     ->level(\Symfony\CS\FixerInterface::PSR2_LEVEL)
     ->fixers(
         array(
-            'unalign_double_arrow',
+            'align_double_arrow',
+            'double_arrow_multiline_whitespaces',
             'align_equals',
             'braces',
             'concat_with_spaces',
             'duplicate_semicolon',
             'elseif',
-            'empty_return',
             'encoding',
             'eof_ending',
             'extra_empty_lines',
@@ -44,8 +52,6 @@ return Symfony\CS\Config\Config::create()
             'phpdoc_no_package',
             'phpdoc_params',
             'phpdoc_scalar',
-            'phpdoc_separation',
-            'phpdoc_to_comment',
             'phpdoc_trim',
             'phpdoc_types',
             'phpdoc_var_without_name',
