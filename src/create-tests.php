@@ -1901,7 +1901,7 @@ foreach ($fileContents as $i => $ua) {
         'standard' => " . ($standard ? 'true' : 'false') . ",
     ],\n";
 
-    $outputDetector .= "    'browscap-issue-$issue-test$i' => [
+    $outputDetector .= "    'browscap-issue-$issue-$counter' => [
         'ua' => '" . str_replace("'", "\\'", $ua) . "',
         'properties' => [
             'Browser_Name'            => '" . str_replace("'", "\\'", $browserNameBrowscap) . "',
