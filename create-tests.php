@@ -39,20 +39,45 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
     
     foreach ($tests as $key => $test) {
         if (isset($data[$key])) {
-            throw new \RuntimeException('Test data is duplicated for key "' . $key . '"');
+            continue;
         }
         
         if (isset($checks[$test['ua']])) {
-            throw new \RuntimeException(
-                'UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "'
-                . $checks[$test['ua']] . '"'
-            );
+            continue;
         }
         
         $data[$key]       = $test;
         $checks[$test['ua']] = $key;
     }
 }
+
+$sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
+
+$iterator = new \RecursiveDirectoryIterator($sourceDirectory);
+$checks   = array();
+
+foreach (new \RecursiveIteratorIterator($iterator) as $file) {
+    /** @var $file \SplFileInfo */
+    if (!$file->isFile() || $file->getExtension() != 'php') {
+        continue;
+    }
+
+    $tests = require_once $file->getPathname();
+
+    foreach ($tests as $key => $test) {
+        if (isset($data[$key])) {
+            continue;
+        }
+
+        if (isset($checks[$test['ua']])) {
+            continue;
+        }
+
+        $data[$key]       = $test;
+        $checks[$test['ua']] = $key;
+    }
+}
+
 //var_dump($checks);exit;
 if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'uas-' . $issue . '.txt')) {
     $fileContents = file(__DIR__ . DIRECTORY_SEPARATOR . 'uas-' . $issue . '.txt', FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
@@ -87,14 +112,16 @@ foreach ($fileContents as $i => $ua) {
     
     echo ("$i, $a, $numberBrowscap\n");
     
-    $browserName = 'Default Browser';
+    $browserNameBrowscap = 'Default Browser';
     $browserType = 'unknown';
     $browserBits = 32;
     $browserMaker = 'unknown';
     $browserVersion = '0.0';
     
-    $platformName = 'unknown';
-    $platformVersion = 'unknown';
+    $platformNameBrowscap = 'unknown';
+    $platformNameDetector = 'unknown';
+    $platformVersionBrowscap = 'unknown';
+    $platformVersionDetector = 'unknown';
     $platformBits = 32;
     $platformMaker = 'unknown';
     
@@ -189,62 +216,78 @@ foreach ($fileContents as $i => $ua) {
     $standard = true;
     
     if (false !== strpos($ua, 'Linux; Android')) {
-        $platformName = 'Android';
+        $platformNameBrowscap = 'Android';
+        $platformNameDetector = 'Android';
         $platformMaker = 'Google Inc';
         $mobileDevice = 'true';
         
         if (preg_match('/Linux; Android (\d+\.\d+)/', $ua, $matches)) {
-            $platformVersion = $matches[1];
+            $platformVersionBrowscap = $matches[1];
+            $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'Linux; U; Android')) {
-        $platformName = 'Android';
+        $platformNameBrowscap = 'Android';
+        $platformNameDetector = 'Android';
         $platformMaker = 'Google Inc';
         $mobileDevice = 'true';
         
         if (preg_match('/Linux; U; Android (\d+\.\d+)/', $ua, $matches)) {
-            $platformVersion = $matches[1];
+            $platformVersionBrowscap = $matches[1];
+            $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'U; Adr')) {
-        $platformName = 'Android';
+        $platformNameBrowscap = 'Android';
+        $platformNameDetector = 'Android';
         $platformMaker = 'Google Inc';
         $mobileDevice = 'true';
         
         if (preg_match('/U; Adr (\d+\.\d+)/', $ua, $matches)) {
-            $platformVersion = $matches[1];
+            $platformVersionBrowscap = $matches[1];
+            $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'Android') || false !== strpos($ua, 'MTK')) {
-        $platformName = 'Android';
+        $platformNameBrowscap = 'Android';
+        $platformNameDetector = 'Android';
         $platformMaker = 'Google Inc';
         $mobileDevice = 'true';
     } elseif (false !== strpos($ua, 'wds')) {
-        $platformName = 'Windows Phone OS';
+        $platformNameBrowscap = 'Windows Phone OS';
+        $platformNameDetector = 'Windows Phone OS';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'true';
         
         if (preg_match('/wds (\d+\.\d+)/', $ua, $matches)) {
-            $platformVersion = $matches[1];
+            $platformVersionBrowscap = $matches[1];
+            $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'Windows Phone')) {
-        $platformName = 'WinPhone';
+        $platformNameBrowscap = 'WinPhone';
+        $platformNameDetector = 'Windows Phone OS';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'true';
     } elseif (false !== strpos($ua, 'Tizen')) {
-        $platformName = 'Tizen';
+        $platformNameBrowscap = 'Tizen';
+        $platformNameDetector = 'Tizen';
         $platformMaker = 'unknown';
         $mobileDevice = 'true';
     } elseif (false !== strpos($ua, 'OpenBSD')) {
-        $platformName = 'OpenBSD';
+        $platformNameBrowscap = 'OpenBSD';
+        $platformNameDetector = 'OpenBSD';
     } elseif (false !== strpos($ua, 'Symbian') || false !== strpos($ua, 'Series 60')) {
-        $platformName = 'SymbianOS';
+        $platformNameBrowscap = 'SymbianOS';
+        $platformNameDetector = 'Symbian OS';
         $platformMaker = 'Symbian Foundation';
         $mobileDevice = 'true';
     } elseif (false !== strpos($ua, 'MIDP')) {
-        $platformName = 'JAVA';
+        $platformNameBrowscap = 'JAVA';
+        $platformNameDetector = 'Java';
         $platformMaker = 'Oracle';
         $mobileDevice = 'true';
     } elseif (false !== strpos($ua, 'Windows NT 10.0')) {
-        $platformName = 'Win10';
-        $platformVersion = '10.0';
+        $platformNameBrowscap = 'Win10';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '10.0';
+        $platformVersionDetector = '10';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -256,8 +299,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.4')) {
-        $platformName = 'Win10';
-        $platformVersion = '6.4';
+        $platformNameBrowscap = 'Win10';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '6.4';
+        $platformVersionDetector = '10';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -269,8 +314,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.3')) {
-        $platformName = 'Win8.1';
-        $platformVersion = '6.3';
+        $platformNameBrowscap = 'Win8.1';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '6.3';
+        $platformVersionDetector = '8.1';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -282,8 +329,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.2')) {
-        $platformName = 'Win8';
-        $platformVersion = '6.2';
+        $platformNameBrowscap = 'Win8';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '6.2';
+        $platformVersionDetector = '8';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -295,8 +344,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.1')) {
-        $platformName = 'Win7';
-        $platformVersion = '6.1';
+        $platformNameBrowscap = 'Win7';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '6.1';
+        $platformVersionDetector = '7';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -308,8 +359,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.0')) {
-        $platformName = 'WinVista';
-        $platformVersion = '6.0';
+        $platformNameBrowscap = 'WinVista';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '6.0';
+        $platformVersionDetector = 'Vista';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -321,8 +374,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.2')) {
-        $platformName = 'WinXP';
-        $platformVersion = '5.2';
+        $platformNameBrowscap = 'WinXP';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '5.2';
+        $platformVersionDetector = 'XP';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -334,8 +389,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.1')) {
-        $platformName = 'WinXP';
-        $platformVersion = '5.1';
+        $platformNameBrowscap = 'WinXP';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '5.1';
+        $platformVersionDetector = 'XP';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -347,8 +404,10 @@ foreach ($fileContents as $i => $ua) {
         
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.0')) {
-        $platformName = 'Win2000';
-        $platformVersion = '5.0';
+        $platformNameBrowscap = 'Win2000';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '5.0';
+        $platformVersionDetector = '2000';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -361,8 +420,10 @@ foreach ($fileContents as $i => $ua) {
         $device = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 4.1')) {
-        $platformName = 'WinNT';
-        $platformVersion = '4.1';
+        $platformNameBrowscap = 'WinNT';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '4.1';
+        $platformVersionDetector = 'NT 4.1';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -375,8 +436,10 @@ foreach ($fileContents as $i => $ua) {
         $device = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 4.0')) {
-        $platformName = 'WinNT';
-        $platformVersion = '4.0';
+        $platformNameBrowscap = 'WinNT';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '4.0';
+        $platformVersionDetector = 'NT 4';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -389,8 +452,10 @@ foreach ($fileContents as $i => $ua) {
         $device = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 3.5')) {
-        $platformName = 'WinNT';
-        $platformVersion = '3.5';
+        $platformNameBrowscap = 'WinNT';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '3.5';
+        $platformVersionDetector = 'NT 3.5';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -403,8 +468,10 @@ foreach ($fileContents as $i => $ua) {
         $device = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 3.1')) {
-        $platformName = 'WinNT';
-        $platformVersion = '3.1';
+        $platformNameBrowscap = 'WinNT';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = '3.1';
+        $platformVersionDetector = 'NT 3.1';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -417,8 +484,10 @@ foreach ($fileContents as $i => $ua) {
         $device = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT')) {
-        $platformName = 'WinNT';
-        $platformVersion = 'unknown';
+        $platformNameBrowscap = 'WinNT';
+        $platformNameDetector = 'Windows';
+        $platformVersionBrowscap = 'unknown';
+        $platformVersionDetector = 'NT';
         $platformMaker = 'Microsoft Corporation';
         $mobileDevice = 'false';
         
@@ -431,7 +500,8 @@ foreach ($fileContents as $i => $ua) {
         $device = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Linux')) {
-        $platformName = 'Linux';
+        $platformNameBrowscap = 'Linux';
+        $platformNameDetector = 'Linux';
         $platformMaker = 'Linux Foundation';
         $mobileDevice = 'false';
         
@@ -441,7 +511,7 @@ foreach ($fileContents as $i => $ua) {
     $browserModus = 'unknown';
     
     if (false !== strpos($ua, 'OPR') && false !== strpos($ua, 'Android')) {
-        $browserName = 'Opera Mobile';
+        $browserNameBrowscap = 'Opera Mobile';
         $browserType = 'Browser';
         $browserMaker = 'Opera Software ASA';
         
@@ -451,7 +521,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Opera Mobi')) {
-        $browserName = 'Opera Mobile';
+        $browserNameBrowscap = 'Opera Mobile';
         $browserType = 'Browser';
         $browserMaker = 'Opera Software ASA';
         
@@ -461,7 +531,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'OPR')) {
-        $browserName = 'Opera';
+        $browserNameBrowscap = 'Opera';
         $browserType = 'Browser';
         $browserMaker = 'Opera Software ASA';
         
@@ -469,7 +539,7 @@ foreach ($fileContents as $i => $ua) {
             $browserVersion = $matches[1];
         }
     } elseif (false !== strpos($ua, 'Opera')) {
-        $browserName = 'Opera';
+        $browserNameBrowscap = 'Opera';
         $browserType = 'Browser';
         $browserMaker = 'Opera Software ASA';
         
@@ -479,7 +549,7 @@ foreach ($fileContents as $i => $ua) {
             $browserVersion = $matches[1];
         }
     } elseif (false !== strpos($ua, 'UCBrowser') || false !== strpos($ua, 'UC Browser')) {
-        $browserName = 'UC Browser';
+        $browserNameBrowscap = 'UC Browser';
         $browserType = 'Browser';
         $browserMaker = 'UC Web';
         
@@ -491,7 +561,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'iCab')) {
-        $browserName = 'iCab';
+        $browserNameBrowscap = 'iCab';
         $browserType = 'Browser';
         $browserMaker = 'Alexander Clauss';
         
@@ -501,7 +571,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Lunascape')) {
-        $browserName = 'Lunascape';
+        $browserNameBrowscap = 'Lunascape';
         $browserType = 'Browser';
         //$browserMaker = 'Alexander Clauss';
         
@@ -511,7 +581,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== stripos($ua, 'midori')) {
-        $browserName = 'Midori';
+        $browserNameBrowscap = 'Midori';
         $browserType = 'Browser';
         //$browserMaker = 'Alexander Clauss';
         
@@ -521,7 +591,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'OmniWeb')) {
-        $browserName = 'OmniWeb';
+        $browserNameBrowscap = 'OmniWeb';
         $browserType = 'Browser';
         //$browserMaker = 'Alexander Clauss';
         
@@ -531,7 +601,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== stripos($ua, 'maxthon') || false !== strpos($ua, 'MyIE2')) {
-        $browserName = 'Maxthon';
+        $browserNameBrowscap = 'Maxthon';
         $browserType = 'Browser';
         //$browserMaker = 'Alexander Clauss';
         
@@ -541,7 +611,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'PhantomJS')) {
-        $browserName = 'PhantomJS';
+        $browserNameBrowscap = 'PhantomJS';
         $browserType = 'Browser';
         $browserMaker = 'phantomjs.org';
         
@@ -551,7 +621,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'YaBrowser')) {
-        $browserName = 'Yandex Browser';
+        $browserNameBrowscap = 'Yandex Browser';
         $browserType = 'Browser';
         $browserMaker = 'Yandex';
         
@@ -561,13 +631,13 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Kamelio')) {
-        $browserName = 'Kamelio App';
+        $browserNameBrowscap = 'Kamelio App';
         $browserType = 'Application';
         $browserMaker = 'Kamelio';
         
         $lite = false;
     } elseif (false !== strpos($ua, 'FBAV')) {
-        $browserName = 'Facebook App';
+        $browserNameBrowscap = 'Facebook App';
         $browserType = 'Application';
         $browserMaker = 'Facebook';
         
@@ -577,13 +647,13 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'ACHEETAHI')) {
-        $browserName = 'CM Browser';
+        $browserNameBrowscap = 'CM Browser';
         $browserType = 'Browser';
         $browserMaker = 'Cheetah Mobile';
         
         $lite = false;
     } elseif (false !== strpos($ua, 'bdbrowser_i18n')) {
-        $browserName = 'Baidu Browser';
+        $browserNameBrowscap = 'Baidu Browser';
         $browserType = 'Browser';
         $browserMaker = 'Baidu';
         
@@ -593,7 +663,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'bdbrowserhd_i18n')) {
-        $browserName = 'Baidu Browser HD';
+        $browserNameBrowscap = 'Baidu Browser HD';
         $browserType = 'Browser';
         $browserMaker = 'Baidu';
         
@@ -603,7 +673,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'bdbrowser_mini')) {
-        $browserName = 'Baidu Browser Mini';
+        $browserNameBrowscap = 'Baidu Browser Mini';
         $browserType = 'Browser';
         $browserMaker = 'Baidu';
         
@@ -613,7 +683,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Puffin')) {
-        $browserName = 'Puffin';
+        $browserNameBrowscap = 'Puffin';
         $browserType = 'Browser';
         $browserMaker = 'CloudMosa Inc.';
         
@@ -623,7 +693,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'SamsungBrowser')) {
-        $browserName = 'Samsung Browser';
+        $browserNameBrowscap = 'Samsung Browser';
         $browserType = 'Browser';
         $browserMaker = 'Samsung';
         
@@ -633,7 +703,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Silk')) {
-        $browserName = 'Silk';
+        $browserNameBrowscap = 'Silk';
         $browserType = 'Browser';
         $browserMaker = 'Amazon.com, Inc.';
         
@@ -646,12 +716,13 @@ foreach ($fileContents as $i => $ua) {
         if (false === strpos($ua, 'Android')) {
             $browserModus = 'Desktop Mode';
             
-            $platformName = 'Android';
+            $platformNameBrowscap = 'Android';
+            $platformNameDetector = 'Android';
             $platformMaker = 'Google Inc';
             $mobileDevice = 'true';
         }
     } elseif (false !== strpos($ua, 'coc_coc_browser')) {
-        $browserName = 'Coc Coc Browser';
+        $browserNameBrowscap = 'Coc Coc Browser';
         $browserType = 'Browser';
         $browserMaker = 'Coc Coc Company Limited';
         
@@ -661,7 +732,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'NaverMatome')) {
-        $browserName = 'NaverMatome';
+        $browserNameBrowscap = 'NaverMatome';
         $browserType = 'Application';
         $browserMaker = 'Naver';
         
@@ -671,7 +742,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Flipboard')) {
-        $browserName = 'Flipboard App';
+        $browserNameBrowscap = 'Flipboard App';
         $browserType = 'Application';
         $browserMaker = 'Flipboard, Inc.';
         
@@ -681,7 +752,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Arora')) {
-        $browserName = 'Arora';
+        $browserNameBrowscap = 'Arora';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -691,7 +762,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Acoo Browser')) {
-        $browserName = 'Acoo Browser';
+        $browserNameBrowscap = 'Acoo Browser';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -701,7 +772,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'ABrowse')) {
-        $browserName = 'ABrowse';
+        $browserNameBrowscap = 'ABrowse';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -711,7 +782,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'AmigaVoyager')) {
-        $browserName = 'AmigaVoyager';
+        $browserNameBrowscap = 'AmigaVoyager';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -721,7 +792,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Beonex')) {
-        $browserName = 'Beonex';
+        $browserNameBrowscap = 'Beonex';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -731,7 +802,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Stainless')) {
-        $browserName = 'Stainless';
+        $browserNameBrowscap = 'Stainless';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -741,7 +812,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Sundance')) {
-        $browserName = 'Sundance';
+        $browserNameBrowscap = 'Sundance';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -751,7 +822,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Sunrise')) {
-        $browserName = 'Sunrise';
+        $browserNameBrowscap = 'Sunrise';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -761,7 +832,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'SunriseBrowser')) {
-        $browserName = 'Sunrise';
+        $browserNameBrowscap = 'Sunrise';
         $browserType = 'Browser';
         //$browserMaker = 'Flipboard, Inc.';
         
@@ -771,7 +842,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Seznam.cz')) {
-        $browserName = 'Seznam Browser';
+        $browserNameBrowscap = 'Seznam Browser';
         $browserType = 'Browser';
         $browserMaker = 'Seznam.cz, a.s.';
         
@@ -781,7 +852,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Aviator')) {
-        $browserName = 'WhiteHat Aviator';
+        $browserNameBrowscap = 'WhiteHat Aviator';
         $browserType = 'Browser';
         $browserMaker = 'WhiteHat Security';
         
@@ -791,7 +862,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Dragon')) {
-        $browserName = 'Dragon';
+        $browserNameBrowscap = 'Dragon';
         $browserType = 'Browser';
         $browserMaker = 'Comodo Group Inc';
         
@@ -801,7 +872,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Beamrise')) {
-        $browserName = 'Beamrise';
+        $browserNameBrowscap = 'Beamrise';
         $browserType = 'Browser';
         $browserMaker = 'Beamrise Team';
         
@@ -811,7 +882,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Diglo')) {
-        $browserName = 'Diglo';
+        $browserNameBrowscap = 'Diglo';
         $browserType = 'Browser';
         $browserMaker = 'Diglo Inc';
         
@@ -821,7 +892,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'APUSBrowser')) {
-        $browserName = 'APUSBrowser';
+        $browserNameBrowscap = 'APUSBrowser';
         $browserType = 'Browser';
         $browserMaker = 'APUS-Group';
         
@@ -831,7 +902,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Chedot')) {
-        $browserName = 'Chedot';
+        $browserNameBrowscap = 'Chedot';
         $browserType = 'Browser';
         $browserMaker = 'Chedot.com';
         
@@ -841,7 +912,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Qword')) {
-        $browserName = 'Qword Browser';
+        $browserNameBrowscap = 'Qword Browser';
         $browserType = 'Browser';
         $browserMaker = 'Qword Corporation';
         
@@ -851,7 +922,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Iridium')) {
-        $browserName = 'Iridium Browser';
+        $browserNameBrowscap = 'Iridium Browser';
         $browserType = 'Browser';
         $browserMaker = 'Iridium Browser Team';
         
@@ -861,7 +932,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'MxNitro')) {
-        $browserName = 'Maxthon Nitro';
+        $browserNameBrowscap = 'Maxthon Nitro';
         $browserType = 'Browser';
         $browserMaker = 'Maxthon International Limited';
         
@@ -871,7 +942,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'MxBrowser')) {
-        $browserName = 'Maxthon';
+        $browserNameBrowscap = 'Maxthon';
         $browserType = 'Browser';
         $browserMaker = 'Maxthon International Limited';
         
@@ -881,7 +952,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Maxthon')) {
-        $browserName = 'Maxthon';
+        $browserNameBrowscap = 'Maxthon';
         $browserType = 'Browser';
         $browserMaker = 'Maxthon International Limited';
         
@@ -891,7 +962,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Superbird') || false !== strpos($ua, 'SuperBird')) {
-        $browserName = 'SuperBird';
+        $browserNameBrowscap = 'SuperBird';
         $browserType = 'Browser';
         $browserMaker = 'superbird-browser.com';
         
@@ -901,7 +972,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'TinyBrowser')) {
-        $browserName = 'TinyBrowser';
+        $browserNameBrowscap = 'TinyBrowser';
         $browserType = 'Browser';
         $browserMaker = 'unknown';
         
@@ -911,7 +982,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Chrome') && false !== strpos($ua, 'Version')) {
-        $browserName = 'Android WebView';
+        $browserNameBrowscap = 'Android WebView';
         $browserType = 'Browser';
         $browserMaker = 'Google Inc';
         
@@ -923,7 +994,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Safari') && false !== strpos($ua, 'Version') && false !== strpos($ua, 'Tizen')) {
-        $browserName = 'Samsung WebView';
+        $browserNameBrowscap = 'Samsung WebView';
         $browserType = 'Browser';
         $browserMaker = 'Samsung';
         
@@ -933,7 +1004,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Chromium')) {
-        $browserName = 'Chromium';
+        $browserNameBrowscap = 'Chromium';
         $browserType = 'Browser';
         $browserMaker = 'Google Inc';
         
@@ -943,7 +1014,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Flock')) {
-        $browserName = 'Flock';
+        $browserNameBrowscap = 'Flock';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -953,7 +1024,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Fluid')) {
-        $browserName = 'Fluid';
+        $browserNameBrowscap = 'Fluid';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -963,7 +1034,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'ChromePlus')) {
-        $browserName = 'ChromePlus';
+        $browserNameBrowscap = 'ChromePlus';
         $browserType = 'Browser';
         //$browserMaker = 'Google Inc';
         
@@ -973,7 +1044,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'RockMelt')) {
-        $browserName = 'RockMelt';
+        $browserNameBrowscap = 'RockMelt';
         $browserType = 'Browser';
         //$browserMaker = 'Google Inc';
         
@@ -983,7 +1054,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Shiira')) {
-        $browserName = 'Shiira';
+        $browserNameBrowscap = 'Shiira';
         $browserType = 'Browser';
         //$browserMaker = 'Google Inc';
         
@@ -993,7 +1064,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Iron')) {
-        $browserName = 'Iron';
+        $browserNameBrowscap = 'Iron';
         $browserType = 'Browser';
         //$browserMaker = 'Google Inc';
         
@@ -1003,7 +1074,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Chrome')) {
-        $browserName = 'Chrome';
+        $browserNameBrowscap = 'Chrome';
         $browserType = 'Browser';
         $browserMaker = 'Google Inc';
         $browserVersion = $chromeVersion;
@@ -1012,7 +1083,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Opera Mini')) {
-        $browserName = 'Opera Mini';
+        $browserNameBrowscap = 'Opera Mini';
         $browserType = 'Browser';
         $browserMaker = 'Opera Software ASA';
         
@@ -1020,7 +1091,7 @@ foreach ($fileContents as $i => $ua) {
             $browserVersion = $matches[1];
         }
     } elseif (false !== strpos($ua, 'FlyFlow')) {
-        $browserName = 'FlyFlow';
+        $browserNameBrowscap = 'FlyFlow';
         $browserType = 'Browser';
         $browserMaker = 'Baidu';
         
@@ -1030,7 +1101,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Epiphany') || false !== strpos($ua, 'epiphany')) {
-        $browserName = 'Epiphany';
+        $browserNameBrowscap = 'Epiphany';
         $browserType = 'Browser';
         //$browserMaker = 'Baidu';
         
@@ -1040,7 +1111,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Safari') && false !== strpos($ua, 'Version') && false !== strpos($ua, 'Android')) {
-        $browserName = 'Android';
+        $browserNameBrowscap = 'Android';
         $browserType = 'Browser';
         $browserMaker = 'Google Inc';
         
@@ -1052,7 +1123,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'BlackBerry') && false !== strpos($ua, 'Version')) {
-        $browserName = 'BlackBerry';
+        $browserNameBrowscap = 'BlackBerry';
         $browserType = 'Browser';
         $browserMaker = 'Research In Motion Limited';
         
@@ -1061,7 +1132,7 @@ foreach ($fileContents as $i => $ua) {
         }
         $lite = false;
     } elseif (false !== strpos($ua, 'Safari') && false !== strpos($ua, 'Version')) {
-        $browserName = 'Safari';
+        $browserNameBrowscap = 'Safari';
         $browserType = 'Browser';
         $browserMaker = 'Apple Inc';
         
@@ -1069,7 +1140,7 @@ foreach ($fileContents as $i => $ua) {
             $browserVersion = $matches[1];
         }
     } elseif (false !== strpos($ua, 'PaleMoon')) {
-        $browserName = 'PaleMoon';
+        $browserNameBrowscap = 'PaleMoon';
         $browserType = 'Browser';
         $browserMaker = 'Moonchild Productions';
         
@@ -1079,7 +1150,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Phoenix')) {
-        $browserName = 'Phoenix';
+        $browserNameBrowscap = 'Phoenix';
         $browserType = 'Browser';
         //$browserMaker = 'www.waterfoxproject.org';
         
@@ -1089,7 +1160,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== stripos($ua, 'Prism')) {
-        $browserName = 'Prism';
+        $browserNameBrowscap = 'Prism';
         $browserType = 'Browser';
         //$browserMaker = 'www.waterfoxproject.org';
         
@@ -1099,7 +1170,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== stripos($ua, 'QtWeb Internet Browser')) {
-        $browserName = 'QtWeb Internet Browser';
+        $browserNameBrowscap = 'QtWeb Internet Browser';
         $browserType = 'Browser';
         //$browserMaker = 'www.waterfoxproject.org';
         
@@ -1109,7 +1180,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Waterfox')) {
-        $browserName = 'Waterfox';
+        $browserNameBrowscap = 'Waterfox';
         $browserType = 'Browser';
         $browserMaker = 'www.waterfoxproject.org';
         
@@ -1119,7 +1190,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'QupZilla')) {
-        $browserName = 'QupZilla';
+        $browserNameBrowscap = 'QupZilla';
         $browserType = 'Browser';
         $browserMaker = 'David Rosca and Community';
         
@@ -1129,7 +1200,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Thunderbird')) {
-        $browserName = 'Thunderbird';
+        $browserNameBrowscap = 'Thunderbird';
         $browserType = 'Email Client';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1139,7 +1210,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'kontact')) {
-        $browserName = 'Kontact';
+        $browserNameBrowscap = 'Kontact';
         $browserType = 'Email Client';
         $browserMaker = 'KDE e.V.';
         
@@ -1149,7 +1220,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Fennec')) {
-        $browserName = 'Fennec';
+        $browserNameBrowscap = 'Fennec';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1159,7 +1230,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'myibrow')) {
-        $browserName = 'My Internet Browser';
+        $browserNameBrowscap = 'My Internet Browser';
         $browserType = 'Browser';
         $browserMaker = 'unknown';
         
@@ -1169,7 +1240,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Daumoa')) {
-        $browserName = 'Daumoa';
+        $browserNameBrowscap = 'Daumoa';
         $browserType = 'Bot/Crawler';
         $browserMaker = 'Daum Communications Corp';
         $crawler      = 'true';
@@ -1180,7 +1251,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Camino')) {
-        $browserName = 'Camino';
+        $browserNameBrowscap = 'Camino';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1190,7 +1261,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Cheshire')) {
-        $browserName = 'Cheshire';
+        $browserNameBrowscap = 'Cheshire';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1200,7 +1271,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Classilla')) {
-        $browserName = 'Classilla';
+        $browserNameBrowscap = 'Classilla';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1210,7 +1281,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'CometBird')) {
-        $browserName = 'CometBird';
+        $browserNameBrowscap = 'CometBird';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1220,7 +1291,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'CometBird')) {
-        $browserName = 'CometBird';
+        $browserNameBrowscap = 'CometBird';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1230,7 +1301,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'EnigmaFox')) {
-        $browserName = 'EnigmaFox';
+        $browserNameBrowscap = 'EnigmaFox';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1240,7 +1311,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'conkeror') || false !== strpos($ua, 'Conkeror')) {
-        $browserName = 'Conkeror';
+        $browserNameBrowscap = 'Conkeror';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1250,7 +1321,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Galeon')) {
-        $browserName = 'Galeon';
+        $browserNameBrowscap = 'Galeon';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1260,7 +1331,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Hana')) {
-        $browserName = 'Hana';
+        $browserNameBrowscap = 'Hana';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1270,7 +1341,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Iceape')) {
-        $browserName = 'Iceape';
+        $browserNameBrowscap = 'Iceape';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1280,7 +1351,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'IceCat')) {
-        $browserName = 'IceCat';
+        $browserNameBrowscap = 'IceCat';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1290,7 +1361,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Iceweasel')) {
-        $browserName = 'Iceweasel';
+        $browserNameBrowscap = 'Iceweasel';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1300,7 +1371,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'K-Meleon')) {
-        $browserName = 'K-Meleon';
+        $browserNameBrowscap = 'K-Meleon';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1310,7 +1381,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'K-Ninja')) {
-        $browserName = 'K-Ninja';
+        $browserNameBrowscap = 'K-Ninja';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1320,7 +1391,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Kapiko')) {
-        $browserName = 'Kapiko';
+        $browserNameBrowscap = 'Kapiko';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1330,7 +1401,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Kazehakase')) {
-        $browserName = 'Kazehakase';
+        $browserNameBrowscap = 'Kazehakase';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1340,7 +1411,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'KMLite')) {
-        $browserName = 'KMLite';
+        $browserNameBrowscap = 'KMLite';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1350,7 +1421,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'lolifox')) {
-        $browserName = 'lolifox';
+        $browserNameBrowscap = 'lolifox';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1360,7 +1431,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Konqueror')) {
-        $browserName = 'Konqueror';
+        $browserNameBrowscap = 'Konqueror';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1370,7 +1441,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Leechcraft')) {
-        $browserName = 'Leechcraft';
+        $browserNameBrowscap = 'Leechcraft';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1380,7 +1451,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Madfox')) {
-        $browserName = 'Madfox';
+        $browserNameBrowscap = 'Madfox';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1390,7 +1461,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'myibrow')) {
-        $browserName = 'myibrow';
+        $browserNameBrowscap = 'myibrow';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1400,7 +1471,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Netscape6')) {
-        $browserName = 'Netscape';
+        $browserNameBrowscap = 'Netscape';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1410,7 +1481,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Netscape')) {
-        $browserName = 'Netscape';
+        $browserNameBrowscap = 'Netscape';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1420,7 +1491,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Navigator')) {
-        $browserName = 'Netscape Navigator';
+        $browserNameBrowscap = 'Netscape Navigator';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1430,7 +1501,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Orca')) {
-        $browserName = 'Orca';
+        $browserNameBrowscap = 'Orca';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1440,7 +1511,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Sylera')) {
-        $browserName = 'Sylera';
+        $browserNameBrowscap = 'Sylera';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1450,7 +1521,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'SeaMonkey')) {
-        $browserName = 'SeaMonkey';
+        $browserNameBrowscap = 'SeaMonkey';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1460,7 +1531,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Fennec')) {
-        $browserName = 'Fennec';
+        $browserNameBrowscap = 'Fennec';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1470,7 +1541,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'GoBrowser')) {
-        $browserName = 'GoBrowser';
+        $browserNameBrowscap = 'GoBrowser';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1480,7 +1551,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Minimo')) {
-        $browserName = 'Minimo';
+        $browserNameBrowscap = 'Minimo';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1490,7 +1561,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'BonEcho')) {
-        $browserName = 'Firefox';
+        $browserNameBrowscap = 'Firefox';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1502,7 +1573,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Shiretoko')) {
-        $browserName = 'Firefox';
+        $browserNameBrowscap = 'Firefox';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1514,7 +1585,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Minefield')) {
-        $browserName = 'Firefox';
+        $browserNameBrowscap = 'Firefox';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1526,7 +1597,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Namoroka')) {
-        $browserName = 'Firefox';
+        $browserNameBrowscap = 'Firefox';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1538,7 +1609,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'GranParadiso')) {
-        $browserName = 'Firefox';
+        $browserNameBrowscap = 'Firefox';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1550,7 +1621,7 @@ foreach ($fileContents as $i => $ua) {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Firebird')) {
-        $browserName = 'Firefox';
+        $browserNameBrowscap = 'Firefox';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1561,8 +1632,20 @@ foreach ($fileContents as $i => $ua) {
         if ($browserVersion < 30) {
             $lite = false;
         }
+    } elseif (false !== strpos($ua, 'Firefox')) {
+        $browserNameBrowscap = 'Firefox';
+        $browserType = 'Browser';
+        $browserMaker = 'Mozilla Foundation';
+
+        if (preg_match('/Firefox\/(\d+\.\d+)/', $ua, $matches)) {
+            $browserVersion = $matches[1];
+        }
+
+        if ($browserVersion < 30) {
+            $lite = false;
+        }
     } elseif (false !== strpos($ua, 'FxiOS')) {
-        $browserName = 'Firefox for iOS';
+        $browserNameBrowscap = 'Firefox for iOS';
         $browserType = 'Browser';
         $browserMaker = 'Mozilla Foundation';
         
@@ -1572,13 +1655,13 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Browzar')) {
-        $browserName = 'Browzar';
+        $browserNameBrowscap = 'Browzar';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Crazy Browser')) {
-        $browserName = 'Crazy Browser';
+        $browserNameBrowscap = 'Crazy Browser';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1588,7 +1671,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'GreenBrowser')) {
-        $browserName = 'GreenBrowser';
+        $browserNameBrowscap = 'GreenBrowser';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1598,7 +1681,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'KKman')) {
-        $browserName = 'KKman';
+        $browserNameBrowscap = 'KKman';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1608,7 +1691,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Lobo')) {
-        $browserName = 'Lobo';
+        $browserNameBrowscap = 'Lobo';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1618,7 +1701,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Sleipnir')) {
-        $browserName = 'Sleipnir';
+        $browserNameBrowscap = 'Sleipnir';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1628,7 +1711,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'SlimBrowser')) {
-        $browserName = 'SlimBrowser';
+        $browserNameBrowscap = 'SlimBrowser';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1638,7 +1721,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'TencentTraveler')) {
-        $browserName = 'TencentTraveler';
+        $browserNameBrowscap = 'TencentTraveler';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1648,7 +1731,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'TheWorld')) {
-        $browserName = 'TheWorld';
+        $browserNameBrowscap = 'TheWorld';
         $browserType = 'Browser';
         //$browserMaker = 'Mozilla Foundation';
         
@@ -1658,7 +1741,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'MSIE')) {
-        $browserName = 'IE';
+        $browserNameBrowscap = 'IE';
         $browserType = 'Browser';
         $browserMaker = 'Microsoft Corporation';
         
@@ -1668,7 +1751,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = true;
     } elseif (false !== strpos($ua, 'SMTBot')) {
-        $browserName = 'SMTBot';
+        $browserNameBrowscap = 'SMTBot';
         $browserType = 'Bot/Crawler';
         $browserMaker = 'SimilarTech Ltd.';
         $crawler      = 'true';
@@ -1679,7 +1762,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'gvfs')) {
-        $browserName = 'gvfs';
+        $browserNameBrowscap = 'gvfs';
         $browserType = 'Tool';
         $browserMaker = 'The GNOME Project';
         
@@ -1689,7 +1772,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'luakit')) {
-        $browserName = 'luakit';
+        $browserNameBrowscap = 'luakit';
         $browserType = 'Browser';
         $browserMaker = 'Mason Larobina';
         
@@ -1699,7 +1782,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Cyberdog')) {
-        $browserName = 'Cyberdog';
+        $browserNameBrowscap = 'Cyberdog';
         $browserType = 'Browser';
         //$browserMaker = 'Mason Larobina';
         
@@ -1709,7 +1792,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'ELinks')) {
-        $browserName = 'ELinks';
+        $browserNameBrowscap = 'ELinks';
         $browserType = 'Browser';
         //$browserMaker = 'Mason Larobina';
         
@@ -1719,7 +1802,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Links')) {
-        $browserName = 'Links';
+        $browserNameBrowscap = 'Links';
         $browserType = 'Browser';
         //$browserMaker = 'Mason Larobina';
         
@@ -1729,7 +1812,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Galaxy')) {
-        $browserName = 'Galaxy';
+        $browserNameBrowscap = 'Galaxy';
         $browserType = 'Browser';
         //$browserMaker = 'Mason Larobina';
         
@@ -1739,7 +1822,7 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'iNet Browser')) {
-        $browserName = 'iNet Browser';
+        $browserNameBrowscap = 'iNet Browser';
         $browserType = 'Browser';
         //$browserMaker = 'Mason Larobina';
         
@@ -1749,21 +1832,11 @@ foreach ($fileContents as $i => $ua) {
         
         $lite = false;
     } elseif (false !== strpos($ua, 'Uzbl')) {
-        $browserName = 'Uzbl';
+        $browserNameBrowscap = 'Uzbl';
         $browserType = 'Browser';
         //$browserMaker = 'Mason Larobina';
         
         if (preg_match('/Uzbl (\d+\.\d+)/', $ua, $matches)) {
-            $browserVersion = $matches[1];
-        }
-        
-        $lite = false;
-    } elseif (false !== strpos($ua, 'Mozilla')) {
-        $browserName = 'Mozilla';
-        $browserType = 'Browser';
-        //$browserMaker = 'Mason Larobina';
-        
-        if (preg_match('/Mozilla\/(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
         
@@ -1775,10 +1848,10 @@ foreach ($fileContents as $i => $ua) {
     $minVersion = (isset($v[1]) ? $v[1] : '0');
     
     $outputBrowscap .= "    'issue-$issue-$numberBrowscap' => [
-        'ua' => '$ua',
+        'ua' => '" . str_replace("'", "\\'", $ua) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace("'", "\\'", $browserName) . "',
+            'Browser' => '" . str_replace("'", "\\'", $browserNameBrowscap) . "',
             'Browser_Type' => '$browserType',
             'Browser_Bits' => '$browserBits',
             'Browser_Maker' => '$browserMaker',
@@ -1786,8 +1859,8 @@ foreach ($fileContents as $i => $ua) {
             'Version' => '$browserVersion',
             'MajorVer' => '$maxVersion',
             'MinorVer' => '$minVersion',
-            'Platform' => '$platformName',
-            'Platform_Version' => '$platformVersion',
+            'Platform' => '$platformNameBrowscap',
+            'Platform_Version' => '$platformVersionBrowscap',
             'Platform_Description' => 'unknown',
             'Platform_Bits' => '$platformBits',
             'Platform_Maker' => '$platformMaker',
@@ -1829,16 +1902,16 @@ foreach ($fileContents as $i => $ua) {
     ],\n";
     
     $outputDetector .= "    'browscap-issue-$issue-test$i' => [
-        'ua' => '$ua',
+        'ua' => '" . str_replace("'", "\\'", $ua) . "',
         'properties' => [
-            'Browser_Name'            => '" . str_replace("'", "\\'", $browserName) . "',
+            'Browser_Name'            => '" . str_replace("'", "\\'", $browserNameBrowscap) . "',
             'Browser_Type'            => '$browserType',
             'Browser_Bits'            => $browserBits,
             'Browser_Maker'           => '$browserMaker',
             'Browser_Modus'           => '$browserModus',
             'Browser_Version'         => '$browserVersion',
-            'Platform_Name'           => '$platformName',
-            'Platform_Version'        => '$platformVersion',
+            'Platform_Name'           => '$platformNameDetector',
+            'Platform_Version'        => '$platformVersionDetector',
             'Platform_Bits'           => $platformBits,
             'Platform_Maker'          => '$platformMaker',
             'isMobileDevice'          => $mobileDevice,
