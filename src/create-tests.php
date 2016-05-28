@@ -538,6 +538,22 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device   = 'Windows Desktop';
         $standard = false;
+    } elseif (false !== stripos($ua, 'cygwin')) {
+        $platformNameBrowscap    = 'Cygwin';
+        $platformNameDetector    = 'Cygwin';
+        $platformVersionBrowscap = 'unknown';
+        $platformVersionDetector = '0.0.0';
+        $platformMaker           = 'Microsoft Corporation';
+        $mobileDevice            = 'false';
+
+        if ($platformBits === 64) {
+            $win64 = true;
+        } else {
+            $win32 = true;
+        }
+
+        $device   = 'Windows Desktop';
+        $standard = false;
     } elseif (false !== strpos($ua, 'Linux')) {
         $platformNameBrowscap = 'Linux';
         $platformNameDetector = 'Linux';
