@@ -272,6 +272,46 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'iPod',
             'Device_Brand_Name'      => 'Apple',
         ),
+        'AT10-A'   => array(
+            'Device_Name'            => 'eXcite Pure',
+            'Device_Maker'           => 'Toshiba',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'AT10-A',
+            'Device_Brand_Name'      => 'Toshiba',
+        ),
+        'SM-T235'   => array(
+            'Device_Name'            => 'Galaxy Tab 4 7.0 WiFi + LTE',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'SM-T235',
+            'Device_Brand_Name'      => 'Samsung',
+        ),
+        'SM-T705'   => array(
+            'Device_Name'            => 'Galaxy Tab S 8.4 LTE',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'SM-T705',
+            'Device_Brand_Name'      => 'Samsung',
+        ),
+        'S5000-F'   => array(
+            'Device_Name'            => 'IdeaTab S5000-F',
+            'Device_Maker'           => 'Lenovo',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'S5000-F',
+            'Device_Brand_Name'      => 'Lenovo',
+        ),
+        'A7600-H'   => array(
+            'Device_Name'            => 'A10-70 A7600 Wi-Fi + 3G',
+            'Device_Maker'           => 'Lenovo',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'A7600-H',
+            'Device_Brand_Name'      => 'Lenovo',
+        ),
     );
 
     $win32    = false;
@@ -660,14 +700,14 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformMakerBrowscap = 'Apple Inc';
         $platformMakerDetector = 'Apple Inc';
         $mobileDevice          = 'true';
-        
+
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
-        
+
         if (preg_match('/CPU OS (\d+\_\d+)/', $ua, $matches)) {
             $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
             $platformVersionDetector = str_replace('_', '.', $matches[1]);
         }
-        
+
         if (false !== strpos($ua, 'iPad')) {
             $device   = 'iPad';
         } elseif (false !== strpos($ua, 'iPod')) {
@@ -681,14 +721,14 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformMakerBrowscap = 'Apple Inc';
         $platformMakerDetector = 'Apple Inc';
         $mobileDevice          = 'true';
-        
+
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
-        
+
         if (preg_match('/CPU iPhone OS (\d+\_\d+)/', $ua, $matches)) {
             $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
             $platformVersionDetector = str_replace('_', '.', $matches[1]);
         }
-        
+
         if (false !== strpos($ua, 'iPad')) {
             $device   = 'iPad';
         } elseif (false !== strpos($ua, 'iPod')) {
@@ -702,9 +742,9 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformMakerBrowscap = 'Apple Inc';
         $platformMakerDetector = 'Apple Inc';
         $mobileDevice          = 'true';
-        
+
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
-        
+
         if (false !== strpos($ua, 'iPad')) {
             $device   = 'iPad';
         } elseif (false !== strpos($ua, 'iPod')) {
@@ -745,6 +785,18 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     }
 
     $browserModus = 'unknown';
+
+    if (false !== strpos($ua, 'AT10-A')) {
+        $device = 'AT10-A';
+    } elseif (false !== strpos($ua, 'SM-T235')) {
+        $device = 'SM-T235';
+    } elseif (false !== strpos($ua, 'SM-T705')) {
+        $device = 'SM-T705';
+    } elseif (false !== strpos($ua, 'S5000-F')) {
+        $device = 'S5000-F';
+    } elseif (false !== strpos($ua, 'A7600-H')) {
+        $device = 'A7600-H';
+    }
 
     if (false !== strpos($ua, 'OPR') && false !== strpos($ua, 'Android')) {
         $browserNameBrowscap = 'Opera Mobile';
@@ -793,7 +845,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Coast';
         $browserType         = 'Application';
         $browserMaker        = 'Opera Software ASA';
-        
+
         if (preg_match('/Coast\/(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
@@ -802,7 +854,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Mercury';
         $browserType         = 'Browser';
         $browserMaker        = 'iLegendSoft, Inc.';
-        
+
         if (preg_match('/Mercury\/(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
@@ -1410,11 +1462,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Chrome';
         $browserType         = 'Browser';
         $browserMaker        = 'Google Inc';
-        
+
         if (preg_match('/CriOS\/(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
-        
+
         if ($browserVersion < 30) {
             $lite = false;
         }
@@ -1423,7 +1475,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Opera Mini';
         $browserType         = 'Browser';
         $browserMaker        = 'Opera Software ASA';
-        
+
         if (preg_match('/OPiOS\/(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
@@ -1463,11 +1515,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Google App';
         $browserType         = 'Application';
         $browserMaker        = 'Google Inc';
-        
+
         if (preg_match('/GSA\/(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
-        
+
         $lite = false;
     } elseif (false !== strpos($ua, 'Safari')
         && false !== strpos($ua, 'Version')
@@ -2182,11 +2234,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Internet Explorer';
         $browserType         = 'Browser';
         $browserMaker        = 'Microsoft Corporation';
-        
+
         if (preg_match('/rv:(\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
-        
+
         $lite = true;
     } elseif (false !== strpos($ua, 'SMTBot')) {
         $browserNameBrowscap = 'SMTBot';
@@ -2282,11 +2334,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Dalvik';
         $browserType         = 'Application';
         $browserMaker        = 'Google Inc';
-        
+
         if (preg_match('/Dalvik (\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
         }
-        
+
         $lite = false;
     } elseif (false !== strpos($ua, 'Uzbl')) {
         $browserNameBrowscap = 'Uzbl';
