@@ -296,12 +296,36 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'SM-T705',
             'Device_Brand_Name'      => 'Samsung',
         ),
+        'SM-T2105'   => array(
+            'Device_Name'            => 'Galaxy Tab 3 Kids',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'SM-T2105',
+            'Device_Brand_Name'      => 'Samsung',
+        ),
+        'SM-N900A'   => array(
+            'Device_Name'            => 'Galaxy Note 3 LTE (AT&T)',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'SM-N900A',
+            'Device_Brand_Name'      => 'Samsung',
+        ),
         'S5000-F'   => array(
             'Device_Name'            => 'IdeaTab S5000-F',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'S5000-F',
+            'Device_Brand_Name'      => 'Lenovo',
+        ),
+        'S5000-H'   => array(
+            'Device_Name'            => 'IdeaTab S5000-H',
+            'Device_Maker'           => 'Lenovo',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'S5000-H',
             'Device_Brand_Name'      => 'Lenovo',
         ),
         'A7600-H'   => array(
@@ -311,6 +335,38 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'A7600-H',
             'Device_Brand_Name'      => 'Lenovo',
+        ),
+        'LG-L160L'   => array(
+            'Device_Name'            => 'Optimus LTE2',
+            'Device_Maker'           => 'LG',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'L160L',
+            'Device_Brand_Name'      => 'LG',
+        ),
+        'GT-S5830'   => array(
+            'Device_Name'            => 'Galaxy Ace',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'GT-S5830',
+            'Device_Brand_Name'      => 'Samsung',
+        ),
+        'GT-S5830i'   => array(
+            'Device_Name'            => 'Galaxy Ace',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'GT-S5830i',
+            'Device_Brand_Name'      => 'Samsung',
+        ),
+        'GT-S5830c'   => array(
+            'Device_Name'            => 'Galaxy Ace',
+            'Device_Maker'           => 'Samsung',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'GT-S5830C',
+            'Device_Brand_Name'      => 'Samsung',
         ),
     );
 
@@ -792,10 +848,24 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device = 'SM-T235';
     } elseif (false !== strpos($ua, 'SM-T705')) {
         $device = 'SM-T705';
+    } elseif (false !== strpos($ua, 'SM-T2105')) {
+        $device = 'SM-T2105';
+    } elseif (false !== strpos($ua, 'SM-N900A')) {
+        $device = 'SM-N900A';
     } elseif (false !== strpos($ua, 'S5000-F')) {
         $device = 'S5000-F';
+    } elseif (false !== strpos($ua, 'S5000-H')) {
+        $device = 'S5000-H';
     } elseif (false !== strpos($ua, 'A7600-H')) {
         $device = 'A7600-H';
+    } elseif (false !== strpos($ua, 'LG-L160L')) {
+        $device = 'LG-L160L';
+    } elseif (false !== strpos($ua, 'GT-S5830i')) {
+        $device = 'GT-S5830i';
+    } elseif (false !== strpos($ua, 'GT-S5830C')) {
+        $device = 'GT-S5830c';
+    } elseif (false !== strpos($ua, 'GT-S5830')) {
+        $device = 'GT-S5830';
     }
 
     if (false !== strpos($ua, 'OPR') && false !== strpos($ua, 'Android')) {
