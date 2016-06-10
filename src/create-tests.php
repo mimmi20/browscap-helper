@@ -248,6 +248,14 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'Linux Desktop',
             'Device_Brand_Name'      => 'unknown',
         ),
+        'Macintosh'   => array(
+            'Device_Name'            => 'Macintosh',
+            'Device_Maker'           => 'Apple Inc',
+            'Device_Type'            => 'Desktop',
+            'Device_Pointing_Method' => 'mouse',
+            'Device_Code_Name'       => 'Macintosh',
+            'Device_Brand_Name'      => 'Apple',
+        ),
         'iPhone'   => array(
             'Device_Name'            => 'iPhone',
             'Device_Maker'           => 'Apple Inc',
@@ -808,6 +816,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         } elseif (false !== strpos($ua, 'iPhone')) {
             $device   = 'iPhone';
         }
+    } elseif (false !== strpos($ua, 'Mac OS X')) {
+        $platformNameBrowscap  = 'MacOSX';
+        $platformNameDetector  = 'Mac OS X';
+        $platformMakerBrowscap = 'Apple Inc';
+        $platformMakerDetector = 'Apple Inc';
+
+        $platformDescriptionBrowscap = 'Mac OS X';
+
+        $device = 'Macintosh';
     } elseif (false !== stripos($ua, 'ubuntu')) {
         $platformNameBrowscap  = 'Ubuntu';
         $platformNameDetector  = 'Ubuntu';
