@@ -824,6 +824,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $platformDescriptionBrowscap = 'Mac OS X';
 
+        if (preg_match('/Mac OS X (\d+[\_\.]\d+)/', $ua, $matches)) {
+            $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
+            $platformVersionDetector = str_replace('_', '.', $matches[1]);
+        }
+
         $device = 'Macintosh';
     } elseif (false !== stripos($ua, 'ubuntu')) {
         $platformNameBrowscap  = 'Ubuntu';
@@ -852,9 +857,19 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformMakerDetector = 'Linux Foundation';
         $mobileDevice          = 'false';
 
-        $platformDescriptionBrowscap = 'unknown';
+        $platformDescriptionBrowscap = 'Linux';
 
         $device = 'Linux Desktop';
+    } elseif (false !== strpos($ua, 'SymbOS')) {
+        $platformNameBrowscap  = 'SymbianOS';
+        $platformNameDetector  = 'Symbian OS';
+        $platformMakerBrowscap = 'Symbian Foundation';
+        $platformMakerDetector = 'Symbian Foundation';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'Symbian OS';
+
+        //$device = 'Linux Desktop';
     }
 
     $browserModus = 'unknown';
