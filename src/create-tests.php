@@ -850,6 +850,26 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
+    } elseif (false !== stripos($ua, 'suse')) {
+        $platformNameBrowscap  = 'Linux';
+        $platformNameDetector  = 'Suse Linux';
+        $platformMakerBrowscap = 'Linux Foundation';
+        $platformMakerDetector = 'Suse';
+        $mobileDevice          = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        $device = 'Linux Desktop';
+    } elseif (false !== strpos($ua, 'CrOS')) {
+        $platformNameBrowscap  = 'ChromeOS';
+        $platformNameDetector  = 'ChromeOS';
+        $platformMakerBrowscap = 'Google Inc';
+        $platformMakerDetector = 'Google Inc';
+        $mobileDevice          = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        $device = 'Linux Desktop';
     } elseif (false !== strpos($ua, 'Linux')) {
         $platformNameBrowscap  = 'Linux';
         $platformNameDetector  = 'Linux';
