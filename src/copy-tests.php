@@ -57,7 +57,7 @@ foreach ($files as $filename) {
         $data[$key]          = $test;
         $checks[$test['ua']] = $key;
 
-        if (file_exists($targetDirectory . $file->getFilename())) {
+        if (file_exists($targetDirectory . 'browscap-' . $file->getFilename())) {
             continue;
         }
 
@@ -66,13 +66,13 @@ foreach ($files as $filename) {
         $output .= "    '$key' => [
         'ua'         => '" . str_replace("'", "\\'", $test['ua']) . "',
         'properties' => [
-            'Browser_Name'            => '" . str_replace("'", "\\'", $test['properties']['Browser_Name']) . "',
+            'Browser_Name'            => '" . str_replace("'", "\\'", $test['properties']['Browser']) . "',
             'Browser_Type'            => '" . str_replace("'", "\\'", $test['properties']['Browser_Type']) . "',
             'Browser_Bits'            => " . str_replace("'", "\\'", $test['properties']['Browser_Bits']) . ",
             'Browser_Maker'           => '" . str_replace("'", "\\'", $test['properties']['Browser_Maker']) . "',
             'Browser_Modus'           => '" . str_replace("'", "\\'", $test['properties']['Browser_Modus']) . "',
-            'Browser_Version'         => '" . str_replace("'", "\\'", $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . str_replace("'", "\\'", $test['properties']['Platform_Name']) . "',
+            'Browser_Version'         => '" . str_replace("'", "\\'", $test['properties']['Version']) . "',
+            'Platform_Name'           => '" . str_replace("'", "\\'", $test['properties']['Platform']) . "',
             'Platform_Version'        => '" . str_replace("'", "\\'", $test['properties']['Platform_Version']) . "',
             'Platform_Bits'           => " . str_replace("'", "\\'", $test['properties']['Platform_Bits']) . ",
             'Platform_Maker'          => '" . str_replace("'", "\\'", $test['properties']['Platform_Maker']) . "',
@@ -93,7 +93,7 @@ foreach ($files as $filename) {
     
     $output .= "];\n";
     
-    file_put_contents($targetDirectory . $file->getFilename(), $output);
+    file_put_contents($targetDirectory . 'browscap-' . $file->getFilename(), $output);
 }
 
-echo "\nEs wurden $counter Tests exportiert";
+echo "\nEs wurden $counter Tests exportiert\n";
