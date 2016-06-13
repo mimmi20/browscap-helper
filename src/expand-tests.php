@@ -1,20 +1,18 @@
 <?php
-$autoloadPaths = array(
-    'vendor/autoload.php',
-    '../../autoload.php',
-);
-
-$foundVendorAutoload = false;
-foreach ($autoloadPaths as $path) {
-    if (file_exists($path)) {
-        require $path;
-        $foundVendorAutoload = true;
-        break;
-    }
-}
-
+/*******************************************************************************
+ * INIT
+ ******************************************************************************/
 ini_set('memory_limit', '-1');
-date_default_timezone_set(date_default_timezone_get());
+ini_set('max_execution_time', '-1');
+ini_set('max_input_time', '-1');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+date_default_timezone_set('Europe/Berlin');
+
+chdir(dirname(__DIR__));
+
+require 'vendor/autoload.php';
 
 $buildNumber    = time();
 $resourceFolder = 'resources/';

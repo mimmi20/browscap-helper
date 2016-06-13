@@ -14,17 +14,17 @@ chdir(dirname(__DIR__));
 
 require 'vendor/autoload.php';
 
-/*******************************************************************************
- * loading files
- ******************************************************************************/
- 
-$sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-$targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
-
-$checks  = array();
-$counter = 0;
+$checks          = [];
+$data            = [];
+$sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
 $files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+
+$logger = new Logger('browser-detector-tests');
+$logger->pushHandler(new NullHandler());
+
+$cache    = new NullStorage();
+$detector = new BrowserDetector($cache, $logger);
 
 foreach ($files as $filename) {
     $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
@@ -35,35 +35,47 @@ foreach ($files as $filename) {
     if (!$file->isFile() || $file->getExtension() !== 'php') {
         continue;
     }
-    
-    echo 'processing ' . $file->getBasename() . ' ...' . "\n";
-    
+
+    echo 'reading file ', $file->getBasename(), ' ...', PHP_EOL;
+
     $tests = require_once $file->getPathname();
-    
-    $output  = "<?php\n\nreturn [\n";
-    
+
+    $outputDetector  = "<?php\n\nreturn [\n";
+
     foreach ($tests as $key => $test) {
         if (isset($data[$key])) {
+            // Test data is duplicated for key
             echo 'Test data is duplicated for key "' . $key . '"', PHP_EOL;
+            unset($tests[$key]);
             continue;
         }
-        
+
         if (isset($checks[$test['ua']])) {
+            // UA was added more than once
             echo 'UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "'
                 . $checks[$test['ua']] . '"', PHP_EOL;
+            unset($tests[$key]);
             continue;
         }
-        
+
         $data[$key]          = $test;
         $checks[$test['ua']] = $key;
 
-        if (file_exists($targetDirectory . $file->getFilename())) {
-            continue;
+        $platformName    = str_replace("'", "\\'", $test['properties']['Platform_Name']);
+        $platformVersion = str_replace("'", "\\'", $test['properties']['Platform_Version']);
+        $platformBits    = str_replace("'", "\\'", $test['properties']['Platform_Bits']);
+        $platformMaker   = str_replace("'", "\\'", $test['properties']['Platform_Maker']);
+
+        if ('unknown' === $platformName) {
+            $result = $detector->getBrowser($key, true);
+
+            $platformName    = $result->getOs()->getName();;
+            $platformVersion = $result->getOs()->getVersion();
+            $platformBits    = $result->getOs()->getBits();
+            $platformMaker   = $result->getOs()->getMaker();;
         }
 
-        $key = "browscap-$key";
-        
-        $output .= "    '$key' => [
+        $outputDetector .= "    '$key' => [
         'ua'         => '" . str_replace("'", "\\'", $test['ua']) . "',
         'properties' => [
             'Browser_Name'            => '" . str_replace("'", "\\'", $test['properties']['Browser_Name']) . "',
@@ -72,10 +84,10 @@ foreach ($files as $filename) {
             'Browser_Maker'           => '" . str_replace("'", "\\'", $test['properties']['Browser_Maker']) . "',
             'Browser_Modus'           => '" . str_replace("'", "\\'", $test['properties']['Browser_Modus']) . "',
             'Browser_Version'         => '" . str_replace("'", "\\'", $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . str_replace("'", "\\'", $test['properties']['Platform_Name']) . "',
-            'Platform_Version'        => '" . str_replace("'", "\\'", $test['properties']['Platform_Version']) . "',
-            'Platform_Bits'           => " . str_replace("'", "\\'", $test['properties']['Platform_Bits']) . ",
-            'Platform_Maker'          => '" . str_replace("'", "\\'", $test['properties']['Platform_Maker']) . "',
+            'Platform_Name'           => '" . $platformName . "',
+            'Platform_Version'        => '" . $platformVersion . "',
+            'Platform_Bits'           => " . $platformBits . ",
+            'Platform_Maker'          => '" . $platformMaker . "',
             'Device_Name'             => '" . str_replace("'", "\\'", $test['properties']['Device_Name']) . "',
             'Device_Maker'            => '" . str_replace("'", "\\'", $test['properties']['Device_Maker']) . "',
             'Device_Type'             => '" . str_replace("'", "\\'", $test['properties']['Device_Type']) . "',
@@ -87,13 +99,10 @@ foreach ($files as $filename) {
             'RenderingEngine_Maker'   => '" . str_replace("'", "\\'", $test['properties']['RenderingEngine_Maker']) . "',
         ],
     ],\n";
-        
-        $counter++;
-    }
-    
-    $output .= "];\n";
-    
-    file_put_contents($targetDirectory . $file->getFilename(), $output);
-}
 
-echo "\nEs wurden $counter Tests exportiert";
+    }
+
+    $outputDetector .= "];\n";
+
+    file_put_contents($file->getPathname(), $outputDetector);
+}

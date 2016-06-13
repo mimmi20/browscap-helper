@@ -4,7 +4,7 @@
  ******************************************************************************/
 use Symfony\Component\Yaml\Yaml;
 
-ini_set('memory_limit', '3000M');
+ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 ini_set('max_input_time', '-1');
 ini_set('display_errors', 1);
@@ -15,8 +15,6 @@ date_default_timezone_set('Europe/Berlin');
 chdir(dirname(__DIR__));
 
 require 'vendor/autoload.php';
-
-ini_set('memory_limit', '-1');
 
 $issue = 994;
 
