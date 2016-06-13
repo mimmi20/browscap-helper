@@ -890,6 +890,16 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformDescriptionBrowscap = 'Symbian OS';
 
         //$device = 'Linux Desktop';
+    } elseif (false !== strpos($ua, 'hpwOS')) {
+        $platformNameBrowscap  = 'webOS';
+        $platformNameDetector  = 'webOS';
+        $platformMakerBrowscap = 'HP';
+        $platformMakerDetector = 'HP';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'webOS';
+
+        //$device = 'Linux Desktop';
     }
 
     $browserModus = 'unknown';
