@@ -20,11 +20,11 @@ $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
 $files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
 
-$logger = new Logger('browser-detector-tests');
-$logger->pushHandler(new NullHandler());
+$logger = new \Monolog\Logger('browser-detector-tests');
+$logger->pushHandler(new \Monolog\Handler\NullHandler());
 
-$cache    = new NullStorage();
-$detector = new BrowserDetector($cache, $logger);
+$cache    = new \WurflCache\Adapter\NullStorage();
+$detector = new \BrowserDetector\BrowserDetector($cache, $logger);
 
 foreach ($files as $filename) {
     $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
@@ -69,10 +69,10 @@ foreach ($files as $filename) {
         if ('unknown' === $platformName) {
             $result = $detector->getBrowser($key, true);
 
-            $platformName    = $result->getOs()->getName();;
+            $platformName    = $result->getOs()->getName();
             $platformVersion = $result->getOs()->getVersion();
             $platformBits    = $result->getOs()->getBits();
-            $platformMaker   = $result->getOs()->getMaker();;
+            $platformMaker   = $result->getOs()->getManufacturer();
         }
 
         $outputDetector .= "    '$key' => [
