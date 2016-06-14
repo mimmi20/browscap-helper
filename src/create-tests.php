@@ -2477,6 +2477,8 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         if (preg_match('/Dalvik (\d+\.\d+)/', $ua, $matches)) {
             $browserVersion = $matches[1];
+        } elseif (preg_match('/Dalvik\/(\d+\.\d+)/', $ua, $matches)) {
+            $browserVersion = $matches[1];
         }
 
         $lite = false;
