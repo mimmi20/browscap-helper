@@ -22,6 +22,8 @@ $issue = 994;
  * loading files
  ******************************************************************************/
 
+echo 'reading files from browscap ...', PHP_EOL;
+
 $browscapIssueDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
 $browscapIssueIterator  = new \RecursiveDirectoryIterator($browscapIssueDirectory);
 $checks   = array();
@@ -48,6 +50,8 @@ foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
     }
 }
 
+echo 'reading files from browser-detector ...', PHP_EOL;
+
 $detectorIssueDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 $detectorIssueIterator  = new \RecursiveDirectoryIterator($detectorIssueDirectory);
 
@@ -73,6 +77,8 @@ foreach (new \RecursiveIteratorIterator($detectorIssueIterator) as $file) {
     }
 }
 
+echo 'reading new files ...', PHP_EOL;
+
 $sourcesDirectory = 'sources/';
 $sourcesIterator  = new \RecursiveDirectoryIterator($sourcesDirectory);
 $counter          = 0;
@@ -82,6 +88,8 @@ foreach (new \RecursiveIteratorIterator($sourcesIterator) as $file) {
     if (!$file->isFile()) {
         continue;
     }
+
+    echo 'checking file ', $file->getBasename(), ' ...', PHP_EOL;
 
     $fileContents = [];
 
@@ -104,6 +112,8 @@ foreach (new \RecursiveIteratorIterator($sourcesIterator) as $file) {
     if (empty($fileContents)) {
         continue;
     }
+
+    echo 'parsing file ', $file->getBasename(), ' ...', PHP_EOL;
 
     $counter += parseFile($fileContents, $file->getBasename(), $checks);
 }
