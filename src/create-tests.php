@@ -2500,10 +2500,10 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $minVersion = (isset($v[1]) ? $v[1] : '0');
 
     $outputBrowscap .= "    'issue-$issue-$numberBrowscap' => [
-        'ua' => '" . str_replace("'", "\\'", $ua) . "',
+        'ua' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $ua) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace("'", "\\'", $browserNameBrowscap) . "',
+            'Browser' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $browserNameBrowscap) . "',
             'Browser_Type' => '$browserType',
             'Browser_Bits' => '$browserBits',
             'Browser_Maker' => '$browserMaker',
@@ -2556,9 +2556,9 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     ],\n";
 
     $outputDetector .= "    'browscap-issue-$issue-$counter' => [
-        'ua' => '" . str_replace("'", "\\'", $ua) . "',
+        'ua' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $ua) . "',
         'properties' => [
-            'Browser_Name'            => '" . str_replace("'", "\\'", $browserNameDetector) . "',
+            'Browser_Name'            => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $browserNameDetector) . "',
             'Browser_Type'            => '$browserType',
             'Browser_Bits'            => $browserBits,
             'Browser_Maker'           => '$browserMaker',
