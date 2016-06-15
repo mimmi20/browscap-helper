@@ -61,18 +61,44 @@ foreach ($files as $filename) {
         $data[$key]          = $test;
         $checks[$test['ua']] = $key;
 
-        $platformName    = str_replace("'", "\\'", $test['properties']['Platform_Name']);
-        $platformVersion = str_replace("'", "\\'", $test['properties']['Platform_Version']);
-        $platformBits    = str_replace("'", "\\'", $test['properties']['Platform_Bits']);
-        $platformMaker   = str_replace("'", "\\'", $test['properties']['Platform_Maker']);
+        $result = $detector->getBrowser($test['ua']);
 
+        $platformName    = $test['properties']['Platform_Name'];
+        $platformVersion = $test['properties']['Platform_Version'];
+        $platformBits    = $test['properties']['Platform_Bits'];
+        $platformMaker   = $test['properties']['Platform_Maker'];
+
+        // rewrite undetected platform properties
         if ('unknown' === $platformName) {
-            $result = $detector->getBrowser($key, true);
+            echo 'platform name for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
 
             $platformName    = $result->getOs()->getName();
-            $platformVersion = $result->getOs()->getVersion();
-            $platformBits    = $result->getOs()->getBits();
-            $platformMaker   = $result->getOs()->getManufacturer();
+        }
+
+        $detectVersion = $result->getOs()->getVersion();
+
+        if ('unknown' === $platformVersion) {
+            echo 'platform version for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+
+            $platformVersion = $detectVersion;
+        } elseif (strlen($detectVersion) > strlen($platformVersion)
+            && substr($detectVersion, 0, strlen($platformVersion)) === $platformVersion
+        ) {
+            echo 'platform version for UA "' . $test['ua'] . '" is incomplete, rewriting', PHP_EOL;
+
+            $platformVersion = $detectVersion;
+        }
+
+        if ('unknown' === $platformBits) {
+            echo 'platform bits for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+
+            $platformBits = $result->getOs()->getBits();
+        }
+
+        if ('unknown' === $platformMaker) {
+            echo 'platform maker for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+
+            $platformMaker = $result->getOs()->getManufacturer();
         }
 
         $outputDetector .= "    '$key' => [
@@ -84,10 +110,10 @@ foreach ($files as $filename) {
             'Browser_Maker'           => '" . str_replace("'", "\\'", $test['properties']['Browser_Maker']) . "',
             'Browser_Modus'           => '" . str_replace("'", "\\'", $test['properties']['Browser_Modus']) . "',
             'Browser_Version'         => '" . str_replace("'", "\\'", $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . $platformName . "',
-            'Platform_Version'        => '" . $platformVersion . "',
-            'Platform_Bits'           => " . $platformBits . ",
-            'Platform_Maker'          => '" . $platformMaker . "',
+            'Platform_Name'           => '" . str_replace("'", "\\'", $platformName) . "',
+            'Platform_Version'        => '" . str_replace("'", "\\'", $platformVersion) . "',
+            'Platform_Bits'           => " . str_replace("'", "\\'", $platformBits) . ",
+            'Platform_Maker'          => '" . str_replace("'", "\\'", $platformMaker) . "',
             'Device_Name'             => '" . str_replace("'", "\\'", $test['properties']['Device_Name']) . "',
             'Device_Maker'            => '" . str_replace("'", "\\'", $test['properties']['Device_Maker']) . "',
             'Device_Type'             => '" . str_replace("'", "\\'", $test['properties']['Device_Type']) . "',
