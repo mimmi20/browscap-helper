@@ -14,17 +14,17 @@ chdir(dirname(__DIR__));
 
 require 'vendor/autoload.php';
 
-$checks          = [];
-$data            = [];
-$sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
-
-$files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
-
 $logger = new \Monolog\Logger('browser-detector-tests');
 $logger->pushHandler(new \Monolog\Handler\NullHandler());
 
 $cache    = new \WurflCache\Adapter\NullStorage();
 $detector = new \BrowserDetector\BrowserDetector($cache, $logger);
+
+$checks          = [];
+$data            = [];
+$sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
+
+$files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
 
 foreach ($files as $filename) {
     $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
@@ -103,7 +103,7 @@ foreach ($files as $filename) {
         } elseif (strlen($detectVersion) > strlen($platformVersion)
             && substr($detectVersion, 0, strlen($platformVersion)) === $platformVersion
         ) {
-            echo 'platform version for UA "' . $test['ua'] . '" is incomplete, rewriting', PHP_EOL;
+            echo '["' . $key . '"] platform version for UA "' . $test['ua'] . '" is incomplete, rewriting', PHP_EOL;
 
             $platformVersion = $detectVersion;
         }
@@ -148,6 +148,8 @@ foreach ($files as $filename) {
     }
 
     $outputDetector .= "];\n";
+
+    echo 'writing file ', $file->getBasename(), ' ...', PHP_EOL;
 
     file_put_contents($file->getPathname(), $outputDetector);
 }

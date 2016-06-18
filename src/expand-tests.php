@@ -155,5 +155,8 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
     $content = str_replace("\n    )", "\n        )", $content);
     $content = str_replace("\n  )", "\n    )", $content);
     $content = str_replace("array (", 'array(', $content);
+
+    echo 'writing file ', $file->getBasename(), ' ...', PHP_EOL;
+
     file_put_contents($file->getPathname(), $content);
 }

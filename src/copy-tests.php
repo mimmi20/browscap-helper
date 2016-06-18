@@ -93,6 +93,8 @@ foreach ($files as $filename) {
 
     $output .= "];\n";
 
+    echo 'writing file ', $file->getBasename(), ' ...', PHP_EOL;
+
     file_put_contents($targetDirectory . 'browscap-' . $file->getFilename(), $output);
 }
 
