@@ -63,14 +63,33 @@ foreach ($files as $filename) {
 
         $result = $detector->getBrowser($test['ua']);
 
-        $platformName    = $test['properties']['Platform_Name'];
-        $platformVersion = $test['properties']['Platform_Version'];
-        $platformBits    = $test['properties']['Platform_Bits'];
-        $platformMaker   = $test['properties']['Platform_Maker'];
+        if (isset($test['properties']['Platform_Name'])) {
+            $platformName = $test['properties']['Platform_Name'];
+        } else {
+            $platformName = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Version'])) {
+            $platformVersion = $test['properties']['Platform_Version'];
+        } else {
+            $platformVersion = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Bits'])) {
+            $platformBits = $test['properties']['Platform_Bits'];
+        } else {
+            $platformBits = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Maker'])) {
+            $platformMaker = $test['properties']['Platform_Maker'];
+        } else {
+            $platformMaker = 'unknown';
+        }
 
         // rewrite undetected platform properties
         if ('unknown' === $platformName) {
-            echo 'platform name for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
 
             $platformName    = $result->getOs()->getName();
         }
@@ -78,7 +97,7 @@ foreach ($files as $filename) {
         $detectVersion = $result->getOs()->getVersion();
 
         if ('unknown' === $platformVersion) {
-            echo 'platform version for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+            echo '["' . $key . '"] platform version for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
 
             $platformVersion = $detectVersion;
         } elseif (strlen($detectVersion) > strlen($platformVersion)
@@ -90,39 +109,39 @@ foreach ($files as $filename) {
         }
 
         if ('unknown' === $platformBits) {
-            echo 'platform bits for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+            echo '["' . $key . '"] platform bits for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
 
             $platformBits = $result->getOs()->getBits();
         }
 
         if ('unknown' === $platformMaker) {
-            echo 'platform maker for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
+            echo '["' . $key . '"] platform maker for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
 
             $platformMaker = $result->getOs()->getManufacturer();
         }
 
         $outputDetector .= "    '$key' => [
-        'ua'         => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['ua']) . "',
+        'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
         'properties' => [
-            'Browser_Name'            => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Browser_Name']) . "',
-            'Browser_Type'            => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Browser_Type']) . "',
-            'Browser_Bits'            => " . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Browser_Bits']) . ",
-            'Browser_Maker'           => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Browser_Maker']) . "',
-            'Browser_Modus'           => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Browser_Modus']) . "',
-            'Browser_Version'         => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $platformName) . "',
-            'Platform_Version'        => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $platformVersion) . "',
-            'Platform_Bits'           => " . str_replace(["'", '\\'], ["\\'", '\\\\'], $platformBits) . ",
-            'Platform_Maker'          => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $platformMaker) . "',
-            'Device_Name'             => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Device_Name']) . "',
-            'Device_Maker'            => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Device_Maker']) . "',
-            'Device_Type'             => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Device_Type']) . "',
-            'Device_Pointing_Method'  => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Device_Pointing_Method']) . "',
-            'Device_Code_Name'        => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Device_Code_Name']) . "',
-            'Device_Brand_Name'       => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['Device_Brand_Name']) . "',
-            'RenderingEngine_Name'    => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['RenderingEngine_Name']) . "',
-            'RenderingEngine_Version' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['RenderingEngine_Version']) . "',
-            'RenderingEngine_Maker'   => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $test['properties']['RenderingEngine_Maker']) . "',
+            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Name']) . "',
+            'Browser_Type'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Type']) . "',
+            'Browser_Bits'            => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Bits']) . ",
+            'Browser_Maker'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Maker']) . "',
+            'Browser_Modus'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Modus']) . "',
+            'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Version']) . "',
+            'Platform_Name'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformName) . "',
+            'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformVersion) . "',
+            'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformBits) . ",
+            'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformMaker) . "',
+            'Device_Name'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Name']) . "',
+            'Device_Maker'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Maker']) . "',
+            'Device_Type'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Type']) . "',
+            'Device_Pointing_Method'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Pointing_Method']) . "',
+            'Device_Code_Name'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Code_Name']) . "',
+            'Device_Brand_Name'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Brand_Name']) . "',
+            'RenderingEngine_Name'    => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Name']) . "',
+            'RenderingEngine_Version' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Version']) . "',
+            'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
         ],
     ],\n";
 

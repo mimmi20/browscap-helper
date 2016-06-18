@@ -392,7 +392,36 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $lite     = true;
     $standard = true;
 
-    if (false !== strpos($ua, 'Linux; Android')) {
+    if (false !== strpos($ua, 'Windows Phone')) {
+        $platformNameBrowscap  = 'WinPhone';
+        $platformNameDetector  = 'Windows Phone OS';
+        $platformMakerBrowscap = 'Microsoft Corporation';
+        $platformMakerDetector = 'Microsoft Corporation';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'unknown';
+    } elseif (false !== strpos($ua, 'wds')) {
+        $platformNameBrowscap  = 'Windows Phone OS';
+        $platformNameDetector  = 'Windows Phone OS';
+        $platformMakerBrowscap = 'Microsoft Corporation';
+        $platformMakerDetector = 'Microsoft Corporation';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        if (preg_match('/wds (\d+\.\d+)/', $ua, $matches)) {
+            $platformVersionBrowscap = $matches[1];
+            $platformVersionDetector = $matches[1];
+        }
+    } elseif (false !== strpos($ua, 'Tizen')) {
+        $platformNameBrowscap  = 'Tizen';
+        $platformNameDetector  = 'Tizen';
+        $platformMakerBrowscap = 'unknown';
+        $platformMakerDetector = 'unknown';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'unknown';
+    } elseif (false !== strpos($ua, 'Linux; Android')) {
         $platformNameBrowscap  = 'Android';
         $platformNameDetector  = 'Android';
         $platformMakerBrowscap = 'Google Inc';
@@ -439,35 +468,6 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $mobileDevice          = 'true';
 
         $platformDescriptionBrowscap = 'Android OS';
-    } elseif (false !== strpos($ua, 'wds')) {
-        $platformNameBrowscap  = 'Windows Phone OS';
-        $platformNameDetector  = 'Windows Phone OS';
-        $platformMakerBrowscap = 'Microsoft Corporation';
-        $platformMakerDetector = 'Microsoft Corporation';
-        $mobileDevice          = 'true';
-
-        $platformDescriptionBrowscap = 'unknown';
-
-        if (preg_match('/wds (\d+\.\d+)/', $ua, $matches)) {
-            $platformVersionBrowscap = $matches[1];
-            $platformVersionDetector = $matches[1];
-        }
-    } elseif (false !== strpos($ua, 'Windows Phone')) {
-        $platformNameBrowscap  = 'WinPhone';
-        $platformNameDetector  = 'Windows Phone OS';
-        $platformMakerBrowscap = 'Microsoft Corporation';
-        $platformMakerDetector = 'Microsoft Corporation';
-        $mobileDevice          = 'true';
-
-        $platformDescriptionBrowscap = 'unknown';
-    } elseif (false !== strpos($ua, 'Tizen')) {
-        $platformNameBrowscap  = 'Tizen';
-        $platformNameDetector  = 'Tizen';
-        $platformMakerBrowscap = 'unknown';
-        $platformMakerDetector = 'unknown';
-        $mobileDevice          = 'true';
-
-        $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'OpenBSD')) {
         $platformNameBrowscap = 'OpenBSD';
         $platformNameDetector = 'OpenBSD';
@@ -525,11 +525,47 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         $device = 'Windows Desktop';
+    } elseif (false !== strpos($ua, 'Windows NT 6.3') && false !== strpos($ua, 'ARM')) {
+        $platformNameBrowscap    = 'Win8.1';
+        $platformNameDetector    = 'Windows RT';
+        $platformVersionBrowscap = '6.3';
+        $platformVersionDetector = '8.1';
+        $platformMakerBrowscap   = 'Microsoft Corporation';
+        $platformMakerDetector   = 'Microsoft Corporation';
+        $mobileDevice            = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        if ($platformBits === 64) {
+            $win64 = true;
+        } else {
+            $win32 = true;
+        }
+
+        $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.3')) {
         $platformNameBrowscap    = 'Win8.1';
         $platformNameDetector    = 'Windows';
         $platformVersionBrowscap = '6.3';
         $platformVersionDetector = '8.1';
+        $platformMakerBrowscap   = 'Microsoft Corporation';
+        $platformMakerDetector   = 'Microsoft Corporation';
+        $mobileDevice            = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        if ($platformBits === 64) {
+            $win64 = true;
+        } else {
+            $win32 = true;
+        }
+
+        $device = 'Windows Desktop';
+    } elseif (false !== strpos($ua, 'Windows NT 6.2') && false !== strpos($ua, 'ARM')) {
+        $platformNameBrowscap    = 'Win8';
+        $platformNameDetector    = 'Windows RT';
+        $platformVersionBrowscap = '6.2';
+        $platformVersionDetector = '8';
         $platformMakerBrowscap   = 'Microsoft Corporation';
         $platformMakerDetector   = 'Microsoft Corporation';
         $mobileDevice            = 'false';
@@ -2500,10 +2536,10 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $minVersion = (isset($v[1]) ? $v[1] : '0');
 
     $outputBrowscap .= "    'issue-$issue-$numberBrowscap' => [
-        'ua' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $ua) . "',
+        'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $browserNameBrowscap) . "',
+            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browserNameBrowscap) . "',
             'Browser_Type' => '$browserType',
             'Browser_Bits' => '$browserBits',
             'Browser_Maker' => '$browserMaker',
@@ -2556,9 +2592,9 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     ],\n";
 
     $outputDetector .= "    'browscap-issue-$issue-$counter' => [
-        'ua' => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $ua) . "',
+        'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
         'properties' => [
-            'Browser_Name'            => '" . str_replace(["'", '\\'], ["\\'", '\\\\'], $browserNameDetector) . "',
+            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browserNameDetector) . "',
             'Browser_Type'            => '$browserType',
             'Browser_Bits'            => $browserBits,
             'Browser_Maker'           => '$browserMaker',
