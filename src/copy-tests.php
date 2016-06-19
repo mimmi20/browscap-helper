@@ -21,7 +21,7 @@ require 'vendor/autoload.php';
 $sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
 $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
-$checks  = array();
+$checks  = [];
 $counter = 0;
 
 $files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
@@ -88,7 +88,7 @@ foreach ($files as $filename) {
         ],
     ],\n";
 
-        $counter++;
+        ++$counter;
     }
 
     $output .= "];\n";

@@ -46,20 +46,18 @@ $writerCollection        = $writerCollectionFactory->createCollection($logger, $
 $buildGenerator
     ->setLogger($logger)
     ->setCollectionCreator(new \Browscap\Helper\CollectionCreator())
-    ->setWriterCollection($writerCollection)
-;
+    ->setWriterCollection($writerCollection);
 
 $buildGenerator->run($buildNumber, false);
 
 echo 'creating cache ...', PHP_EOL;
 
-$cache = new \WurflCache\Adapter\File(array(\WurflCache\Adapter\File::DIR => $cacheFolder));
+$cache = new \WurflCache\Adapter\File([\WurflCache\Adapter\File::DIR => $cacheFolder]);
 // Now, load an INI file into BrowscapPHP\Browscap for testing the UAs
 $browscap = new \BrowscapPHP\Browscap();
 $browscap
     ->setCache($cache)
-    ->setLogger($logger)
-;
+    ->setLogger($logger);
 
 $browscap->getCache()->flush();
 $browscap->convertFile($buildFolder . '/full_php_browscap.ini');
@@ -74,15 +72,15 @@ $properties  = $json['userAgents'][0]['properties'];
 
 unset($properties['RenderingEngine_Description']);
 
-$data            = array();
-$checks          = array();
+$data            = [];
+$checks          = [];
 $sourceDirectory = 'tests/fixtures/issues/';
 
 $iterator = new \RecursiveDirectoryIterator($sourceDirectory);
 
 foreach (new \RecursiveIteratorIterator($iterator) as $file) {
     /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() != 'php') {
+    if (!$file->isFile() || $file->getExtension() !== 'php') {
         continue;
     }
 
@@ -112,12 +110,12 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
         $data[$key]  = $test;
         $checks[$ua] = $key;
 
-        $newTest = array(
+        $newTest = [
             'ua'         => $ua,
             'properties' => $properties,
             'lite'       => (array_key_exists('lite', $test) ? $test['lite'] : true),
             'standard'   => (array_key_exists('standard', $test) ? $test['standard'] : true),
-        );
+        ];
 
         $actualProps = (array) $browscap->getBrowser($ua);
 
@@ -154,7 +152,7 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
     $content = str_replace("\n  '", "\n    '", $content);
     $content = str_replace("\n    )", "\n        )", $content);
     $content = str_replace("\n  )", "\n    )", $content);
-    $content = str_replace("array (", 'array(', $content);
+    $content = str_replace('array (', 'array(', $content);
 
     echo 'writing file ', $file->getBasename(), ' ...', PHP_EOL;
 

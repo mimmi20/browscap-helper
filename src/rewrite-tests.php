@@ -144,7 +144,6 @@ foreach ($files as $filename) {
             'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
         ],
     ],\n";
-
     }
 
     $outputDetector .= "];\n";

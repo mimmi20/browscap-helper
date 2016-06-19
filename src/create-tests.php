@@ -26,11 +26,11 @@ echo 'reading files from browscap ...', PHP_EOL;
 
 $browscapIssueDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
 $browscapIssueIterator  = new \RecursiveDirectoryIterator($browscapIssueDirectory);
-$checks   = array();
+$checks                 = [];
 
 foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
     /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() != 'php') {
+    if (!$file->isFile() || $file->getExtension() !== 'php') {
         continue;
     }
 
@@ -45,7 +45,7 @@ foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
             continue;
         }
 
-        $data[$key]       = $test;
+        $data[$key]          = $test;
         $checks[$test['ua']] = $key;
     }
 }
@@ -57,7 +57,7 @@ $detectorIssueIterator  = new \RecursiveDirectoryIterator($detectorIssueDirector
 
 foreach (new \RecursiveIteratorIterator($detectorIssueIterator) as $file) {
     /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() != 'php') {
+    if (!$file->isFile() || $file->getExtension() !== 'php') {
         continue;
     }
 
@@ -72,7 +72,7 @@ foreach (new \RecursiveIteratorIterator($detectorIssueIterator) as $file) {
             continue;
         }
 
-        $data[$key]       = $test;
+        $data[$key]          = $test;
         $checks[$test['ua']] = $key;
     }
 }
@@ -122,7 +122,6 @@ echo "\nEs wurden $counter Tests exportiert\n";
 
 function parseFile(array $fileContents = [], $issue = '', &$checks = [])
 {
-
     $outputBrowscap = "<?php\n\nreturn [\n";
     $outputDetector = "<?php\n\nreturn [\n";
     $counter        = 0;
@@ -154,8 +153,8 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 {
     $a              = intval(1 + ($i - 702) / 702);
     $numberBrowscap = ($i >= 702 ? chr(65 + intval(($i - 702) / 702)) : '') . ($i >= 26 ? chr(
-            65 + intval(($i - 26 - ($i >= 702 ? (702 * $a - 26) : 0)) / 26)
-        ) : '') . chr(65 + ($i % 26));
+        65 + intval(($i - 26 - ($i >= 702 ? (702 * $a - 26) : 0)) / 26)
+    ) : '') . chr(65 + ($i % 26));
     echo "handle useragent $i ...\n";
 
     $browserNameBrowscap = 'Default Browser';
@@ -165,13 +164,13 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $browserMaker        = 'unknown';
     $browserVersion      = '0.0';
 
-    $platformNameBrowscap    = 'unknown';
-    $platformNameDetector    = 'unknown';
-    $platformVersionBrowscap = 'unknown';
-    $platformVersionDetector = 'unknown';
-    $platformBits            = 32;
-    $platformMakerBrowscap   = 'unknown';
-    $platformMakerDetector   = 'unknown';
+    $platformNameBrowscap        = 'unknown';
+    $platformNameDetector        = 'unknown';
+    $platformVersionBrowscap     = 'unknown';
+    $platformVersionDetector     = 'unknown';
+    $platformBits                = 32;
+    $platformMakerBrowscap       = 'unknown';
+    $platformMakerDetector       = 'unknown';
     $platformDescriptionBrowscap = 'unknown';
 
     $engineName    = 'unknown';
@@ -231,160 +230,160 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $applets     = 'true';
     }
 
-    $devices = array(
-        ''                => array(
+    $devices = [
+        ''                => [
             'Device_Name'            => 'unknown',
             'Device_Maker'           => 'unknown',
             'Device_Type'            => 'unknown',
             'Device_Pointing_Method' => 'unknown',
             'Device_Code_Name'       => 'unknown',
             'Device_Brand_Name'      => 'unknown',
-        ),
-        'Windows Desktop' => array(
+        ],
+        'Windows Desktop' => [
             'Device_Name'            => 'Windows Desktop',
             'Device_Maker'           => 'Various',
             'Device_Type'            => 'Desktop',
             'Device_Pointing_Method' => 'mouse',
             'Device_Code_Name'       => 'Windows Desktop',
             'Device_Brand_Name'      => 'unknown',
-        ),
-        'Linux Desktop'   => array(
+        ],
+        'Linux Desktop'   => [
             'Device_Name'            => 'Linux Desktop',
             'Device_Maker'           => 'Various',
             'Device_Type'            => 'Desktop',
             'Device_Pointing_Method' => 'mouse',
             'Device_Code_Name'       => 'Linux Desktop',
             'Device_Brand_Name'      => 'unknown',
-        ),
-        'Macintosh'   => array(
+        ],
+        'Macintosh'   => [
             'Device_Name'            => 'Macintosh',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Desktop',
             'Device_Pointing_Method' => 'mouse',
             'Device_Code_Name'       => 'Macintosh',
             'Device_Brand_Name'      => 'Apple',
-        ),
-        'iPhone'   => array(
+        ],
+        'iPhone'   => [
             'Device_Name'            => 'iPhone',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Mobile Phone',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'iPhone',
             'Device_Brand_Name'      => 'Apple',
-        ),
-        'iPad'   => array(
+        ],
+        'iPad'   => [
             'Device_Name'            => 'iPad',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'iPad',
             'Device_Brand_Name'      => 'Apple',
-        ),
-        'iPod'   => array(
+        ],
+        'iPod'   => [
             'Device_Name'            => 'iPod',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Mobile Device',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'iPod',
             'Device_Brand_Name'      => 'Apple',
-        ),
-        'AT10-A'   => array(
+        ],
+        'AT10-A'   => [
             'Device_Name'            => 'eXcite Pure',
             'Device_Maker'           => 'Toshiba',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'AT10-A',
             'Device_Brand_Name'      => 'Toshiba',
-        ),
-        'SM-T235'   => array(
+        ],
+        'SM-T235'   => [
             'Device_Name'            => 'Galaxy Tab 4 7.0 WiFi + LTE',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'SM-T235',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-        'SM-T705'   => array(
+        ],
+        'SM-T705'   => [
             'Device_Name'            => 'Galaxy Tab S 8.4 LTE',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'SM-T705',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-        'SM-T2105'   => array(
+        ],
+        'SM-T2105'   => [
             'Device_Name'            => 'Galaxy Tab 3 Kids',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'SM-T2105',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-        'SM-N900A'   => array(
+        ],
+        'SM-N900A'   => [
             'Device_Name'            => 'Galaxy Note 3 LTE (AT&T)',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'SM-N900A',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-        'S5000-F'   => array(
+        ],
+        'S5000-F'   => [
             'Device_Name'            => 'IdeaTab S5000-F',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'S5000-F',
             'Device_Brand_Name'      => 'Lenovo',
-        ),
-        'S5000-H'   => array(
+        ],
+        'S5000-H'   => [
             'Device_Name'            => 'IdeaTab S5000-H',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'S5000-H',
             'Device_Brand_Name'      => 'Lenovo',
-        ),
-        'A7600-H'   => array(
+        ],
+        'A7600-H'   => [
             'Device_Name'            => 'A10-70 A7600 Wi-Fi + 3G',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'A7600-H',
             'Device_Brand_Name'      => 'Lenovo',
-        ),
-        'LG-L160L'   => array(
+        ],
+        'LG-L160L'   => [
             'Device_Name'            => 'Optimus LTE2',
             'Device_Maker'           => 'LG',
             'Device_Type'            => 'Mobile Phone',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'L160L',
             'Device_Brand_Name'      => 'LG',
-        ),
-        'GT-S5830'   => array(
+        ],
+        'GT-S5830'   => [
             'Device_Name'            => 'Galaxy Ace',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'GT-S5830',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-        'GT-S5830i'   => array(
+        ],
+        'GT-S5830i'   => [
             'Device_Name'            => 'Galaxy Ace',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'GT-S5830i',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-        'GT-S5830c'   => array(
+        ],
+        'GT-S5830c'   => [
             'Device_Name'            => 'Galaxy Ace',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
             'Device_Pointing_Method' => 'touchscreen',
             'Device_Code_Name'       => 'GT-S5830C',
             'Device_Brand_Name'      => 'Samsung',
-        ),
-    );
+        ],
+    ];
 
     $win32    = false;
     $win64    = false;
@@ -1532,9 +1531,9 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'Safari') && false !== strpos($ua, 'Version') && false !== strpos(
-            $ua,
-            'Tizen'
-        )
+        $ua,
+        'Tizen'
+    )
     ) {
         $browserNameBrowscap = 'Samsung WebView';
         $browserNameDetector = 'Samsung WebView';
@@ -1712,7 +1711,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $browserVersion = $matches[1];
         }
 
-        if ($browserVersion != '4.0') {
+        if ($browserVersion !== '4.0') {
             $lite = false;
         }
     } elseif (false !== strpos($ua, 'BlackBerry') && false !== strpos($ua, 'Version')) {
