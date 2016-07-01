@@ -50,33 +50,6 @@ foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
     }
 }
 
-echo 'reading files from browser-detector ...', PHP_EOL;
-
-$detectorIssueDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
-$detectorIssueIterator  = new \RecursiveDirectoryIterator($detectorIssueDirectory);
-
-foreach (new \RecursiveIteratorIterator($detectorIssueIterator) as $file) {
-    /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() !== 'php') {
-        continue;
-    }
-
-    $tests = require_once $file->getPathname();
-
-    foreach ($tests as $key => $test) {
-        if (isset($data[$key])) {
-            continue;
-        }
-
-        if (isset($checks[$test['ua']])) {
-            continue;
-        }
-
-        $data[$key]          = $test;
-        $checks[$test['ua']] = $key;
-    }
-}
-
 echo 'reading new files ...', PHP_EOL;
 
 $sourcesDirectory = 'sources/';
