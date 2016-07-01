@@ -14,14 +14,13 @@ chdir(dirname(__DIR__));
 
 require 'vendor/autoload.php';
 
-/*******************************************************************************
- * loading files
- ******************************************************************************/
+$logger = new \Monolog\Logger('browser-detector-tests');
+$logger->pushHandler(new \Monolog\Handler\NullHandler());
 
-$sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-$targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
+$cache    = new \WurflCache\Adapter\NullStorage();
+$detector = new \BrowserDetector\BrowserDetector($cache, $logger);
 
-$counter = 0;
+$sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
 $files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
 
@@ -35,41 +34,33 @@ foreach ($files as $filename) {
         continue;
     }
 
-    echo 'processing ' . $file->getBasename() . ' ...' . "\n";
-
-    $oldname = $file->getBasename('.php');
-    $newname = 'browscap-' . $oldname;
-
-    if (preg_match('/issue\-(\d+)/', $oldname, $matches)) {
-        $newname = sprintf('browscap-issue-%1$05d', (int) $matches[1]);
-    }
+    echo 'reading file ', $file->getBasename(), ' ...', PHP_EOL;
 
     $tests  = require_once $file->getPathname();
     $chunks = array_chunk($tests, 100, true);
+
+    if (count($chunks) <= 1) {
+        continue;
+    }
+
+    echo 'removing file ', $file->getBasename(), ' ...', PHP_EOL;
+
+    //rename($file->getPathname(), $file->getPathname() . '.old');
+    unlink($file->getPathname());
+
+    echo 'splitting file ', $file->getBasename(), ' ...', PHP_EOL;
 
     foreach ($chunks as $chunkId => $chunk) {
         if (!count($chunk)) {
             continue;
         }
 
-        if (count($chunks) <= 1) {
-            $chunkNumber = '';
-        } else {
-            $chunkNumber = '-' . sprintf('%1$05d', (int)$chunkId);
-        }
-
-        $targetFilename = $newname . $chunkNumber . '.php';
-
-        if (file_exists($targetDirectory . $targetFilename)) {
-            continue;
-        }
-
-        $output = "<?php\n\nreturn [\n";
+        $outputDetector  = "<?php\n\nreturn [\n";
 
         foreach ($chunk as $key => $test) {
             $result = $detector->getBrowser($test['ua']);
 
-            $outputDetector .= "    'browscap-$key' => [
+            $outputDetector .= "    '$key' => [
             'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
             'properties' => [
                 'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Name']) . "',
@@ -93,19 +84,18 @@ foreach ($files as $filename) {
                 'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
             ],
         ],\n";
-
-            ++$counter;
         }
 
-        $output .= "];\n";
+        $outputDetector .= "];\n";
 
-        echo 'writing file ', $targetFilename, ' ...', PHP_EOL;
+        $basename    = $file->getBasename('.php');
+        $chunkNumber = sprintf('%1$05d', (int) $chunkId);
+
+        echo 'writing file ', $basename, '-', $chunkNumber, '.php', ' ...', PHP_EOL;
 
         file_put_contents(
-            $targetDirectory . $targetFilename,
-            $output
+            $file->getPath() . '/' . $basename . '-' . $chunkNumber . '.php',
+            $outputDetector
         );
     }
 }
-
-echo "\nEs wurden $counter Tests exportiert\n";
