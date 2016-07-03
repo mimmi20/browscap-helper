@@ -144,13 +144,13 @@ foreach ($files as $filename) {
             'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
         ],
     ],\n";
-
-        $outputDetector .= "];\n";
-
-        $basename = $file->getBasename();
-
-        echo 'writing file ', $basename, ' ...', PHP_EOL;
-
-        file_put_contents($file->getPath() . '/' . $basename, $outputDetector);
     }
+
+    $outputDetector .= "];\n";
+
+    $basename = $file->getBasename();
+
+    echo 'writing file ', $basename, ' ...', PHP_EOL;
+
+    file_put_contents($file->getPath() . '/' . $basename, $outputDetector);
 }

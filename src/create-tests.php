@@ -2563,7 +2563,10 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         'standard' => " . ($standard ? 'true' : 'false') . ",
     ],\n";
 
-    $outputDetector .= "    'browscap-issue-$issue-$counter' => [
+    $formatedIssue   = sprintf('%1$05d', (int) $issue);
+    $formatedCounter = sprintf('%1$05d', (int) $counter);
+
+    $outputDetector .= "    'browscap-issue-$formatedIssue-$formatedCounter' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
         'properties' => [
             'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browserNameDetector) . "',
