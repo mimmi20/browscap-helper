@@ -40,6 +40,12 @@ foreach ($files as $filename) {
 
     $tests = require_once $file->getPathname();
 
+    if (empty($tests)) {
+        unlink($file->getPathname());
+
+        continue;
+    }
+
     $outputDetector  = "<?php\n\nreturn [\n";
 
     foreach ($tests as $key => $test) {
