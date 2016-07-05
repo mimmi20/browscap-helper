@@ -159,7 +159,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
     if (false !== strpos($ua, 'Chrome')) {
         if (preg_match('/Chrome\/(\d+\.\d+)/', $ua, $matches)) {
-            $chromeVersion = $matches[1];
+            $chromeVersion = (float) $matches[1];
         }
     }
 
@@ -181,7 +181,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $engineName  = 'T5';
         $engineMaker = 'Baidu';
     } elseif (false !== strpos($ua, 'AppleWebKit')) {
-        if ($chromeVersion >= 28) {
+        if ($chromeVersion >= 28.0) {
             $engineName  = 'Blink';
             $engineMaker = 'Google Inc';
         } else {
@@ -393,6 +393,14 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $mobileDevice          = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
+    } elseif (false !== strpos($ua, 'Windows CE')) {
+        $platformNameBrowscap  = 'WinCE';
+        $platformNameDetector  = 'Windows CE';
+        $platformMakerBrowscap = 'Microsoft Corporation';
+        $platformMakerDetector = 'Microsoft Corporation';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'Windows CE';
     } elseif (false !== strpos($ua, 'Linux; Android')) {
         $platformNameBrowscap  = 'Android';
         $platformNameDetector  = 'Android';
@@ -1600,7 +1608,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $browserNameDetector = 'Chrome';
         $browserType         = 'Browser';
         $browserMaker        = 'Google Inc';
-        $browserVersion      = $chromeVersion;
+        $browserVersion      = (string) $chromeVersion;
 
         if ($browserVersion < 30) {
             $lite = false;

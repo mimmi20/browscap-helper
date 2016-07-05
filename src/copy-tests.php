@@ -44,7 +44,12 @@ foreach ($files as $filename) {
         $newname = sprintf('browscap-issue-%1$05d', (int) $matches[1]);
     }
 
-    $tests  = require_once $file->getPathname();
+    $tests = require_once $file->getPathname();
+
+    if (empty($tests)) {
+        continue;
+    }
+
     $chunks = array_chunk($tests, 100, true);
 
     foreach ($chunks as $chunkId => $chunk) {
