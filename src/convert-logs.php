@@ -44,7 +44,7 @@ foreach ($dir as $file) {
     ++$i;
     $filePath = strtolower($path . $file->getFilename());
 
-    echo '#' . $i . ' :' . $filePath . ' [ bisher ' . ($j > 0 ? $j : 'keine') . ' Agent' . ($j !== 1 ? 'en' : '') . ' ]';
+    echo '#' . sprintf('%1$05d', (int) $i) . ' :' . $filePath . ' [ bisher ' . ($j > 0 ? $j : 'keine') . ' Agent' . ($j !== 1 ? 'en' : '') . ' ]';
 
     if (!$file->isFile() || !$file->isReadable()) {
         echo ' - ignoriert' . "\n";
@@ -72,43 +72,12 @@ foreach ($dir as $file) {
     foreach ($lines as $line) {
         $agentOfLine   = trim(extractAgent($line));
         $timeOfLine    = trim(extractTime($line));
-        // $ipOfLine      = trim(extractIP($line));
-        // $codeOfLine    = trim(extractReturn($line));
-        // $requestOfLine = trim(extractRequest($line));
 
         if (!array_key_exists($agentOfLine, $agents)) {
             $agents[$agentOfLine] = ['count' => 1, 'time' => $timeOfLine, 'file' => $targetSqlFile . ' / ' . $file->getFilename(), 'line' => $line];
         } else {
             ++$agents[$agentOfLine]['count'];
         }
-        /*
-        if ($codeOfLine >= 400 || preg_match('/(<|>|\'|\"|\#|\*|\\|\)|\\r|\\n|%0a|%0d|%22|%27|%3c|%3e|%00|document\.referrer|Math\.random\(\)|escape\(|localhost|loopback|127\.0\.0\.1|vuln|cast|concat|declare|from|sleep|waitfor|delay|convert|netsparker|alert|onmouseover|lmcoeq|0lmcoeq|ping|pg_sleep|receive_message|passwd|error\.log)/i', $requestOfLine)) {
-            if (!array_key_exists($ipOfLine, $ips)) {
-                $ips[$ipOfLine] = array('count' => 1, 'time' => $timeOfLine);
-            } else {
-                $ips[$ipOfLine]['count']++;
-            }
-            
-            if (!array_key_exists($requestOfLine, $requests)) {
-                $requests[$requestOfLine] = array('count' => 1, 'time' => $timeOfLine, 'code' => $codeOfLine, 'ip' => $ipOfLine, 'reason' => '');
-                
-                $reasons = array();
-                
-                if ($codeOfLine >= 400) {
-                    $reasons[] = 'Statuscode >= 400';
-                }
-                
-                $matches = array();
-                if (preg_match('/(<|>|\'|\"|\#|\*|\\|\)|\\r|\\n|%0a|%0d|%22|%27|%3c|%3e|%00|document\.referrer|Math\.random\(\)|escape\(|localhost|loopback|127\.0\.0\.1|vuln|cast|concat|declare|from|sleep|waitfor|delay|convert|netsparker|alert|onmouseover|lmcoeq|0lmcoeq|ping|pg_sleep|receive_message|passwd|error\.log)/i', $requestOfLine, $matches)) {
-                    $reasons[] = 'Bad Request: ' . json_encode($matches);
-                }
-                
-                $requests[$requestOfLine]['reason'] = json_encode($reasons);
-            } else {
-                $requests[$requestOfLine]['count']++;
-            }
-        }
-        */
     }
 
     file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . ': UserAgents (' . count($agents) . " Pcs.)\n\n", FILE_APPEND | LOCK_EX);
@@ -136,51 +105,6 @@ foreach ($dir as $file) {
 
     file_put_contents($targetSqlFile, "\n\n", FILE_APPEND | LOCK_EX);
 
-    /*
-    file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . ": used IPs (" . count($ips) . " Pcs.)\n\n", FILE_APPEND | LOCK_EX);
-    
-    $sort1 = array();
-    $sort2 = array();
-    $sort3 = array();
-
-    foreach ($ips as $ipOfLine => $data) {
-        $sort1[$ipOfLine] = $data['count'];
-        $sort2[$ipOfLine] = $data['time'];
-        $sort3[$ipOfLine] = $ipOfLine;
-    }
-    
-    array_multisort($sort1, SORT_DESC, $sort2, SORT_DESC, $sort3, SORT_ASC, $ips);
-
-    foreach ($ips as $ipOfLine => $data) {
-        $sql = "INSERT INTO `ips` (`IP`, `count`, `created`) VALUES ('" . addslashes($ipOfLine) . "', " . addslashes($data['count']) . ", '" . addslashes($data['time']) . "') ON DUPLICATE KEY UPDATE `count`=`count`+" . addslashes($data['count']) . "; \n";
-        file_put_contents($targetSqlFile, $sql, FILE_APPEND | LOCK_EX);
-    }
-    
-    file_put_contents($targetSqlFile, "\n\n", FILE_APPEND | LOCK_EX);
-    
-    file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . ": bad Requests (" . count($requests) . " Pcs.)\n\n", FILE_APPEND | LOCK_EX);
-    
-    $sort1 = array();
-    $sort2 = array();
-    $sort3 = array();
-    $sort4 = array();
-
-    foreach ($requests as $requestOfLine => $data) {
-        $sort1[$requestOfLine] = $data['code'];
-        $sort2[$requestOfLine] = $data['count'];
-        $sort3[$requestOfLine] = $data['time'];
-        $sort4[$requestOfLine] = $requestOfLine;
-    }
-    
-    array_multisort($sort1, SORT_ASC, $sort2, SORT_DESC, $sort3, SORT_DESC, $sort4, SORT_ASC, $requests);
-
-    foreach ($requests as $requestOfLine => $data) {
-        $sql = "INSERT INTO `requests` (`request`, `count`, `created`, `ip`, `code`, `reason`) VALUES ('" . addslashes($requestOfLine) . "', " . addslashes($data['count']) . ", '" . addslashes($data['time']) . "', '" . addslashes($data['ip']) . "', '" . addslashes($data['code']) . "', '" . addslashes($data['reason']) . "') ON DUPLICATE KEY UPDATE `count`=`count`+" . addslashes($data['count']) . "; \n";
-        file_put_contents($targetSqlFile, $sql, FILE_APPEND | LOCK_EX);
-    }
-    
-     */
-
     file_put_contents($targetSqlFile, "COMMIT;\n\n", FILE_APPEND | LOCK_EX);
     $agentsToStore = '';
 
@@ -198,7 +122,6 @@ foreach ($dir as $file) {
 
         break;
     }
-    //exit;
 }
 
 $data = file($targetBulkFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
