@@ -2,6 +2,8 @@
 /*******************************************************************************
  * INIT
  ******************************************************************************/
+use FileLoader\Loader;
+
 ini_set('memory_limit', '3000M');
 ini_set('max_execution_time', '-1');
 ini_set('max_input_time', '-1');
@@ -15,14 +17,17 @@ define('DB_PASSWORD', '');
 
 date_default_timezone_set('Europe/Berlin');
 
-$path = 'D:\\projects\\temp\\log\\';
-//$db   = new database();Thomas Mueller
+chdir(dirname(__DIR__));
+
+require 'vendor/autoload.php';
+
+$sourcesDirectory = 'sources/';
 
 /*******************************************************************************
  * loading files
  ******************************************************************************/
 try {
-    $dir = new FilesystemIterator($path);
+    $dir = new FilesystemIterator($sourcesDirectory);
 } catch (Exception $e) {
     echo $e->getMessage();
     die();
@@ -33,43 +38,58 @@ $j = 0;
 
 $requests = [];
 
-$targetSqlFile  = 'D:\\projects\\temp\\' . date('Y-m-d') . '-testagents.sql';
-$targetBulkFile = 'D:\\projects\\temp\\' . date('Y-m-d') . '-testagents.txt';
+$targetSqlFile  = 'results/' . date('Y-m-d') . '-testagents.sql';
+$targetBulkFile = 'results/' . date('Y-m-d') . '-testagents.txt';
 echo "writing to file '" . $targetSqlFile . "'\n";
 
+$loader = new Loader();
+
 foreach ($dir as $file) {
+    /** @var $file \SplFileInfo */
     $ips      = [];
     $requests = [];
 
     ++$i;
-    $filePath = strtolower($path . $file->getFilename());
+    $filePath = strtolower($sourcesDirectory . $file->getFilename());
 
-    echo '#' . sprintf('%1$05d', (int) $i) . ' :' . $filePath . ' [ bisher ' . ($j > 0 ? $j : 'keine') . ' Agent' . ($j !== 1 ? 'en' : '') . ' ]';
+    echo '# ', sprintf('%1$05d', (int) $i), ' :', $filePath, ' [ bisher ', ($j > 0 ? $j : 'keine'), ' Agent', ($j !== 1 ? 'en' : ''), ' ]';
 
     if (!$file->isFile() || !$file->isReadable()) {
-        echo ' - ignoriert' . "\n";
+        echo ' - ignoriert', PHP_EOL;
 
         continue;
     }
 
-    if (('.gz' === substr($filePath, -3)) || ('.tgz' === substr($filePath, -4)) || ('.filepart' === substr($filePath, -9)) || ('.sql' === substr($filePath, -4)) || ('.rename' === substr($filePath, -7)) || ('.txt' === substr($filePath, -4)) || ('.zip' === substr($filePath, -4)) || ('.rar' === substr($filePath, -4))) {
-        echo ' - ignoriert' . "\n";
+    if (in_array($file->getExtension(), ['gz', 'tgz', 'filepart', 'sql', 'rename', 'txt', 'zip', 'rar', 'php', 'gitkeep'])) {
+        echo ' - ignoriert', PHP_EOL;
 
         continue;
     }
 
     $startTime = microtime(true);
-    $lines     = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $lines     = array_unique($lines);
-    $k         = 0;
-    $agents    = [];
-    $ips       = [];
-    $requests  = [];
+    $loader->setLocalFile(getPath($file));
+
+    /** @var \GuzzleHttp\Psr7\Response $response */
+    $response = $loader->load();
+
+    /** @var \GuzzleHttp\Psr7\Stream $stream */
+    $stream = $response->getBody();
+
+    $stream->read(1);
+
+    $k        = 0;
+    $agents   = [];
+    $ips      = [];
+    $requests = [];
 
     file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . "\n\n", FILE_APPEND | LOCK_EX);
     file_put_contents($targetSqlFile, "START TRANSACTION;\n", FILE_APPEND | LOCK_EX);
 
-    foreach ($lines as $line) {
+    $stream->rewind();
+
+    while (!$stream->eof()){
+        $line = $stream->read(8192);
+
         $agentOfLine   = trim(extractAgent($line));
         $timeOfLine    = trim(extractTime($line));
 
@@ -104,33 +124,25 @@ foreach ($dir as $file) {
     }
 
     file_put_contents($targetSqlFile, "\n\n", FILE_APPEND | LOCK_EX);
-
     file_put_contents($targetSqlFile, "COMMIT;\n\n", FILE_APPEND | LOCK_EX);
     $agentsToStore = '';
 
     $dauer = microtime(true) - $startTime;
-    echo ' - fertig [ ' . ($k > 0 ? $k . ' neue' : 'keine neuen') . ($k === 1 ? 'r' : '') . ' Agent' . ($k !== 1 ? 'en' : '') . ', ' . number_format($dauer, 4, ',', '.') . ' sec ]';
+    echo ' - fertig [ ', ($k > 0 ? $k . ' neue' : 'keine neuen'), ($k === 1 ? 'r' : ''), ' Agent', ($k !== 1 ? 'en' : ''), ', ', number_format($dauer, 4, ',', '.'), ' sec ]', PHP_EOL;
 
-    echo "\n";//exit;
     unlink($filePath);
-
     $j += $k;
-
-    if (600 <= (int) $dauer) {
-        echo "\n\n";
-        echo 'Abbruch, da Einlesen zu Lange dauert ... - bitte Neu starten' . "\n";
-
-        break;
-    }
 }
 
-$data = file($targetBulkFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
-$data = array_unique($data);
+if (file_exists($targetBulkFile)) {
+    $data = file($targetBulkFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
+    $data = array_unique($data);
 
-file_put_contents($targetBulkFile, implode("\n", $data), LOCK_EX);
+    file_put_contents($targetBulkFile, implode("\n", $data), LOCK_EX);
+}
 
-echo "\n\n";
-echo 'lesen der Dateien beendet. ' . $j . ' neue Agenten hinzugefuegt' . "\n";
+echo PHP_EOL, PHP_EOL;
+echo 'lesen der Dateien beendet. ', $j, ' neue Agenten hinzugefuegt', PHP_EOL;
 exit;
 
 /*******************************************************************************
@@ -195,4 +207,28 @@ function extractRequest($text)
     $parts = explode('"', $text);
 
     return $parts[1];
+}
+
+
+
+/**
+ * @param \SplFileInfo $file
+ *
+ * @return string
+ */
+function getPath(\SplFileInfo $file)
+{
+    switch ($file->getExtension()) {
+        case 'gz':
+            $path = 'compress.zlib://' . $file->getPathname();
+            break;
+        case 'bz2':
+            $path = 'compress.bzip2://' . $file->getPathname();
+            break;
+        default:
+            $path = $file->getPathname();
+            break;
+    }
+
+    return $path;
 }
