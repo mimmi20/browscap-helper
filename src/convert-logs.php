@@ -202,14 +202,13 @@ function extractReturn($text)
 
     return (int) trim(substr($text, $posStart, $posEnd - $posStart + 1));
 }
+
 function extractRequest($text)
 {
     $parts = explode('"', $text);
 
     return $parts[1];
 }
-
-
 
 /**
  * @param \SplFileInfo $file
@@ -224,6 +223,9 @@ function getPath(\SplFileInfo $file)
             break;
         case 'bz2':
             $path = 'compress.bzip2://' . $file->getPathname();
+            break;
+        case 'tgz':
+            $path = 'phar://' . $file->getPathname();
             break;
         default:
             $path = $file->getPathname();
