@@ -72,8 +72,6 @@ foreach ($files as $filename) {
         $output = "<?php\n\nreturn [\n";
 
         foreach ($chunk as $key => $test) {
-            $result = $detector->getBrowser($test['ua']);
-
             $outputDetector .= "    'browscap-$key' => [
         'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
         'properties' => [
