@@ -87,7 +87,7 @@ foreach ($dir as $file) {
 
     $stream->rewind();
 
-    while (!$stream->eof()){
+    while (!$stream->eof()) {
         $line = $stream->read(8192);
 
         $agentOfLine   = trim(extractAgent($line));
