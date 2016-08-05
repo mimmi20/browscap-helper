@@ -17,35 +17,34 @@ define('DB_PASSWORD', '');
 
 date_default_timezone_set('Europe/Berlin');
 
-chdir(dirname(__DIR__));
+require __DIR__ . '/../vendor/autoload.php';
 
-require 'vendor/autoload.php';
-
-$sourcesDirectory = 'sources/';
-
-/*******************************************************************************
- * loading files
- ******************************************************************************/
-try {
-    $dir = new FilesystemIterator($sourcesDirectory);
-} catch (Exception $e) {
-    echo $e->getMessage();
-    die();
-}
+$sourcesDirectory =  __DIR__ . '/../sources/';
 
 $i = 0;
 $j = 0;
 
 $requests = [];
 
-$targetSqlFile  = 'results/' . date('Y-m-d') . '-testagents.sql';
-$targetBulkFile = 'results/' . date('Y-m-d') . '-testagents.txt';
+$targetSqlFile  = __DIR__ . '/../results/' . date('Y-m-d') . '-testagents.sql';
+$targetBulkFile = __DIR__ . '/../results/' . date('Y-m-d') . '-testagents.txt';
+$targetInfoFile = __DIR__ . '/../results/' . date('Y-m-d') . '-testagents.info.txt';
+
 echo "writing to file '" . $targetSqlFile . "'\n";
 
+$regex  = getRegex();
 $loader = new Loader();
 
-foreach ($dir as $file) {
+/*******************************************************************************
+ * loading files
+ ******************************************************************************/
+
+$files = scandir($sourcesDirectory, SCANDIR_SORT_ASCENDING);
+
+foreach ($files as $filename) {
     /** @var $file \SplFileInfo */
+    $file = new \SplFileInfo($sourcesDirectory . DIRECTORY_SEPARATOR . $filename);
+
     $ips      = [];
     $requests = [];
 
@@ -90,8 +89,26 @@ foreach ($dir as $file) {
     while (!$stream->eof()) {
         $line = $stream->read(8192);
 
-        $agentOfLine   = trim(extractAgent($line));
-        $timeOfLine    = trim(extractTime($line));
+        $lineMatches = array();
+
+        if (!preg_match($regex, $line, $lineMatches)) {
+            file_put_contents($targetInfoFile, 'no useragent found in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
+
+            continue;
+        }
+
+        if (isset($lineMatches['userAgentString'])) {
+            $agentOfLine = trim($lineMatches['userAgentString']);
+        } else {
+            $agentOfLine = trim(extractAgent($line));
+        }
+
+        if (isset($lineMatches['time'])) {
+            $datetime = new DateTime($lineMatches['time']);
+            $timeOfLine = $datetime->format('Y-m-d H:i:s');
+        } else {
+            $timeOfLine = trim(extractTime($line));
+        }
 
         if (!array_key_exists($agentOfLine, $agents)) {
             $agents[$agentOfLine] = ['count' => 1, 'time' => $timeOfLine, 'file' => $targetSqlFile . ' / ' . $file->getFilename(), 'line' => $line];
@@ -102,21 +119,19 @@ foreach ($dir as $file) {
 
     file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . ': UserAgents (' . count($agents) . " Pcs.)\n\n", FILE_APPEND | LOCK_EX);
 
-    $sort1 = [];
-    $sort2 = [];
-    $sort3 = [];
+    $sortCount = [];
+    $sortTime  = [];
+    $sortAgent = [];
 
     foreach ($agents as $agentOfLine => $data) {
-        $sort1[$agentOfLine] = $data['count'];
-        $sort2[$agentOfLine] = $data['time'];
-        $sort3[$agentOfLine] = $agentOfLine;
+        $sortCount[$agentOfLine] = $data['count'];
+        $sortTime[$agentOfLine]  = $data['time'];
+        $sortAgent[$agentOfLine] = $agentOfLine;
     }
 
-    array_multisort($sort1, SORT_DESC, $sort2, SORT_DESC, $sort3, SORT_ASC, $agents);
+    array_multisort($sortCount, SORT_DESC, $sortTime, SORT_DESC, $sortAgent, SORT_ASC, $agents);
 
     foreach ($agents as $agentOfLine => $data) {
-        //file_put_contents($targetSqlFile, '-- ' . $data['line'] . "\n", FILE_APPEND | LOCK_EX);
-
         $sql = "INSERT INTO `agents` (`agent`, `count`, `lastTimeFound`, `created`, `file`) VALUES ('" . addslashes($agentOfLine) . "', " . addslashes($data['count']) . ", '" . addslashes($data['time']) . "', '" . addslashes($data['time']) . "', '" . addslashes($data['file']) . "') ON DUPLICATE KEY UPDATE `count`=`count`+" . addslashes($data['count']) . ", `file`='" . addslashes($data['file']) . "',`lastTimeFound`='" . addslashes($data['time']) . "';\n";
         file_put_contents($targetSqlFile, $sql, FILE_APPEND | LOCK_EX);
         file_put_contents($targetBulkFile, $agentOfLine . "\n", FILE_APPEND | LOCK_EX);
@@ -161,14 +176,13 @@ function extractAgent($text)
 function extractTime($text)
 {
     $timeParts = explode('[', $text);
-    $time      = time();
 
     if (isset($timeParts[1])) {
         $parts = explode(']', $timeParts[1]);
         $time  = str_replace(']', '', trim($parts[0]));
         $time  = strtotime($time);
     } else {
-        var_dump($text, $timeParts);
+        var_dump('extractTime failed: no time found', $text, $timeParts);
         exit;
     }
 
@@ -196,7 +210,7 @@ function extractReturn($text)
             return (int) trim($parts[12]);
         }
 
-        var_dump($text, $parts[12]);
+        var_dump('extractReturn failed: no HTTP found', $text, $parts[12]);
         exit;
     }
 
@@ -233,4 +247,27 @@ function getPath(\SplFileInfo $file)
     }
 
     return $path;
+}
+
+function getRegex()
+{
+    return '/^'
+    . '(?P<remotehost>\S+)'                            # remote host (IP)
+    . '\s+'
+    . '(?P<logname>\S+)'                            # remote logname
+    . '\s+'
+    . '(?P<user>\S+)'                            # remote user
+    . '.*'
+    . '\[(?P<time>[^]]+)\]'                      # date/time
+    . '[^"]+'
+    . '\"(?P<http>.*)\"'                         # Verb(GET|POST|HEAD) Path HTTP Version
+    . '\s+'
+    . '(?P<status>.*)'                             # Status
+    . '\s+'
+    . '(?P<length>.*)'                             # Length (include Header)
+    . '[^"]+'
+    . '\"(?P<referrer>.*)\"'                         # Referrer
+    . '[^"]+'
+    . '\"(?P<userAgentString>.*)\".*'   # User Agent
+    . '$/x';
 }
