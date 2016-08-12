@@ -58,8 +58,6 @@ foreach ($files as $filename) {
         $outputDetector  = "<?php\n\nreturn [\n";
 
         foreach ($chunk as $key => $test) {
-            $result = $detector->getBrowser($test['ua']);
-
             $outputDetector .= "    '$key' => [
         'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
         'properties' => [

@@ -37,8 +37,28 @@ foreach ($files as $filename) {
     $oldname = $file->getBasename('.php');
     $newname = $oldname;
 
-    if (preg_match('/test\-(\d+)/', $oldname, $matches)) {
+    if (preg_match('/^test\-\d{5}\-\d{5}$/', $oldname, $matches)) {
+        continue;
+    }
+
+    if (preg_match('/^test\-\d{5}$/', $oldname, $matches)) {
+        continue;
+    }
+
+    if (preg_match('/^browscap\-issue\-\d{5}\-\d{5}$/', $oldname, $matches)) {
+        continue;
+    }
+
+    if (preg_match('/^browscap\-issue\-\d{5}$/', $oldname, $matches)) {
+        continue;
+    }
+
+    if (preg_match('/test\-(\d+)\-(\d+)/', $oldname, $matches)) {
+        $newname = sprintf('test-%1$05d-%1$05d', (int) $matches[1], (int) $matches[2]);
+    } elseif (preg_match('/test\-(\d+)/', $oldname, $matches)) {
         $newname = sprintf('test-%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/browscap\-issue\-(\d+)\-(\d+)/', $oldname, $matches)) {
+        $newname = sprintf('browscap-issue-%1$05d-%1$05d', (int) $matches[1], (int) $matches[2]);
     } elseif (preg_match('/browscap\-issue\-(\d+)/', $oldname, $matches)) {
         $newname = sprintf('browscap-issue-%1$05d', (int) $matches[1]);
     }

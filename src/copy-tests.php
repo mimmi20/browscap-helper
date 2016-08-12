@@ -57,13 +57,7 @@ foreach ($files as $filename) {
             continue;
         }
 
-        if (count($chunks) <= 1) {
-            $chunkNumber = '';
-        } else {
-            $chunkNumber = '-' . sprintf('%1$05d', (int) $chunkId);
-        }
-
-        $targetFilename = $newname . $chunkNumber . '.php';
+        $targetFilename = $newname . '-' . sprintf('%1$05d', (int) $chunkId) . '.php';
 
         if (file_exists($targetDirectory . $targetFilename)) {
             continue;
@@ -72,16 +66,16 @@ foreach ($files as $filename) {
         $output = "<?php\n\nreturn [\n";
 
         foreach ($chunk as $key => $test) {
-            $outputDetector .= "    'browscap-$key' => [
+            $output .= "    'browscap-$key' => [
         'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
         'properties' => [
-            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Name']) . "',
+            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser']) . "',
             'Browser_Type'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Type']) . "',
             'Browser_Bits'            => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Bits']) . ",
             'Browser_Maker'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Maker']) . "',
             'Browser_Modus'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Modus']) . "',
-            'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Name']) . "',
+            'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Version']) . "',
+            'Platform_Name'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform']) . "',
             'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Version']) . "',
             'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Bits']) . ",
             'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Maker']) . "',
