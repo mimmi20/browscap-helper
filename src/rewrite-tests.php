@@ -24,7 +24,29 @@ $checks          = [];
 $data            = [];
 $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
-$files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+$filesArray = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+$files      = [];
+
+foreach ($filesArray as $filename) {
+    if (in_array($filename, ['.', '..'])) {
+        continue;
+    }
+
+    if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
+        $files[] = $filename;
+        continue;
+    }
+
+    $subdirFilesArray = scandir($sourceDirectory . DIRECTORY_SEPARATOR . $filename, SCANDIR_SORT_ASCENDING);
+
+    foreach ($subdirFilesArray as $subdirFilename) {
+        if (in_array($subdirFilename, ['.', '..'])) {
+            continue;
+        }
+
+        $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
+    }
+}
 
 foreach ($files as $filename) {
     $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
@@ -41,6 +63,7 @@ foreach ($files as $filename) {
     $tests = require_once $file->getPathname();
 
     if (empty($tests)) {
+        echo 'removing empty file ', $file->getBasename(), ' ...', PHP_EOL;
         unlink($file->getPathname());
 
         continue;
@@ -67,7 +90,7 @@ foreach ($files as $filename) {
         $data[$key]          = $test;
         $checks[$test['ua']] = $key;
 
-        $result = $detector->getBrowser($test['ua']);
+        //$result = $detector->getBrowser($test['ua']);
 
         if (isset($test['properties']['Platform_Name'])) {
             $platformName = $test['properties']['Platform_Name'];
@@ -93,6 +116,7 @@ foreach ($files as $filename) {
             $platformMaker = 'unknown';
         }
 
+        /*
         // rewrite undetected platform properties
         if ('unknown' === $platformName) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" is unknown yet, rewriting', PHP_EOL;
@@ -125,6 +149,7 @@ foreach ($files as $filename) {
 
             $platformMaker = $result->getOs()->getManufacturer();
         }
+        /**/
 
         $outputDetector .= "    '$key' => [
         'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',

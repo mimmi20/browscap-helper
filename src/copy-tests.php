@@ -19,7 +19,7 @@ require 'vendor/autoload.php';
  ******************************************************************************/
 
 $sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-$targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
+$targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/00000-browscap/';
 
 $counter = 0;
 
