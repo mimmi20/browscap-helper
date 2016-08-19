@@ -356,6 +356,30 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'GT-S5830C',
             'Device_Brand_Name'      => 'Samsung',
         ],
+        'MI 4W'   => [
+            'Device_Name'            => 'MI 4W',
+            'Device_Maker'           => 'Xiaomi Tech',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'MI 4W',
+            'Device_Brand_Name'      => 'Xiaomi',
+        ],
+        'MI 4LTE'   => [
+            'Device_Name'            => 'MI 4 LTE',
+            'Device_Maker'           => 'Xiaomi Tech',
+            'Device_Type'            => 'Mobile Phone',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'MI 4 LTE',
+            'Device_Brand_Name'      => 'Xiaomi',
+        ],
+        'Mi Pad'   => [
+            'Device_Name'            => 'Mi Pad',
+            'Device_Maker'           => 'Xiaomi Tech',
+            'Device_Type'            => 'Tablet',
+            'Device_Pointing_Method' => 'touchscreen',
+            'Device_Code_Name'       => 'Mi Pad',
+            'Device_Brand_Name'      => 'Xiaomi',
+        ],
     ];
 
     $win32    = false;
@@ -854,6 +878,16 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         $device = 'Macintosh';
+    } elseif (false !== stripos($ua, 'kubuntu')) {
+        $platformNameBrowscap  = 'Ubuntu';
+        $platformNameDetector  = 'Kubuntu';
+        $platformMakerBrowscap = 'Canonical Foundation';
+        $platformMakerDetector = 'Canonical Foundation';
+        $mobileDevice          = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'ubuntu')) {
         $platformNameBrowscap  = 'Ubuntu';
         $platformNameDetector  = 'Ubuntu';
@@ -879,6 +913,26 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformNameDetector  = 'Suse Linux';
         $platformMakerBrowscap = 'Linux Foundation';
         $platformMakerDetector = 'Suse';
+        $mobileDevice          = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        $device = 'Linux Desktop';
+    } elseif (false !== stripos($ua, 'gentoo')) {
+        $platformNameBrowscap  = 'Linux';
+        $platformNameDetector  = 'Gentoo Linux';
+        $platformMakerBrowscap = 'Linux Foundation';
+        $platformMakerDetector = 'Gentoo Foundation Inc';
+        $mobileDevice          = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        $device = 'Linux Desktop';
+    } elseif (false !== stripos($ua, 'slackware')) {
+        $platformNameBrowscap  = 'Linux';
+        $platformNameDetector  = 'Slackware Linux';
+        $platformMakerBrowscap = 'Linux Foundation';
+        $platformMakerDetector = 'Slackware Linux Inc';
         $mobileDevice          = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
@@ -952,6 +1006,12 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device = 'GT-S5830c';
     } elseif (false !== strpos($ua, 'GT-S5830')) {
         $device = 'GT-S5830';
+    } elseif (false !== strpos($ua, 'MI PAD')) {
+        $device = 'Mi Pad';
+    } elseif (false !== strpos($ua, 'MI 4W')) {
+        $device = 'MI 4W';
+    } elseif (false !== strpos($ua, 'MI 4LTE')) {
+        $device = 'MI 4LTE';
     }
 
     if (false !== strpos($ua, 'OPR') && false !== strpos($ua, 'Android')) {
@@ -2255,7 +2315,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         if ($browserVersion < 30) {
             $lite = false;
         }
-    } elseif (false !== strpos($ua, 'Firefox')) {
+    } elseif (false !== stripos($ua, 'firefox')) {
         $browserNameBrowscap = 'Firefox';
         $browserNameDetector = 'Firefox';
         $browserType         = 'Browser';
