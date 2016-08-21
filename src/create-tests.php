@@ -409,6 +409,14 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $platformVersionBrowscap = $matches[1];
             $platformVersionDetector = $matches[1];
         }
+    } elseif (false !== stripos($ua, 'wpdesktop')) {
+        $platformNameBrowscap  = 'WinPhone';
+        $platformNameDetector  = 'Windows Phone OS';
+        $platformMakerBrowscap = 'Microsoft Corporation';
+        $platformMakerDetector = 'Microsoft Corporation';
+        $mobileDevice          = 'true';
+
+        $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'Tizen')) {
         $platformNameBrowscap  = 'Tizen';
         $platformNameDetector  = 'Tizen';
@@ -913,6 +921,16 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformNameDetector  = 'Suse Linux';
         $platformMakerBrowscap = 'Linux Foundation';
         $platformMakerDetector = 'Suse';
+        $mobileDevice          = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        $device = 'Linux Desktop';
+    } elseif (false !== stripos($ua, 'mandriva')) {
+        $platformNameBrowscap  = 'Linux';
+        $platformNameDetector  = 'Mandriva Linux';
+        $platformMakerBrowscap = 'Linux Foundation';
+        $platformMakerDetector = 'Mandriva';
         $mobileDevice          = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
