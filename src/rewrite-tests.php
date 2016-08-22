@@ -169,6 +169,33 @@ foreach ($files as $filename) {
             $platformVersion = $platform->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
+        } elseif ('Linux' === $platformName && preg_match('/kubuntu/i', $test['ua'])) {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Kubuntu, rewriting', PHP_EOL;
+
+            $platform = new \BrowserDetector\Detector\Os\Kubuntu($test['ua']);
+
+            $platformName    = $platform->getName();
+            $platformVersion = $platform->getVersion();
+            $platformBits    = $platform->getBits();
+            $platformMaker   = $platform->getManufacturer();
+        } elseif ('Linux' === $platformName && preg_match('/ubuntu/i', $test['ua'])) {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Ubuntu, rewriting', PHP_EOL;
+
+            $platform = new \BrowserDetector\Detector\Os\Ubuntu($test['ua']);
+
+            $platformName    = $platform->getName();
+            $platformVersion = $platform->getVersion();
+            $platformBits    = $platform->getBits();
+            $platformMaker   = $platform->getManufacturer();
+        } elseif ('Linux Smartphone OS (Maemo)' === $platformName && preg_match('/ubuntu/i', $test['ua'])) {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Maemo, but is Ubuntu, rewriting', PHP_EOL;
+
+            $platform = new \BrowserDetector\Detector\Os\Ubuntu($test['ua']);
+
+            $platformName    = $platform->getName();
+            $platformVersion = $platform->getVersion();
+            $platformBits    = $platform->getBits();
+            $platformMaker   = $platform->getManufacturer();
         } elseif ('Linux' === $platformName && preg_match('/linux arm/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Maemo, rewriting', PHP_EOL;
 
@@ -196,24 +223,6 @@ foreach ($files as $filename) {
             $platformVersion = $platform->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/kubuntu/i', $test['ua'])) {
-            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Kubuntu, rewriting', PHP_EOL;
-
-            $platform = new \BrowserDetector\Detector\Os\Kubuntu($test['ua']);
-
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
-            $platformBits    = $platform->getBits();
-            $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/ubuntu/i', $test['ua'])) {
-            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Ubuntu, rewriting', PHP_EOL;
-
-            $platform = new \BrowserDetector\Detector\Os\Ubuntu($test['ua']);
-
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
-            $platformBits    = $platform->getBits();
-            $platformMaker   = $platform->getManufacturer();
         } elseif ('Linux' === $platformName && preg_match('/(red hat|redhat)/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Red Hut, rewriting', PHP_EOL;
 
@@ -236,6 +245,15 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Suse, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Suse($test['ua']);
+
+            $platformName    = $platform->getName();
+            $platformVersion = $platform->getVersion();
+            $platformBits    = $platform->getBits();
+            $platformMaker   = $platform->getManufacturer();
+        } elseif ('Linux' === $platformName && preg_match('/centos/i', $test['ua'])) {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Cent OS, rewriting', PHP_EOL;
+
+            $platform = new \BrowserDetector\Detector\Os\CentOs($test['ua']);
 
             $platformName    = $platform->getName();
             $platformVersion = $platform->getVersion();
