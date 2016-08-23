@@ -259,6 +259,15 @@ foreach ($files as $filename) {
             $platformVersion = $platform->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
+        } elseif ('Linux' === $platformName && preg_match('/mint/i', $test['ua'])) {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Linux Mint, rewriting', PHP_EOL;
+
+            $platform = new \BrowserDetector\Detector\Os\Mint($test['ua']);
+
+            $platformName    = $platform->getName();
+            $platformVersion = $platform->getVersion();
+            $platformBits    = $platform->getBits();
+            $platformMaker   = $platform->getManufacturer();
         } else {
             $result = $detector->getBrowser($test['ua']);
 
@@ -269,6 +278,12 @@ foreach ($files as $filename) {
                 $platformBits  = $result->getOs()->getBits();
                 $platformMaker = $result->getOs()->getManufacturer();
             }
+        }
+
+        if (preg_match('/test\-(\d+)\-(\d+)/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
+        } elseif (preg_match('/test\-(\d+)/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-00000';
         }
 
         $outputDetector .= "    '$key' => [
