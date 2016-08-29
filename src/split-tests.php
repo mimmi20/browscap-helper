@@ -22,7 +22,29 @@ $detector = new \BrowserDetector\BrowserDetector($cache, $logger);
 
 $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
-$files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+$filesArray = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+$files      = [];
+
+foreach ($filesArray as $filename) {
+    if (in_array($filename, ['.', '..'])) {
+        continue;
+    }
+
+    if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
+        $files[] = $filename;
+        continue;
+    }
+
+    $subdirFilesArray = scandir($sourceDirectory . DIRECTORY_SEPARATOR . $filename, SCANDIR_SORT_ASCENDING);
+
+    foreach ($subdirFilesArray as $subdirFilename) {
+        if (in_array($subdirFilename, ['.', '..'])) {
+            continue;
+        }
+
+        $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
+    }
+}
 
 foreach ($files as $filename) {
     $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
@@ -43,12 +65,33 @@ foreach ($files as $filename) {
         continue;
     }
 
+    $oldname  = $file->getBasename('.php');
+    $basename = $oldname;
+
     echo 'removing file ', $file->getBasename(), ' ...', PHP_EOL;
 
     //rename($file->getPathname(), $file->getPathname() . '.old');
     unlink($file->getPathname());
 
     echo 'splitting file ', $file->getBasename(), ' ...', PHP_EOL;
+
+    if (preg_match('/^test\-(\d{5})\-(\d{5})$/', $oldname, $matches)) {
+        $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/^test\-(\d{5})$/', $oldname, $matches)) {
+        $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/test\-(\d+)\-(\d+)/', $oldname, $matches)) {
+        $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/test\-(\d+)/', $oldname, $matches)) {
+        $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/^browscap\-issue\-(\d{5})\-(\d{5})$/', $oldname, $matches)) {
+        $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/^browscap\-issue\-(\d{5})$/', $oldname, $matches)) {
+        $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/browscap\-issue\-(\d+)\-(\d+)/', $oldname, $matches)) {
+        $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
+    } elseif (preg_match('/browscap\-issue\-(\d+)/', $oldname, $matches)) {
+        $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
+    }
 
     foreach ($chunks as $chunkId => $chunk) {
         if (!count($chunk)) {
@@ -86,7 +129,6 @@ foreach ($files as $filename) {
 
         $outputDetector .= "];\n";
 
-        $basename    = $file->getBasename('.php');
         $chunkNumber = sprintf('%1$05d', (int) $chunkId);
 
         echo 'writing file ', $basename, '-', $chunkNumber, '.php', ' ...', PHP_EOL;
