@@ -280,10 +280,12 @@ foreach ($files as $filename) {
             }
         }
 
-        if (preg_match('/test\-(\d+)\-(\d+)/', $key, $matches)) {
+        if (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
-        } elseif (preg_match('/test\-(\d+)/', $key, $matches)) {
+        } elseif (preg_match('/^test\-(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-00000';
+        } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
         }
 
         $outputDetector .= "    '$key' => [

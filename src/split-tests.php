@@ -79,17 +79,17 @@ foreach ($files as $filename) {
         $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
     } elseif (preg_match('/^test\-(\d{5})$/', $oldname, $matches)) {
         $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
-    } elseif (preg_match('/test\-(\d+)\-(\d+)/', $oldname, $matches)) {
+    } elseif (preg_match('/^test\-(\d+)\-(\d+)$/', $oldname, $matches)) {
         $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
-    } elseif (preg_match('/test\-(\d+)/', $oldname, $matches)) {
+    } elseif (preg_match('/^test\-(\d+)$/', $oldname, $matches)) {
         $basename = 'test-' . sprintf('%1$05d', (int) $matches[1]);
     } elseif (preg_match('/^browscap\-issue\-(\d{5})\-(\d{5})$/', $oldname, $matches)) {
         $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
     } elseif (preg_match('/^browscap\-issue\-(\d{5})$/', $oldname, $matches)) {
         $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
-    } elseif (preg_match('/browscap\-issue\-(\d+)\-(\d+)/', $oldname, $matches)) {
+    } elseif (preg_match('/^browscap\-issue\-(\d+)\-(\d+)$/', $oldname, $matches)) {
         $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
-    } elseif (preg_match('/browscap\-issue\-(\d+)/', $oldname, $matches)) {
+    } elseif (preg_match('/^browscap\-issue\-(\d+)$/', $oldname, $matches)) {
         $basename = 'browscap-issue-' . sprintf('%1$05d', (int) $matches[1]);
     }
 
