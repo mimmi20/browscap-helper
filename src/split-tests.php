@@ -98,7 +98,7 @@ foreach ($files as $filename) {
             continue;
         }
 
-        $outputDetector  = "<?php\n\nreturn [\n";
+        $outputDetector = "<?php\n\nreturn [\n";
 
         foreach ($chunk as $key => $test) {
             $outputDetector .= "    '$key' => [

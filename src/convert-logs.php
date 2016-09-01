@@ -19,7 +19,7 @@ date_default_timezone_set('Europe/Berlin');
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$sourcesDirectory =  __DIR__ . '/../sources/';
+$sourcesDirectory = __DIR__ . '/../sources/';
 
 $i = 0;
 $j = 0;
@@ -89,7 +89,7 @@ foreach ($files as $filename) {
     while (!$stream->eof()) {
         $line = $stream->read(8192);
 
-        $lineMatches = array();
+        $lineMatches = [];
 
         if (!preg_match($regex, $line, $lineMatches)) {
             file_put_contents($targetInfoFile, 'no useragent found in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
@@ -104,7 +104,7 @@ foreach ($files as $filename) {
         }
 
         if (isset($lineMatches['time'])) {
-            $datetime = new DateTime($lineMatches['time']);
+            $datetime   = new DateTime($lineMatches['time']);
             $timeOfLine = $datetime->format('Y-m-d H:i:s');
         } else {
             $timeOfLine = trim(extractTime($line));

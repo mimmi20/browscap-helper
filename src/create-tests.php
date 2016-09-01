@@ -204,7 +204,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     }
 
     $devices = [
-        ''                => [
+        '' => [
             'Device_Name'            => 'unknown',
             'Device_Maker'           => 'unknown',
             'Device_Type'            => 'unknown',
@@ -220,7 +220,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'Windows Desktop',
             'Device_Brand_Name'      => 'unknown',
         ],
-        'Linux Desktop'   => [
+        'Linux Desktop' => [
             'Device_Name'            => 'Linux Desktop',
             'Device_Maker'           => 'Various',
             'Device_Type'            => 'Desktop',
@@ -228,7 +228,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'Linux Desktop',
             'Device_Brand_Name'      => 'unknown',
         ],
-        'Macintosh'   => [
+        'Macintosh' => [
             'Device_Name'            => 'Macintosh',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Desktop',
@@ -236,7 +236,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'Macintosh',
             'Device_Brand_Name'      => 'Apple',
         ],
-        'iPhone'   => [
+        'iPhone' => [
             'Device_Name'            => 'iPhone',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Mobile Phone',
@@ -244,7 +244,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'iPhone',
             'Device_Brand_Name'      => 'Apple',
         ],
-        'iPad'   => [
+        'iPad' => [
             'Device_Name'            => 'iPad',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Tablet',
@@ -252,7 +252,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'iPad',
             'Device_Brand_Name'      => 'Apple',
         ],
-        'iPod'   => [
+        'iPod' => [
             'Device_Name'            => 'iPod',
             'Device_Maker'           => 'Apple Inc',
             'Device_Type'            => 'Mobile Device',
@@ -260,7 +260,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'iPod',
             'Device_Brand_Name'      => 'Apple',
         ],
-        'AT10-A'   => [
+        'AT10-A' => [
             'Device_Name'            => 'eXcite Pure',
             'Device_Maker'           => 'Toshiba',
             'Device_Type'            => 'Tablet',
@@ -268,7 +268,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'AT10-A',
             'Device_Brand_Name'      => 'Toshiba',
         ],
-        'SM-T235'   => [
+        'SM-T235' => [
             'Device_Name'            => 'Galaxy Tab 4 7.0 WiFi + LTE',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Tablet',
@@ -276,7 +276,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'SM-T235',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'SM-T705'   => [
+        'SM-T705' => [
             'Device_Name'            => 'Galaxy Tab S 8.4 LTE',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Tablet',
@@ -284,7 +284,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'SM-T705',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'SM-T2105'   => [
+        'SM-T2105' => [
             'Device_Name'            => 'Galaxy Tab 3 Kids',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Tablet',
@@ -292,7 +292,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'SM-T2105',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'SM-N900A'   => [
+        'SM-N900A' => [
             'Device_Name'            => 'Galaxy Note 3 LTE (AT&T)',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
@@ -300,7 +300,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'SM-N900A',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'S5000-F'   => [
+        'S5000-F' => [
             'Device_Name'            => 'IdeaTab S5000-F',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
@@ -308,7 +308,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'S5000-F',
             'Device_Brand_Name'      => 'Lenovo',
         ],
-        'S5000-H'   => [
+        'S5000-H' => [
             'Device_Name'            => 'IdeaTab S5000-H',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
@@ -316,7 +316,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'S5000-H',
             'Device_Brand_Name'      => 'Lenovo',
         ],
-        'A7600-H'   => [
+        'A7600-H' => [
             'Device_Name'            => 'A10-70 A7600 Wi-Fi + 3G',
             'Device_Maker'           => 'Lenovo',
             'Device_Type'            => 'Tablet',
@@ -324,7 +324,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'A7600-H',
             'Device_Brand_Name'      => 'Lenovo',
         ],
-        'LG-L160L'   => [
+        'LG-L160L' => [
             'Device_Name'            => 'Optimus LTE2',
             'Device_Maker'           => 'LG',
             'Device_Type'            => 'Mobile Phone',
@@ -332,7 +332,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'L160L',
             'Device_Brand_Name'      => 'LG',
         ],
-        'GT-S5830'   => [
+        'GT-S5830' => [
             'Device_Name'            => 'Galaxy Ace',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
@@ -340,7 +340,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'GT-S5830',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'GT-S5830i'   => [
+        'GT-S5830i' => [
             'Device_Name'            => 'Galaxy Ace',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
@@ -348,7 +348,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'GT-S5830i',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'GT-S5830c'   => [
+        'GT-S5830c' => [
             'Device_Name'            => 'Galaxy Ace',
             'Device_Maker'           => 'Samsung',
             'Device_Type'            => 'Mobile Phone',
@@ -356,7 +356,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'GT-S5830C',
             'Device_Brand_Name'      => 'Samsung',
         ],
-        'MI 4W'   => [
+        'MI 4W' => [
             'Device_Name'            => 'MI 4W',
             'Device_Maker'           => 'Xiaomi Tech',
             'Device_Type'            => 'Mobile Phone',
@@ -364,7 +364,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'MI 4W',
             'Device_Brand_Name'      => 'Xiaomi',
         ],
-        'MI 4LTE'   => [
+        'MI 4LTE' => [
             'Device_Name'            => 'MI 4 LTE',
             'Device_Maker'           => 'Xiaomi Tech',
             'Device_Type'            => 'Mobile Phone',
@@ -372,7 +372,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             'Device_Code_Name'       => 'MI 4 LTE',
             'Device_Brand_Name'      => 'Xiaomi',
         ],
-        'Mi Pad'   => [
+        'Mi Pad' => [
             'Device_Name'            => 'Mi Pad',
             'Device_Maker'           => 'Xiaomi Tech',
             'Device_Type'            => 'Tablet',
@@ -829,11 +829,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         if (false !== strpos($ua, 'iPad')) {
-            $device   = 'iPad';
+            $device = 'iPad';
         } elseif (false !== strpos($ua, 'iPod')) {
-            $device   = 'iPod';
+            $device = 'iPod';
         } elseif (false !== strpos($ua, 'iPhone')) {
-            $device   = 'iPhone';
+            $device = 'iPhone';
         }
     } elseif (false !== strpos($ua, 'CPU iPhone OS')) {
         $platformNameBrowscap  = 'iOS';
@@ -850,11 +850,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         if (false !== strpos($ua, 'iPad')) {
-            $device   = 'iPad';
+            $device = 'iPad';
         } elseif (false !== strpos($ua, 'iPod')) {
-            $device   = 'iPod';
+            $device = 'iPod';
         } elseif (false !== strpos($ua, 'iPhone')) {
-            $device   = 'iPhone';
+            $device = 'iPhone';
         }
     } elseif (false !== strpos($ua, 'iOS')) {
         $platformNameBrowscap  = 'iOS';
@@ -866,11 +866,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
         if (false !== strpos($ua, 'iPad')) {
-            $device   = 'iPad';
+            $device = 'iPad';
         } elseif (false !== strpos($ua, 'iPod')) {
-            $device   = 'iPod';
+            $device = 'iPod';
         } elseif (false !== strpos($ua, 'iPhone')) {
-            $device   = 'iPhone';
+            $device = 'iPhone';
         }
     } elseif (false !== strpos($ua, 'Mac OS X')) {
         $platformNameBrowscap  = 'MacOSX';

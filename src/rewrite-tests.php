@@ -69,7 +69,7 @@ foreach ($files as $filename) {
         continue;
     }
 
-    $outputDetector  = "<?php\n\nreturn [\n";
+    $outputDetector = "<?php\n\nreturn [\n";
 
     foreach ($tests as $key => $test) {
         if (isset($data[$key])) {
