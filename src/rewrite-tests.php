@@ -90,193 +90,264 @@ foreach ($files as $filename) {
         $data[$key]          = $test;
         $checks[$test['ua']] = $key;
 
-        if (isset($test['properties']['Platform_Name'])) {
-            $platformName = $test['properties']['Platform_Name'];
+        if (isset($test['properties']['Platform_Codename'])) {
+            $platformCodename = $test['properties']['Platform_Codename'];
+        } elseif (isset($test['properties']['Platform_Name'])) {
+            $platformCodename = $test['properties']['Platform_Name'];
         } else {
-            $platformName = 'unknown';
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
+            $platformCodename = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Marketingname'])) {
+            $platformMarketingname = $test['properties']['Platform_Marketingname'];
+        } else {
+            $platformMarketingname = $platformCodename;
         }
 
         if (isset($test['properties']['Platform_Version'])) {
             $platformVersion = $test['properties']['Platform_Version'];
         } else {
+            echo '["' . $key . '"] platform version for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
             $platformVersion = 'unknown';
         }
 
         if (isset($test['properties']['Platform_Bits'])) {
             $platformBits = $test['properties']['Platform_Bits'];
         } else {
+            echo '["' . $key . '"] platform bits for UA "' . $test['ua'] . '" are missing, using "unknown" instead', PHP_EOL;
+
             $platformBits = 'unknown';
         }
 
         if (isset($test['properties']['Platform_Maker'])) {
             $platformMaker = $test['properties']['Platform_Maker'];
         } else {
+            echo '["' . $key . '"] platform maker for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
             $platformMaker = 'unknown';
         }
 
+        if (isset($test['properties']['Platform_Brand_Name'])) {
+            $platformBrandname = $test['properties']['Platform_Brand_Name'];
+        } else {
+            echo '["' . $key . '"] platform brand for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
+            $platformBrandname = 'unknown';
+        }
+
         // rewrite Darwin platform
-        if ('Darwin' === $platformName) {
+        if ('Darwin' === $platformCodename) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Darwin, rewriting', PHP_EOL;
 
             $platform = \BrowserDetector\Detector\Factory\Platform\DarwinFactory::detect($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Android' === $platformName && preg_match('/windows phone/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Windows' === $platformCodename) {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Windows, rewriting', PHP_EOL;
+
+            $platform = \BrowserDetector\Detector\Factory\Platform\WindowsFactory::detect($test['ua']);
+
+            $platformCodename = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
+            $platformBits    = $platform->getBits();
+            $platformMaker   = $platform->getManufacturer();
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Android' === $platformCodename && preg_match('/windows phone/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Android, but is mobile windows, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\WindowsPhoneOs($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Windows' === $platformName && preg_match('/wpdesktop/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Windows' === $platformCodename && preg_match('/wpdesktop/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Windows, but is mobile, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\WindowsPhoneOs($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/Puffin\/[\d\.]+I(T|P)/', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/Puffin\/[\d\.]+I(T|P)/', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is iOS, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Ios($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/Puffin\/[\d\.]+A(T|P)/', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/Puffin\/[\d\.]+A(T|P)/', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Android, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\AndroidOs($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/Puffin\/[\d\.]+W(T|P)/', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/Puffin\/[\d\.]+W(T|P)/', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Windows Phone, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\WindowsPhoneOs($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/kubuntu/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/kubuntu/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Kubuntu, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Kubuntu($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/ubuntu/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/ubuntu/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Ubuntu, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Ubuntu($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux Smartphone OS (Maemo)' === $platformName && preg_match('/ubuntu/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux Smartphone OS (Maemo)' === $platformCodename && preg_match('/ubuntu/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Maemo, but is Ubuntu, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Ubuntu($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/linux arm/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/linux arm/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Maemo, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Maemo($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/HP\-UX/', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/HP\-UX/', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is HP-UX, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Hpux($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Windows' === $platformName && preg_match('/windows ce/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Windows' === $platformCodename && preg_match('/windows ce/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Windows, but is Windows CE, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\WindowsCe($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/(red hat|redhat)/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/(red hat|redhat)/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Red Hut, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Redhat($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Windows Mobile OS' === $platformName && preg_match('/Windows Mobile; WCE/', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Windows Mobile OS' === $platformCodename && preg_match('/Windows Mobile; WCE/', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Windows Mobile, but is Windows CE, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\WindowsCe($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/SUSE/', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/SUSE/', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Suse, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Suse($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/centos/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/centos/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Cent OS, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\CentOs($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
-        } elseif ('Linux' === $platformName && preg_match('/mint/i', $test['ua'])) {
+            $platformBrandname = $platform->getBrand();
+        } elseif ('Linux' === $platformCodename && preg_match('/mint/i', $test['ua'])) {
             echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" was written as Linux, but is Linux Mint, rewriting', PHP_EOL;
 
             $platform = new \BrowserDetector\Detector\Os\Mint($test['ua']);
 
-            $platformName    = $platform->getName();
-            $platformVersion = $platform->getVersion();
+            $platformCodename    = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
             $platformBits    = $platform->getBits();
             $platformMaker   = $platform->getManufacturer();
+            $platformBrandname = $platform->getBrand();
         } else {
             $result = $detector->getBrowser($test['ua']);
 
-            if ($platformName === $result->getOs()->getName()) {
-                echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '", rewriting platform details', PHP_EOL;
+            if ($platformCodename === $result->getOs()->getName()) {
+                echo '["' . $key . '"] platform name for UA "' . $test['ua'] . ' successful detected", rewriting platform details', PHP_EOL;
 
-                $detectVersion = $result->getOs()->getVersion();
-                $platformBits  = $result->getOs()->getBits();
-                $platformMaker = $result->getOs()->getManufacturer();
+                $platformMarketingname = $result->getOs()->getMarketingName();
+                $platformVersion = $result->getOs()->getVersion()->getVersion();
+                $platformBits    = $result->getOs()->getBits();
+                $platformMaker   = $result->getOs()->getManufacturer();
+                $platformBrandname = $result->getOs()->getBrand();
             }
         }
 
@@ -297,10 +368,12 @@ foreach ($files as $filename) {
             'Browser_Maker'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Maker']) . "',
             'Browser_Modus'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Modus']) . "',
             'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformName) . "',
+            'Platform_Codename'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformCodename) . "',
+            'Platform_Marketingname'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformMarketingname) . "',
             'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformVersion) . "',
             'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformBits) . ",
             'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformMaker) . "',
+            'Platform_Brand_Name'     => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformBrandname) . "',
             'Device_Name'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Name']) . "',
             'Device_Maker'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Maker']) . "',
             'Device_Type'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Type']) . "',
