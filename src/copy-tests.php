@@ -185,6 +185,7 @@ foreach ($files as $filename) {
                         $marketingname = 'Windows NT';
                     }
                     $version = '0.0.0';
+                    break;
                 case 'MacOSX':
                     $codename = 'Mac OS X';
                     $marketingname = 'Mac OS X';
@@ -210,6 +211,7 @@ foreach ($files as $filename) {
             'Device_Maker'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Maker']) . "',
             'Device_Type'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Type']) . "',
             'Device_Pointing_Method'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Pointing_Method']) . "',
+            'Device_Dual_Orientation' => false,
             'Device_Code_Name'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Code_Name']) . "',
             'Device_Brand_Name'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Brand_Name']) . "',
             'RenderingEngine_Name'    => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Name']) . "',

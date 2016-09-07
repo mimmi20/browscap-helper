@@ -2778,6 +2778,7 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             : 'unknown') . "',
             'Device_Pointing_Method'  => '" . (isset($devices[$device]) ? $devices[$device]['Device_Pointing_Method']
             : 'unknown') . "',
+            'Device_Dual_Orientation' => false,
             'Device_Code_Name'        => '" . (isset($devices[$device]) ? $devices[$device]['Device_Code_Name']
             : 'unknown') . "',
             'Device_Brand_Name'       => '" . (isset($devices[$device]) ? $devices[$device]['Device_Brand_Name']
