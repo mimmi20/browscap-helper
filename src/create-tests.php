@@ -137,16 +137,16 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $browserMaker        = 'unknown';
     $browserVersion      = '0.0';
 
-    $platformNameBrowscap        = 'unknown';
-    $platformCodenameDetector        = 'unknown';
-    $platformMarketingnameDetector = 'unknown';
-    $platformVersionBrowscap     = 'unknown';
-    $platformVersionDetector     = 'unknown';
-    $platformBits                = 32;
-    $platformMakerBrowscap       = 'unknown';
-    $platformMakerNameDetector       = 'unknown';
-    $platformMakerBrandnameDetector       = 'unknown';
-    $platformDescriptionBrowscap = 'unknown';
+    $platformNameBrowscap           = 'unknown';
+    $platformCodenameDetector       = 'unknown';
+    $platformMarketingnameDetector  = 'unknown';
+    $platformVersionBrowscap        = 'unknown';
+    $platformVersionDetector        = 'unknown';
+    $platformBits                   = 32;
+    $platformMakerBrowscap          = 'unknown';
+    $platformMakerNameDetector      = 'unknown';
+    $platformMakerBrandnameDetector = 'unknown';
+    $platformDescriptionBrowscap    = 'unknown';
 
     $engineName    = 'unknown';
     $engineVersion = 'unknown';
@@ -391,23 +391,23 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $standard = true;
 
     if (false !== strpos($ua, 'Windows Phone')) {
-        $platformNameBrowscap  = 'WinPhone';
-        $platformCodenameDetector  = 'Windows Phone OS';
+        $platformNameBrowscap           = 'WinPhone';
+        $platformCodenameDetector       = 'Windows Phone OS';
         $platformMarketingnameDetector  = 'Windows Phone OS';
-        $platformMakerBrowscap = 'Microsoft Corporation';
-        $platformMakerNameDetector = 'Microsoft Corporation';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'wds')) {
-        $platformNameBrowscap  = 'Windows Phone OS';
-        $platformCodenameDetector  = 'Windows Phone OS';
+        $platformNameBrowscap           = 'Windows Phone OS';
+        $platformCodenameDetector       = 'Windows Phone OS';
         $platformMarketingnameDetector  = 'Windows Phone OS';
-        $platformMakerBrowscap = 'Microsoft Corporation';
-        $platformMakerNameDetector = 'Microsoft Corporation';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -416,43 +416,43 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $platformVersionDetector = $matches[1];
         }
     } elseif (false !== stripos($ua, 'wpdesktop')) {
-        $platformNameBrowscap  = 'WinPhone';
-        $platformCodenameDetector  = 'Windows Phone OS';
+        $platformNameBrowscap           = 'WinPhone';
+        $platformCodenameDetector       = 'Windows Phone OS';
         $platformMarketingnameDetector  = 'Windows Phone OS';
-        $platformMakerBrowscap = 'Microsoft Corporation';
-        $platformMakerNameDetector = 'Microsoft Corporation';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'Tizen')) {
-        $platformNameBrowscap  = 'Tizen';
-        $platformCodenameDetector  = 'Tizen';
+        $platformNameBrowscap           = 'Tizen';
+        $platformCodenameDetector       = 'Tizen';
         $platformMarketingnameDetector  = 'Tizen';
-        $platformMakerBrowscap = 'unknown';
-        $platformMakerNameDetector = 'unknown';
+        $platformMakerBrowscap          = 'unknown';
+        $platformMakerNameDetector      = 'unknown';
         $platformMakerBrandnameDetector = 'unknown';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'Windows CE')) {
-        $platformNameBrowscap  = 'WinCE';
-        $platformCodenameDetector  = 'Windows CE';
+        $platformNameBrowscap           = 'WinCE';
+        $platformCodenameDetector       = 'Windows CE';
         $platformMarketingnameDetector  = 'Windows CE';
-        $platformMakerBrowscap = 'Microsoft Corporation';
-        $platformMakerNameDetector = 'Microsoft Corporation';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'Windows CE';
     } elseif (false !== strpos($ua, 'Linux; Android')) {
-        $platformNameBrowscap  = 'Android';
-        $platformCodenameDetector  = 'Android';
+        $platformNameBrowscap           = 'Android';
+        $platformCodenameDetector       = 'Android';
         $platformMarketingnameDetector  = 'Android';
-        $platformMakerBrowscap = 'Google Inc';
-        $platformMakerNameDetector = 'Google Inc';
+        $platformMakerBrowscap          = 'Google Inc';
+        $platformMakerNameDetector      = 'Google Inc';
         $platformMakerBrandnameDetector = 'Google';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'Android OS';
 
@@ -461,13 +461,13 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'Linux; U; Android')) {
-        $platformNameBrowscap  = 'Android';
-        $platformCodenameDetector  = 'Android';
+        $platformNameBrowscap           = 'Android';
+        $platformCodenameDetector       = 'Android';
         $platformMarketingnameDetector  = 'Android';
-        $platformMakerBrowscap = 'Google Inc';
-        $platformMakerNameDetector = 'Google Inc';
+        $platformMakerBrowscap          = 'Google Inc';
+        $platformMakerNameDetector      = 'Google Inc';
         $platformMakerBrandnameDetector = 'Google';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'Android OS';
 
@@ -476,13 +476,13 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'U; Adr')) {
-        $platformNameBrowscap  = 'Android';
-        $platformCodenameDetector  = 'Android';
+        $platformNameBrowscap           = 'Android';
+        $platformCodenameDetector       = 'Android';
         $platformMarketingnameDetector  = 'Android';
-        $platformMakerBrowscap = 'Google Inc';
-        $platformMakerNameDetector = 'Google Inc';
+        $platformMakerBrowscap          = 'Google Inc';
+        $platformMakerNameDetector      = 'Google Inc';
         $platformMakerBrandnameDetector = 'Google';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'Android OS';
 
@@ -491,51 +491,51 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $platformVersionDetector = $matches[1];
         }
     } elseif (false !== strpos($ua, 'Android') || false !== strpos($ua, 'MTK')) {
-        $platformNameBrowscap  = 'Android';
-        $platformCodenameDetector  = 'Android';
+        $platformNameBrowscap           = 'Android';
+        $platformCodenameDetector       = 'Android';
         $platformMarketingnameDetector  = 'Android';
-        $platformMakerBrowscap = 'Google Inc';
-        $platformMakerNameDetector = 'Google Inc';
+        $platformMakerBrowscap          = 'Google Inc';
+        $platformMakerNameDetector      = 'Google Inc';
         $platformMakerBrandnameDetector = 'Google';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'Android OS';
     } elseif (false !== strpos($ua, 'OpenBSD')) {
-        $platformNameBrowscap = 'OpenBSD';
-        $platformCodenameDetector = 'OpenBSD';
-        $platformMarketingnameDetector  = 'OpenBSD';
+        $platformNameBrowscap          = 'OpenBSD';
+        $platformCodenameDetector      = 'OpenBSD';
+        $platformMarketingnameDetector = 'OpenBSD';
 
         $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'Symbian') || false !== strpos($ua, 'Series 60')) {
-        $platformNameBrowscap  = 'SymbianOS';
-        $platformCodenameDetector  = 'Symbian OS';
+        $platformNameBrowscap           = 'SymbianOS';
+        $platformCodenameDetector       = 'Symbian OS';
         $platformMarketingnameDetector  = 'Symbian OS';
-        $platformMakerBrowscap = 'Symbian Foundation';
-        $platformMakerNameDetector = 'Symbian Foundation';
+        $platformMakerBrowscap          = 'Symbian Foundation';
+        $platformMakerNameDetector      = 'Symbian Foundation';
         $platformMakerBrandnameDetector = 'Symbian';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'MIDP')) {
-        $platformNameBrowscap  = 'JAVA';
-        $platformCodenameDetector  = 'Java';
+        $platformNameBrowscap           = 'JAVA';
+        $platformCodenameDetector       = 'Java';
         $platformMarketingnameDetector  = 'Java';
-        $platformMakerBrowscap = 'Oracle';
-        $platformMakerNameDetector = 'Oracle';
+        $platformMakerBrowscap          = 'Oracle';
+        $platformMakerNameDetector      = 'Oracle';
         $platformMakerBrandnameDetector = 'Oracle';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'unknown';
     } elseif (false !== strpos($ua, 'Windows NT 10.0')) {
-        $platformNameBrowscap    = 'Win10';
-        $platformCodenameDetector    = 'Windows NT 10.0';
+        $platformNameBrowscap           = 'Win10';
+        $platformCodenameDetector       = 'Windows NT 10.0';
         $platformMarketingnameDetector  = 'Windows 10';
-        $platformVersionBrowscap = '10.0';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '10.0';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -547,15 +547,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.4')) {
-        $platformNameBrowscap    = 'Win10';
-        $platformCodenameDetector    = 'Windows NT 6.4';
+        $platformNameBrowscap           = 'Win10';
+        $platformCodenameDetector       = 'Windows NT 6.4';
         $platformMarketingnameDetector  = 'Windows 10';
-        $platformVersionBrowscap = '6.4';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.4';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -567,15 +567,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.3') && false !== strpos($ua, 'ARM')) {
-        $platformNameBrowscap    = 'Win8.1';
-        $platformCodenameDetector    = 'Windows RT 8.1';
+        $platformNameBrowscap           = 'Win8.1';
+        $platformCodenameDetector       = 'Windows RT 8.1';
         $platformMarketingnameDetector  = 'Windows RT 8.1';
-        $platformVersionBrowscap = '6.3';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.3';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -587,15 +587,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.3')) {
-        $platformNameBrowscap    = 'Win8.1';
-        $platformCodenameDetector    = 'Windows NT 6.3';
+        $platformNameBrowscap           = 'Win8.1';
+        $platformCodenameDetector       = 'Windows NT 6.3';
         $platformMarketingnameDetector  = 'Windows 8.1';
-        $platformVersionBrowscap = '6.3';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.3';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -607,15 +607,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.2') && false !== strpos($ua, 'ARM')) {
-        $platformNameBrowscap    = 'Win8';
-        $platformCodenameDetector    = 'Windows RT 8';
+        $platformNameBrowscap           = 'Win8';
+        $platformCodenameDetector       = 'Windows RT 8';
         $platformMarketingnameDetector  = 'Windows RT 8';
-        $platformVersionBrowscap = '6.2';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.2';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -627,15 +627,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.2')) {
-        $platformNameBrowscap    = 'Win8';
-        $platformCodenameDetector    = 'Windows NT 6.2';
+        $platformNameBrowscap           = 'Win8';
+        $platformCodenameDetector       = 'Windows NT 6.2';
         $platformMarketingnameDetector  = 'Windows 8';
-        $platformVersionBrowscap = '6.2';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.2';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -647,15 +647,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.1')) {
-        $platformNameBrowscap    = 'Win7';
-        $platformCodenameDetector    = 'Windows NT 6.1';
+        $platformNameBrowscap           = 'Win7';
+        $platformCodenameDetector       = 'Windows NT 6.1';
         $platformMarketingnameDetector  = 'Windows 7';
-        $platformVersionBrowscap = '6.1';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.1';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -667,15 +667,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 6.0')) {
-        $platformNameBrowscap    = 'WinVista';
-        $platformCodenameDetector    = 'Windows NT 6.0';
+        $platformNameBrowscap           = 'WinVista';
+        $platformCodenameDetector       = 'Windows NT 6.0';
         $platformMarketingnameDetector  = 'Windows Vista';
-        $platformVersionBrowscap = '6.0';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '6.0';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -687,15 +687,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.2')) {
-        $platformNameBrowscap    = 'WinXP';
-        $platformCodenameDetector    = 'Windows NT 5.2';
+        $platformNameBrowscap           = 'WinXP';
+        $platformCodenameDetector       = 'Windows NT 5.2';
         $platformMarketingnameDetector  = 'Windows XP';
-        $platformVersionBrowscap = '5.2';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '5.2';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -707,15 +707,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.1')) {
-        $platformNameBrowscap    = 'WinXP';
-        $platformCodenameDetector    = 'Windows NT 5.1';
+        $platformNameBrowscap           = 'WinXP';
+        $platformCodenameDetector       = 'Windows NT 5.1';
         $platformMarketingnameDetector  = 'Windows XP';
-        $platformVersionBrowscap = '5.1';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '5.1';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -727,15 +727,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
 
         $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.0')) {
-        $platformNameBrowscap    = 'Win2000';
-        $platformCodenameDetector    = 'Windows NT 5.0';
+        $platformNameBrowscap           = 'Win2000';
+        $platformCodenameDetector       = 'Windows NT 5.0';
         $platformMarketingnameDetector  = 'Windows 2000';
-        $platformVersionBrowscap = '5.0';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '5.0';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -748,15 +748,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 4.1')) {
-        $platformNameBrowscap    = 'WinNT';
-        $platformCodenameDetector    = 'Windows NT 4.1';
+        $platformNameBrowscap           = 'WinNT';
+        $platformCodenameDetector       = 'Windows NT 4.1';
         $platformMarketingnameDetector  = 'Windows NT';
-        $platformVersionBrowscap = '4.1';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '4.1';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -769,15 +769,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 4.0')) {
-        $platformNameBrowscap    = 'WinNT';
-        $platformCodenameDetector    = 'Windows NT 4.0';
+        $platformNameBrowscap           = 'WinNT';
+        $platformCodenameDetector       = 'Windows NT 4.0';
         $platformMarketingnameDetector  = 'Windows NT';
-        $platformVersionBrowscap = '4.0';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '4.0';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -790,15 +790,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 3.5')) {
-        $platformNameBrowscap    = 'WinNT';
-        $platformCodenameDetector    = 'Windows NT 3.5';
+        $platformNameBrowscap           = 'WinNT';
+        $platformCodenameDetector       = 'Windows NT 3.5';
         $platformMarketingnameDetector  = 'Windows NT';
-        $platformVersionBrowscap = '3.5';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '3.5';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -811,15 +811,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 3.1')) {
-        $platformNameBrowscap    = 'WinNT';
-        $platformCodenameDetector    = 'Windows NT 3.1';
+        $platformNameBrowscap           = 'WinNT';
+        $platformCodenameDetector       = 'Windows NT 3.1';
         $platformMarketingnameDetector  = 'Windows NT';
-        $platformVersionBrowscap = '3.1';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = '3.1';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -832,15 +832,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT')) {
-        $platformNameBrowscap    = 'WinNT';
-        $platformCodenameDetector    = 'Windows NT';
+        $platformNameBrowscap           = 'WinNT';
+        $platformCodenameDetector       = 'Windows NT';
         $platformMarketingnameDetector  = 'Windows NT';
-        $platformVersionBrowscap = 'unknown';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = 'unknown';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -853,15 +853,15 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== stripos($ua, 'cygwin')) {
-        $platformNameBrowscap    = 'Cygwin';
-        $platformCodenameDetector    = 'Cygwin';
+        $platformNameBrowscap           = 'Cygwin';
+        $platformCodenameDetector       = 'Cygwin';
         $platformMarketingnameDetector  = 'Cygwin';
-        $platformVersionBrowscap = 'unknown';
-        $platformVersionDetector = '0.0.0';
-        $platformMakerBrowscap   = 'Microsoft Corporation';
-        $platformMakerNameDetector   = 'Microsoft Corporation';
+        $platformVersionBrowscap        = 'unknown';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
         $platformMakerBrandnameDetector = 'Microsoft';
-        $mobileDevice            = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
@@ -874,13 +874,13 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $device   = 'Windows Desktop';
         $standard = false;
     } elseif (false !== strpos($ua, 'CPU OS')) {
-        $platformNameBrowscap  = 'iOS';
-        $platformCodenameDetector  = 'iOS';
+        $platformNameBrowscap           = 'iOS';
+        $platformCodenameDetector       = 'iOS';
         $platformMarketingnameDetector  = 'iOS';
-        $platformMakerBrowscap = 'Apple Inc';
-        $platformMakerNameDetector = 'Apple Inc';
+        $platformMakerBrowscap          = 'Apple Inc';
+        $platformMakerNameDetector      = 'Apple Inc';
         $platformMakerBrandnameDetector = 'Apple';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
@@ -897,13 +897,13 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $device = 'iPhone';
         }
     } elseif (false !== strpos($ua, 'CPU iPhone OS')) {
-        $platformNameBrowscap  = 'iOS';
-        $platformCodenameDetector  = 'iOS';
+        $platformNameBrowscap           = 'iOS';
+        $platformCodenameDetector       = 'iOS';
         $platformMarketingnameDetector  = 'iOS';
-        $platformMakerBrowscap = 'Apple Inc';
-        $platformMakerNameDetector = 'Apple Inc';
+        $platformMakerBrowscap          = 'Apple Inc';
+        $platformMakerNameDetector      = 'Apple Inc';
         $platformMakerBrandnameDetector = 'Apple';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
@@ -920,13 +920,13 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $device = 'iPhone';
         }
     } elseif (false !== strpos($ua, 'iOS')) {
-        $platformNameBrowscap  = 'iOS';
-        $platformCodenameDetector  = 'iOS';
+        $platformNameBrowscap           = 'iOS';
+        $platformCodenameDetector       = 'iOS';
         $platformMarketingnameDetector  = 'iOS';
-        $platformMakerBrowscap = 'Apple Inc';
-        $platformMakerNameDetector = 'Apple Inc';
+        $platformMakerBrowscap          = 'Apple Inc';
+        $platformMakerNameDetector      = 'Apple Inc';
         $platformMakerBrandnameDetector = 'Apple';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
@@ -938,8 +938,8 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
             $device = 'iPhone';
         }
     } elseif (false !== strpos($ua, 'Mac OS X')) {
-        $platformMakerBrowscap = 'Apple Inc';
-        $platformMakerNameDetector = 'Apple Inc';
+        $platformMakerBrowscap          = 'Apple Inc';
+        $platformMakerNameDetector      = 'Apple Inc';
         $platformMakerBrandnameDetector = 'Apple';
 
         $platformDescriptionBrowscap = 'Mac OS X';
@@ -950,148 +950,148 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         if (version_compare((float) $platformVersionBrowscap, 10.12, '>=')) {
-            $platformNameBrowscap  = 'macOS';
+            $platformNameBrowscap = 'macOS';
         } else {
-            $platformNameBrowscap  = 'MacOSX';
+            $platformNameBrowscap = 'MacOSX';
         }
 
         if (version_compare((float) $platformVersionDetector, 10.12, '>=')) {
-            $platformCodenameDetector  = 'macOS';
-            $platformMarketingnameDetector  = 'macOS';
+            $platformCodenameDetector      = 'macOS';
+            $platformMarketingnameDetector = 'macOS';
         } else {
-            $platformCodenameDetector  = 'Mac OS X';
-            $platformMarketingnameDetector  = 'Mac OS X';
+            $platformCodenameDetector      = 'Mac OS X';
+            $platformMarketingnameDetector = 'Mac OS X';
         }
 
         $device = 'Macintosh';
     } elseif (false !== stripos($ua, 'kubuntu')) {
-        $platformNameBrowscap  = 'Ubuntu';
-        $platformCodenameDetector  = 'Kubuntu';
+        $platformNameBrowscap           = 'Ubuntu';
+        $platformCodenameDetector       = 'Kubuntu';
         $platformMarketingnameDetector  = 'Kubuntu';
-        $platformMakerBrowscap = 'Canonical Foundation';
-        $platformMakerNameDetector = 'Canonical Foundation';
+        $platformMakerBrowscap          = 'Canonical Foundation';
+        $platformMakerNameDetector      = 'Canonical Foundation';
         $platformMakerBrandnameDetector = 'Canonical';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'ubuntu')) {
-        $platformNameBrowscap  = 'Ubuntu';
-        $platformCodenameDetector  = 'Ubuntu';
+        $platformNameBrowscap           = 'Ubuntu';
+        $platformCodenameDetector       = 'Ubuntu';
         $platformMarketingnameDetector  = 'Ubuntu';
-        $platformMakerBrowscap = 'Canonical Foundation';
-        $platformMakerNameDetector = 'Canonical Foundation';
+        $platformMakerBrowscap          = 'Canonical Foundation';
+        $platformMakerNameDetector      = 'Canonical Foundation';
         $platformMakerBrandnameDetector = 'Canonical';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'fedora')) {
-        $platformNameBrowscap  = 'Linux';
-        $platformCodenameDetector  = 'Fedora Linux';
+        $platformNameBrowscap           = 'Linux';
+        $platformCodenameDetector       = 'Fedora Linux';
         $platformMarketingnameDetector  = 'Fedora Linux';
-        $platformMakerBrowscap = 'Linux Foundation';
-        $platformMakerNameDetector = 'Red Hat Inc';
+        $platformMakerBrowscap          = 'Linux Foundation';
+        $platformMakerNameDetector      = 'Red Hat Inc';
         $platformMakerBrandnameDetector = 'Red Hat';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'suse')) {
-        $platformNameBrowscap  = 'Linux';
-        $platformCodenameDetector  = 'Suse Linux';
+        $platformNameBrowscap           = 'Linux';
+        $platformCodenameDetector       = 'Suse Linux';
         $platformMarketingnameDetector  = 'Suse Linux';
-        $platformMakerBrowscap = 'Linux Foundation';
-        $platformMakerNameDetector = 'Suse';
+        $platformMakerBrowscap          = 'Linux Foundation';
+        $platformMakerNameDetector      = 'Suse';
         $platformMakerBrandnameDetector = 'Suse';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'mandriva')) {
-        $platformNameBrowscap  = 'Linux';
-        $platformCodenameDetector  = 'Mandriva Linux';
+        $platformNameBrowscap           = 'Linux';
+        $platformCodenameDetector       = 'Mandriva Linux';
         $platformMarketingnameDetector  = 'Mandriva Linux';
-        $platformMakerBrowscap = 'Linux Foundation';
-        $platformMakerNameDetector = 'Mandriva';
+        $platformMakerBrowscap          = 'Linux Foundation';
+        $platformMakerNameDetector      = 'Mandriva';
         $platformMakerBrandnameDetector = 'Mandriva';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'gentoo')) {
-        $platformNameBrowscap  = 'Linux';
-        $platformCodenameDetector  = 'Gentoo Linux';
+        $platformNameBrowscap           = 'Linux';
+        $platformCodenameDetector       = 'Gentoo Linux';
         $platformMarketingnameDetector  = 'Gentoo Linux';
-        $platformMakerBrowscap = 'Linux Foundation';
-        $platformMakerNameDetector = 'Gentoo Foundation Inc';
+        $platformMakerBrowscap          = 'Linux Foundation';
+        $platformMakerNameDetector      = 'Gentoo Foundation Inc';
         $platformMakerBrandnameDetector = 'Gentoo';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== stripos($ua, 'slackware')) {
-        $platformNameBrowscap  = 'Linux';
-        $platformCodenameDetector  = 'Slackware Linux';
+        $platformNameBrowscap           = 'Linux';
+        $platformCodenameDetector       = 'Slackware Linux';
         $platformMarketingnameDetector  = 'Slackware Linux';
-        $platformMakerBrowscap = 'Linux Foundation';
-        $platformMakerNameDetector = 'Slackware Linux Inc';
+        $platformMakerBrowscap          = 'Linux Foundation';
+        $platformMakerNameDetector      = 'Slackware Linux Inc';
         $platformMakerBrandnameDetector = 'Slackware';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== strpos($ua, 'CrOS')) {
-        $platformNameBrowscap  = 'ChromeOS';
-        $platformCodenameDetector  = 'ChromeOS';
+        $platformNameBrowscap           = 'ChromeOS';
+        $platformCodenameDetector       = 'ChromeOS';
         $platformMarketingnameDetector  = 'ChromeOS';
-        $platformMakerBrowscap = 'Google Inc';
-        $platformMakerNameDetector = 'Google Inc';
+        $platformMakerBrowscap          = 'Google Inc';
+        $platformMakerNameDetector      = 'Google Inc';
         $platformMakerBrandnameDetector = 'Google';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'unknown';
 
         $device = 'Linux Desktop';
     } elseif (false !== strpos($ua, 'Linux')) {
-        $platformNameBrowscap  = 'Linux';
-        $platformCodenameDetector  = 'Linux';
+        $platformNameBrowscap           = 'Linux';
+        $platformCodenameDetector       = 'Linux';
         $platformMarketingnameDetector  = 'Linux';
-        $platformMakerBrowscap = 'Linux Foundation';
-        $platformMakerNameDetector = 'Linux Foundation';
+        $platformMakerBrowscap          = 'Linux Foundation';
+        $platformMakerNameDetector      = 'Linux Foundation';
         $platformMakerBrandnameDetector = 'Linux Foundation';
-        $mobileDevice          = 'false';
+        $mobileDevice                   = 'false';
 
         $platformDescriptionBrowscap = 'Linux';
 
         $device = 'Linux Desktop';
     } elseif (false !== strpos($ua, 'SymbOS')) {
-        $platformNameBrowscap  = 'SymbianOS';
-        $platformCodenameDetector  = 'Symbian OS';
+        $platformNameBrowscap           = 'SymbianOS';
+        $platformCodenameDetector       = 'Symbian OS';
         $platformMarketingnameDetector  = 'Symbian OS';
-        $platformMakerBrowscap = 'Symbian Foundation';
-        $platformMakerNameDetector = 'Symbian Foundation';
+        $platformMakerBrowscap          = 'Symbian Foundation';
+        $platformMakerNameDetector      = 'Symbian Foundation';
         $platformMakerBrandnameDetector = 'Symbian';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'Symbian OS';
 
         //$device = 'Linux Desktop';
     } elseif (false !== strpos($ua, 'hpwOS')) {
-        $platformNameBrowscap  = 'webOS';
-        $platformCodenameDetector  = 'webOS';
+        $platformNameBrowscap           = 'webOS';
+        $platformCodenameDetector       = 'webOS';
         $platformMarketingnameDetector  = 'webOS';
-        $platformMakerBrowscap = 'HP';
-        $platformMakerNameDetector = 'HP';
+        $platformMakerBrowscap          = 'HP';
+        $platformMakerNameDetector      = 'HP';
         $platformMakerBrandnameDetector = 'HP';
-        $mobileDevice          = 'true';
+        $mobileDevice                   = 'true';
 
         $platformDescriptionBrowscap = 'webOS';
 
@@ -1382,11 +1382,11 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         if (false === strpos($ua, 'Android')) {
             $browserModus = 'Desktop Mode';
 
-            $platformNameBrowscap  = 'Android';
+            $platformNameBrowscap      = 'Android';
             $platformCodenameDetector  = 'Android';
-            $platformMakerBrowscap = 'Google Inc';
+            $platformMakerBrowscap     = 'Google Inc';
             $platformMakerNameDetector = 'Google Inc';
-            $mobileDevice          = 'true';
+            $mobileDevice              = 'true';
 
             $platformDescriptionBrowscap = 'Android OS';
         }

@@ -78,116 +78,116 @@ foreach ($files as $filename) {
                 $version = '0.0.0';
             }
 
-            $codename = $platform;
+            $codename      = $platform;
             $marketingname = $platform;
 
             switch ($platform) {
                 case 'Win10':
                     if ('10.0' === $version) {
-                        $codename = 'Windows NT 10.0';
+                        $codename      = 'Windows NT 10.0';
                         $marketingname = 'Windows 10';
                     } else {
-                        $codename = 'Windows NT 6.4';
+                        $codename      = 'Windows NT 6.4';
                         $marketingname = 'Windows 10';
                     }
                     $version = '0.0.0';
                     break;
                 case 'Win8.1':
-                    $codename = 'Windows NT 6.3';
+                    $codename      = 'Windows NT 6.3';
                     $marketingname = 'Windows 8.1';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'Win8':
-                    $codename = 'Windows NT 6.2';
+                    $codename      = 'Windows NT 6.2';
                     $marketingname = 'Windows 8';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'Win7':
-                    $codename = 'Windows NT 6.1';
+                    $codename      = 'Windows NT 6.1';
                     $marketingname = 'Windows 7';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'WinVista':
-                    $codename = 'Windows NT 6.0';
+                    $codename      = 'Windows NT 6.0';
                     $marketingname = 'Windows Vista';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'WinXP':
                     if ('5.2' === $version) {
-                        $codename = 'Windows NT 5.2';
+                        $codename      = 'Windows NT 5.2';
                         $marketingname = 'Windows XP';
                     } else {
-                        $codename = 'Windows NT 5.1';
+                        $codename      = 'Windows NT 5.1';
                         $marketingname = 'Windows XP';
                     }
                     $version = '0.0.0';
                     break;
                 case 'Win2000':
-                    $codename = 'Windows NT 5.0';
+                    $codename      = 'Windows NT 5.0';
                     $marketingname = 'Windows 2000';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'WinME':
-                    $codename = 'Windows ME';
+                    $codename      = 'Windows ME';
                     $marketingname = 'Windows ME';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'Win98':
-                    $codename = 'Windows 98';
+                    $codename      = 'Windows 98';
                     $marketingname = 'Windows 98';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'Win95':
-                    $codename = 'Windows 95';
+                    $codename      = 'Windows 95';
                     $marketingname = 'Windows 95';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'Win3.1':
-                    $codename = 'Windows 3.1';
+                    $codename      = 'Windows 3.1';
                     $marketingname = 'Windows 3.1';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'WinPhone10':
-                    $codename = 'Windows Phone OS';
+                    $codename      = 'Windows Phone OS';
                     $marketingname = 'Windows Phone OS';
-                    $version = '10.0.0';
+                    $version       = '10.0.0';
                     break;
                 case 'WinPhone8.1':
-                    $codename = 'Windows Phone OS';
+                    $codename      = 'Windows Phone OS';
                     $marketingname = 'Windows Phone OS';
-                    $version = '8.1.0';
+                    $version       = '8.1.0';
                     break;
                 case 'WinPhone8':
-                    $codename = 'Windows Phone OS';
+                    $codename      = 'Windows Phone OS';
                     $marketingname = 'Windows Phone OS';
-                    $version = '8.0.0';
+                    $version       = '8.0.0';
                     break;
                 case 'Win32':
-                    $codename = 'Windows';
+                    $codename      = 'Windows';
                     $marketingname = 'Windows';
-                    $version = '0.0.0';
+                    $version       = '0.0.0';
                     break;
                 case 'WinNT':
                     if ('4.0' === $version) {
-                        $codename = 'Windows NT 4.0';
+                        $codename      = 'Windows NT 4.0';
                         $marketingname = 'Windows NT';
                     } elseif ('4.1' === $version) {
-                        $codename = 'Windows NT 4.1';
+                        $codename      = 'Windows NT 4.1';
                         $marketingname = 'Windows NT';
                     } elseif ('3.5' === $version) {
-                        $codename = 'Windows NT 3.5';
+                        $codename      = 'Windows NT 3.5';
                         $marketingname = 'Windows NT';
                     } elseif ('3.1' === $version) {
-                        $codename = 'Windows NT 3.1';
+                        $codename      = 'Windows NT 3.1';
                         $marketingname = 'Windows NT';
                     } else {
-                        $codename = 'Windows NT';
+                        $codename      = 'Windows NT';
                         $marketingname = 'Windows NT';
                     }
                     $version = '0.0.0';
                     break;
                 case 'MacOSX':
-                    $codename = 'Mac OS X';
+                    $codename      = 'Mac OS X';
                     $marketingname = 'Mac OS X';
                     break;
             }
