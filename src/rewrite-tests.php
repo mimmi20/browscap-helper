@@ -568,6 +568,30 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/desire[ _]eye/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireEye($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 9/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcNexus9($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(rm\-1113|lumia 640 lte)/i', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
@@ -976,6 +1000,18 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/E5823/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE5823($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/ONEPLUS A3000/i', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
@@ -1124,6 +1160,18 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT525($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-T810/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT810($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -1328,6 +1376,210 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE500H($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A500FU/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500fu($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A500F/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500f($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A300FU/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA300fu($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A300F/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA300f($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A310F/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA310f($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A510FD/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510fd($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A510F/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510f($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A510M/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510m($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A510Y/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510y($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-A5100/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA5100($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J500FN/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500fn($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J500F/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500f($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J500G/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500g($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J500Y/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500y($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J500M/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500m($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J500H/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500h($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SM\-J5007/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ5007($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -2008,6 +2260,18 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/gt\-n8010/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8010($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/sgh\-e250i/i', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
@@ -2120,6 +2384,18 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE210k($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 10/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGalaxyNexus10($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -2260,10 +2536,46 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
-        } elseif (preg_match('/Nexus 5X/i', $test['ua'])) {
+        } elseif (preg_match('/LG\-V935/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgv935($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 5x/i', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgNexus5x($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 5/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgNexus5($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 4/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgNexus4($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -2324,6 +2636,18 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP733x($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/LIFETAB_P1034X/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP1034x($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -2512,10 +2836,70 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 6p/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiNexus6p($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 6/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaNexus6($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/ME302KL/i', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusMe302kl($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/nexus 7/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusGalaxyNexus7($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/K013/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusMemoPadK013($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/ME302C/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusMe302c($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -2600,6 +2984,18 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA850Plus($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/SmartTabII10/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\VodafoneSmartTabIi10($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -2720,6 +3116,54 @@ foreach ($files as $filename) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
             $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteN919($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/ZTE Blade L5 Plus/', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBladeL5plus($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/IEOS_QUAD_W/', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysIeosQuadw($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/MAVEN_10_PLUS/', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysMaven10plus($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/AT300SE/', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Toshiba\ToshibaAt300SE($test['ua']);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
