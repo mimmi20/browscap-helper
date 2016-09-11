@@ -3100,6 +3100,18 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/Archos 101 Copper/', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos101Copper($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/ZTE Blade V6/', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
