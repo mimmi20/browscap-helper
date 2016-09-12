@@ -3004,6 +3004,18 @@ foreach ($files as $filename) {
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
+        } elseif (preg_match('/P1032X/i', $test['ua'])) {
+            echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
+
+            $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoP1032x($test['ua']);
+
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/S208/i', $test['ua'])) {
             echo '["' . $key . '"] device name for UA "' . $test['ua'] . '" is rewritten', PHP_EOL;
 
