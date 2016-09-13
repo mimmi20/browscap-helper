@@ -10,25 +10,21 @@ ini_set('max_input_time', '-1');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-define('DB_SERVER', 'localhost');
-define('DB_NAME', 'test');
-define('DB_USER', 'root');
-define('DB_PASSWORD', '');
-
 date_default_timezone_set('Europe/Berlin');
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $sourcesDirectory =  __DIR__ . '/../sources/';
+$targetDirectory  =  __DIR__ . '/../results/';
 
 $i = 0;
 $j = 0;
 
 $requests = [];
 
-$targetSqlFile  = __DIR__ . '/../results/' . date('Y-m-d') . '-testagents.sql';
-$targetBulkFile = __DIR__ . '/../results/' . date('Y-m-d') . '-testagents.txt';
-$targetInfoFile = __DIR__ . '/../results/' . date('Y-m-d') . '-testagents.info.txt';
+$targetSqlFile  = $targetDirectory . date('Y-m-d') . '-testagents.sql';
+$targetBulkFile = $targetDirectory . date('Y-m-d') . '-testagents.txt';
+$targetInfoFile = $targetDirectory . date('Y-m-d') . '-testagents.info.txt';
 
 echo "writing to file '" . $targetSqlFile . "'\n";
 
@@ -49,7 +45,7 @@ foreach ($files as $filename) {
     $requests = [];
 
     ++$i;
-    $filePath = strtolower($sourcesDirectory . $file->getFilename());
+    $filePath = strtolower($file->getPathname());
 
     echo '# ', sprintf('%1$05d', (int) $i), ' :', $filePath, ' [ bisher ', ($j > 0 ? $j : 'keine'), ' Agent', ($j !== 1 ? 'en' : ''), ' ]';
 
@@ -139,13 +135,16 @@ foreach ($files as $filename) {
     }
 
     file_put_contents($targetSqlFile, "\n\n", FILE_APPEND | LOCK_EX);
+
     file_put_contents($targetSqlFile, "COMMIT;\n\n", FILE_APPEND | LOCK_EX);
     $agentsToStore = '';
 
     $dauer = microtime(true) - $startTime;
     echo ' - fertig [ ', ($k > 0 ? $k . ' neue' : 'keine neuen'), ($k === 1 ? 'r' : ''), ' Agent', ($k !== 1 ? 'en' : ''), ', ', number_format($dauer, 4, ',', '.'), ' sec ]', PHP_EOL;
 
+    echo "\n";//exit;
     unlink($filePath);
+
     $j += $k;
 }
 
