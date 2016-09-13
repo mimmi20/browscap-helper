@@ -55,14 +55,21 @@ foreach ($files as $filename) {
         continue;
     }
 
-    if (in_array($file->getExtension(), ['gz', 'tgz', 'filepart', 'sql', 'rename', 'txt', 'zip', 'rar', 'php', 'gitkeep'])) {
+    if (in_array($file->getExtension(), ['filepart', 'sql', 'rename', 'txt', 'zip', 'rar', 'php', 'gitkeep'])) {
         echo ' - ignoriert', PHP_EOL;
 
         continue;
     }
 
     $startTime = microtime(true);
-    $loader->setLocalFile(getPath($file));
+
+    if (null === ($filepath = getPath($file))) {
+        echo ' - ignoriert', PHP_EOL;
+
+        continue;
+    }
+
+    $loader->setLocalFile($filepath);
 
     /** @var \GuzzleHttp\Psr7\Response $response */
     $response = $loader->load();
@@ -85,7 +92,7 @@ foreach ($files as $filename) {
     while (!$stream->eof()) {
         $line = $stream->read(8192);
 
-        $lineMatches = array();
+        $lineMatches = [];
 
         if (!preg_match($regex, $line, $lineMatches)) {
             file_put_contents($targetInfoFile, 'no useragent found in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
@@ -100,7 +107,7 @@ foreach ($files as $filename) {
         }
 
         if (isset($lineMatches['time'])) {
-            $datetime = new DateTime($lineMatches['time']);
+            $datetime   = new DateTime($lineMatches['time']);
             $timeOfLine = $datetime->format('Y-m-d H:i:s');
         } else {
             $timeOfLine = trim(extractTime($line));
@@ -142,7 +149,6 @@ foreach ($files as $filename) {
     $dauer = microtime(true) - $startTime;
     echo ' - fertig [ ', ($k > 0 ? $k . ' neue' : 'keine neuen'), ($k === 1 ? 'r' : ''), ' Agent', ($k !== 1 ? 'en' : ''), ', ', number_format($dauer, 4, ',', '.'), ' sec ]', PHP_EOL;
 
-    echo "\n";//exit;
     unlink($filePath);
 
     $j += $k;
@@ -230,18 +236,22 @@ function extractRequest($text)
  */
 function getPath(\SplFileInfo $file)
 {
+    if (false === realpath($file->getPathname())) {
+        return null;
+    }
+
     switch ($file->getExtension()) {
         case 'gz':
-            $path = 'compress.zlib://' . $file->getPathname();
+            $path = 'compress.zlib://' . realpath($file->getPathname());
             break;
         case 'bz2':
-            $path = 'compress.bzip2://' . $file->getPathname();
+            $path = 'compress.bzip2://' . realpath($file->getPathname());
             break;
         case 'tgz':
-            $path = 'phar://' . $file->getPathname();
+            $path = 'phar://' . realpath($file->getPathname());
             break;
         default:
-            $path = $file->getPathname();
+            $path = realpath($file->getPathname());
             break;
     }
 
