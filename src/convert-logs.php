@@ -28,7 +28,6 @@ $targetInfoFile = $targetDirectory . date('Y-m-d') . '-testagents.info.txt';
 
 echo "writing to file '" . $targetSqlFile . "'\n";
 
-$regex  = getRegex();
 $loader = new Loader();
 
 /*******************************************************************************
@@ -45,9 +44,7 @@ foreach ($files as $filename) {
     $requests = [];
 
     ++$i;
-    $filePath = strtolower($file->getPathname());
-
-    echo '# ', sprintf('%1$05d', (int) $i), ' :', $filePath, ' [ bisher ', ($j > 0 ? $j : 'keine'), ' Agent', ($j !== 1 ? 'en' : ''), ' ]';
+    echo '# ', sprintf('%1$05d', (int) $i), ' :', strtolower($file->getPathname()), ' [ bisher ', ($j > 0 ? $j : 'keine'), ' Agent', ($j !== 1 ? 'en' : ''), ' ]';
 
     if (!$file->isFile() || !$file->isReadable()) {
         echo ' - ignoriert', PHP_EOL;
@@ -61,13 +58,32 @@ foreach ($files as $filename) {
         continue;
     }
 
-    $startTime = microtime(true);
-
     if (null === ($filepath = getPath($file))) {
         echo ' - ignoriert', PHP_EOL;
 
         continue;
     }
+
+    $j += handleFile($loader, $filepath, $targetSqlFile, $targetInfoFile, $targetBulkFile, $file);
+}
+
+if (file_exists($targetBulkFile)) {
+    $data = file($targetBulkFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
+    $data = array_unique($data);
+
+    file_put_contents($targetBulkFile, implode("\n", $data), LOCK_EX);
+}
+
+echo PHP_EOL, PHP_EOL;
+echo 'lesen der Dateien beendet. ', $j, ' neue Agenten hinzugefuegt', PHP_EOL;
+exit;
+
+/*******************************************************************************
+ * library
+ ******************************************************************************/
+function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targetInfoFile, $targetBulkFile, \SplFileInfo $file)
+{
+    $startTime = microtime(true);
 
     $loader->setLocalFile($filepath);
 
@@ -79,10 +95,8 @@ foreach ($files as $filename) {
 
     $stream->read(1);
 
-    $k        = 0;
-    $agents   = [];
-    $ips      = [];
-    $requests = [];
+    $k      = 0;
+    $agents = [];
 
     file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . "\n\n", FILE_APPEND | LOCK_EX);
     file_put_contents($targetSqlFile, "START TRANSACTION;\n", FILE_APPEND | LOCK_EX);
@@ -94,7 +108,7 @@ foreach ($files as $filename) {
 
         $lineMatches = [];
 
-        if (!preg_match($regex, $line, $lineMatches)) {
+        if (!preg_match(getRegex(), $line, $lineMatches)) {
             file_put_contents($targetInfoFile, 'no useragent found in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
 
             continue;
@@ -144,30 +158,15 @@ foreach ($files as $filename) {
     file_put_contents($targetSqlFile, "\n\n", FILE_APPEND | LOCK_EX);
 
     file_put_contents($targetSqlFile, "COMMIT;\n\n", FILE_APPEND | LOCK_EX);
-    $agentsToStore = '';
 
     $dauer = microtime(true) - $startTime;
     echo ' - fertig [ ', ($k > 0 ? $k . ' neue' : 'keine neuen'), ($k === 1 ? 'r' : ''), ' Agent', ($k !== 1 ? 'en' : ''), ', ', number_format($dauer, 4, ',', '.'), ' sec ]', PHP_EOL;
 
-    unlink($filePath);
+    unlink($file->getPathname());
 
-    $j += $k;
+    return $k;
 }
 
-if (file_exists($targetBulkFile)) {
-    $data = file($targetBulkFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
-    $data = array_unique($data);
-
-    file_put_contents($targetBulkFile, implode("\n", $data), LOCK_EX);
-}
-
-echo PHP_EOL, PHP_EOL;
-echo 'lesen der Dateien beendet. ', $j, ' neue Agenten hinzugefuegt', PHP_EOL;
-exit;
-
-/*******************************************************************************
- * library
- ******************************************************************************/
 function extractAgent($text)
 {
     $parts = explode('"', $text);

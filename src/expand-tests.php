@@ -84,6 +84,11 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
         continue;
     }
 
+    handleFile($file, $properties, $browscap, $data, $checks);
+}
+
+function handleFile(\SplFileInfo $file, array $properties, \BrowscapPHP\Browscap $browscap, &$data, &$checks)
+{
     echo 'expand test file ', $file->getPathname(), ' ...', PHP_EOL;
 
     $tests = require_once $file->getPathname();
@@ -92,8 +97,6 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
         if (isset($data[$key])) {
             continue;
         }
-
-        //echo 'checking test ', $key, ' ...', PHP_EOL;
 
         $ua = null;
 
@@ -107,41 +110,7 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
             continue;
         }
 
-        $data[$key]  = $test;
-        $checks[$ua] = $key;
-
-        $newTest = [
-            'ua'         => $ua,
-            'properties' => $properties,
-            'lite'       => (array_key_exists('lite', $test) ? $test['lite'] : true),
-            'standard'   => (array_key_exists('standard', $test) ? $test['standard'] : true),
-        ];
-
-        $actualProps = (array) $browscap->getBrowser($ua);
-
-        foreach ($properties as $property => $value) {
-            $testProperties = null;
-
-            if (isset($test[1])) {
-                $testProperties = $test[1];
-            } elseif (isset($test['properties'])) {
-                $testProperties = $test['properties'];
-            }
-
-            if (null === $testProperties) {
-                continue;
-            }
-
-            if (array_key_exists($property, $testProperties)) {
-                $newTest['properties'][$property] = $testProperties[$property];
-            } elseif (array_key_exists(strtolower($property), $actualProps)) {
-                $newTest['properties'][$property] = $actualProps[strtolower($property)];
-            } else {
-                $newTest['properties'][$property] = $value;
-            }
-        }
-
-        $tests[$key] = $newTest;
+        $tests[$key] = hanleTest($key, $ua, $test, $properties, $browscap, $data, $checks);
     }
 
     $content = "<?php\n\nreturn " . var_export($tests, true) . ";\n";
@@ -157,4 +126,43 @@ foreach (new \RecursiveIteratorIterator($iterator) as $file) {
     echo 'writing file ', $file->getBasename(), ' ...', PHP_EOL;
 
     file_put_contents($file->getPathname(), $content);
+}
+
+function hanleTest($key, $ua, array $test, array $properties, \BrowscapPHP\Browscap $browscap, &$data, &$checks)
+{
+    $data[$key]  = $test;
+    $checks[$ua] = $key;
+
+    $newTest = [
+        'ua'         => $ua,
+        'properties' => $properties,
+        'lite'       => (array_key_exists('lite', $test) ? $test['lite'] : true),
+        'standard'   => (array_key_exists('standard', $test) ? $test['standard'] : true),
+    ];
+
+    $actualProps = (array) $browscap->getBrowser($ua);
+
+    foreach ($properties as $property => $value) {
+        $testProperties = null;
+
+        if (isset($test[1])) {
+            $testProperties = $test[1];
+        } elseif (isset($test['properties'])) {
+            $testProperties = $test['properties'];
+        }
+
+        if (null === $testProperties) {
+            continue;
+        }
+
+        if (array_key_exists($property, $testProperties)) {
+            $newTest['properties'][$property] = $testProperties[$property];
+        } elseif (array_key_exists(strtolower($property), $actualProps)) {
+            $newTest['properties'][$property] = $actualProps[strtolower($property)];
+        } else {
+            $newTest['properties'][$property] = $value;
+        }
+    }
+
+    return $newTest;
 }

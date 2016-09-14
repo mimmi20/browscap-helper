@@ -65,12 +65,16 @@ foreach ($files as $filename) {
         continue;
     }
 
+    handleFile($file, $chunks);
+}
+
+function handleFile(\SplFileInfo $file, array $chunks)
+{
     $oldname  = $file->getBasename('.php');
     $basename = $oldname;
 
     echo 'removing file ', $file->getBasename(), ' ...', PHP_EOL;
 
-    //rename($file->getPathname(), $file->getPathname() . '.old');
     unlink($file->getPathname());
 
     echo 'splitting file ', $file->getBasename(), ' ...', PHP_EOL;
@@ -98,10 +102,16 @@ foreach ($files as $filename) {
             continue;
         }
 
-        $outputDetector = "<?php\n\nreturn [\n";
+        handleChunk($file, $chunk, $chunkId, $basename);
+    }
+}
 
-        foreach ($chunk as $key => $test) {
-            $outputDetector .= "    '$key' => [
+function handleChunk(\SplFileInfo $file, array $chunk, $chunkId, $basename)
+{
+    $outputDetector = "<?php\n\nreturn [\n";
+
+    foreach ($chunk as $key => $test) {
+        $outputDetector .= "    '$key' => [
         'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
         'properties' => [
             'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Name']) . "',
@@ -110,7 +120,8 @@ foreach ($files as $filename) {
             'Browser_Maker'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Maker']) . "',
             'Browser_Modus'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Modus']) . "',
             'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Version']) . "',
-            'Platform_Name'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Name']) . "',
+            'Platform_Codename'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Codename']) . "',
+            'Platform_Marketingname'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Marketingname']) . "',
             'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Version']) . "',
             'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Bits']) . ",
             'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Maker']) . "',
@@ -125,17 +136,16 @@ foreach ($files as $filename) {
             'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
         ],
     ],\n";
-        }
-
-        $outputDetector .= "];\n";
-
-        $chunkNumber = sprintf('%1$05d', (int) $chunkId);
-
-        echo 'writing file ', $basename, '-', $chunkNumber, '.php', ' ...', PHP_EOL;
-
-        file_put_contents(
-            $file->getPath() . '/' . $basename . '-' . $chunkNumber . '.php',
-            $outputDetector
-        );
     }
+
+    $outputDetector .= "];\n";
+
+    $chunkNumber = sprintf('%1$05d', (int) $chunkId);
+
+    echo 'writing file ', $basename, '-', $chunkNumber, '.php', ' ...', PHP_EOL;
+
+    file_put_contents(
+        $file->getPath() . '/' . $basename . '-' . $chunkNumber . '.php',
+        $outputDetector
+    );
 }
