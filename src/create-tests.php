@@ -686,6 +686,26 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         $device = 'Windows Desktop';
+    } elseif (false !== strpos($ua, 'Windows NT 5.3')) {
+        $platformNameBrowscap           = 'WinXP';
+        $platformCodenameDetector       = 'Windows NT 5.3';
+        $platformMarketingnameDetector  = 'Windows XP';
+        $platformVersionBrowscap        = '5.3';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
+        $platformMakerBrandnameDetector = 'Microsoft';
+        $mobileDevice                   = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        if ($platformBits === 64) {
+            $win64 = true;
+        } else {
+            $win32 = true;
+        }
+
+        $device = 'Windows Desktop';
     } elseif (false !== strpos($ua, 'Windows NT 5.2')) {
         $platformNameBrowscap           = 'WinXP';
         $platformCodenameDetector       = 'Windows NT 5.2';
@@ -726,6 +746,27 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         }
 
         $device = 'Windows Desktop';
+    } elseif (false !== strpos($ua, 'Windows NT 5.01')) {
+        $platformNameBrowscap           = 'Win2000';
+        $platformCodenameDetector       = 'Windows NT 5.01';
+        $platformMarketingnameDetector  = 'Windows 2000';
+        $platformVersionBrowscap        = '5.0';
+        $platformVersionDetector        = '0.0.0';
+        $platformMakerBrowscap          = 'Microsoft Corporation';
+        $platformMakerNameDetector      = 'Microsoft Corporation';
+        $platformMakerBrandnameDetector = 'Microsoft';
+        $mobileDevice                   = 'false';
+
+        $platformDescriptionBrowscap = 'unknown';
+
+        if ($platformBits === 64) {
+            $win64 = true;
+        } else {
+            $win32 = true;
+        }
+
+        $device   = 'Windows Desktop';
+        $standard = false;
     } elseif (false !== strpos($ua, 'Windows NT 5.0')) {
         $platformNameBrowscap           = 'Win2000';
         $platformCodenameDetector       = 'Windows NT 5.0';
@@ -908,6 +949,29 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
         $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
         if (preg_match('/CPU iPhone OS (\d+\_\d+)/', $ua, $matches)) {
+            $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
+            $platformVersionDetector = str_replace('_', '.', $matches[1]);
+        }
+
+        if (false !== strpos($ua, 'iPad')) {
+            $device = 'iPad';
+        } elseif (false !== strpos($ua, 'iPod')) {
+            $device = 'iPod';
+        } elseif (false !== strpos($ua, 'iPhone')) {
+            $device = 'iPhone';
+        }
+    } elseif (false !== strpos($ua, 'CPU like Mac OS X')) {
+        $platformNameBrowscap           = 'iOS';
+        $platformCodenameDetector       = 'iOS';
+        $platformMarketingnameDetector  = 'iOS';
+        $platformMakerBrowscap          = 'Apple Inc';
+        $platformMakerNameDetector      = 'Apple Inc';
+        $platformMakerBrandnameDetector = 'Apple';
+        $mobileDevice                   = 'true';
+
+        $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+
+        if (preg_match('/CPU like Mac OS X (\d+\_\d+)/', $ua, $matches)) {
             $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
             $platformVersionDetector = str_replace('_', '.', $matches[1]);
         }
