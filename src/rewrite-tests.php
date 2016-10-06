@@ -8221,8 +8221,88 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_P831X\.2/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP831x2($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_P9516/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP9516($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_P9514/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP9514($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S1034X/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS1034x($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_S1033X/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS1033x($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_S1036X/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS1036x($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_S9714/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS9714($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_S831X/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS831x($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/LIFETAB_S785X/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS785x($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8243,6 +8323,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E5001/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifeE5001($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/MEDION X5004/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdX5004($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/MEDION X4701/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdX4701($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9711,6 +9811,46 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/TechniPad[_ ]10\-3G/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatTechnipad103g($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/TechniPad[_ ]10/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatTechnipad10($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/AQIPAD[_ ]7G/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatAqistonAqipad7g($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/TechniPhone[_ ]5/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatTechniphone5($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M7T/', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Pipo\PipoM7t3g($useragent);
 
@@ -10112,7 +10252,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (!preg_match('/trident/i', $useragent) && preg_match('/Android/', $useragent) && preg_match(
-        '/iphone 5c/i',
+        '/iphone[ ]?5c/i',
         $useragent
     )
     ) {
@@ -10126,7 +10266,21 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (!preg_match('/trident/i', $useragent) && preg_match('/Android/', $useragent) && preg_match(
-        '/iphone 6c/i',
+            '/iphone[ ]?5/i',
+            $useragent
+        )
+    ) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Xianghe\XiangheIphone5($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (!preg_match('/trident/i', $useragent) && preg_match('/Android/', $useragent) && preg_match(
+        '/iphone[ ]?6c/i',
         $useragent
     )
     ) {
@@ -10603,7 +10757,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/iPhone/', $useragent)) {
+    } elseif (!preg_match('/trident/i', $useragent) && preg_match('/iPhone/', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Apple\Iphone($useragent);
 
         $deviceBrand       = $device->getBrand();
