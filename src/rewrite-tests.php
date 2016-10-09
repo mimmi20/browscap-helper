@@ -10766,9 +10766,9 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (!preg_match('/trident/i', $useragent) && preg_match('/Android/', $useragent) && preg_match(
-            '/iphone[ ]?5/i',
-            $useragent
-        )
+        '/iphone[ ]?5/i',
+        $useragent
+    )
     ) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Xianghe\XiangheIphone5($useragent);
 
