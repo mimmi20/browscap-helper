@@ -22,8 +22,9 @@ $detector = new \BrowserDetector\BrowserDetector($cache, $logger);
 
 $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
-$filesArray = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
-$files      = [];
+$filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+$files       = [];
+$testCounter = [];
 
 foreach ($filesArray as $filename) {
     if (in_array($filename, ['.', '..'])) {
@@ -32,6 +33,7 @@ foreach ($filesArray as $filename) {
 
     if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
         $files[] = $filename;
+        echo 'file ', $filename, ' is out of strcture', PHP_EOL;
         continue;
     }
 
@@ -43,6 +45,13 @@ foreach ($filesArray as $filename) {
         }
 
         $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
+        $group = $filename;
+
+        if ('00000-browscap' === $filename) {
+            $group = '00000';
+        }
+
+        $testCounter[$group][$filename . DIRECTORY_SEPARATOR . $subdirFilename] = 0;
     }
 }
 
@@ -52,14 +61,15 @@ $data   = [];
 foreach ($files as $filename) {
     $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
 
-    echo 'checking file ', $file->getBasename(), ' ...', PHP_EOL;
+    echo 'file ', $file->getBasename(), PHP_EOL;
+    echo '    checking ...', PHP_EOL;
 
     /** @var $file \SplFileInfo */
     if (!$file->isFile() || $file->getExtension() !== 'php') {
         continue;
     }
 
-    echo 'reading file ', $file->getBasename(), ' ...', PHP_EOL;
+    echo '    reading ...', PHP_EOL;
 
     $tests = require_once $file->getPathname();
 
@@ -70,8 +80,73 @@ foreach ($files as $filename) {
         continue;
     }
 
+    foreach ($testCounter as $group => $filesinGroup) {
+        foreach (array_keys($filesinGroup) as $fileinGroup) {
+            if ($fileinGroup !== $filename) {
+                continue;
+            }
+
+            $testCounter[$group][$fileinGroup] += count($tests);
+        }
+    }
+
+    echo '    processing ...', PHP_EOL;
     handleFile($tests, $file, $detector, $data, $checks);
 }
+
+$circleFile      = 'vendor/mimmi20/browser-detector/circle.yml';
+$circleciContent = 'machine:
+  php:
+    version: 7.0.4
+  timezone:
+    Europe/Berlin
+
+dependencies:
+  override:
+    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-interaction --no-progress
+
+test:
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/phpunit
+    - vendor/bin/phpunit -c phpunit.library.xml --exclude-group useragenttest --coverage-text --colors=auto --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml
+    #- vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group useragenttest --colors=auto
+';
+
+$circleLines = [];
+
+foreach ($testCounter as $group => $filesinGroup) {
+    $count = 0;
+
+    foreach (array_keys($filesinGroup) as $fileinGroup) {
+        $count += $testCounter[$group][$fileinGroup];
+    }
+
+    $circleLines[$group] = $count;
+}
+
+$countArray = [];
+$groupArray = [];
+
+foreach ($circleLines as $group => $count) {
+    $countArray[$group] = $count;
+    $groupArray[$group] = $group;
+}
+
+array_multisort(
+    $countArray, SORT_NUMERIC, SORT_ASC,
+    $groupArray, SORT_NUMERIC, SORT_ASC,
+    $circleLines
+);
+/**/
+
+foreach ($circleLines as $group => $count) {
+    $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' tests' . PHP_EOL;
+    $circleciContent .= '    - vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --test-suffix=' . $group . 'Test.php' . PHP_EOL;
+}
+
+echo 'writing ', $circleFile, ' ...', PHP_EOL;
+file_put_contents($circleFile, $circleciContent);
+echo 'done', PHP_EOL;
 
 function handleFile(
     array $tests,
@@ -85,14 +160,14 @@ function handleFile(
     foreach ($tests as $key => $test) {
         if (isset($data[$key])) {
             // Test data is duplicated for key
-            echo 'Test data is duplicated for key "' . $key . '"', PHP_EOL;
+            echo '    Test data is duplicated for key "' . $key . '"', PHP_EOL;
             unset($tests[$key]);
             continue;
         }
 
         if (isset($checks[$test['ua']])) {
             // UA was added more than once
-            echo 'UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "'
+            echo '    UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "'
                 . $checks[$test['ua']] . '"', PHP_EOL;
             unset($tests[$key]);
             continue;
@@ -101,6 +176,7 @@ function handleFile(
         $data[$key]          = $test;
         $checks[$test['ua']] = $key;
 
+        echo '    processing Test ', $key, ' ...', PHP_EOL;
         $outputDetector .= handleTest($test, $detector, $key);
     }
 
@@ -1602,6 +1678,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/HUAWEI; W2\-U00/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiW2u00($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[_ ]m9plus/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcOneM9plus($useragent);
 
@@ -2322,6 +2408,56 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaX6\-00/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX600($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaX2\-00/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX200($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaX2\-01/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX201($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaX2\-02/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX202($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaX2\-05/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX205($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia300/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia300($useragent);
 
@@ -2392,6 +2528,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/nokia501/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia501($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nokia5800d/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia5800XpressMusic($useragent);
 
@@ -2424,6 +2570,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaC6\-01/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaC601($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaC6\-00/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaC600($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2504,6 +2660,36 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NOKIA6120c/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia6120c($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaE71\-1/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokiae711($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/NokiaE71/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokiae71($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/nokia7230/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia7230($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3562,8 +3748,68 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sm\-g850fq/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850fq($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(sm\-g850f|galaxy alpha)/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850F($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sm\-g850a/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850a($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sm\-g850m/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850m($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sm\-g850t/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850t($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sm\-g850w/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850w($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sm\-g850y/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850y($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4064,6 +4310,36 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G110H/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG110H($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/SM\-G720N0/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG720n0($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/SM\-G720D/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG720d($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/SM\-G7202/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7202($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6572,6 +6848,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/SM\-P355/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP355($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/SM\-P350/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP350($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-Z130H/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmZ130H($useragent);
 
@@ -6624,6 +6920,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/vns\-l31/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiVnsL31($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/vns\-l21/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiVnsL21($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/tit\-u02/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiTitU02($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6692,6 +7008,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/MediaPad 7 Lite/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad7Lite($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PE\-TL10/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiPetl10($useragent);
 
@@ -6742,6 +7068,36 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/G7\-L11/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG7l11($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/G700\-U10/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG700U10($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/G740\-L00/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG740l00($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI P7\-L10/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP7L10($useragent);
 
@@ -6772,6 +7128,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/HUAWEI P2\-6011/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP26011($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI SCL\-L01/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiSclL01($useragent);
 
@@ -6784,6 +7150,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI SCL\-L21/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiSclL21($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/HUAWEI SCL\-U31/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiSclu31($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6812,7 +7188,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI GEM\-701L/i', $useragent)) {
+    } elseif (preg_match('/GEM\-701L/', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGem701l($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -6822,7 +7198,27 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI G620S\-L01/i', $useragent)) {
+    } elseif (preg_match('/GEM\-702L/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGem702l($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/GEM\-703L/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGem703l($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/G620S\-L01/', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG620sL01($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -6842,8 +7238,28 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/G630\-U20/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG630u20($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/EVA\-L09/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiEvaL09($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/EVA\-L19/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiEvaL19($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6874,6 +7290,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/mediapad 10 fhd/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad10fhd($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/MediaPad T1 8\.0/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPadT180($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/MediaPad M1 8\.0/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPadM18($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6992,6 +7428,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/U9200/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU9200($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/U8860/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8860($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Huawei Y511/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY511($useragent);
 
@@ -7002,7 +7458,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/Huawei Y600\-U00/i', $useragent)) {
+    } elseif (preg_match('/Y600\-U00/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY600u00($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7012,7 +7468,17 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y635\-L21/i', $useragent)) {
+    } elseif (preg_match('/Y600\-U20/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY600u20($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/Y635\-L21/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY635l21($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7022,7 +7488,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y625\-U51/i', $useragent)) {
+    } elseif (preg_match('/Y625\-U51/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY625u51($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7042,7 +7508,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y320\-U30/i', $useragent)) {
+    } elseif (preg_match('/Y320\-U30/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY320u30($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7052,7 +7518,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y320\-U10/i', $useragent)) {
+    } elseif (preg_match('/Y320\-U10/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY320u10($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7062,7 +7528,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y330\-U11/i', $useragent)) {
+    } elseif (preg_match('/Y330\-U11/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY330u11($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7072,7 +7538,17 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y360\-U61/i', $useragent)) {
+    } elseif (preg_match('/Y336\-U02/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY336u02($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/Y360\-U61/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY360u61($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7082,7 +7558,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y330\-U05/i', $useragent)) {
+    } elseif (preg_match('/Y330\-U05/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY330u05($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7092,8 +7568,18 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/HUAWEI Y330\-U01/i', $useragent)) {
+    } elseif (preg_match('/Y330\-U01/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY330u01($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/Y220\-U10/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY220u10($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7132,6 +7618,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/ALE\-L02/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiAlel02($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/H30\-U10/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiH30u10($useragent);
 
@@ -7162,8 +7658,28 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/TAG\-L21/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiTagl21($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GRA\-L09/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGraL09($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/GRACE/', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGrace($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7192,8 +7708,18 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/MT7\-L09/i', $useragent)) {
+    } elseif (preg_match('/(MT7\-L09|JAZZ)/', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMt7L09($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/MT1\-U06/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMt1U06($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7222,7 +7748,17 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/T1\-701u/i', $useragent)) {
+    } elseif (preg_match('/HOL\-U19/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiHolu19($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/(t1\-701u|t1 7\.0)/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiT1701u($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -7252,8 +7788,48 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/FDR\-a01l/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiFdra01l($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M2\-a01l/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2a01l($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/M2\-a01w/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2a01w($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/M2\-801w/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2801w($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/M2\-801l/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2801l($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7314,6 +7890,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y560\-L01/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY560l01($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/Y540\-U01/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY540u01($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/Y210\-0100/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY2100100($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7764,6 +8360,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9205/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9205($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/gt\-i9200/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9200($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8912,6 +9518,26 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sgh\-t959v/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT959v($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sgh\-t959/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT959($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t839/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT839($useragent);
 
@@ -9024,6 +9650,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I467/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi467($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/SGH\-I897/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi897($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9184,6 +9820,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sc\-01f/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc01f($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/sc\-06d/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc06d($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10632,7 +11278,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/nexus 7/i', $useragent)) {
+    } elseif (preg_match('/nexus[ _]?7/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusGalaxyNexus7($useragent);
 
         $deviceBrand       = $device->getBrand();
@@ -11754,6 +12400,16 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]tab[ _]8hd/i', $useragent)) {
         $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOtTab8hd($useragent);
+
+        $deviceBrand       = $device->getBrand();
+        $deviceCode        = $device->getDeviceName();
+        $devicePointing    = $device->getPointingMethod();
+        $deviceType        = $device->getType()->getName();
+        $deviceMaker       = $device->getManufacturer();
+        $deviceName        = $device->getMarketingName();
+        $deviceOrientation = $device->getDualOrientation();
+    } elseif (preg_match('/one[ _]touch[ _]p321/i', $useragent)) {
+        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelP321($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
