@@ -121,8 +121,13 @@ function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targ
         }
 
         if (isset($lineMatches['time'])) {
-            $datetime   = new DateTime($lineMatches['time']);
-            $timeOfLine = $datetime->format('Y-m-d H:i:s');
+            try {
+                $datetime = new DateTime($lineMatches['time']);
+                $timeOfLine = $datetime->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                file_put_contents($targetInfoFile, 'Exception with message "' . $e->getMessage() . '" in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
+                $timeOfLine = trim(extractTime($line));
+            }
         } else {
             $timeOfLine = trim(extractTime($line));
         }
