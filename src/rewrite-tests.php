@@ -80,6 +80,11 @@ foreach ($files as $filename) {
         continue;
     }
 
+    if (!is_array($tests)) {
+        echo 'file ', $file->getBasename(), ' does not contain test array', PHP_EOL;
+        continue;
+    }
+
     foreach ($testCounter as $group => $filesinGroup) {
         foreach (array_keys($filesinGroup) as $fileinGroup) {
             if ($fileinGroup !== $filename) {
@@ -137,10 +142,9 @@ array_multisort(
     $groupArray, SORT_NUMERIC, SORT_ASC,
     $circleLines
 );
-/**/
 
 foreach ($circleLines as $group => $count) {
-    $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' tests' . PHP_EOL;
+    $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count <> 1 ? 's' : '') . PHP_EOL;
     $circleciContent .= '    - vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --test-suffix=' . $group . 'Test.php' . PHP_EOL;
 }
 
