@@ -17,7 +17,7 @@ require 'vendor/autoload.php';
 $logger = new \Monolog\Logger('browser-detector-tests');
 $logger->pushHandler(new \Monolog\Handler\NullHandler());
 
-$cache    = new \WurflCache\Adapter\NullStorage();
+$cache    = new \Cache\Adapter\Void\VoidCachePool();
 $detector = new \BrowserDetector\BrowserDetector($cache, $logger);
 
 $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';

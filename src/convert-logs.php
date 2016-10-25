@@ -81,6 +81,17 @@ exit;
 /*******************************************************************************
  * library
  ******************************************************************************/
+/**
+ * @param Loader      $loader
+ * @param string      $filepath
+ * @param string      $targetSqlFile
+ * @param string      $targetInfoFile
+ * @param string      $targetBulkFile
+ * @param SplFileInfo $file
+ *
+ * @return int
+ * @throws \FileLoader\Exception
+ */
 function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targetInfoFile, $targetBulkFile, \SplFileInfo $file)
 {
     $startTime = microtime(true);

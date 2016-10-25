@@ -17,7 +17,7 @@ require 'vendor/autoload.php';
 $logger = new \Monolog\Logger('browser-detector-tests');
 $logger->pushHandler(new \Monolog\Handler\NullHandler());
 
-$cache    = new \WurflCache\Adapter\NullStorage();
+$cache    = new \Cache\Adapter\Void\VoidCachePool();
 $detector = new \BrowserDetector\BrowserDetector($cache, $logger);
 
 $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
@@ -153,6 +153,13 @@ echo 'writing ', $circleFile, ' ...', PHP_EOL;
 file_put_contents($circleFile, $circleciContent);
 echo 'done', PHP_EOL;
 
+/**
+ * @param array                            $tests
+ * @param \SplFileInfo                     $file
+ * @param \BrowserDetector\BrowserDetector $detector
+ * @param array                            $data
+ * @param array                            $checks
+ */
 function handleFile(
     array $tests,
     \SplFileInfo $file,
@@ -201,6 +208,13 @@ function handleFile(
     file_put_contents($file->getPath() . '/' . $basename, $outputDetector);
 }
 
+/**
+ * @param array                            $test
+ * @param \BrowserDetector\BrowserDetector $detector
+ * @param string                           $key
+ *
+ * @return string
+ */
 function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $key)
 {
     /** rewrite platforms */
@@ -313,6 +327,13 @@ function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $ke
     ],\n";
 }
 
+/**
+ * @param array                            $test
+ * @param \BrowserDetector\BrowserDetector $detector
+ * @param string                           $key
+ *
+ * @return array
+ */
 function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detector, $key)
 {
     if (isset($test['properties']['Platform_Codename'])) {
@@ -1057,6 +1078,13 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
     ];
 }
 
+/**
+ * @param array                            $test
+ * @param \BrowserDetector\BrowserDetector $detector
+ * @param \UaResult\Os\OsInterface         $platform
+ *
+ * @return array
+ */
 function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, \UaResult\Os\OsInterface $platform)
 {
     if (isset($test['properties']['Device_Name'])) {

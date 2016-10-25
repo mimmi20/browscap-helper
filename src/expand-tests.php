@@ -2,6 +2,10 @@
 /*******************************************************************************
  * INIT
  ******************************************************************************/
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 ini_set('max_input_time', '-1');
@@ -52,7 +56,7 @@ $buildGenerator->run($buildNumber, false);
 
 echo 'creating cache ...', PHP_EOL;
 
-$cache = new \WurflCache\Adapter\File([\WurflCache\Adapter\File::DIR => $cacheFolder]);
+$cache = new FilesystemCachePool(new Filesystem(new Local($cacheFolder)));
 // Now, load an INI file into BrowscapPHP\Browscap for testing the UAs
 $browscap = new \BrowscapPHP\Browscap();
 $browscap
