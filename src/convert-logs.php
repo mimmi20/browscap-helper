@@ -89,8 +89,8 @@ exit;
  * @param string      $targetBulkFile
  * @param SplFileInfo $file
  *
- * @return int
  * @throws \FileLoader\Exception
+ * @return int
  */
 function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targetInfoFile, $targetBulkFile, \SplFileInfo $file)
 {
@@ -133,7 +133,7 @@ function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targ
 
         if (isset($lineMatches['time'])) {
             try {
-                $datetime = new DateTime($lineMatches['time']);
+                $datetime   = new DateTime($lineMatches['time']);
                 $timeOfLine = $datetime->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
                 file_put_contents($targetInfoFile, 'Exception with message "' . $e->getMessage() . '" in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);

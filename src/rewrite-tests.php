@@ -45,7 +45,7 @@ foreach ($filesArray as $filename) {
         }
 
         $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
-        $group = $filename;
+        $group   = $filename;
 
         if ('00000-browscap' === $filename) {
             $group = '00000';
@@ -138,13 +138,17 @@ foreach ($circleLines as $group => $count) {
 }
 
 array_multisort(
-    $countArray, SORT_NUMERIC, SORT_ASC,
-    $groupArray, SORT_NUMERIC, SORT_ASC,
+    $countArray,
+    SORT_NUMERIC,
+    SORT_ASC,
+    $groupArray,
+    SORT_NUMERIC,
+    SORT_ASC,
     $circleLines
 );
 
 foreach ($circleLines as $group => $count) {
-    $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count <> 1 ? 's' : '') . PHP_EOL;
+    $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '') . PHP_EOL;
     $circleciContent .= '    - vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
     $circleciContent .= '    - vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
 }
