@@ -392,7 +392,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
 
     // rewrite Darwin platform
     if ('Darwin' === $platformCodename) {
-        $platform = \BrowserDetector\Detector\Factory\Platform\DarwinFactory::detect($useragent);
+        $platform = (new \BrowserDetector\Factory\Platform\DarwinFactory())->detect($useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -401,7 +401,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif ('Windows' === $platformCodename) {
-        $platform = \BrowserDetector\Detector\Factory\Platform\WindowsFactory::detect($useragent);
+        $platform = (new \BrowserDetector\Factory\Platform\WindowsFactory())->detect($useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -1049,7 +1049,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (preg_match('/CFNetwork/', $useragent)) {
-        $platform = \BrowserDetector\Detector\Factory\Platform\DarwinFactory::detect($useragent);
+        $platform = \BrowserDetector\Factory\Platform\DarwinFactory::detect($useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -14621,7 +14621,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CFNetwork/', $useragent)) {
-        $device = \BrowserDetector\Detector\Factory\Device\DarwinFactory::detect($useragent);
+        $device = \BrowserDetector\Factory\Device\DarwinFactory::detect($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
