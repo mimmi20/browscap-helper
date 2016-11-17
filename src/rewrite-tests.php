@@ -96,7 +96,7 @@ foreach ($files as $filename) {
     }
 
     echo '    processing ...', PHP_EOL;
-    handleFile($tests, $file, $detector, $data, $checks);
+    handleFile($tests, $file, $detector, $data, $checks, $cache);
 }
 
 $circleFile      = 'vendor/mimmi20/browser-detector/circle.yml';
@@ -158,18 +158,20 @@ file_put_contents($circleFile, $circleciContent);
 echo 'done', PHP_EOL;
 
 /**
- * @param array                            $tests
- * @param \SplFileInfo                     $file
- * @param \BrowserDetector\BrowserDetector $detector
- * @param array                            $data
- * @param array                            $checks
+ * @param array                             $tests
+ * @param \SplFileInfo                      $file
+ * @param \BrowserDetector\BrowserDetector  $detector
+ * @param array                             $data
+ * @param array                             $checks
+ * @param \Psr\Cache\CacheItemPoolInterface $cache
  */
 function handleFile(
     array $tests,
     \SplFileInfo $file,
     \BrowserDetector\BrowserDetector $detector,
     array &$data,
-    array &$checks
+    array &$checks,
+    \Psr\Cache\CacheItemPoolInterface $cache
 ) {
     $outputDetector = "<?php\n\nreturn [\n";
 
@@ -193,7 +195,7 @@ function handleFile(
         $checks[$test['ua']] = $key;
 
         echo '    processing Test ', $key, ' ...', PHP_EOL;
-        $outputDetector .= handleTest($test, $detector, $key);
+        $outputDetector .= handleTest($test, $detector, $key, $cache);
     }
 
     $basename = $file->getBasename();
@@ -213,20 +215,22 @@ function handleFile(
 }
 
 /**
- * @param array                            $test
- * @param \BrowserDetector\BrowserDetector $detector
- * @param string                           $key
+ * @param array                             $test
+ * @param \BrowserDetector\BrowserDetector  $detector
+ * @param string                            $key
+ * @param \Psr\Cache\CacheItemPoolInterface $cache
  *
  * @return string
  */
-function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $key)
+function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
 {
     /** rewrite platforms */
 
     list($platformCodename, $platformMarketingname, $platformVersion, $platformBits, $platformMaker, $platformBrandname, $platform) = rewritePlatforms(
         $test,
         $detector,
-        $key
+        $key,
+        $cache
     );
     /** @var $platform \UaResult\Os\OsInterface */
 
@@ -332,13 +336,14 @@ function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $ke
 }
 
 /**
- * @param array                            $test
- * @param \BrowserDetector\BrowserDetector $detector
- * @param string                           $key
+ * @param array                             $test
+ * @param \BrowserDetector\BrowserDetector  $detector
+ * @param string                            $key
+ * @param \Psr\Cache\CacheItemPoolInterface $cache
  *
  * @return array
  */
-function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detector, $key)
+function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
 {
     if (isset($test['properties']['Platform_Codename'])) {
         $platformCodename = $test['properties']['Platform_Codename'];
@@ -389,10 +394,11 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
     }
 
     $useragent = $test['ua'];
+    $platformLoader = new \BrowserDetector\Loader\PlatformLoader();
 
     // rewrite Darwin platform
     if ('Darwin' === $platformCodename) {
-        $platform = (new \BrowserDetector\Factory\Platform\DarwinFactory())->detect($useragent);
+        $platform = (new \BrowserDetector\Factory\Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -401,7 +407,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif ('Windows' === $platformCodename) {
-        $platform = (new \BrowserDetector\Factory\Platform\WindowsFactory())->detect($useragent);
+        $platform = (new \BrowserDetector\Factory\Platform\WindowsFactory($cache, $platformLoader))->detect($useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -1049,7 +1055,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (preg_match('/CFNetwork/', $useragent)) {
-        $platform = \BrowserDetector\Factory\Platform\DarwinFactory::detect($useragent);
+        $platform = (new \BrowserDetector\Factory\Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
