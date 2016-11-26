@@ -16,7 +16,7 @@ require 'vendor/autoload.php';
 
 $logger = new \Monolog\Logger('browser-detector-tests');
 $logger->pushHandler(new \Monolog\Handler\NullHandler());
-$logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
+$logger->pushHandler(new \Monolog\Handler\StreamHandler('error.log', \Monolog\Logger::ERROR));
 
 $adapter  = new \League\Flysystem\Adapter\Local(__DIR__ . '/../cache/');
 $cache    = new \Cache\Adapter\Filesystem\FilesystemCachePool(new \League\Flysystem\Filesystem($adapter));
@@ -226,35 +226,6 @@ function handleFile(
  */
 function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
 {
-    /** rewrite platforms */
-
-    list($platformCodename, $platformMarketingname, $platformVersion, $platformBits, $platformMaker, $platformBrandname, $platform) = rewritePlatforms(
-        $test,
-        $detector,
-        $key,
-        $cache
-    );
-    /** @var $platform \UaResult\Os\OsInterface */
-
-    /** rewrite devices */
-
-    list($deviceBrand, $deviceCode, $devicePointing, $deviceType, $deviceMaker, $deviceName, $deviceOrientation, $device) = rewriteDevice(
-        $test,
-        $detector,
-        $platform,
-        $cache
-    );
-    /** @var $device \BrowserDetector\Matcher\Device\DeviceHasSpecificPlatformInterface */
-
-    if (null !== ($platform = $device->detectOs())) {
-        $platformCodename      = $platform->getName();
-        $platformMarketingname = $platform->getMarketingName();
-        $platformVersion       = $platform->getVersion()->getVersion();
-        $platformBits          = $platform->getBits();
-        $platformMaker         = $platform->getManufacturer();
-        $platformBrandname     = $platform->getBrand();
-    }
-
     /** rewrite test numbers */
 
     if (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
@@ -264,6 +235,137 @@ function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $ke
     } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
         $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
     }
+
+    /** rewrite platforms */
+
+    try {
+        list($platformCodename, $platformMarketingname, $platformVersion, $platformBits, $platformMaker, $platformBrandname, $platform) = rewritePlatforms(
+            $test,
+            $detector,
+            $key,
+            $cache
+        );
+    } catch (\BrowserDetector\Loader\NotFoundException $e) {
+        if (isset($test['properties']['Platform_Codename'])) {
+            $platformCodename = $test['properties']['Platform_Codename'];
+        } elseif (isset($test['properties']['Platform_Name'])) {
+            $platformCodename = $test['properties']['Platform_Name'];
+        } else {
+            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
+            $platformCodename = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Marketingname'])) {
+            $platformMarketingname = $test['properties']['Platform_Marketingname'];
+        } else {
+            $platformMarketingname = $platformCodename;
+        }
+
+        if (isset($test['properties']['Platform_Version'])) {
+            $platformVersion = $test['properties']['Platform_Version'];
+        } else {
+            echo '["' . $key . '"] platform version for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
+            $platformVersion = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Bits'])) {
+            $platformBits = $test['properties']['Platform_Bits'];
+        } else {
+            echo '["' . $key . '"] platform bits for UA "' . $test['ua'] . '" are missing, using "unknown" instead', PHP_EOL;
+
+            $platformBits = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Maker'])) {
+            $platformMaker = $test['properties']['Platform_Maker'];
+        } else {
+            echo '["' . $key . '"] platform maker for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
+            $platformMaker = 'unknown';
+        }
+
+        if (isset($test['properties']['Platform_Brand_Name'])) {
+            $platformBrandname = $test['properties']['Platform_Brand_Name'];
+        } else {
+            echo '["' . $key . '"] platform brand for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+
+            $platformBrandname = 'unknown';
+        }
+
+        $platform = null;
+    }
+
+    /** @var $platform \UaResult\Os\OsInterface|null */
+
+    /** rewrite devices */
+
+    try {
+        list($deviceBrand, $deviceCode, $devicePointing, $deviceType, $deviceMaker, $deviceName, $deviceOrientation, $device) = rewriteDevice(
+            $test,
+            $detector,
+            $platform,
+            $cache
+        );
+
+        /** @var $device \UaResult\Device\DeviceInterface */
+
+        if (null !== ($platform = $device->getPlatform())) {
+            $platformCodename = $platform->getName();
+            $platformMarketingname = $platform->getMarketingName();
+            $platformVersion = $platform->getVersion()->getVersion();
+            $platformBits = $platform->getBits();
+            $platformMaker = $platform->getManufacturer();
+            $platformBrandname = $platform->getBrand();
+        }
+    } catch (\BrowserDetector\Loader\NotFoundException $e) {
+        if (isset($test['properties']['Device_Name'])) {
+            $deviceName = $test['properties']['Device_Name'];
+        } else {
+            $deviceName = 'unknown';
+        }
+
+        if (isset($test['properties']['Device_Maker'])) {
+            $deviceMaker = $test['properties']['Device_Maker'];
+        } else {
+            $deviceMaker = 'unknown';
+        }
+
+        if (isset($test['properties']['Device_Type'])) {
+            $deviceType = $test['properties']['Device_Type'];
+        } else {
+            $deviceType = 'unknown';
+        }
+
+        if (isset($test['properties']['Device_Pointing_Method'])) {
+            $devicePointing = $test['properties']['Device_Pointing_Method'];
+        } else {
+            $devicePointing = 'unknown';
+        }
+
+        if (isset($test['properties']['Device_Code_Name'])) {
+            $deviceCode = $test['properties']['Device_Code_Name'];
+        } else {
+            $deviceCode = 'unknown';
+        }
+
+        if (isset($test['properties']['Device_Brand_Name'])) {
+            $deviceBrand = $test['properties']['Device_Brand_Name'];
+        } else {
+            $deviceBrand = 'unknown';
+        }
+
+        if (isset($test['properties']['Device_Dual_Orientation'])) {
+            $deviceOrientation = $test['properties']['Device_Dual_Orientation'];
+        } else {
+            $deviceOrientation = 'unknown';
+        }
+
+        $device = null;
+    }
+
+    /** generate result */
 
     return "    '$key' => [
         'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
@@ -419,7 +521,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif ('Android' === $platformCodename && preg_match('/windows phone/i', $useragent)) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -446,7 +548,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (preg_match('/Puffin\/[\d\.]+W(T|P)/', $useragent)) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -518,7 +620,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== strpos($useragent, 'Windows Phone')) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -527,7 +629,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== strpos($useragent, 'wds')) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -536,7 +638,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== stripos($useragent, 'wpdesktop')) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -545,7 +647,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== stripos($useragent, 'xblwp7')) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -554,7 +656,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== stripos($useragent, 'zunewp7')) {
-        $platform = $platformLoader->load('windows phone os', $useragent);
+        $platform = $platformLoader->load('windows phone', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -653,7 +755,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== strpos($useragent, 'Symbian') || false !== strpos($useragent, 'Series 60')) {
-        $platform = $platformLoader->load('symbian os', $useragent);
+        $platform = $platformLoader->load('symbian', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -671,7 +773,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== strpos($useragent, 'Windows NT 10.0')) {
-        $platform = $platformLoader->load('windows nt 10', $useragent);
+        $platform = $platformLoader->load('windows nt 10.0', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -1049,7 +1151,7 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
         $platformMaker         = $platform->getManufacturer();
         $platformBrandname     = $platform->getBrand();
     } elseif (false !== strpos($useragent, 'SymbOS')) {
-        $platform = $platformLoader->load('symbian os', $useragent);
+        $platform = $platformLoader->load('symbian', $useragent);
 
         $platformCodename      = $platform->getName();
         $platformMarketingname = $platform->getMarketingName();
@@ -1657,7 +1759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]820/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire820($useragent);
+        $device = $deviceLoader->load('desire 820', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1667,7 +1769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]816g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire816g($useragent);
+        $device = $deviceLoader->load('desire 816g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1677,7 +1779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]816/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire816($useragent);
+        $device = $deviceLoader->load('desire 816', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1687,7 +1789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]728g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire728g($useragent);
+        $device = $deviceLoader->load('desire 728g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1697,7 +1799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]700/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire700($useragent);
+        $device = $deviceLoader->load('desire 700', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1707,7 +1809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]610/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire610($useragent);
+        $device = $deviceLoader->load('desire 610', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1717,7 +1819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]600c/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire600c($useragent);
+        $device = $deviceLoader->load('desire 600c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1727,7 +1829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]600/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire600($useragent);
+        $device = $deviceLoader->load('desire 600', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1737,7 +1839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]626g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire626g($useragent);
+        $device = $deviceLoader->load('desire 626g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1747,7 +1849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]626/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire626($useragent);
+        $device = $deviceLoader->load('desire 626', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1757,7 +1859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]620g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire620g($useragent);
+        $device = $deviceLoader->load('desire 620g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1767,7 +1869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]526g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire526g($useragent);
+        $device = $deviceLoader->load('desire 526g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1777,7 +1879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire500($useragent);
+        $device = $deviceLoader->load('desire 500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1787,7 +1889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]510/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire510($useragent);
+        $device = $deviceLoader->load('desire 510', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1797,7 +1899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]530/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire530($useragent);
+        $device = $deviceLoader->load('desire 530', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1807,7 +1909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]400/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire400($useragent);
+        $device = $deviceLoader->load('desire 400', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1817,7 +1919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]320/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire320($useragent);
+        $device = $deviceLoader->load('desire 320', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1827,7 +1929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]310/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire310($useragent);
+        $device = $deviceLoader->load('desire 310', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1837,7 +1939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]300/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesire300($useragent);
+        $device = $deviceLoader->load('desire 300', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1847,7 +1949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(0p4e2|desire[ _]601)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\Htc0p4e2($useragent);
+        $device = $deviceLoader->load('0p4e2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1857,7 +1959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire[ _]eye/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireEye($useragent);
+        $device = $deviceLoader->load('desire eye', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1867,7 +1969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desire_a8181/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcA8181Desire($useragent);
+        $device = $deviceLoader->load('a8181', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1877,7 +1979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/desirez\_a7272/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireZA7272($useragent);
+        $device = $deviceLoader->load('a7272', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1887,7 +1989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(desire[ _]z|desirez)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireZ($useragent);
+        $device = $deviceLoader->load('desire z', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1897,7 +1999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/s510e/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcS510eDesireS($useragent);
+        $device = $deviceLoader->load('s510e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1907,7 +2009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(desire[ _]sv|desiresv)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireSv($useragent);
+        $device = $deviceLoader->load('desire sv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1917,7 +2019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(desire[ _]s|desires)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireS($useragent);
+        $device = $deviceLoader->load('desire s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1927,7 +2029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/a9191/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcA9191DesireHd($useragent);
+        $device = $deviceLoader->load('a9191', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1937,7 +2039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(desire hd|desirehd)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcDesireHd($useragent);
+        $device = $deviceLoader->load('desire hd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1947,7 +2049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/apa9292kt/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcA9292Apa9292kt($useragent);
+        $device = $deviceLoader->load('9292', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1957,7 +2059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/a9192/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcA9192Inspire4g($useragent);
+        $device = $deviceLoader->load('inspire 4g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1967,7 +2069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(hd7|mondrian)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcT9292($useragent);
+        $device = $deviceLoader->load('t9292', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1987,7 +2089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/htc_ruby/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcRuby($useragent);
+        $device = $deviceLoader->load('ruby', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -1997,7 +2099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus 9/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcNexus9($useragent);
+        $device = $deviceLoader->load('nexus 9', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2007,7 +2109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nexus One/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\GalaxyNexusOne($useragent);
+        $device = $deviceLoader->load('nexus one', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2017,7 +2119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/htc_amaze/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcAmaze($useragent);
+        $device = $deviceLoader->load('amaze 4g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2027,7 +2129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/htc_butterfly_s_901s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcS901s($useragent);
+        $device = $deviceLoader->load('s901s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2037,7 +2139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HTC[ _]Sensation[ _]4G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcSensation4g($useragent);
+        $device = $deviceLoader->load('sensation 4g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2047,7 +2149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sensation[ _]z710e/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcZ710e($useragent);
+        $device = $deviceLoader->load('z710e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2057,7 +2159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(sensation|pyramid)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcZ710($useragent);
+        $device = $deviceLoader->load('z710', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2067,7 +2169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/genm14/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaXl2($useragent);
+        $device = $deviceLoader->load('xl2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2077,7 +2179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nokia_XL/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaXl($useragent);
+        $device = $deviceLoader->load('xl', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2087,7 +2189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaX3\-02/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX302($useragent);
+        $device = $deviceLoader->load('x3-02', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2097,7 +2199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaX6\-00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX600($useragent);
+        $device = $deviceLoader->load('x6-00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2107,7 +2209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaX2\-00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX200($useragent);
+        $device = $deviceLoader->load('x2-00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2117,7 +2219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaX2\-01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX201($useragent);
+        $device = $deviceLoader->load('x2-01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2127,7 +2229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaX2\-02/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX202($useragent);
+        $device = $deviceLoader->load('x2-02', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2137,7 +2239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaX2\-05/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaX205($useragent);
+        $device = $deviceLoader->load('x2-05', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2147,7 +2249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia300/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia300($useragent);
+        $device = $deviceLoader->load('300', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2157,7 +2259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia200($useragent);
+        $device = $deviceLoader->load('200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2167,7 +2269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia203/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia203($useragent);
+        $device = $deviceLoader->load('203', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2177,7 +2279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia210/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia210($useragent);
+        $device = $deviceLoader->load('210', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2187,7 +2289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia206/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia206($useragent);
+        $device = $deviceLoader->load('206', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2197,7 +2299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia205/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia205($useragent);
+        $device = $deviceLoader->load('205', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2207,7 +2309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(nokia500|nokiaasha500)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia500($useragent);
+        $device = $deviceLoader->load('500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2217,7 +2319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia501/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia501($useragent);
+        $device = $deviceLoader->load('501', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2227,7 +2329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nokia5800d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia5800XpressMusic($useragent);
+        $device = $deviceLoader->load('5800 xpressmusic', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2237,7 +2339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nokia5230/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia5230($useragent);
+        $device = $deviceLoader->load('5230', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2247,7 +2349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaC2\-01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaC201($useragent);
+        $device = $deviceLoader->load('c2-01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2257,7 +2359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaC6\-01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaC601($useragent);
+        $device = $deviceLoader->load('c6-01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2267,7 +2369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaC6\-00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaC600($useragent);
+        $device = $deviceLoader->load('c6-00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2277,7 +2379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaC5\-00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaC500($useragent);
+        $device = $deviceLoader->load('c5-00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2287,7 +2389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaN8\-00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaN800($useragent);
+        $device = $deviceLoader->load('n8-00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2297,7 +2399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaN82/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaN82($useragent);
+        $device = $deviceLoader->load('n82', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2307,7 +2409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaN95/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaN95($useragent);
+        $device = $deviceLoader->load('n95', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2317,7 +2419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia ?n70/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\NokiaN70($useragent);
+        $device = $deviceLoader->load('n70', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2327,7 +2429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NOKIA6700s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia6700s($useragent);
+        $device = $deviceLoader->load('6700s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2337,7 +2439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NOKIA6700c/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia6700c($useragent);
+        $device = $deviceLoader->load('6700 classic', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2347,7 +2449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NOKIA6120c/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia6120c($useragent);
+        $device = $deviceLoader->load('6120c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2357,7 +2459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaE71\-1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokiae711($useragent);
+        $device = $deviceLoader->load('e71-1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2367,7 +2469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NokiaE71/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokiae71($useragent);
+        $device = $deviceLoader->load('e71', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2377,7 +2479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nokia7230/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nokia\Nokia7230($useragent);
+        $device = $deviceLoader->load('7230', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2387,7 +2489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/L50u/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyL50uExperiaZ2lte($useragent);
+        $device = $deviceLoader->load('l50u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2397,7 +2499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SonyEricssonS312/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonS312($useragent);
+        $device = $deviceLoader->load('s312', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2407,7 +2509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(xperia z1|c6903)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6903ExperiaZ1($useragent);
+        $device = $deviceLoader->load('c6903', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2417,7 +2519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(Xperia Z|C6603)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6603ExperiaZ($useragent);
+        $device = $deviceLoader->load('c6603', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2427,7 +2529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C6602/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6602ExperiaZ($useragent);
+        $device = $deviceLoader->load('c6602', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2437,7 +2539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C6606/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6606ExperiaZ($useragent);
+        $device = $deviceLoader->load('c6606', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2447,7 +2549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C6833/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6833ExperiaZultra($useragent);
+        $device = $deviceLoader->load('c6833', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2457,7 +2559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT26ii/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT26ii($useragent);
+        $device = $deviceLoader->load('lt26ii', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2467,7 +2569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT26i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT26i($useragent);
+        $device = $deviceLoader->load('lt26i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2477,7 +2579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT22i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT22i($useragent);
+        $device = $deviceLoader->load('lt22i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2487,7 +2589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT18iv/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT18iv($useragent);
+        $device = $deviceLoader->load('lt18iv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2497,7 +2599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT18i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT18i($useragent);
+        $device = $deviceLoader->load('lt18i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2507,7 +2609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT18a/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT18a($useragent);
+        $device = $deviceLoader->load('lt18a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2517,7 +2619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT18/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT18($useragent);
+        $device = $deviceLoader->load('lt18', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2527,7 +2629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT15iv/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT15iv($useragent);
+        $device = $deviceLoader->load('lt15iv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2537,7 +2639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT15i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonLT15i($useragent);
+        $device = $deviceLoader->load('lt15i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2547,7 +2649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MT27i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonMT27i($useragent);
+        $device = $deviceLoader->load('mt27i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2557,7 +2659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT26w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyLT26w($useragent);
+        $device = $deviceLoader->load('lt26w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2567,7 +2669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT25i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyLT25i($useragent);
+        $device = $deviceLoader->load('lt25i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2577,7 +2679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LT30p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyLT30p($useragent);
+        $device = $deviceLoader->load('lt30p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2587,7 +2689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ST26i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyST26i($useragent);
+        $device = $deviceLoader->load('st26i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2597,7 +2699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ST27i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonST27i($useragent);
+        $device = $deviceLoader->load('st27i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2607,7 +2709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ST23i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyST23i($useragent);
+        $device = $deviceLoader->load('st23i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2617,7 +2719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ST18iv/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonST18iv($useragent);
+        $device = $deviceLoader->load('st18iv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2627,7 +2729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ST18i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonST18i($useragent);
+        $device = $deviceLoader->load('st18i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2637,7 +2739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D6603/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD6603ExperiaZ3($useragent);
+        $device = $deviceLoader->load('d6603', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2647,7 +2749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D6633/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD6633($useragent);
+        $device = $deviceLoader->load('d6633', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2657,7 +2759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D6503/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD6503ExperiaZ2($useragent);
+        $device = $deviceLoader->load('d6503', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2667,7 +2769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D6000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Innos\InnosD6000($useragent);
+        $device = $deviceLoader->load('d6000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2677,7 +2779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D5803/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD5803XperiaZ3Compact($useragent);
+        $device = $deviceLoader->load('d5803', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2687,7 +2789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D5103/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD5103($useragent);
+        $device = $deviceLoader->load('d5103', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2697,7 +2799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D5303/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD5303($useragent);
+        $device = $deviceLoader->load('d5303', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2707,7 +2809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D5503/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD5503XperiaZ1Compact($useragent);
+        $device = $deviceLoader->load('d5503', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2717,7 +2819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D2005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD2005($useragent);
+        $device = $deviceLoader->load('d2005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2727,7 +2829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D2203/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD2203($useragent);
+        $device = $deviceLoader->load('d2203', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2737,7 +2839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D2403/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD2403($useragent);
+        $device = $deviceLoader->load('d2403', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2747,7 +2849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D2303/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyD2303($useragent);
+        $device = $deviceLoader->load('d2303', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2757,7 +2859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C5303/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC5303XperiaSp($useragent);
+        $device = $deviceLoader->load('c5303', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2767,7 +2869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C5502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC5502($useragent);
+        $device = $deviceLoader->load('c5502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2777,7 +2879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C6902/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6902($useragent);
+        $device = $deviceLoader->load('c6902', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2787,7 +2889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C6503/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC6503XperiaZl($useragent);
+        $device = $deviceLoader->load('c6503', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2797,7 +2899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C1905/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC1905($useragent);
+        $device = $deviceLoader->load('c1905', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2807,7 +2909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C1505/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC1505XperiaE($useragent);
+        $device = $deviceLoader->load('c1505', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2817,7 +2919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C2105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC2105XperiaL($useragent);
+        $device = $deviceLoader->load('c2105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2827,7 +2929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/C2005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyC2005($useragent);
+        $device = $deviceLoader->load('c2005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2837,7 +2939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP512/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp512($useragent);
+        $device = $deviceLoader->load('sgp512', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2847,7 +2949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP521/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp521($useragent);
+        $device = $deviceLoader->load('sgp521', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2857,7 +2959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP511/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp511($useragent);
+        $device = $deviceLoader->load('sgp511', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2867,7 +2969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP771/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp771($useragent);
+        $device = $deviceLoader->load('sgp771', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2877,7 +2979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP712/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp712($useragent);
+        $device = $deviceLoader->load('sgp712', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2887,7 +2989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP412/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp412($useragent);
+        $device = $deviceLoader->load('sgp412', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2897,7 +2999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP311/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp311($useragent);
+        $device = $deviceLoader->load('sgp311', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2907,7 +3009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP312/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp312($useragent);
+        $device = $deviceLoader->load('sgp312', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2917,7 +3019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP321/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp321($useragent);
+        $device = $deviceLoader->load('sgp321', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2927,7 +3029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP611/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp611($useragent);
+        $device = $deviceLoader->load('sgp611', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2937,7 +3039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGP621/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgp621($useragent);
+        $device = $deviceLoader->load('sgp621', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2947,7 +3049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGPT12/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletSgpt12($useragent);
+        $device = $deviceLoader->load('sgpt12', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2957,7 +3059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Sony Tablet S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyTabletS($useragent);
+        $device = $deviceLoader->load('tablet s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2967,7 +3069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E5823/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE5823($useragent);
+        $device = $deviceLoader->load('e5823', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2977,7 +3079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E5603/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE5603($useragent);
+        $device = $deviceLoader->load('e5603', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2987,7 +3089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E2303/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE2303($useragent);
+        $device = $deviceLoader->load('e2303', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -2997,7 +3099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E2003/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE2003($useragent);
+        $device = $deviceLoader->load('e2003', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3007,7 +3109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E2105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE2105($useragent);
+        $device = $deviceLoader->load('e2105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3017,7 +3119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/F3111/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyF3111($useragent);
+        $device = $deviceLoader->load('f3111', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3027,7 +3129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E6653/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE6653($useragent);
+        $device = $deviceLoader->load('e6653', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3037,7 +3139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E6553/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE6553($useragent);
+        $device = $deviceLoader->load('e6553', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3047,7 +3149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E6653/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE6653($useragent);
+        $device = $deviceLoader->load('e6653', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3057,7 +3159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/E6853/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyE6853($useragent);
+        $device = $deviceLoader->load('e6853', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3067,7 +3169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SO\-01E/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonSo01e($useragent);
+        $device = $deviceLoader->load('so-01e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3077,7 +3179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SO\-02E/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonSo02e($useragent);
+        $device = $deviceLoader->load('so-02e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3087,7 +3189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SO\-01D/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonSo01d($useragent);
+        $device = $deviceLoader->load('so-01d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3097,7 +3199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SO\-01C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonSo01c($useragent);
+        $device = $deviceLoader->load('so-01c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3107,7 +3209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SO\-01B/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonSo01b($useragent);
+        $device = $deviceLoader->load('so-01b', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3117,7 +3219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SO\-05D/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonSo05d($useragent);
+        $device = $deviceLoader->load('so-05d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3127,7 +3229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SonyEricssonST25a/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonST25a($useragent);
+        $device = $deviceLoader->load('st25a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3137,7 +3239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SonyEricssonST25iv/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonST25iv($useragent);
+        $device = $deviceLoader->load('st25iv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3147,7 +3249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SonyEricssonST25i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonST25i($useragent);
+        $device = $deviceLoader->load('st25i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3157,7 +3259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SonyEricssonK770i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\SonyEricssonK770i($useragent);
+        $device = $deviceLoader->load('k770i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3167,7 +3269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PlayStation 4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\PlayStation4($useragent);
+        $device = $deviceLoader->load('playstation 4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3177,7 +3279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PlayStation 3/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\PlayStation3($useragent);
+        $device = $deviceLoader->load('playstation 3', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3187,7 +3289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PlayStation Vita/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\SonyEricsson\PlayStationVita($useragent);
+        $device = $deviceLoader->load('playstation vita', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3197,7 +3299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ONEPLUS A3000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oneplus\OneplusA3000($useragent);
+        $device = $deviceLoader->load('a3000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3207,7 +3309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ONE E1003/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oneplus\OneplusE1003($useragent);
+        $device = $deviceLoader->load('e1003', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3217,7 +3319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ONE A2005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oneplus\OneplusA2005($useragent);
+        $device = $deviceLoader->load('a2005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3227,7 +3329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ONE A2003/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oneplus\OneplusA2003($useragent);
+        $device = $deviceLoader->load('a2003', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3237,7 +3339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ONE A2001/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oneplus\OneplusA2001($useragent);
+        $device = $deviceLoader->load('a2001', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3247,7 +3349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MZ\-MX5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Meizu\MeizuMx5($useragent);
+        $device = $deviceLoader->load('mx5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3257,7 +3359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9006V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9006v($useragent);
+        $device = $deviceLoader->load('sm-g9006v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3267,7 +3369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900F($useragent);
+        $device = $deviceLoader->load('sm-g900f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3277,7 +3379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900a/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900a($useragent);
+        $device = $deviceLoader->load('sm-g900a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3287,7 +3389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900h/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900h($useragent);
+        $device = $deviceLoader->load('sm-g900h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3297,7 +3399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900i($useragent);
+        $device = $deviceLoader->load('sm-g900i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3307,7 +3409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900t/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900T($useragent);
+        $device = $deviceLoader->load('sm-g900t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3317,7 +3419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900v/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900V($useragent);
+        $device = $deviceLoader->load('sm-g900v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3327,7 +3429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900w8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900w8($useragent);
+        $device = $deviceLoader->load('sm-g900w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3337,7 +3439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G900/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG900($useragent);
+        $device = $deviceLoader->load('sm-g900', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3347,7 +3449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G903F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG903F($useragent);
+        $device = $deviceLoader->load('sm-g903f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3357,7 +3459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G901F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG901F($useragent);
+        $device = $deviceLoader->load('sm-g901f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3367,7 +3469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928F($useragent);
+        $device = $deviceLoader->load('sm-g928f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3377,7 +3479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928C($useragent);
+        $device = $deviceLoader->load('sm-g928c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3387,7 +3489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928P($useragent);
+        $device = $deviceLoader->load('sm-g928p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3397,7 +3499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928V($useragent);
+        $device = $deviceLoader->load('sm-g928v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3407,7 +3509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928G($useragent);
+        $device = $deviceLoader->load('sm-g928g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3417,7 +3519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928I/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928I($useragent);
+        $device = $deviceLoader->load('sm-g928i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3427,7 +3529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G928W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG928W8($useragent);
+        $device = $deviceLoader->load('sm-g928w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3437,7 +3539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9287/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9287($useragent);
+        $device = $deviceLoader->load('sm-g9287', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3447,7 +3549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G925F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG925F($useragent);
+        $device = $deviceLoader->load('sm-g925f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3457,7 +3559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G925I/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG925I($useragent);
+        $device = $deviceLoader->load('sm-g925i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3467,7 +3569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G925P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG925P($useragent);
+        $device = $deviceLoader->load('sm-g925p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3477,7 +3579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G925T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG925T($useragent);
+        $device = $deviceLoader->load('sm-g925t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3487,7 +3589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G925R4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG925R4($useragent);
+        $device = $deviceLoader->load('sm-g925r4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3497,7 +3599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G925K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG925k($useragent);
+        $device = $deviceLoader->load('sm-g925k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3507,7 +3609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920V($useragent);
+        $device = $deviceLoader->load('sm-g920v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3517,7 +3619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920L($useragent);
+        $device = $deviceLoader->load('sm-g920l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3527,7 +3629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920P($useragent);
+        $device = $deviceLoader->load('sm-g920p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3537,7 +3639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920K($useragent);
+        $device = $deviceLoader->load('sm-g920k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3547,7 +3649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920Fd($useragent);
+        $device = $deviceLoader->load('sm-g920fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3557,7 +3659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920F($useragent);
+        $device = $deviceLoader->load('sm-g920f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3567,7 +3669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920S($useragent);
+        $device = $deviceLoader->load('sm-g920s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3577,7 +3679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920I/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920I($useragent);
+        $device = $deviceLoader->load('sm-g920i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3587,7 +3689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920A($useragent);
+        $device = $deviceLoader->load('sm-g920a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3597,7 +3699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920T1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920T1($useragent);
+        $device = $deviceLoader->load('sm-g920t1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3607,7 +3709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920T($useragent);
+        $device = $deviceLoader->load('sm-g920t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3617,7 +3719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9200($useragent);
+        $device = $deviceLoader->load('sm-g9200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3627,7 +3729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9208/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9208($useragent);
+        $device = $deviceLoader->load('sm-g9208', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3637,7 +3739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9209/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9209($useragent);
+        $device = $deviceLoader->load('sm-g9209', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3647,7 +3749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920W8($useragent);
+        $device = $deviceLoader->load('sm-g920w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3657,7 +3759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G920R/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG920R($useragent);
+        $device = $deviceLoader->load('sm-g920r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3667,7 +3769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930FD($useragent);
+        $device = $deviceLoader->load('sm-g930fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3677,7 +3779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930F($useragent);
+        $device = $deviceLoader->load('sm-g930f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3687,7 +3789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930A($useragent);
+        $device = $deviceLoader->load('sm-g930a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3697,7 +3799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930R/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930R($useragent);
+        $device = $deviceLoader->load('sm-g930r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3707,7 +3809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930V($useragent);
+        $device = $deviceLoader->load('sm-g930v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3717,7 +3819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930P($useragent);
+        $device = $deviceLoader->load('sm-g930p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3727,7 +3829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930T($useragent);
+        $device = $deviceLoader->load('sm-g930t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3737,7 +3839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9308/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9308($useragent);
+        $device = $deviceLoader->load('sm-g9308', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3747,7 +3849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G930/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG930($useragent);
+        $device = $deviceLoader->load('sm-g930', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3757,7 +3859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935FD($useragent);
+        $device = $deviceLoader->load('sm-g935fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3767,7 +3869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935F($useragent);
+        $device = $deviceLoader->load('sm-g935f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3777,7 +3879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935A($useragent);
+        $device = $deviceLoader->load('sm-g935a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3787,7 +3889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935P($useragent);
+        $device = $deviceLoader->load('sm-g935p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3797,7 +3899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935R/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935R($useragent);
+        $device = $deviceLoader->load('sm-g935r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3807,7 +3909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935T($useragent);
+        $device = $deviceLoader->load('sm-g935t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3817,7 +3919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935V($useragent);
+        $device = $deviceLoader->load('sm-g935v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3827,7 +3929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935K($useragent);
+        $device = $deviceLoader->load('sm-g935k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3837,7 +3939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935L($useragent);
+        $device = $deviceLoader->load('sm-g935l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3847,7 +3949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935S($useragent);
+        $device = $deviceLoader->load('sm-g935s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3857,7 +3959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935W8($useragent);
+        $device = $deviceLoader->load('sm-g935w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3867,7 +3969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G935X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG935X($useragent);
+        $device = $deviceLoader->load('sm-g935x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3877,7 +3979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G9350/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG9350($useragent);
+        $device = $deviceLoader->load('sm-g9350', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3887,7 +3989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g850fq/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850fq($useragent);
+        $device = $deviceLoader->load('sm-g850fq', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3897,7 +3999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(sm\-g850f|galaxy alpha)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850F($useragent);
+        $device = $deviceLoader->load('sm-g850f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3907,7 +4009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g850a/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850a($useragent);
+        $device = $deviceLoader->load('sm-g850a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3917,7 +4019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g850m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850m($useragent);
+        $device = $deviceLoader->load('sm-g850m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3927,7 +4029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g850t/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850t($useragent);
+        $device = $deviceLoader->load('sm-g850t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3937,7 +4039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g850w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850w($useragent);
+        $device = $deviceLoader->load('sm-g850w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3947,7 +4049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g850y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG850y($useragent);
+        $device = $deviceLoader->load('sm-g850y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3957,7 +4059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G870A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG870a($useragent);
+        $device = $deviceLoader->load('sm-g870a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3967,7 +4069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G870F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG870F($useragent);
+        $device = $deviceLoader->load('sm-g870f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3977,7 +4079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800hq/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800HQ($useragent);
+        $device = $deviceLoader->load('sm-g800hq', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3987,7 +4089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800h/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800H($useragent);
+        $device = $deviceLoader->load('sm-g800h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -3997,7 +4099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800f/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800F($useragent);
+        $device = $deviceLoader->load('sm-g800f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4007,7 +4109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800M($useragent);
+        $device = $deviceLoader->load('sm-g800m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4017,7 +4119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800a/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800A($useragent);
+        $device = $deviceLoader->load('sm-g800a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4027,7 +4129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800r4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800R4($useragent);
+        $device = $deviceLoader->load('sm-g800r4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4037,7 +4139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sm\-g800y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG800Y($useragent);
+        $device = $deviceLoader->load('sm-g800y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4047,7 +4149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G890A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG890a($useragent);
+        $device = $deviceLoader->load('sm-g890a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4057,7 +4159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530h($useragent);
+        $device = $deviceLoader->load('sm-g530h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4067,7 +4169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530t($useragent);
+        $device = $deviceLoader->load('sm-g530t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4077,7 +4179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530FZ/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530fz($useragent);
+        $device = $deviceLoader->load('sm-g530fz', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4087,7 +4189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530f($useragent);
+        $device = $deviceLoader->load('sm-g530f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4097,7 +4199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530BT/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530bt($useragent);
+        $device = $deviceLoader->load('sm-g530bt', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4107,7 +4209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530m($useragent);
+        $device = $deviceLoader->load('sm-g530m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4117,7 +4219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G530Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG530y($useragent);
+        $device = $deviceLoader->load('sm-g530y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4127,7 +4229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G5306W/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG5306w($useragent);
+        $device = $deviceLoader->load('sm-g5306w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4137,7 +4239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G5308W/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG5308w($useragent);
+        $device = $deviceLoader->load('sm-g5308w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4147,7 +4249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G531F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG531f($useragent);
+        $device = $deviceLoader->load('sm-g531f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4157,7 +4259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G531H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG531h($useragent);
+        $device = $deviceLoader->load('sm-g531h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4167,7 +4269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G388F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG388F($useragent);
+        $device = $deviceLoader->load('sm-g388f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4177,7 +4279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G389F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG389F($useragent);
+        $device = $deviceLoader->load('sm-g389f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4187,7 +4289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G386F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG386F($useragent);
+        $device = $deviceLoader->load('sm-g386f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4197,7 +4299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G3815/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG3815($useragent);
+        $device = $deviceLoader->load('sm-g3815', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4207,7 +4309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360HU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360HU($useragent);
+        $device = $deviceLoader->load('sm-g360hu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4217,7 +4319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360H($useragent);
+        $device = $deviceLoader->load('sm-g360h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4227,7 +4329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360T1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360T1($useragent);
+        $device = $deviceLoader->load('sm-g360t1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4237,7 +4339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360T($useragent);
+        $device = $deviceLoader->load('sm-g360t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4247,7 +4349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360G($useragent);
+        $device = $deviceLoader->load('sm-g360g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4257,7 +4359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360F($useragent);
+        $device = $deviceLoader->load('sm-g360f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4267,7 +4369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G360BT/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG360BT($useragent);
+        $device = $deviceLoader->load('sm-g360bt', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4277,7 +4379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G361F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG361F($useragent);
+        $device = $deviceLoader->load('sm-g361f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4287,7 +4389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G361H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG361h($useragent);
+        $device = $deviceLoader->load('sm-g361h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4297,7 +4399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G313HU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG313hu($useragent);
+        $device = $deviceLoader->load('sm-g313hu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4307,7 +4409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G313HN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG313hn($useragent);
+        $device = $deviceLoader->load('sm-g313hn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4317,7 +4419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G310HN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG310hn($useragent);
+        $device = $deviceLoader->load('sm-g310hn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4327,7 +4429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G318H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG318h($useragent);
+        $device = $deviceLoader->load('sm-g318h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4337,7 +4439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G355HQ/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG355hq($useragent);
+        $device = $deviceLoader->load('sm-g355hq', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4347,7 +4449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G355HN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG355hn($useragent);
+        $device = $deviceLoader->load('sm-g355hn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4357,7 +4459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G355H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG355h($useragent);
+        $device = $deviceLoader->load('sm-g355h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4367,7 +4469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G355M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG355m($useragent);
+        $device = $deviceLoader->load('sm-g355m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4377,7 +4479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G350e/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG350e($useragent);
+        $device = $deviceLoader->load('sm-g350e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4387,7 +4489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G3500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG3500($useragent);
+        $device = $deviceLoader->load('sm-g3500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4397,7 +4499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G3502L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG3502l($useragent);
+        $device = $deviceLoader->load('sm-g3502l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4407,7 +4509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G3502T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG3502t($useragent);
+        $device = $deviceLoader->load('sm-g3502t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4417,7 +4519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G350/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG350($useragent);
+        $device = $deviceLoader->load('sm-g350', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4427,7 +4529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G357fz/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG357fz($useragent);
+        $device = $deviceLoader->load('sm-g357fz', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4437,7 +4539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G130H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG130H($useragent);
+        $device = $deviceLoader->load('sm-g130h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4447,7 +4549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G110H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG110H($useragent);
+        $device = $deviceLoader->load('sm-g110h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4457,7 +4559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G720N0/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG720n0($useragent);
+        $device = $deviceLoader->load('sm-g720n0', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4467,7 +4569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G720D/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG720d($useragent);
+        $device = $deviceLoader->load('sm-g720d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4477,7 +4579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7202/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7202($useragent);
+        $device = $deviceLoader->load('sm-g7202', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4487,7 +4589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G710L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG710L($useragent);
+        $device = $deviceLoader->load('sm-g710l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4497,7 +4599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7102T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7102T($useragent);
+        $device = $deviceLoader->load('sm-g7102t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4507,7 +4609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7102/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7102($useragent);
+        $device = $deviceLoader->load('sm-g7102', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4517,7 +4619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7105L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7105L($useragent);
+        $device = $deviceLoader->load('sm-g7105l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4527,7 +4629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7105($useragent);
+        $device = $deviceLoader->load('sm-g7105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4537,7 +4639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7106/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7106($useragent);
+        $device = $deviceLoader->load('sm-g7106', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4547,7 +4649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7108V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7108V($useragent);
+        $device = $deviceLoader->load('sm-g7108v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4557,7 +4659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7108/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7108($useragent);
+        $device = $deviceLoader->load('sm-g7108', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4567,7 +4669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G7109/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG7109($useragent);
+        $device = $deviceLoader->load('sm-g7109', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4577,7 +4679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-G710/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmG710($useragent);
+        $device = $deviceLoader->load('sm-g710', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4587,7 +4689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T110/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT110($useragent);
+        $device = $deviceLoader->load('sm-t110', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4597,7 +4699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T113/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT113($useragent);
+        $device = $deviceLoader->load('sm-t113', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4607,7 +4709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T116/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT116($useragent);
+        $device = $deviceLoader->load('sm-t116', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4617,7 +4719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T111/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT111($useragent);
+        $device = $deviceLoader->load('sm-t111', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4627,7 +4729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T2105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT2105($useragent);
+        $device = $deviceLoader->load('sm-t2105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4637,7 +4739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T210l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT210l($useragent);
+        $device = $deviceLoader->load('sm-t210l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4647,7 +4749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T210r/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT210r($useragent);
+        $device = $deviceLoader->load('sm-t210r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4657,7 +4759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T210/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT210($useragent);
+        $device = $deviceLoader->load('sm-t210', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4667,7 +4769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T211/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT211($useragent);
+        $device = $deviceLoader->load('sm-t211', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4677,7 +4779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T230NU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT230nu($useragent);
+        $device = $deviceLoader->load('sm-t230nu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4687,7 +4789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T230/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT230($useragent);
+        $device = $deviceLoader->load('sm-t230', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4697,7 +4799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T231/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT231($useragent);
+        $device = $deviceLoader->load('sm-t231', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4707,7 +4809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T280/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT280($useragent);
+        $device = $deviceLoader->load('sm-t280', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4717,7 +4819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T525/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT525($useragent);
+        $device = $deviceLoader->load('sm-t525', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4727,7 +4829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T520/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT520($useragent);
+        $device = $deviceLoader->load('sm-t520', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4737,7 +4839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T580/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT580($useragent);
+        $device = $deviceLoader->load('sm-t580', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4747,7 +4849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T585/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT585($useragent);
+        $device = $deviceLoader->load('sm-t585', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4757,7 +4859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T550x/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT550x($useragent);
+        $device = $deviceLoader->load('sm-t550x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4767,7 +4869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T550/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT550($useragent);
+        $device = $deviceLoader->load('sm-t550', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4777,7 +4879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T555/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT555($useragent);
+        $device = $deviceLoader->load('sm-t555', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4787,7 +4889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T560/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT560($useragent);
+        $device = $deviceLoader->load('sm-t560', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4797,7 +4899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T561/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT561($useragent);
+        $device = $deviceLoader->load('sm-t561', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4807,7 +4909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T530nu/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT530nu($useragent);
+        $device = $deviceLoader->load('sm-t530nu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4817,7 +4919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T530/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT530($useragent);
+        $device = $deviceLoader->load('sm-t530', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4827,7 +4929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T531/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT531($useragent);
+        $device = $deviceLoader->load('sm-t531', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4837,7 +4939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T535/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT535($useragent);
+        $device = $deviceLoader->load('sm-t535', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4847,7 +4949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T533/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT533($useragent);
+        $device = $deviceLoader->load('sm-t533', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4857,7 +4959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T810x/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT810x($useragent);
+        $device = $deviceLoader->load('sm-t810x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4867,7 +4969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T810/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT810($useragent);
+        $device = $deviceLoader->load('sm-t810', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4877,7 +4979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T815y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT815y($useragent);
+        $device = $deviceLoader->load('sm-t815y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4887,7 +4989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T815/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT815($useragent);
+        $device = $deviceLoader->load('sm-t815', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4897,7 +4999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T813/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT813($useragent);
+        $device = $deviceLoader->load('sm-t813', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4907,7 +5009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T819/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT819($useragent);
+        $device = $deviceLoader->load('sm-t819', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4917,7 +5019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T805/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT805($useragent);
+        $device = $deviceLoader->load('sm-t805', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4927,7 +5029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T800/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT800($useragent);
+        $device = $deviceLoader->load('sm-t800', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4937,7 +5039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T315/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT315($useragent);
+        $device = $deviceLoader->load('sm-t315', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4947,7 +5049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T311/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT311($useragent);
+        $device = $deviceLoader->load('sm-t311', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4957,7 +5059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T310/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT310($useragent);
+        $device = $deviceLoader->load('sm-t310', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4967,7 +5069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T320/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT320($useragent);
+        $device = $deviceLoader->load('sm-t320', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4977,7 +5079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T325/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT325($useragent);
+        $device = $deviceLoader->load('sm-t325', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4987,7 +5089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T335/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT335($useragent);
+        $device = $deviceLoader->load('sm-t335', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -4997,7 +5099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T331/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT331($useragent);
+        $device = $deviceLoader->load('sm-t331', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5007,7 +5109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T330/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT330($useragent);
+        $device = $deviceLoader->load('sm-t330', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5017,7 +5119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T350/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT350($useragent);
+        $device = $deviceLoader->load('sm-t350', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5027,7 +5129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T355Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT355y($useragent);
+        $device = $deviceLoader->load('sm-t355y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5037,7 +5139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T365/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT365($useragent);
+        $device = $deviceLoader->load('sm-t365', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5047,7 +5149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T710/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT710($useragent);
+        $device = $deviceLoader->load('sm-t710', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5057,7 +5159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T715/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT715($useragent);
+        $device = $deviceLoader->load('sm-t715', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5067,7 +5169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T719/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT719($useragent);
+        $device = $deviceLoader->load('sm-t719', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5077,7 +5179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T713/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT713($useragent);
+        $device = $deviceLoader->load('sm-t713', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5087,7 +5189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T700/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT700($useragent);
+        $device = $deviceLoader->load('sm-t700', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5097,7 +5199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T705m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT705m($useragent);
+        $device = $deviceLoader->load('sm-t705m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5107,7 +5209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T705/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT705($useragent);
+        $device = $deviceLoader->load('sm-t705', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5117,7 +5219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T900/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT900($useragent);
+        $device = $deviceLoader->load('sm-t900', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5127,7 +5229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-T670/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmT670($useragent);
+        $device = $deviceLoader->load('sm-t670', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5137,7 +5239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-C101/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmC101($useragent);
+        $device = $deviceLoader->load('sm-c101', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5147,7 +5249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-C105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmC105($useragent);
+        $device = $deviceLoader->load('sm-c105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5157,7 +5259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-C115/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmC115($useragent);
+        $device = $deviceLoader->load('sm-c115', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5167,7 +5269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-C111/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmC111($useragent);
+        $device = $deviceLoader->load('sm-c111', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5177,7 +5279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9005($useragent);
+        $device = $deviceLoader->load('sm-n9005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5187,7 +5289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9002/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9002($useragent);
+        $device = $deviceLoader->load('sm-n9002', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5197,7 +5299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9008V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9008V($useragent);
+        $device = $deviceLoader->load('sm-n9008v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5207,7 +5309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9009/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9009($useragent);
+        $device = $deviceLoader->load('sm-n9009', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5217,7 +5319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9007/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9007($useragent);
+        $device = $deviceLoader->load('sm-n9007', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5227,7 +5329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9006/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9006($useragent);
+        $device = $deviceLoader->load('sm-n9006', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5237,7 +5339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900A($useragent);
+        $device = $deviceLoader->load('sm-n900a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5247,7 +5349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900V($useragent);
+        $device = $deviceLoader->load('sm-n900v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5257,7 +5359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900K($useragent);
+        $device = $deviceLoader->load('sm-n900k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5267,7 +5369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900S($useragent);
+        $device = $deviceLoader->load('sm-n900s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5277,7 +5379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900T($useragent);
+        $device = $deviceLoader->load('sm-n900t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5287,7 +5389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900P($useragent);
+        $device = $deviceLoader->load('sm-n900p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5297,7 +5399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900L($useragent);
+        $device = $deviceLoader->load('sm-n900l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5307,7 +5409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900W8($useragent);
+        $device = $deviceLoader->load('sm-n900w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5317,7 +5419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9000Q/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9000Q($useragent);
+        $device = $deviceLoader->load('sm-n9000q', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5327,7 +5429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N900/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN900($useragent);
+        $device = $deviceLoader->load('sm-n900', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5337,7 +5439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910FQ/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910FQ($useragent);
+        $device = $deviceLoader->load('sm-n910fq', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5347,7 +5449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910FD($useragent);
+        $device = $deviceLoader->load('sm-n910fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5357,7 +5459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910F($useragent);
+        $device = $deviceLoader->load('sm-n910f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5367,7 +5469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910A($useragent);
+        $device = $deviceLoader->load('sm-n910a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5377,7 +5479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910C($useragent);
+        $device = $deviceLoader->load('sm-n910c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5387,7 +5489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910G($useragent);
+        $device = $deviceLoader->load('sm-n910g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5397,7 +5499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910H($useragent);
+        $device = $deviceLoader->load('sm-n910h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5407,7 +5509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910K($useragent);
+        $device = $deviceLoader->load('sm-n910k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5417,7 +5519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910L($useragent);
+        $device = $deviceLoader->load('sm-n910l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5427,7 +5529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910M($useragent);
+        $device = $deviceLoader->load('sm-n910m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5437,7 +5539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910R4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910R4($useragent);
+        $device = $deviceLoader->load('sm-n910r4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5447,7 +5549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910P($useragent);
+        $device = $deviceLoader->load('sm-n910p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5457,7 +5559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910S($useragent);
+        $device = $deviceLoader->load('sm-n910s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5467,7 +5569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910T1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910T1($useragent);
+        $device = $deviceLoader->load('sm-n910t1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5477,7 +5579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910T3/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910T3($useragent);
+        $device = $deviceLoader->load('sm-n910t3', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5487,7 +5589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910T($useragent);
+        $device = $deviceLoader->load('sm-n910t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5497,7 +5599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910U/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910U($useragent);
+        $device = $deviceLoader->load('sm-n910u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5507,7 +5609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910V($useragent);
+        $device = $deviceLoader->load('sm-n910v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5517,7 +5619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910W8($useragent);
+        $device = $deviceLoader->load('sm-n910w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5527,7 +5629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N910X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN910X($useragent);
+        $device = $deviceLoader->load('sm-n910x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5537,7 +5639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9100H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9100H($useragent);
+        $device = $deviceLoader->load('sm-n9100h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5547,7 +5649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9100($useragent);
+        $device = $deviceLoader->load('sm-n9100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5557,7 +5659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915g($useragent);
+        $device = $deviceLoader->load('sm-n915g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5567,7 +5669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915t($useragent);
+        $device = $deviceLoader->load('sm-n915t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5577,7 +5679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915D/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915d($useragent);
+        $device = $deviceLoader->load('sm-n915d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5587,7 +5689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915k($useragent);
+        $device = $deviceLoader->load('sm-n915k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5597,7 +5699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915l($useragent);
+        $device = $deviceLoader->load('sm-n915l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5607,7 +5709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915s($useragent);
+        $device = $deviceLoader->load('sm-n915s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5617,7 +5719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915p($useragent);
+        $device = $deviceLoader->load('sm-n915p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5627,7 +5729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915FY/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915fy($useragent);
+        $device = $deviceLoader->load('sm-n915fy', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5637,7 +5739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915f($useragent);
+        $device = $deviceLoader->load('sm-n915f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5647,7 +5749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915a($useragent);
+        $device = $deviceLoader->load('sm-n915a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5657,7 +5759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N915V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN915v($useragent);
+        $device = $deviceLoader->load('sm-n915v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5667,7 +5769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9150/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9150($useragent);
+        $device = $deviceLoader->load('sm-n9150', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5677,7 +5779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N916S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN916s($useragent);
+        $device = $deviceLoader->load('sm-n916s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5687,7 +5789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930FD($useragent);
+        $device = $deviceLoader->load('sm-n930fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5697,7 +5799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930F($useragent);
+        $device = $deviceLoader->load('sm-n930f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5707,7 +5809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930U/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930U($useragent);
+        $device = $deviceLoader->load('sm-n930u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5717,7 +5819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930W8($useragent);
+        $device = $deviceLoader->load('sm-n930w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5727,7 +5829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9300/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9300($useragent);
+        $device = $deviceLoader->load('sm-n9300', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5737,7 +5839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9308/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9308($useragent);
+        $device = $deviceLoader->load('sm-n9308', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5747,7 +5849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930K($useragent);
+        $device = $deviceLoader->load('sm-n930k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5757,7 +5859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930L($useragent);
+        $device = $deviceLoader->load('sm-n930l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5767,7 +5869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930S($useragent);
+        $device = $deviceLoader->load('sm-n930s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5777,7 +5879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930AZ/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930AZ($useragent);
+        $device = $deviceLoader->load('sm-n930az', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5787,7 +5889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930A($useragent);
+        $device = $deviceLoader->load('sm-n930a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5797,7 +5899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930P($useragent);
+        $device = $deviceLoader->load('sm-n930p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5807,7 +5909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930V($useragent);
+        $device = $deviceLoader->load('sm-n930v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5817,7 +5919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930T1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930T1($useragent);
+        $device = $deviceLoader->load('sm-n930t1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5827,7 +5929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930T($useragent);
+        $device = $deviceLoader->load('sm-n930t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5837,7 +5939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930R4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930R4($useragent);
+        $device = $deviceLoader->load('sm-n930r4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5847,7 +5949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930R4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930R4($useragent);
+        $device = $deviceLoader->load('sm-n930r4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5857,7 +5959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930R6/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930R6($useragent);
+        $device = $deviceLoader->load('sm-n930r6', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5867,7 +5969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N930R7/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN930R7($useragent);
+        $device = $deviceLoader->load('sm-n930r7', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5877,7 +5979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920V($useragent);
+        $device = $deviceLoader->load('sm-n920v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5887,7 +5989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920T($useragent);
+        $device = $deviceLoader->load('sm-n920t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5897,7 +5999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920P/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920P($useragent);
+        $device = $deviceLoader->load('sm-n920p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5907,7 +6009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920A($useragent);
+        $device = $deviceLoader->load('sm-n920a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5917,7 +6019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920W8($useragent);
+        $device = $deviceLoader->load('sm-n920w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5927,7 +6029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9208/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9208($useragent);
+        $device = $deviceLoader->load('sm-n9208', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5937,7 +6039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N9200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN9200($useragent);
+        $device = $deviceLoader->load('sm-n9200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5947,7 +6049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920I/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920I($useragent);
+        $device = $deviceLoader->load('sm-n920i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5957,7 +6059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920C($useragent);
+        $device = $deviceLoader->load('sm-n920c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5967,7 +6069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920G($useragent);
+        $device = $deviceLoader->load('sm-n920g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5977,7 +6079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920K($useragent);
+        $device = $deviceLoader->load('sm-n920k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5987,7 +6089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920L($useragent);
+        $device = $deviceLoader->load('sm-n920l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -5997,7 +6099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920S($useragent);
+        $device = $deviceLoader->load('sm-n920s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6007,7 +6109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N920R/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN920R($useragent);
+        $device = $deviceLoader->load('sm-n920r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6017,7 +6119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N7505L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN7505L($useragent);
+        $device = $deviceLoader->load('sm-n7505l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6027,7 +6129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N7505/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN7505($useragent);
+        $device = $deviceLoader->load('sm-n7505', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6037,7 +6139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N7502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN7502($useragent);
+        $device = $deviceLoader->load('sm-n7502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6047,7 +6149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N7500Q/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN7500Q($useragent);
+        $device = $deviceLoader->load('sm-n7500q', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6057,7 +6159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-N750/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmN750($useragent);
+        $device = $deviceLoader->load('sm-n750', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6067,7 +6169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-E500H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE500H($useragent);
+        $device = $deviceLoader->load('sm-e500h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6077,7 +6179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-E700F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE700f($useragent);
+        $device = $deviceLoader->load('sm-e700f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6087,7 +6189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-E700H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE700h($useragent);
+        $device = $deviceLoader->load('sm-e700h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6097,7 +6199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-E700M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE700m($useragent);
+        $device = $deviceLoader->load('sm-e700m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6107,7 +6209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-E7000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE7000($useragent);
+        $device = $deviceLoader->load('sm-e7000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6117,7 +6219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-E7009/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmE7009($useragent);
+        $device = $deviceLoader->load('sm-e7009', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6127,7 +6229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A500FU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500fu($useragent);
+        $device = $deviceLoader->load('sm-a500fu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6137,7 +6239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A500F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500f($useragent);
+        $device = $deviceLoader->load('sm-a500f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6147,7 +6249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A500H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500h($useragent);
+        $device = $deviceLoader->load('sm-a500h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6157,7 +6259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A500L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500l($useragent);
+        $device = $deviceLoader->load('sm-a500l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6167,7 +6269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A500Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA500y($useragent);
+        $device = $deviceLoader->load('sm-a500y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6177,7 +6279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A5000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA5000($useragent);
+        $device = $deviceLoader->load('sm-a5000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6187,7 +6289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A300FU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA300fu($useragent);
+        $device = $deviceLoader->load('sm-a300fu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6197,7 +6299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A300F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA300f($useragent);
+        $device = $deviceLoader->load('sm-a300f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6207,7 +6309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A300H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA300h($useragent);
+        $device = $deviceLoader->load('sm-a300h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6217,7 +6319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A310F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA310f($useragent);
+        $device = $deviceLoader->load('sm-a310f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6227,7 +6329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A510FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510fd($useragent);
+        $device = $deviceLoader->load('sm-a510fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6237,7 +6339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A510F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510f($useragent);
+        $device = $deviceLoader->load('sm-a510f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6247,7 +6349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A510M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510m($useragent);
+        $device = $deviceLoader->load('sm-a510m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6257,7 +6359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A510Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510y($useragent);
+        $device = $deviceLoader->load('sm-a510y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6267,7 +6369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A5100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA5100($useragent);
+        $device = $deviceLoader->load('sm-a5100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6277,7 +6379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A510S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA510s($useragent);
+        $device = $deviceLoader->load('sm-a510s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6287,7 +6389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700fd($useragent);
+        $device = $deviceLoader->load('sm-a700fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6297,7 +6399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700f($useragent);
+        $device = $deviceLoader->load('sm-a700f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6307,7 +6409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700s($useragent);
+        $device = $deviceLoader->load('sm-a700s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6317,7 +6419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700k($useragent);
+        $device = $deviceLoader->load('sm-a700k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6327,7 +6429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700l($useragent);
+        $device = $deviceLoader->load('sm-a700l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6337,7 +6439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700h($useragent);
+        $device = $deviceLoader->load('sm-a700h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6347,7 +6449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A700YD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA700yd($useragent);
+        $device = $deviceLoader->load('sm-a700yd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6357,7 +6459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A7000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA7000($useragent);
+        $device = $deviceLoader->load('sm-a7000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6367,7 +6469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A7009/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA7009($useragent);
+        $device = $deviceLoader->load('sm-a7009', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6377,7 +6479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A710FD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA710fd($useragent);
+        $device = $deviceLoader->load('sm-a710fd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6387,7 +6489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A710F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA710f($useragent);
+        $device = $deviceLoader->load('sm-a710f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6397,7 +6499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A710M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA710m($useragent);
+        $device = $deviceLoader->load('sm-a710m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6407,7 +6509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A7100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA7100($useragent);
+        $device = $deviceLoader->load('sm-a7100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6417,7 +6519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A710Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA710y($useragent);
+        $device = $deviceLoader->load('sm-a710y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6427,7 +6529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A800F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA800f($useragent);
+        $device = $deviceLoader->load('sm-a800f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6437,7 +6539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A800Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA800y($useragent);
+        $device = $deviceLoader->load('sm-a800y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6447,7 +6549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A800I/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA800i($useragent);
+        $device = $deviceLoader->load('sm-a800i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6457,7 +6559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A8000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA8000($useragent);
+        $device = $deviceLoader->load('sm-a8000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6467,7 +6569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-A9000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmA9000($useragent);
+        $device = $deviceLoader->load('sm-a9000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6477,7 +6579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J510FN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ510fn($useragent);
+        $device = $deviceLoader->load('sm-j510fn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6487,7 +6589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J510F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ510f($useragent);
+        $device = $deviceLoader->load('sm-j510f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6497,7 +6599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J500FN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500fn($useragent);
+        $device = $deviceLoader->load('sm-j500fn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6507,7 +6609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J500F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500f($useragent);
+        $device = $deviceLoader->load('sm-j500f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6517,7 +6619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J500G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500g($useragent);
+        $device = $deviceLoader->load('sm-j500g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6527,7 +6629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J500Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500y($useragent);
+        $device = $deviceLoader->load('sm-j500y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6537,7 +6639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J500M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500m($useragent);
+        $device = $deviceLoader->load('sm-j500m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6547,7 +6649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J500H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500h($useragent);
+        $device = $deviceLoader->load('sm-j500h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6557,7 +6659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J5007/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ5007($useragent);
+        $device = $deviceLoader->load('sm-j5007', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6567,7 +6669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J320g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ320g($useragent);
+        $device = $deviceLoader->load('sm-j320g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6577,7 +6679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J320fn/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ320fn($useragent);
+        $device = $deviceLoader->load('sm-j320fn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6587,7 +6689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J320f/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ320f($useragent);
+        $device = $deviceLoader->load('sm-j320f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6597,7 +6699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J3109/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ3109($useragent);
+        $device = $deviceLoader->load('sm-j3109', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6607,7 +6709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J100H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ100h($useragent);
+        $device = $deviceLoader->load('sm-j100h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6617,7 +6719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J100Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ100y($useragent);
+        $device = $deviceLoader->load('sm-j100y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6627,7 +6729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J100F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ100f($useragent);
+        $device = $deviceLoader->load('sm-j100f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6637,7 +6739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J105H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ105h($useragent);
+        $device = $deviceLoader->load('sm-j105h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6647,7 +6749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J100ML/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ100ml($useragent);
+        $device = $deviceLoader->load('sm-j100ml', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6657,7 +6759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J110F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ110f($useragent);
+        $device = $deviceLoader->load('sm-j110f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6667,7 +6769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J110G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ110G($useragent);
+        $device = $deviceLoader->load('sm-j110g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6677,7 +6779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J110H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ110h($useragent);
+        $device = $deviceLoader->load('sm-j110h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6687,7 +6789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J110L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ110l($useragent);
+        $device = $deviceLoader->load('sm-j110l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6697,7 +6799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J110M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ110m($useragent);
+        $device = $deviceLoader->load('sm-j110m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6707,7 +6809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J111F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ111f($useragent);
+        $device = $deviceLoader->load('sm-j111f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6717,7 +6819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J120FN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ120fn($useragent);
+        $device = $deviceLoader->load('sm-j120fn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6727,7 +6829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J120F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ120f($useragent);
+        $device = $deviceLoader->load('sm-j120f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6737,7 +6839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J120G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ120g($useragent);
+        $device = $deviceLoader->load('sm-j120g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6747,7 +6849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J120H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ120h($useragent);
+        $device = $deviceLoader->load('sm-j120h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6757,7 +6859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J120M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ120m($useragent);
+        $device = $deviceLoader->load('sm-j120m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6767,7 +6869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J200GU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ200gu($useragent);
+        $device = $deviceLoader->load('sm-j200gu', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6777,7 +6879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J200G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ200g($useragent);
+        $device = $deviceLoader->load('sm-j200g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6787,7 +6889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J200F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ200f($useragent);
+        $device = $deviceLoader->load('sm-j200f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6797,7 +6899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J200H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ200h($useragent);
+        $device = $deviceLoader->load('sm-j200h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6807,7 +6909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J200BT/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ200bt($useragent);
+        $device = $deviceLoader->load('sm-j200bt', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6817,7 +6919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J200Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ200y($useragent);
+        $device = $deviceLoader->load('sm-j200y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6827,7 +6929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J700F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ700f($useragent);
+        $device = $deviceLoader->load('sm-j700f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6837,7 +6939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J700M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ700m($useragent);
+        $device = $deviceLoader->load('sm-j700m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6847,7 +6949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J700H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ700h($useragent);
+        $device = $deviceLoader->load('sm-j700h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6857,7 +6959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J710FN/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ710fn($useragent);
+        $device = $deviceLoader->load('sm-j710fn', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6867,7 +6969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J710F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ710f($useragent);
+        $device = $deviceLoader->load('sm-j710f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6877,7 +6979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J710H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ710h($useragent);
+        $device = $deviceLoader->load('sm-j710h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6887,7 +6989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-J710M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ710m($useragent);
+        $device = $deviceLoader->load('sm-j710m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6897,7 +6999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P600/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP600($useragent);
+        $device = $deviceLoader->load('sm-p600', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6907,7 +7009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P601/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP601($useragent);
+        $device = $deviceLoader->load('sm-p601', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6917,7 +7019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P605/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP605($useragent);
+        $device = $deviceLoader->load('sm-p605', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6927,7 +7029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P550/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP550($useragent);
+        $device = $deviceLoader->load('sm-p550', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6937,7 +7039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P901/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP901($useragent);
+        $device = $deviceLoader->load('sm-p901', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6947,7 +7049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P900/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP900($useragent);
+        $device = $deviceLoader->load('sm-p900', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6957,7 +7059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P907A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP907a($useragent);
+        $device = $deviceLoader->load('sm-p907a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6967,7 +7069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P905M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP905m($useragent);
+        $device = $deviceLoader->load('sm-p905m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6977,7 +7079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P905V/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP905v($useragent);
+        $device = $deviceLoader->load('sm-p905v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6987,7 +7089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P905/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP905($useragent);
+        $device = $deviceLoader->load('sm-p905', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -6997,7 +7099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P355/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP355($useragent);
+        $device = $deviceLoader->load('sm-p355', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7007,7 +7109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-P350/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmP350($useragent);
+        $device = $deviceLoader->load('sm-p350', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7017,7 +7119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-Z130H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmZ130H($useragent);
+        $device = $deviceLoader->load('sm-z130h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7027,7 +7129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-S820L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmS820l($useragent);
+        $device = $deviceLoader->load('sm-s820l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7037,7 +7139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SM\-B550H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmB550h($useragent);
+        $device = $deviceLoader->load('sm-b550h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7047,7 +7149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nexus Player/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGalaxyNexusPlayer($useragent);
+        $device = $deviceLoader->load('nexus player', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7057,7 +7159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NEO\-X5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Minix\MinixNeoX5($useragent);
+        $device = $deviceLoader->load('neo x5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7067,7 +7169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/vns\-l31/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiVnsL31($useragent);
+        $device = $deviceLoader->load('vns-l31', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7077,7 +7179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/vns\-l21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiVnsL21($useragent);
+        $device = $deviceLoader->load('vns-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7087,7 +7189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/tit\-u02/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiTitU02($useragent);
+        $device = $deviceLoader->load('tit-u02', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7097,7 +7199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/g750\-u10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG750u10($useragent);
+        $device = $deviceLoader->load('g750-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7107,7 +7209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/g750\-t00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG750t00($useragent);
+        $device = $deviceLoader->load('g750-t00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7117,7 +7219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/g730\-u10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG730u10($useragent);
+        $device = $deviceLoader->load('g730-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7127,7 +7229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/g730\-u27/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG730u27($useragent);
+        $device = $deviceLoader->load('g730-u27', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7137,7 +7239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G510\-0100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG5100100($useragent);
+        $device = $deviceLoader->load('g510-0100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7147,7 +7249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G525\-U00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG525U00($useragent);
+        $device = $deviceLoader->load('g525-u00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7157,7 +7259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediaPad 7 Youth/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad7Youth($useragent);
+        $device = $deviceLoader->load('mediapad 7 youth', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7167,7 +7269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediaPad 7 Lite/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad7Lite($useragent);
+        $device = $deviceLoader->load('mediapad 7 lite', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7177,7 +7279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PE\-TL10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiPetl10($useragent);
+        $device = $deviceLoader->load('pe-tl10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7187,7 +7289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P6\-U06/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP6U06($useragent);
+        $device = $deviceLoader->load('p6-u06', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7197,7 +7299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI G6\-L11/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG6L11($useragent);
+        $device = $deviceLoader->load('g6-l11', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7207,7 +7309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI G6\-U10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG6u10($useragent);
+        $device = $deviceLoader->load('g6-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7217,7 +7319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G7\-L01/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG7l01($useragent);
+        $device = $deviceLoader->load('g7-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7227,7 +7329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G7\-L11/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG7l11($useragent);
+        $device = $deviceLoader->load('g7-l11', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7237,7 +7339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G700\-U10/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG700U10($useragent);
+        $device = $deviceLoader->load('g700-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7247,7 +7349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G740\-L00/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG740l00($useragent);
+        $device = $deviceLoader->load('g740-l00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7257,7 +7359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI P7\-L10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP7L10($useragent);
+        $device = $deviceLoader->load('p7-l10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7267,7 +7369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI P7\-L09/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP7L09($useragent);
+        $device = $deviceLoader->load('p7-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7277,7 +7379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(p7 mini|p7mini)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP7mini($useragent);
+        $device = $deviceLoader->load('p7 mini', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7287,7 +7389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI P2\-6011/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP26011($useragent);
+        $device = $deviceLoader->load('p2-6011', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7297,7 +7399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI SCL\-L01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiSclL01($useragent);
+        $device = $deviceLoader->load('scl-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7307,7 +7409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI SCL\-L21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiSclL21($useragent);
+        $device = $deviceLoader->load('scl-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7317,7 +7419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI SCL\-U31/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiSclu31($useragent);
+        $device = $deviceLoader->load('scl-u31', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7327,7 +7429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI NXT\-L29/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiNxtL29($useragent);
+        $device = $deviceLoader->load('nxt-l29', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7337,7 +7439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI NXT\-AL10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiNxtAl10($useragent);
+        $device = $deviceLoader->load('nxt-al10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7347,7 +7449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GEM\-701L/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGem701l($useragent);
+        $device = $deviceLoader->load('gem-701l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7357,7 +7459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GEM\-702L/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGem702l($useragent);
+        $device = $deviceLoader->load('gem-702l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7367,7 +7469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GEM\-703L/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGem703l($useragent);
+        $device = $deviceLoader->load('gem-703l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7377,7 +7479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G620S\-L01/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG620sL01($useragent);
+        $device = $deviceLoader->load('g620s-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7387,7 +7489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI G610\-U20/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG610u20($useragent);
+        $device = $deviceLoader->load('g610-u20', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7397,7 +7499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G630\-U20/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG630u20($useragent);
+        $device = $deviceLoader->load('g630-u20', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7407,7 +7509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/G630\-U251/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiG630u251($useragent);
+        $device = $deviceLoader->load('g630-u251', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7417,7 +7519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/EVA\-L09/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiEvaL09($useragent);
+        $device = $deviceLoader->load('eva-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7427,7 +7529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/EVA\-L19/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiEvaL19($useragent);
+        $device = $deviceLoader->load('eva-l19', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7437,7 +7539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/FRD\-L09/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiFrdL09($useragent);
+        $device = $deviceLoader->load('frd-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7447,7 +7549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/mediapad 10 link\+/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad10LinkPlus($useragent);
+        $device = $deviceLoader->load('mediapad 10+', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7457,7 +7559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/mediapad 10 link/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad10Link($useragent);
+        $device = $deviceLoader->load('s7-301w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7467,7 +7569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/mediapad 10 fhd/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPad10fhd($useragent);
+        $device = $deviceLoader->load('mediapad 10 fhd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7477,7 +7579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediaPad T1 8\.0/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPadT180($useragent);
+        $device = $deviceLoader->load('s8-701u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7487,7 +7589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediaPad X1 7\.0/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPadX170($useragent);
+        $device = $deviceLoader->load('mediapad x1 7.0', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7497,7 +7599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediaPad M1 8\.0/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMediaPadM18($useragent);
+        $device = $deviceLoader->load('mediapad m1 8.0', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7507,7 +7609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/u8651t/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8651t($useragent);
+        $device = $deviceLoader->load('u8651t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7517,7 +7619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/u8651s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8651s($useragent);
+        $device = $deviceLoader->load('u8651s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7527,7 +7629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/u8651/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8651($useragent);
+        $device = $deviceLoader->load('u8651', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7537,7 +7639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI U8666 Build\/HuaweiU8666E/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8666($useragent);
+        $device = $deviceLoader->load('u8666', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7547,7 +7649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/u8666e/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8666e($useragent);
+        $device = $deviceLoader->load('u8666e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7557,7 +7659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/u8666/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8666($useragent);
+        $device = $deviceLoader->load('u8666', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7567,7 +7669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U8950d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8950d($useragent);
+        $device = $deviceLoader->load('u8950d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7577,7 +7679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U8950n\-1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8950n1($useragent);
+        $device = $deviceLoader->load('u8950n-1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7587,7 +7689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U8950n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8950n($useragent);
+        $device = $deviceLoader->load('u8950n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7597,7 +7699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U8950\-1/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU89501($useragent);
+        $device = $deviceLoader->load('u8950-1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7607,7 +7709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U8950/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8950($useragent);
+        $device = $deviceLoader->load('u8950', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7617,7 +7719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U9200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU9200($useragent);
+        $device = $deviceLoader->load('u9200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7627,7 +7729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U8860/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiU8860($useragent);
+        $device = $deviceLoader->load('u8860', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7637,7 +7739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Huawei Y511/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY511($useragent);
+        $device = $deviceLoader->load('y511', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7647,7 +7749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y600\-U00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY600u00($useragent);
+        $device = $deviceLoader->load('y600-u00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7657,7 +7759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y600\-U20/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY600u20($useragent);
+        $device = $deviceLoader->load('y600-u20', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7667,7 +7769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y635\-L21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY635l21($useragent);
+        $device = $deviceLoader->load('y635-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7677,7 +7779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y625\-U51/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY625u51($useragent);
+        $device = $deviceLoader->load('y625-u51', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7687,7 +7789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y625\-U21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY625u21($useragent);
+        $device = $deviceLoader->load('y625-u21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7697,7 +7799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Huawei Y530\-U00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY530u00($useragent);
+        $device = $deviceLoader->load('y530-u00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7707,7 +7809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y320\-U30/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY320u30($useragent);
+        $device = $deviceLoader->load('y320-u30', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7717,7 +7819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y320\-U10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY320u10($useragent);
+        $device = $deviceLoader->load('y320-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7727,7 +7829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y330\-U11/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY330u11($useragent);
+        $device = $deviceLoader->load('y330-u11', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7737,7 +7839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y336\-U02/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY336u02($useragent);
+        $device = $deviceLoader->load('y336-u02', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7747,7 +7849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y360\-U61/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY360u61($useragent);
+        $device = $deviceLoader->load('y360-u61', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7757,7 +7859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y360\-U31/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY360u31($useragent);
+        $device = $deviceLoader->load('y360-u31', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7767,7 +7869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y340\-U081/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY340u081($useragent);
+        $device = $deviceLoader->load('y340-u081', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7777,7 +7879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y330\-U05/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY330u05($useragent);
+        $device = $deviceLoader->load('y330-u05', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7787,7 +7889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y330\-U01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY330u01($useragent);
+        $device = $deviceLoader->load('y330-u01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7797,7 +7899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y220\-U10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY220u10($useragent);
+        $device = $deviceLoader->load('y220-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7807,7 +7909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI Y300/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY300($useragent);
+        $device = $deviceLoader->load('y300', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7817,7 +7919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI ALE\-21/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiAle21($useragent);
+        $device = $deviceLoader->load('ale 21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7827,7 +7929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ALE\-L21/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiAlel21($useragent);
+        $device = $deviceLoader->load('ale-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7837,7 +7939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ALE\-L02/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiAlel02($useragent);
+        $device = $deviceLoader->load('ale-l02', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7847,7 +7949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/H30\-U10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiH30u10($useragent);
+        $device = $deviceLoader->load('h30-u10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7857,7 +7959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/KIW\-L21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiKiwl21($useragent);
+        $device = $deviceLoader->load('kiw-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7867,7 +7969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lyo\-L21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiLyol21($useragent);
+        $device = $deviceLoader->load('lyo-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7877,7 +7979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nmo\-L31/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiNmol31($useragent);
+        $device = $deviceLoader->load('nmo-l31', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7887,7 +7989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HUAWEI P8max/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiP8max($useragent);
+        $device = $deviceLoader->load('p8max', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7897,7 +7999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TAG\-AL00/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiTagal00($useragent);
+        $device = $deviceLoader->load('tag-al00', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7907,7 +8009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TAG\-L21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiTagl21($useragent);
+        $device = $deviceLoader->load('tag-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7917,7 +8019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TAG\-L01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiTagl01($useragent);
+        $device = $deviceLoader->load('tag-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7927,7 +8029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GRA\-L09/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGraL09($useragent);
+        $device = $deviceLoader->load('gra-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7937,7 +8039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/VIE\-L09/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiVieL09($useragent);
+        $device = $deviceLoader->load('vie-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7947,7 +8049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/VIE\-AL10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiVieAl10($useragent);
+        $device = $deviceLoader->load('vie-al10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7957,7 +8059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GRACE/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiGrace($useragent);
+        $device = $deviceLoader->load('grace', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7967,7 +8069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/S8\-701w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiS8701w($useragent);
+        $device = $deviceLoader->load('s8-701w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7977,7 +8079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MT7\-TL10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMt7Tl10($useragent);
+        $device = $deviceLoader->load('mt7-tl10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7987,7 +8089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(MT7\-L09|JAZZ)/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMt7L09($useragent);
+        $device = $deviceLoader->load('mt7-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -7997,7 +8099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MT1\-U06/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiMt1U06($useragent);
+        $device = $deviceLoader->load('mt1-u06', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8007,7 +8109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/D2\-0082/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiD20082($useragent);
+        $device = $deviceLoader->load('d2-0082', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8017,7 +8119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HN3\-U01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiHn3u01($useragent);
+        $device = $deviceLoader->load('hn3-u01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8027,7 +8129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HOL\-U19/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiHolu19($useragent);
+        $device = $deviceLoader->load('hol-u19', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8037,7 +8139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(t1\-701u|t1 7\.0)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiT1701u($useragent);
+        $device = $deviceLoader->load('t1-701u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8047,7 +8149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T1\-a21l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiT1a21l($useragent);
+        $device = $deviceLoader->load('t1-a21l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8057,7 +8159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T1\-a21w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiT1a21w($useragent);
+        $device = $deviceLoader->load('t1-a21w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8067,7 +8169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/FDR\-a01l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiFdra01l($useragent);
+        $device = $deviceLoader->load('fdr-a01l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8077,7 +8179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/FDR\-a01w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiFdra01w($useragent);
+        $device = $deviceLoader->load('fdr-a01w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8087,7 +8189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M2\-a01l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2a01l($useragent);
+        $device = $deviceLoader->load('m2-a01l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8097,7 +8199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M2\-a01w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2a01w($useragent);
+        $device = $deviceLoader->load('m2-a01w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8107,7 +8209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M2\-801w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2801w($useragent);
+        $device = $deviceLoader->load('m2-801w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8117,7 +8219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M2\-801l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiM2801l($useragent);
+        $device = $deviceLoader->load('m2-801l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8127,7 +8229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/RIO\-L01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiRiol01($useragent);
+        $device = $deviceLoader->load('rio-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8137,7 +8239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CRR\-L09/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiCrrl09($useragent);
+        $device = $deviceLoader->load('crr-l09', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8147,7 +8249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CUN\-L03/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiCunl03($useragent);
+        $device = $deviceLoader->load('cun-l03', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8157,7 +8259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CUN\-L21/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiCunl21($useragent);
+        $device = $deviceLoader->load('cun-l21', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8167,7 +8269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CHC\-U01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiChcu01($useragent);
+        $device = $deviceLoader->load('chc-u01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8177,7 +8279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ATH\-UL01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiAthul01($useragent);
+        $device = $deviceLoader->load('ath-ul01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8187,7 +8289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y550\-L01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY550l01($useragent);
+        $device = $deviceLoader->load('y550-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8197,7 +8299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y560\-L01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY560l01($useragent);
+        $device = $deviceLoader->load('y560-l01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8207,7 +8309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y540\-U01/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY540u01($useragent);
+        $device = $deviceLoader->load('y540-u01', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8217,7 +8319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Y210\-0100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiY2100100($useragent);
+        $device = $deviceLoader->load('y210-0100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8227,7 +8329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/F5281/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Hisense\HisenseF5281($useragent);
+        $device = $deviceLoader->load('f5281', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8237,7 +8339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Aquaris M10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bq\BqAquarisM10($useragent);
+        $device = $deviceLoader->load('aquaris m10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8247,7 +8349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Aquaris M5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bq\BqAquarisM5($useragent);
+        $device = $deviceLoader->load('aquaris m5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8257,7 +8359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Aquaris[ _]M4\.5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bq\BqAquarisM45($useragent);
+        $device = $deviceLoader->load('aquaris m4.5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8267,7 +8369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Aquaris E5 HD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bq\BqAquarisE5hd($useragent);
+        $device = $deviceLoader->load('aquaris e5 hd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8277,7 +8379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BQS\-4005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bq\Bq4005($useragent);
+        $device = $deviceLoader->load('bqs-4005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8287,7 +8389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BQS\-4007/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bq\Bq4007($useragent);
+        $device = $deviceLoader->load('bqs-4007', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8297,7 +8399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9195i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9195i($useragent);
+        $device = $deviceLoader->load('gt-i9195i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8307,7 +8409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9195/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9195($useragent);
+        $device = $deviceLoader->load('gt-i9195', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8317,7 +8419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9190/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9190($useragent);
+        $device = $deviceLoader->load('gt-i9190', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8327,7 +8429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9192/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9192($useragent);
+        $device = $deviceLoader->load('gt-i9192', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8337,7 +8439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9100g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9100g($useragent);
+        $device = $deviceLoader->load('gt-i9100g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8347,7 +8449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9100p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9100p($useragent);
+        $device = $deviceLoader->load('gt-i9100p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8357,7 +8459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9100($useragent);
+        $device = $deviceLoader->load('gt-i9100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8367,7 +8469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9105p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9105p($useragent);
+        $device = $deviceLoader->load('gt-i9105p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8377,7 +8479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9105($useragent);
+        $device = $deviceLoader->load('gt-i9105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8387,7 +8489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9103/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9103($useragent);
+        $device = $deviceLoader->load('gt-i9103', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8397,7 +8499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9152/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9152($useragent);
+        $device = $deviceLoader->load('gt-i9152', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8407,7 +8509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9300i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9300i($useragent);
+        $device = $deviceLoader->load('gt-i9300i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8417,7 +8519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9300/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9300($useragent);
+        $device = $deviceLoader->load('gt-i9300', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8427,7 +8529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9301i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9301i($useragent);
+        $device = $deviceLoader->load('gt-i9301i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8437,7 +8539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9301q/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9301q($useragent);
+        $device = $deviceLoader->load('gt-i9301q', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8447,7 +8549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9301/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9301($useragent);
+        $device = $deviceLoader->load('gt-i9301', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8457,7 +8559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9305/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9305($useragent);
+        $device = $deviceLoader->load('gt-i9305', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8467,7 +8569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9060i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9060i($useragent);
+        $device = $deviceLoader->load('gt-i9060i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8477,7 +8579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9060l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9060l($useragent);
+        $device = $deviceLoader->load('gt-i9060l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8487,7 +8589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9060/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9060($useragent);
+        $device = $deviceLoader->load('gt-i9060', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8497,7 +8599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9070p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9070P($useragent);
+        $device = $deviceLoader->load('gt-i9070p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8507,7 +8609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9070/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9070($useragent);
+        $device = $deviceLoader->load('gt-i9070', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8517,7 +8619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9003l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9003l($useragent);
+        $device = $deviceLoader->load('gt-i9003l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8527,7 +8629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9003/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9003($useragent);
+        $device = $deviceLoader->load('gt-i9003', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8537,7 +8639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9001/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9001($useragent);
+        $device = $deviceLoader->load('gt-i9001', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8547,7 +8649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9000($useragent);
+        $device = $deviceLoader->load('gt-i9000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8557,7 +8659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9082L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9082L($useragent);
+        $device = $deviceLoader->load('gt-i9082l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8567,7 +8669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9082/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9082($useragent);
+        $device = $deviceLoader->load('gt-i9082', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8577,7 +8679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9505g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9505g($useragent);
+        $device = $deviceLoader->load('gt-i9505g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8587,7 +8689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9505x/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9505x($useragent);
+        $device = $deviceLoader->load('gt-i9505x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8597,7 +8699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9505/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9505($useragent);
+        $device = $deviceLoader->load('gt-i9505', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8607,7 +8709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9506/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9506($useragent);
+        $device = $deviceLoader->load('gt-i9506', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8617,7 +8719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9502($useragent);
+        $device = $deviceLoader->load('gt-i9502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8627,7 +8729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9500($useragent);
+        $device = $deviceLoader->load('gt-i9500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8637,7 +8739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9502($useragent);
+        $device = $deviceLoader->load('gt-i9502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8647,7 +8749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9515/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9515($useragent);
+        $device = $deviceLoader->load('gt-i9515', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8657,7 +8759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9295/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9295($useragent);
+        $device = $deviceLoader->load('gt-i9295', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8667,7 +8769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9205/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9205($useragent);
+        $device = $deviceLoader->load('gt-i9205', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8677,7 +8779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9200($useragent);
+        $device = $deviceLoader->load('gt-i9200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8687,7 +8789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i5500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti5500($useragent);
+        $device = $deviceLoader->load('gt-i5500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8697,7 +8799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i9515/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9515($useragent);
+        $device = $deviceLoader->load('gt-i9515', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8707,7 +8809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i5500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti5500($useragent);
+        $device = $deviceLoader->load('gt-i5500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8717,7 +8819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i5700/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti5700($useragent);
+        $device = $deviceLoader->load('gt-i5700', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8727,7 +8829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8190n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8190n($useragent);
+        $device = $deviceLoader->load('gt-i8190n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8737,7 +8839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8190/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8190($useragent);
+        $device = $deviceLoader->load('gt-i8190', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8747,7 +8849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8150/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8150($useragent);
+        $device = $deviceLoader->load('gt-i8150', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8757,7 +8859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8160p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8160p($useragent);
+        $device = $deviceLoader->load('gt-i8160p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8767,7 +8869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8160/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8160($useragent);
+        $device = $deviceLoader->load('gt-i8160', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8777,7 +8879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8200n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8200n($useragent);
+        $device = $deviceLoader->load('gt-i8200n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8787,7 +8889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8200($useragent);
+        $device = $deviceLoader->load('gt-i8200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8797,7 +8899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8260/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8260($useragent);
+        $device = $deviceLoader->load('gt-i8260', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8807,7 +8909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8262/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8262($useragent);
+        $device = $deviceLoader->load('gt-i8262', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8817,7 +8919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8552/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8552($useragent);
+        $device = $deviceLoader->load('gt-i8552', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8827,7 +8929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8530/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8530($useragent);
+        $device = $deviceLoader->load('gt-i8530', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8837,7 +8939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(gt\-i8910|i8910)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8910($useragent);
+        $device = $deviceLoader->load('gt-i8910', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8847,7 +8949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8730/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8730($useragent);
+        $device = $deviceLoader->load('gt-i8730', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8857,7 +8959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-i8750/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8750($useragent);
+        $device = $deviceLoader->load('gt-i8750', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8867,7 +8969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-e3309t/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGte3309t($useragent);
+        $device = $deviceLoader->load('gt-e3309t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8877,7 +8979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-e2202/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGte2202($useragent);
+        $device = $deviceLoader->load('gt-e2202', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8887,7 +8989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-e2252/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGte2252($useragent);
+        $device = $deviceLoader->load('gt-e2252', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8897,7 +8999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-b7722/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtb7722($useragent);
+        $device = $deviceLoader->load('gt-b7722', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8907,7 +9009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7262/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7262($useragent);
+        $device = $deviceLoader->load('gt-s7262', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8917,7 +9019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7275r/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7275r($useragent);
+        $device = $deviceLoader->load('gt-s7275r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8927,7 +9029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7275/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7275($useragent);
+        $device = $deviceLoader->load('gt-s7275', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8937,7 +9039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7272/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7272($useragent);
+        $device = $deviceLoader->load('gt-s7272', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8947,7 +9049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7270/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7270($useragent);
+        $device = $deviceLoader->load('gt-s7270', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8957,7 +9059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7500($useragent);
+        $device = $deviceLoader->load('gt-s7500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8967,7 +9069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7580/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7580($useragent);
+        $device = $deviceLoader->load('gt-s7580', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8977,7 +9079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7582/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7582($useragent);
+        $device = $deviceLoader->load('gt-s7582', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8987,7 +9089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7562l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7562l($useragent);
+        $device = $deviceLoader->load('gt-s7562l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -8997,7 +9099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7562/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7562($useragent);
+        $device = $deviceLoader->load('gt-s7562', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9007,7 +9109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7560/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7560($useragent);
+        $device = $deviceLoader->load('gt-s7560', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9017,7 +9119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7392/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7392($useragent);
+        $device = $deviceLoader->load('gt-s7392', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9027,7 +9129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7390/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7390($useragent);
+        $device = $deviceLoader->load('gt-s7390', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9037,7 +9139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s7710/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts7710($useragent);
+        $device = $deviceLoader->load('gt-s7710', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9047,7 +9149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s3802/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts3802($useragent);
+        $device = $deviceLoader->load('gt-s3802', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9057,7 +9159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s3653/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts3653($useragent);
+        $device = $deviceLoader->load('gt-s3653', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9067,7 +9169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5620/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5620($useragent);
+        $device = $deviceLoader->load('gt-s5620', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9077,7 +9179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5660/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5660($useragent);
+        $device = $deviceLoader->load('gt-s5660', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9087,7 +9189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5301L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5301l($useragent);
+        $device = $deviceLoader->load('gt-s5301l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9097,7 +9199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5301/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5301($useragent);
+        $device = $deviceLoader->load('gt-s5301', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9107,7 +9209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5302/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5302($useragent);
+        $device = $deviceLoader->load('gt-s5302', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9117,7 +9219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5300b/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5300B($useragent);
+        $device = $deviceLoader->load('gt-s5300b', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9127,7 +9229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5300/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5300($useragent);
+        $device = $deviceLoader->load('gt-s5300', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9137,7 +9239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5310m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5310m($useragent);
+        $device = $deviceLoader->load('gt-s5310m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9147,7 +9249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5310/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5310($useragent);
+        $device = $deviceLoader->load('gt-s5310', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9157,7 +9259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5360/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5360($useragent);
+        $device = $deviceLoader->load('gt-s5360', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9167,7 +9269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5363/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5363($useragent);
+        $device = $deviceLoader->load('gt-s5363', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9177,7 +9279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5369/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5369($useragent);
+        $device = $deviceLoader->load('gt-s5369', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9187,7 +9289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5380/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5380($useragent);
+        $device = $deviceLoader->load('gt-s5380', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9197,7 +9299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5830l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5830l($useragent);
+        $device = $deviceLoader->load('gt-s5830l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9207,7 +9309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5830i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5830i($useragent);
+        $device = $deviceLoader->load('gt-s5830i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9217,7 +9319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5830c/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5830c($useragent);
+        $device = $deviceLoader->load('gt-s5830c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9227,7 +9329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6810b/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6810b($useragent);
+        $device = $deviceLoader->load('gt-s6810b', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9237,7 +9339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6810p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6810p($useragent);
+        $device = $deviceLoader->load('gt-s6810p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9247,7 +9349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6810/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6810($useragent);
+        $device = $deviceLoader->load('gt-s6810', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9257,7 +9359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6500t/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6500t($useragent);
+        $device = $deviceLoader->load('gt-s6500t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9267,7 +9369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6500d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6500d($useragent);
+        $device = $deviceLoader->load('gt-s6500d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9277,7 +9379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6500($useragent);
+        $device = $deviceLoader->load('gt-s6500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9287,7 +9389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6312/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6312($useragent);
+        $device = $deviceLoader->load('gt-s6312', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9297,7 +9399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6310n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6310N($useragent);
+        $device = $deviceLoader->load('gt-s6310n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9307,7 +9409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6310/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6310($useragent);
+        $device = $deviceLoader->load('gt-s6310', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9317,7 +9419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6102b/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6102B($useragent);
+        $device = $deviceLoader->load('gt-s6102b', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9327,7 +9429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s6102/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts6102($useragent);
+        $device = $deviceLoader->load('gt-s6102', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9337,7 +9439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5830/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5830($useragent);
+        $device = $deviceLoader->load('gt-s5830', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9347,7 +9449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5839i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5839i($useragent);
+        $device = $deviceLoader->load('gt-s5839i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9357,7 +9459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5570/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5570($useragent);
+        $device = $deviceLoader->load('gt-s5570', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9367,7 +9469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5280/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5280($useragent);
+        $device = $deviceLoader->load('gt-s5280', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9377,7 +9479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5220/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5220($useragent);
+        $device = $deviceLoader->load('gt-s5220', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9387,7 +9489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-s5233s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5233S($useragent);
+        $device = $deviceLoader->load('gt-s5233s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9397,7 +9499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-c6712/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtc6712($useragent);
+        $device = $deviceLoader->load('gt-c6712', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9407,7 +9509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-c3262/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtc3262($useragent);
+        $device = $deviceLoader->load('gt-c3262', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9417,7 +9519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-c3322/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtc3322($useragent);
+        $device = $deviceLoader->load('gt-c3322', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9427,7 +9529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-c3780/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtc3780($useragent);
+        $device = $deviceLoader->load('gt-c3780', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9437,7 +9539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p5110/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp5110($useragent);
+        $device = $deviceLoader->load('gt-p5110', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9447,7 +9549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p5100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp5100($useragent);
+        $device = $deviceLoader->load('gt-p5100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9457,7 +9559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-P5210/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp5210($useragent);
+        $device = $deviceLoader->load('gt-p5210', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9467,7 +9569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-P5200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp5200($useragent);
+        $device = $deviceLoader->load('gt-p5200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9477,7 +9579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-P5220/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp5220($useragent);
+        $device = $deviceLoader->load('gt-p5220', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9487,7 +9589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7510/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7510($useragent);
+        $device = $deviceLoader->load('gt-p7510', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9497,7 +9599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7511/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7511($useragent);
+        $device = $deviceLoader->load('gt-p7511', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9507,7 +9609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7500M/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7500M($useragent);
+        $device = $deviceLoader->load('gt-p7500m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9517,7 +9619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7500($useragent);
+        $device = $deviceLoader->load('gt-p7500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9527,7 +9629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7501/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7501($useragent);
+        $device = $deviceLoader->load('gt-p7501', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9537,7 +9639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7100($useragent);
+        $device = $deviceLoader->load('gt-p7100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9547,7 +9649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p7310/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp7310($useragent);
+        $device = $deviceLoader->load('gt-p7310', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9557,7 +9659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p3100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp3100($useragent);
+        $device = $deviceLoader->load('gt-p3100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9567,7 +9669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p3110/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp3110($useragent);
+        $device = $deviceLoader->load('gt-p3110', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9577,7 +9679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p3113/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp3113($useragent);
+        $device = $deviceLoader->load('gt-p3113', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9587,7 +9689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p1010/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp1010($useragent);
+        $device = $deviceLoader->load('gt-p1010', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9597,7 +9699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p1000m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp1000M($useragent);
+        $device = $deviceLoader->load('gt-p1000m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9607,7 +9709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p1000n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp1000N($useragent);
+        $device = $deviceLoader->load('gt-p1000n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9617,7 +9719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p1000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp1000($useragent);
+        $device = $deviceLoader->load('gt-p1000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9627,7 +9729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p6201/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp6201($useragent);
+        $device = $deviceLoader->load('gt-p6201', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9637,7 +9739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p6211/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp6211($useragent);
+        $device = $deviceLoader->load('gt-p6211', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9647,7 +9749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-p6200/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp6200($useragent);
+        $device = $deviceLoader->load('gt-p6200', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9657,7 +9759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n7100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn7100($useragent);
+        $device = $deviceLoader->load('gt-n7100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9667,7 +9769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n7105/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn7105($useragent);
+        $device = $deviceLoader->load('gt-n7105', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9677,7 +9779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n7000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn7000($useragent);
+        $device = $deviceLoader->load('gt-n7000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9687,7 +9789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n5110/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn5110($useragent);
+        $device = $deviceLoader->load('gt-n5110', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9697,7 +9799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n5100/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn5100($useragent);
+        $device = $deviceLoader->load('gt-n5100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9707,7 +9809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n5120/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn5120($useragent);
+        $device = $deviceLoader->load('gt-n5120', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9717,7 +9819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n8010/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8010($useragent);
+        $device = $deviceLoader->load('gt-n8010', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9727,7 +9829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n8013/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8013($useragent);
+        $device = $deviceLoader->load('gt-n8013', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9737,7 +9839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n8020/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8020($useragent);
+        $device = $deviceLoader->load('gt-n8020', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9747,7 +9849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n8005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8005($useragent);
+        $device = $deviceLoader->load('gt-n8005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9757,7 +9859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/N8000D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8000d($useragent);
+        $device = $deviceLoader->load('gt-n8000d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9767,7 +9869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-n8000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtn8000($useragent);
+        $device = $deviceLoader->load('gt-n8000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9777,7 +9879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-e250i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghE250i($useragent);
+        $device = $deviceLoader->load('sgh-e250i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9787,7 +9889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-e250/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghE250($useragent);
+        $device = $deviceLoader->load('sgh-e250', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9797,7 +9899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t528g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSght528g($useragent);
+        $device = $deviceLoader->load('sgh-t528g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9807,7 +9909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t989d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT989d($useragent);
+        $device = $deviceLoader->load('sgh-t989d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9817,7 +9919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t989/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT989($useragent);
+        $device = $deviceLoader->load('sgh-t989', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9827,7 +9929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t999/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT999($useragent);
+        $device = $deviceLoader->load('sgh-t999', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9837,7 +9939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t959v/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT959v($useragent);
+        $device = $deviceLoader->load('sgh-t959v', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9847,7 +9949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t959/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT959($useragent);
+        $device = $deviceLoader->load('sgh-t959', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9857,7 +9959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t839/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT839($useragent);
+        $device = $deviceLoader->load('sgh-t839', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9867,7 +9969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t859/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT859($useragent);
+        $device = $deviceLoader->load('sgh-t859', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9877,7 +9979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t889/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT889($useragent);
+        $device = $deviceLoader->load('sgh-t889', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9887,7 +9989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-t899m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghT899m($useragent);
+        $device = $deviceLoader->load('sgh-t899m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9897,7 +9999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-i257/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi257($useragent);
+        $device = $deviceLoader->load('sgh-i257', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9907,7 +10009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I717/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi717($useragent);
+        $device = $deviceLoader->load('sgh-i717', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9917,7 +10019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I727R/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi727r($useragent);
+        $device = $deviceLoader->load('sgh-i727r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9927,7 +10029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I727/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi727($useragent);
+        $device = $deviceLoader->load('sgh-i727', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9937,7 +10039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I317/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi317($useragent);
+        $device = $deviceLoader->load('sgh-i317', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9947,7 +10049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I337m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi337m($useragent);
+        $device = $deviceLoader->load('sgh-i337m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9957,7 +10059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I337/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi337($useragent);
+        $device = $deviceLoader->load('sgh-i337', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9967,7 +10069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I467/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi467($useragent);
+        $device = $deviceLoader->load('sgh-i467', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9977,7 +10079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SGH\-I897/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghi897($useragent);
+        $device = $deviceLoader->load('sgh-i897', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9987,7 +10089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-m919/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghm919($useragent);
+        $device = $deviceLoader->load('sgh-m919', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -9997,7 +10099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-f480i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghF480i($useragent);
+        $device = $deviceLoader->load('sgh-f480i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10007,7 +10109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sgh\-f480/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSghF480($useragent);
+        $device = $deviceLoader->load('sgh-f480', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10017,7 +10119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-r970/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchr970($useragent);
+        $device = $deviceLoader->load('sch-r970', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10027,7 +10129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-r950/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchr950($useragent);
+        $device = $deviceLoader->load('sch-r950', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10037,7 +10139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-r530u/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchR530u($useragent);
+        $device = $deviceLoader->load('sch-r530u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10047,7 +10149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-r530c/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchR530c($useragent);
+        $device = $deviceLoader->load('sch-r530c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10057,7 +10159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-i815/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchI8154g($useragent);
+        $device = $deviceLoader->load('sch-i815', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10067,7 +10169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-i545/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchI545($useragent);
+        $device = $deviceLoader->load('sch-i545', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10077,7 +10179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-i535/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchI535($useragent);
+        $device = $deviceLoader->load('sch-i535', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10087,7 +10189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-i605/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchI605($useragent);
+        $device = $deviceLoader->load('sch-i605', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10097,7 +10199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-i435/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchI435($useragent);
+        $device = $deviceLoader->load('sch-i435', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10107,7 +10209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-i400/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchI400($useragent);
+        $device = $deviceLoader->load('sch-i400', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10117,7 +10219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sch\-n719/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSchN719($useragent);
+        $device = $deviceLoader->load('sch-n719', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10127,7 +10229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sc\-02f/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc02f($useragent);
+        $device = $deviceLoader->load('sc-02f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10137,7 +10239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sc\-02c/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc02c($useragent);
+        $device = $deviceLoader->load('sc-02c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10147,7 +10249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sc\-02b/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc02b($useragent);
+        $device = $deviceLoader->load('sc-02b', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10157,7 +10259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sc\-01f/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc01f($useragent);
+        $device = $deviceLoader->load('sc-01f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10167,7 +10269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sc\-06d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSc06d($useragent);
+        $device = $deviceLoader->load('sc-06d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10177,7 +10279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e210l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE210l($useragent);
+        $device = $deviceLoader->load('shv-e210l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10187,7 +10289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e210s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE210s($useragent);
+        $device = $deviceLoader->load('shv-e210s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10197,7 +10299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e210k/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE210k($useragent);
+        $device = $deviceLoader->load('shv-e210k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10207,7 +10309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e250l/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE250l($useragent);
+        $device = $deviceLoader->load('shv-e250l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10217,7 +10319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e250k/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE250k($useragent);
+        $device = $deviceLoader->load('shv-e250k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10227,7 +10329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e250s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE250s($useragent);
+        $device = $deviceLoader->load('shv-e250s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10237,7 +10339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e160s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE160s($useragent);
+        $device = $deviceLoader->load('shv-e160s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10247,7 +10349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shv\-e370k/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShvE370k($useragent);
+        $device = $deviceLoader->load('shv-e370k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10257,7 +10359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shw\-m480w/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShwM480W($useragent);
+        $device = $deviceLoader->load('shw-m480w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10267,7 +10369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/shw\-m180s/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungShwM180s($useragent);
+        $device = $deviceLoader->load('shw-m180s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10277,7 +10379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sph\-m840/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSphm840($useragent);
+        $device = $deviceLoader->load('sph-m840', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10287,7 +10389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sph\-m930/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSphm930($useragent);
+        $device = $deviceLoader->load('sph-m930', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10297,7 +10399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sph\-l900/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSphl900($useragent);
+        $device = $deviceLoader->load('sph-l900', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10307,7 +10409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sph\-l720/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSphl720($useragent);
+        $device = $deviceLoader->load('sph-l720', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10317,7 +10419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sph\-l710/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSphl710($useragent);
+        $device = $deviceLoader->load('sph-l710', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10327,7 +10429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus 10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGalaxyNexus10($useragent);
+        $device = $deviceLoader->load('nexus 10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10337,7 +10439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nexus S 4G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGalaxyNexusS4G($useragent);
+        $device = $deviceLoader->load('nexus s 4g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10347,7 +10449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Nexus S/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGalaxyNexusS($useragent);
+        $device = $deviceLoader->load('nexus s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10357,7 +10459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/samsung galaxy s4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti9500($useragent);
+        $device = $deviceLoader->load('gt-i9500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10367,7 +10469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/gt\-9000/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Star\StarGt9000($useragent);
+        $device = $deviceLoader->load('gt-9000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10377,7 +10479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Slate 17/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Hp\HpSlate17($useragent);
+        $device = $deviceLoader->load('slate 17', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10387,7 +10489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/H345/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgH345($useragent);
+        $device = $deviceLoader->load('h345', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10397,7 +10499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/H340n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgH340n($useragent);
+        $device = $deviceLoader->load('h340n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10407,7 +10509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/H320/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgH320($useragent);
+        $device = $deviceLoader->load('h320', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10417,7 +10519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/H850/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgH850($useragent);
+        $device = $deviceLoader->load('h850', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10427,7 +10529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D802TR/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd802tr($useragent);
+        $device = $deviceLoader->load('d802tr', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10437,7 +10539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D802/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd802($useragent);
+        $device = $deviceLoader->load('d802', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10447,7 +10549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D855/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd855($useragent);
+        $device = $deviceLoader->load('d855', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10457,7 +10559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D856/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd856($useragent);
+        $device = $deviceLoader->load('d856', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10467,7 +10569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D320/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd320($useragent);
+        $device = $deviceLoader->load('d320', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10477,7 +10579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D325/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd325($useragent);
+        $device = $deviceLoader->load('d325', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10487,7 +10589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D373/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd373($useragent);
+        $device = $deviceLoader->load('d373', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10497,7 +10599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D290/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd290($useragent);
+        $device = $deviceLoader->load('d290', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10507,7 +10609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D955/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd955($useragent);
+        $device = $deviceLoader->load('d955', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10517,7 +10619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D958/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd958($useragent);
+        $device = $deviceLoader->load('d958', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10527,7 +10629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D686/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgD686($useragent);
+        $device = $deviceLoader->load('d686', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10537,7 +10639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D682tr/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgD682tr($useragent);
+        $device = $deviceLoader->load('d682tr', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10547,7 +10649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D682/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgD682($useragent);
+        $device = $deviceLoader->load('d682', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10557,7 +10659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D690/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgD690($useragent);
+        $device = $deviceLoader->load('d690', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10567,7 +10669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D620/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgD620($useragent);
+        $device = $deviceLoader->load('d620', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10577,7 +10679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D415/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd415($useragent);
+        $device = $deviceLoader->load('d415', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10587,7 +10689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-D410/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgd410($useragent);
+        $device = $deviceLoader->load('d410', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10597,7 +10699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E425/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge425($useragent);
+        $device = $deviceLoader->load('e425', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10607,7 +10709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E612/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge612($useragent);
+        $device = $deviceLoader->load('e612', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10617,7 +10719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E610/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge610($useragent);
+        $device = $deviceLoader->load('e610', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10627,7 +10729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E615/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge615($useragent);
+        $device = $deviceLoader->load('e615', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10637,7 +10739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E460/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge460($useragent);
+        $device = $deviceLoader->load('e460', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10647,7 +10749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E988/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge988($useragent);
+        $device = $deviceLoader->load('e988', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10657,7 +10759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-E989/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lge989($useragent);
+        $device = $deviceLoader->load('e989', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10667,7 +10769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-F240K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgF240k($useragent);
+        $device = $deviceLoader->load('f240k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10677,7 +10779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-F220K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgF220K($useragent);
+        $device = $deviceLoader->load('f220k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10687,7 +10789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-F200K/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgF200K($useragent);
+        $device = $deviceLoader->load('f200k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10697,7 +10799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-V935/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgv935($useragent);
+        $device = $deviceLoader->load('v935', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10707,7 +10809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-V490/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgv490($useragent);
+        $device = $deviceLoader->load('v490', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10717,7 +10819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-X150/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgx150($useragent);
+        $device = $deviceLoader->load('x150', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10727,7 +10829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-P765/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgp765($useragent);
+        $device = $deviceLoader->load('p765', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10737,7 +10839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-P970/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\Lgp970($useragent);
+        $device = $deviceLoader->load('p970', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10747,7 +10849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LG\-H525n/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgH525n($useragent);
+        $device = $deviceLoader->load('h525n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10757,7 +10859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus 5x/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgNexus5x($useragent);
+        $device = $deviceLoader->load('nexus 5x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10767,7 +10869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus ?5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgNexus5($useragent);
+        $device = $deviceLoader->load('nexus 5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10777,7 +10879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus ?4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lg\LgNexus4($useragent);
+        $device = $deviceLoader->load('nexus 4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10787,7 +10889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E10316/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE10316($useragent);
+        $device = $deviceLoader->load('lifetab e10316', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10797,7 +10899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E10312/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE10312($useragent);
+        $device = $deviceLoader->load('lifetab e10312', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10807,7 +10909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E10320/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE10320($useragent);
+        $device = $deviceLoader->load('lifetab e10320', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10817,7 +10919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E10310/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE10310($useragent);
+        $device = $deviceLoader->load('lifetab e10310', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10827,7 +10929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E7312/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE7312($useragent);
+        $device = $deviceLoader->load('lifetab e7312', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10837,7 +10939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E7316/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE7316($useragent);
+        $device = $deviceLoader->load('lifetab e7316', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10847,7 +10949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E7313/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE7313($useragent);
+        $device = $deviceLoader->load('lifetab e7313', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10857,7 +10959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E733X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE733x($useragent);
+        $device = $deviceLoader->load('lifetab e733x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10867,7 +10969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_E723X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabE723x($useragent);
+        $device = $deviceLoader->load('lifetab e723x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10877,7 +10979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P733X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP733x($useragent);
+        $device = $deviceLoader->load('lifetab p733x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10887,7 +10989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P1034X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP1034x($useragent);
+        $device = $deviceLoader->load('lifetab p1034x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10897,7 +10999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P891X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP891x($useragent);
+        $device = $deviceLoader->load('lifetab p891x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10907,7 +11009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P831X\.2/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP831x2($useragent);
+        $device = $deviceLoader->load('lifetab p831x.2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10917,7 +11019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P831X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP831x($useragent);
+        $device = $deviceLoader->load('lifetab p831x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10927,7 +11029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P9516/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP9516($useragent);
+        $device = $deviceLoader->load('lifetab p9516', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10937,7 +11039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_P9514/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabP9514($useragent);
+        $device = $deviceLoader->load('lifetab p9514', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10947,7 +11049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S1034X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS1034x($useragent);
+        $device = $deviceLoader->load('lifetab s1034x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10957,7 +11059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S1033X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS1033x($useragent);
+        $device = $deviceLoader->load('lifetab s1033x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10967,7 +11069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S1036X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS1036x($useragent);
+        $device = $deviceLoader->load('lifetab s1036x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10977,7 +11079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S9714/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS9714($useragent);
+        $device = $deviceLoader->load('lifetab s9714', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10987,7 +11089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S9512/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS9512($useragent);
+        $device = $deviceLoader->load('lifetab s9512', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -10997,7 +11099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S831X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS831x($useragent);
+        $device = $deviceLoader->load('lifetab s831x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11007,7 +11109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S785X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS785x($useragent);
+        $device = $deviceLoader->load('lifetab s785x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11017,7 +11119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LIFETAB_S732X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifetabS732x($useragent);
+        $device = $deviceLoader->load('lifetab s732x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11027,7 +11129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P4501/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifeP4501($useragent);
+        $device = $deviceLoader->load('md 98428', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11037,7 +11139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P4502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionP4502($useragent);
+        $device = $deviceLoader->load('life p4502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11047,7 +11149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P4013/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifeP4013($useragent);
+        $device = $deviceLoader->load('life p4013', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11057,7 +11159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E5001/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifeE5001($useragent);
+        $device = $deviceLoader->load('life e5001', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11067,7 +11169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(MEDION|LIFE) E3501/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdLifeE3501($useragent);
+        $device = $deviceLoader->load('life e3501', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11077,7 +11179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E4502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdE4502($useragent);
+        $device = $deviceLoader->load('life e4502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11087,7 +11189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E4504/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionE4504($useragent);
+        $device = $deviceLoader->load('life e4504', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11097,7 +11199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E4506/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionE4506($useragent);
+        $device = $deviceLoader->load('life e4506', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11107,7 +11209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E4503/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionE4503($useragent);
+        $device = $deviceLoader->load('life e4503', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11117,7 +11219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION E4005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionE4005($useragent);
+        $device = $deviceLoader->load('life e4005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11127,7 +11229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION X5004/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdX5004($useragent);
+        $device = $deviceLoader->load('x5004', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11137,7 +11239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION X5020/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdX5020($useragent);
+        $device = $deviceLoader->load('life x5020', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11147,7 +11249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION X4701/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MdX4701($useragent);
+        $device = $deviceLoader->load('x4701', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11157,7 +11259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION P5001/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionP5001($useragent);
+        $device = $deviceLoader->load('life p5001', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11167,7 +11269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION P5004/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionP5004($useragent);
+        $device = $deviceLoader->load('life p5004', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11177,7 +11279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION P5005/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionP5005($useragent);
+        $device = $deviceLoader->load('life p5005', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11187,7 +11289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MEDION S5004/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Medion\MedionS5004($useragent);
+        $device = $deviceLoader->load('life s5004', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11197,7 +11299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YUANDA50/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Yuanda\Yuanda50($useragent);
+        $device = $deviceLoader->load('50', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11207,7 +11309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ4415/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq4415($useragent);
+        $device = $deviceLoader->load('iq4415', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11217,7 +11319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ4490/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq4490($useragent);
+        $device = $deviceLoader->load('iq4490', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11227,7 +11329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ449/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq449($useragent);
+        $device = $deviceLoader->load('iq449', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11237,7 +11339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ448/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq448($useragent);
+        $device = $deviceLoader->load('iq448', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11247,7 +11349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ444/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq444($useragent);
+        $device = $deviceLoader->load('iq444', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11257,7 +11359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ442/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq442($useragent);
+        $device = $deviceLoader->load('iq442', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11267,7 +11369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ436i/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq436i($useragent);
+        $device = $deviceLoader->load('iq436i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11277,7 +11379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ434/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq434($useragent);
+        $device = $deviceLoader->load('iq434', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11287,7 +11389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ452/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq452($useragent);
+        $device = $deviceLoader->load('iq452', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11297,7 +11399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ456/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq456($useragent);
+        $device = $deviceLoader->load('iq456', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11307,7 +11409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ4502/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq4502($useragent);
+        $device = $deviceLoader->load('iq4502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11317,7 +11419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ4504/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq4504($useragent);
+        $device = $deviceLoader->load('iq4504', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11327,7 +11429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IQ450/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fly\FlyIq450($useragent);
+        $device = $deviceLoader->load('iq450', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11337,7 +11439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/(CX919|gxt_dongle_3188)/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Tv\AndoerCx919($useragent);
+        $device = $deviceLoader->load('cx919', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11347,7 +11449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP5000TDUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap5000tDuo($useragent);
+        $device = $deviceLoader->load('pap5000tduo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11357,7 +11459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP5000DUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap5000Duo($useragent);
+        $device = $deviceLoader->load('pap5000duo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11367,7 +11469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP5044DUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap5044Duo($useragent);
+        $device = $deviceLoader->load('pap5044duo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11377,7 +11479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP7600DUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap7600Duo($useragent);
+        $device = $deviceLoader->load('pap7600duo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11387,7 +11489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP4500DUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap4500Duo($useragent);
+        $device = $deviceLoader->load('pap4500duo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11397,7 +11499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP4044DUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap4044Duo($useragent);
+        $device = $deviceLoader->load('pap4044duo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11407,7 +11509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP3350DUO/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap3350Duo($useragent);
+        $device = $deviceLoader->load('pap3350duo', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11417,7 +11519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PAP5503/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPap5503($useragent);
+        $device = $deviceLoader->load('pap5503', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11427,7 +11529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PMT3037_3G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPmt30373g($useragent);
+        $device = $deviceLoader->load('pmt3037_3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11437,7 +11539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PMP7074B3GRU/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPmp7074b3gru($useragent);
+        $device = $deviceLoader->load('pmp7074b3gru', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11447,7 +11549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PMP3007C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPmp3007c($useragent);
+        $device = $deviceLoader->load('pmp3007c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11457,7 +11559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PMP3970B/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prestigio\PrestigioPmp3970b($useragent);
+        $device = $deviceLoader->load('pmp3970b', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11467,7 +11569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/sprd\-B51\+/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Sprd\SprdB51plus($useragent);
+        $device = $deviceLoader->load('b51+', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11477,7 +11579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BlackBerry 9790/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\BlackBerry\BlackBerry9790($useragent);
+        $device = $deviceLoader->load('blackberry 9790', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11487,7 +11589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BlackBerry 9720/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\BlackBerry\BlackBerry9720($useragent);
+        $device = $deviceLoader->load('blackberry 9720', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11497,7 +11599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BB10; Kbd/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\BlackBerry\BlackBerryKbd($useragent);
+        $device = $deviceLoader->load('kbd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11507,7 +11609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BB10; Touch/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\BlackBerry\BlackBerryZ10($useragent);
+        $device = $deviceLoader->load('z10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11517,7 +11619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/XT1068/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaXt1068($useragent);
+        $device = $deviceLoader->load('xt1068', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11527,7 +11629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/XT1039/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaXt1039($useragent);
+        $device = $deviceLoader->load('xt1039', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11537,7 +11639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/XT1032/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaXt1032($useragent);
+        $device = $deviceLoader->load('xt1032', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11547,7 +11649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/XT1080/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaXt1080($useragent);
+        $device = $deviceLoader->load('xt1080', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11557,7 +11659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/XT1021/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaXt1021($useragent);
+        $device = $deviceLoader->load('xt1021', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11567,7 +11669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MotoG3/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaMotoG3($useragent);
+        $device = $deviceLoader->load('motog3', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11577,7 +11679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MB612/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaMb612($useragent);
+        $device = $deviceLoader->load('mb612', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11587,7 +11689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus 6p/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Huawei\HuaweiNexus6p($useragent);
+        $device = $deviceLoader->load('nexus 6p', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11597,7 +11699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus 6/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Motorola\MotorolaNexus6($useragent);
+        $device = $deviceLoader->load('nexus 6', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11607,7 +11709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ME302KL/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusMe302kl($useragent);
+        $device = $deviceLoader->load('me302kl', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11617,7 +11719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/nexus[ _]?7/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusGalaxyNexus7($useragent);
+        $device = $deviceLoader->load('nexus 7', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11627,7 +11729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/K013/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusMemoPadK013($useragent);
+        $device = $deviceLoader->load('k013', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11637,7 +11739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/K01E/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusFoneK01E($useragent);
+        $device = $deviceLoader->load('k01e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11647,7 +11749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Z00AD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusZ00ad($useragent);
+        $device = $deviceLoader->load('z00ad', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11657,7 +11759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/K012/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusFoneK012($useragent);
+        $device = $deviceLoader->load('k012', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11667,7 +11769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ME302C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusMe302c($useragent);
+        $device = $deviceLoader->load('me302c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11677,7 +11779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T00N/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusT00n($useragent);
+        $device = $deviceLoader->load('t00n', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11687,7 +11789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T00J/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusT00j($useragent);
+        $device = $deviceLoader->load('t00j', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11697,7 +11799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P01Y/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusP01y($useragent);
+        $device = $deviceLoader->load('p01y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11707,7 +11809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PadFone T004/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusPadFoneT004($useragent);
+        $device = $deviceLoader->load('padfone t004', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11717,7 +11819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PadFone 2/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusPadFone2($useragent);
+        $device = $deviceLoader->load('a68', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11727,7 +11829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PadFone/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusPadFone($useragent);
+        $device = $deviceLoader->load('padfone', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11737,7 +11839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TF300TG/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusTf300Tg($useragent);
+        $device = $deviceLoader->load('tf300tg', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11747,7 +11849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TF300TL/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusTf300Tl($useragent);
+        $device = $deviceLoader->load('tf300tl', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11757,7 +11859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TF300T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusTf300T($useragent);
+        $device = $deviceLoader->load('tf300t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11767,7 +11869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P1801\-T/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Asus\AsusP1801t($useragent);
+        $device = $deviceLoader->load('p1801-t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11777,7 +11879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/WIN HD W510u/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Blu\BluWinHdW510u($useragent);
+        $device = $deviceLoader->load('win hd w510u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11787,7 +11889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/STUDIO 5\.5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Blu\BluStudio55($useragent);
+        $device = $deviceLoader->load('studio 5.5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11797,7 +11899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/N9500/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Star\StarN9500($useragent);
+        $device = $deviceLoader->load('n9500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11807,7 +11909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/tolino tab 8\.9/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Tolino\TolinoTab89($useragent);
+        $device = $deviceLoader->load('tab 8.9', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11817,7 +11919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/tolino tab 8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Tolino\TolinoTab8($useragent);
+        $device = $deviceLoader->load('tab 8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11827,7 +11929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo S660/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS660($useragent);
+        $device = $deviceLoader->load('s660', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11837,7 +11939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo S920/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS920($useragent);
+        $device = $deviceLoader->load('s920', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11847,7 +11949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo S720/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS720($useragent);
+        $device = $deviceLoader->load('s720', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11857,7 +11959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IdeaTab S6000\-H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS6000hIdeaTab($useragent);
+        $device = $deviceLoader->load('s6000-h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11867,7 +11969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IdeaTabS2110AH/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS2110ahIdeaTab($useragent);
+        $device = $deviceLoader->load('s2110a-h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11877,7 +11979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IdeaTabS2110AF/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS2110afIdeaTab($useragent);
+        $device = $deviceLoader->load('s2110a-f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11887,7 +11989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IdeaTabS2109A\-F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoS2109afIdeaTab($useragent);
+        $device = $deviceLoader->load('s2109a-f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11897,7 +11999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A606/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA606($useragent);
+        $device = $deviceLoader->load('a606', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11907,7 +12009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A850\+/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA850Plus($useragent);
+        $device = $deviceLoader->load('a850+', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11917,7 +12019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A766/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA766($useragent);
+        $device = $deviceLoader->load('a766', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11927,7 +12029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A536/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA536($useragent);
+        $device = $deviceLoader->load('a536', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11937,7 +12039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SmartTabII10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\VodafoneSmartTabIi10($useragent);
+        $device = $deviceLoader->load('smarttab ii 10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11947,7 +12049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Vodafone Smart Tab III 10/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\VodafoneSmartTabIii10($useragent);
+        $device = $deviceLoader->load('smart tab iii 10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11957,7 +12059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Smart Tab 4G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\VodafoneSmartTab4g($useragent);
+        $device = $deviceLoader->load('smart tab 4g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11967,7 +12069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Smart Tab 4/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\VodafoneSmartTab4($useragent);
+        $device = $deviceLoader->load('smart tab 4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11977,7 +12079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Smart Tab 3G/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\VodafoneSmartTab3g($useragent);
+        $device = $deviceLoader->load('smart tab 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11987,7 +12089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P1032X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoP1032x($useragent);
+        $device = $deviceLoader->load('lifetab p1032x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -11997,7 +12099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P1050X/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoP1050x($useragent);
+        $device = $deviceLoader->load('lifetab p1050x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12007,7 +12109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A7000\-a/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA7000a($useragent);
+        $device = $deviceLoader->load('a7000-a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12017,7 +12119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LenovoA3300\-GV/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA3300gv($useragent);
+        $device = $deviceLoader->load('a3300-gv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12027,7 +12129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo B6000\-HV/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoB6000hv($useragent);
+        $device = $deviceLoader->load('b6000-hv', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12037,7 +12139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo B6000\-H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoB6000h($useragent);
+        $device = $deviceLoader->load('b6000-h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12047,7 +12149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo B6000\-F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoB6000f($useragent);
+        $device = $deviceLoader->load('b6000-f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12057,7 +12159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo B8080\-H/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoB8080h($useragent);
+        $device = $deviceLoader->load('b8080-h', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12067,7 +12169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo TB2\-X30F/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoTb2x30f($useragent);
+        $device = $deviceLoader->load('tb2-x30f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12077,7 +12179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo YT3\-X50L/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoYt3x50l($useragent);
+        $device = $deviceLoader->load('yt3-x50l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12087,7 +12189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo K900/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoK900($useragent);
+        $device = $deviceLoader->load('k900', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12097,7 +12199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AT1010\-T/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoAt1010t($useragent);
+        $device = $deviceLoader->load('at1010-t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12107,7 +12209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/A10\-70F/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA1070f($useragent);
+        $device = $deviceLoader->load('a10-70f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12117,7 +12219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A1000L\-F/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA1000lf($useragent);
+        $device = $deviceLoader->load('a1000l-f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12127,7 +12229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A1000\-F/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA1000f($useragent);
+        $device = $deviceLoader->load('a1000-f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12137,7 +12239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Lenovo A1000/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\LenovoA1000($useragent);
+        $device = $deviceLoader->load('a1000', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12147,7 +12249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YOGA Tablet 2 Pro\-1380L/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\Lenovo1380L($useragent);
+        $device = $deviceLoader->load('1380l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12157,7 +12259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YOGA Tablet 2 Pro\-1380F/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\Lenovo1380F($useragent);
+        $device = $deviceLoader->load('1380f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12167,7 +12269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YOGA Tablet 2\-1050L/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\Lenovo1050L($useragent);
+        $device = $deviceLoader->load('1050l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12177,7 +12279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YOGA Tablet 2\-1050F/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\Lenovo1050F($useragent);
+        $device = $deviceLoader->load('1050f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12187,7 +12289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YOGA Tablet 2\-830L/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\Lenovo830L($useragent);
+        $device = $deviceLoader->load('830l', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12197,7 +12299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/YOGA Tablet 2\-830F/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Lenovo\Lenovo830F($useragent);
+        $device = $deviceLoader->load('830f', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12207,7 +12309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/S208/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Cubot\CubotS208($useragent);
+        $device = $deviceLoader->load('s208', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12217,7 +12319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/306SH/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Sharp\SH306($useragent);
+        $device = $deviceLoader->load('306sh', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12227,7 +12329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/JERRY/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Wiko\WikoJerry($useragent);
+        $device = $deviceLoader->load('jerry', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12237,7 +12339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BLOOM/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Wiko\WikoBloom($useragent);
+        $device = $deviceLoader->load('bloom', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12247,7 +12349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/DARKSIDE/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Wiko\WikoDarkside($useragent);
+        $device = $deviceLoader->load('darkside', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12257,7 +12359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SLIDE2/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Wiko\WikoSlide2($useragent);
+        $device = $deviceLoader->load('slide 2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12267,7 +12369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ M3 /', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Gionee\GioneeMarathonM3($useragent);
+        $device = $deviceLoader->load('m3', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12277,7 +12379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4034D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4034D($useragent);
+        $device = $deviceLoader->load('ot-4034d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12287,7 +12389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4030D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4030D($useragent);
+        $device = $deviceLoader->load('ot-4030d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12297,7 +12399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4030X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4030X($useragent);
+        $device = $deviceLoader->load('ot-4030x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12307,7 +12409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4012X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4012X($useragent);
+        $device = $deviceLoader->load('ot-4012x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12317,7 +12419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4012A/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4012A($useragent);
+        $device = $deviceLoader->load('ot-4012a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12327,7 +12429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4015D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4015D($useragent);
+        $device = $deviceLoader->load('ot-4015d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12337,7 +12439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4015X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4015X($useragent);
+        $device = $deviceLoader->load('ot-4015x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12347,7 +12449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/7041D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt7041d($useragent);
+        $device = $deviceLoader->load('ot-7041d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12357,7 +12459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/7041X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt7041x($useragent);
+        $device = $deviceLoader->load('ot-7041x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12367,7 +12469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/7047D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt7047d($useragent);
+        $device = $deviceLoader->load('ot-7047d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12377,7 +12479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/7049D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt7049d($useragent);
+        $device = $deviceLoader->load('ot-7049d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12387,7 +12489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/7025D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt7025d($useragent);
+        $device = $deviceLoader->load('ot-7025d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12397,7 +12499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/5020D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt5020D($useragent);
+        $device = $deviceLoader->load('ot-5020d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12407,7 +12509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/5035D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt5035D($useragent);
+        $device = $deviceLoader->load('ot-5035d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12417,7 +12519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/5036D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt5036D($useragent);
+        $device = $deviceLoader->load('ot-5036d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12427,7 +12529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/4037T/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt4037T($useragent);
+        $device = $deviceLoader->load('ot-4037t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12437,7 +12539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P310X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelP310x($useragent);
+        $device = $deviceLoader->load('ot-p310x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12447,7 +12549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P310A/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelP310a($useragent);
+        $device = $deviceLoader->load('ot-p310a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12457,7 +12559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/P320X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelP320x($useragent);
+        $device = $deviceLoader->load('ot-p320x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12467,7 +12569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6040D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6040D($useragent);
+        $device = $deviceLoader->load('ot-6040d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12477,7 +12579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6043D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6043D($useragent);
+        $device = $deviceLoader->load('ot-6043d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12487,7 +12589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6010D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6010D($useragent);
+        $device = $deviceLoader->load('ot-6010d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12497,7 +12599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6010X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6010X($useragent);
+        $device = $deviceLoader->load('ot-6010x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12507,7 +12609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6015X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6015X($useragent);
+        $device = $deviceLoader->load('ot-6015x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12517,7 +12619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6035R/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6035R($useragent);
+        $device = $deviceLoader->load('ot-6035r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12527,7 +12629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6034R/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6034R($useragent);
+        $device = $deviceLoader->load('ot-6034r', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12537,7 +12639,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6032/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6032($useragent);
+        $device = $deviceLoader->load('ot-6032', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12547,7 +12649,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6036Y/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6036Y($useragent);
+        $device = $deviceLoader->load('ot-6036y', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12557,7 +12659,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6033X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6033X($useragent);
+        $device = $deviceLoader->load('ot-6033x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12567,7 +12669,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6030X/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6030X($useragent);
+        $device = $deviceLoader->load('ot-6030x', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12577,7 +12679,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6030D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6030D($useragent);
+        $device = $deviceLoader->load('ot-6030d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12587,7 +12689,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/6050A/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt6050A($useragent);
+        $device = $deviceLoader->load('ot-6050a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12597,7 +12699,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/8008D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt8008D($useragent);
+        $device = $deviceLoader->load('ot-8008d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12607,7 +12709,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/8000D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt8000D($useragent);
+        $device = $deviceLoader->load('ot-8000d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12617,7 +12719,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/5042D/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt5042D($useragent);
+        $device = $deviceLoader->load('ot-5042d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12627,7 +12729,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]995/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt995($useragent);
+        $device = $deviceLoader->load('ot-995', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12637,7 +12739,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]997d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt997d($useragent);
+        $device = $deviceLoader->load('ot-997d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12647,7 +12749,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]992d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt992d($useragent);
+        $device = $deviceLoader->load('ot-992d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12657,7 +12759,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]991t/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt991t($useragent);
+        $device = $deviceLoader->load('ot-991t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12667,7 +12769,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]991d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt991d($useragent);
+        $device = $deviceLoader->load('ot-991d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12677,7 +12779,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]991/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt991($useragent);
+        $device = $deviceLoader->load('ot-991', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12687,7 +12789,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]903D/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt903d($useragent);
+        $device = $deviceLoader->load('ot-903d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12697,7 +12799,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]980/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt980($useragent);
+        $device = $deviceLoader->load('ot-980', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12707,7 +12809,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]985d/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt985d($useragent);
+        $device = $deviceLoader->load('ot-985d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12717,7 +12819,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]818/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOt818($useragent);
+        $device = $deviceLoader->load('ot-818', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12727,7 +12829,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]tab[ _]7hd/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOtTab7hd($useragent);
+        $device = $deviceLoader->load('ot-tab7hd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12737,7 +12839,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]tab[ _]8hd/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelOtTab8hd($useragent);
+        $device = $deviceLoader->load('ot-tab8hd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12747,7 +12849,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]p321/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelP321($useragent);
+        $device = $deviceLoader->load('ot-p321', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12757,7 +12859,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/one[ _]touch[ _]Fierce/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Alcatel\AlcatelFierce($useragent);
+        $device = $deviceLoader->load('fierce', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12767,7 +12869,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 50b Platinum/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos50bPlatinum($useragent);
+        $device = $deviceLoader->load('50b platinum', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12777,7 +12879,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 50 Platinum/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos50Platinum($useragent);
+        $device = $deviceLoader->load('50 platinum', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12787,7 +12889,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 50 Titanium/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos50Titanium($useragent);
+        $device = $deviceLoader->load('50 titanium', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12797,7 +12899,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 50 Oxygen Plus/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos50OxygenPlus($useragent);
+        $device = $deviceLoader->load('50 oxygen plus', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12807,7 +12909,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ARCHOS 101 XS 2/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos101xs2($useragent);
+        $device = $deviceLoader->load('101 xs 2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12817,7 +12919,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 101d Neon/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos101dNeon($useragent);
+        $device = $deviceLoader->load('101d neon', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12827,7 +12929,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 121 Neon/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos121Neon($useragent);
+        $device = $deviceLoader->load('121 neon', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12837,7 +12939,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 101 Neon/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos101Neon($useragent);
+        $device = $deviceLoader->load('101 neon', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12847,7 +12949,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Archos 101 Copper/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Archos\Archos101Copper($useragent);
+        $device = $deviceLoader->load('101 copper', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12857,7 +12959,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE Blade V6/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBladev6($useragent);
+        $device = $deviceLoader->load('blade v6', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12867,7 +12969,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE Blade L5 Plus/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBladeL5plus($useragent);
+        $device = $deviceLoader->load('blade l5 plus', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12877,7 +12979,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE Blade L6/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBladeL6($useragent);
+        $device = $deviceLoader->load('blade l6', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12887,7 +12989,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE Blade L2/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBladeL2($useragent);
+        $device = $deviceLoader->load('blade l2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12897,7 +12999,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE Blade L3/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBladeL3($useragent);
+        $device = $deviceLoader->load('blade l3', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12907,7 +13009,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE N919/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteN919($useragent);
+        $device = $deviceLoader->load('n919', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12917,7 +13019,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Beeline Pro/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteBeelinePro($useragent);
+        $device = $deviceLoader->load('beeline pro', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12927,7 +13029,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SmartTab7/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteSmartTab7($useragent);
+        $device = $deviceLoader->load('smarttab7', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12937,7 +13039,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE_V829/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteV829($useragent);
+        $device = $deviceLoader->load('v829', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12947,7 +13049,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE Geek/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteV975($useragent);
+        $device = $deviceLoader->load('v975', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12957,7 +13059,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ZTE LEO Q2/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zte\ZteLeoQ2($useragent);
+        $device = $deviceLoader->load('v769m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12967,7 +13069,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IEOS_QUAD_10_PRO/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysIeosQuad10pro($useragent);
+        $device = $deviceLoader->load('ieos quad 10 pro', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12977,7 +13079,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IEOS_QUAD_W/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysIeosQuadw($useragent);
+        $device = $deviceLoader->load('ieos quad w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12987,7 +13089,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MAVEN_10_PLUS/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysMaven10plus($useragent);
+        $device = $deviceLoader->load('maven 10 plus', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -12997,7 +13099,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CONNECT7PRO/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysConnect7pro($useragent);
+        $device = $deviceLoader->load('connect 7 pro', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13007,7 +13109,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SPACE10_PLUS_3G/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Odys\OdysSpace10plus3g($useragent);
+        $device = $deviceLoader->load('space 10 plus 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13017,7 +13119,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AT300SE/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Toshiba\ToshibaAt300SE($useragent);
+        $device = $deviceLoader->load('at300se', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13027,7 +13129,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/A3\-A11/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Acer\AcerIconiaA3A11($useragent);
+        $device = $deviceLoader->load('a3-a11', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13037,7 +13139,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/A3\-A10/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Acer\AcerIconiaA3A10($useragent);
+        $device = $deviceLoader->load('a3-a10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13047,7 +13149,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/A700/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Acer\AcerIconiaA700($useragent);
+        $device = $deviceLoader->load('a700', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13057,7 +13159,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/B1\-711/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Acer\AcerIconiaB1711($useragent);
+        $device = $deviceLoader->load('b1-711', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13067,7 +13169,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/B1\-770/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Acer\AcerIconiaB1770($useragent);
+        $device = $deviceLoader->load('b1-770', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13077,7 +13179,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediPaD13/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bewatec\BewatecMediPad13($useragent);
+        $device = $deviceLoader->load('medipad 13', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13087,7 +13189,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MediPaD/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bewatec\BewatecMediPad($useragent);
+        $device = $deviceLoader->load('medipad', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13097,7 +13199,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TechniPad[_ ]10\-3G/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatTechnipad103g($useragent);
+        $device = $deviceLoader->load('technipad 10 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13107,7 +13209,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TechniPad[_ ]10/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatTechnipad10($useragent);
+        $device = $deviceLoader->load('technipad 10', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13117,7 +13219,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AQIPAD[_ ]7G/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatAqistonAqipad7g($useragent);
+        $device = $deviceLoader->load('aqiston aqipad 7g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13127,7 +13229,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TechniPhone[_ ]5/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Technisat\TechnisatTechniphone5($useragent);
+        $device = $deviceLoader->load('techniphone 5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13137,7 +13239,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M7T/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Pipo\PipoM7t3g($useragent);
+        $device = $deviceLoader->load('m7t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13147,7 +13249,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/M83g/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Pipo\PipoM83g($useragent);
+        $device = $deviceLoader->load('m8 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13157,7 +13259,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ M6 /', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Pipo\PipoM6($useragent);
+        $device = $deviceLoader->load('m6', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13167,7 +13269,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ORION7o/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\GoClever\GoCleverOrion7o($useragent);
+        $device = $deviceLoader->load('orion 7o', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13177,7 +13279,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/GOCLEVER TAB A93\.2/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\GoClever\GoCleverTabA932($useragent);
+        $device = $deviceLoader->load('a93.2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13187,7 +13289,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/QUANTUM 4/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\GoClever\GoCleverQuantum4($useragent);
+        $device = $deviceLoader->load('quantum 4', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13197,7 +13299,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/QUANTUM_700m/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\GoClever\GoCleverQuantum700m($useragent);
+        $device = $deviceLoader->load('quantum 700m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13207,7 +13309,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NT\-1009T/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\IconBit\IconBitNt1009t($useragent);
+        $device = $deviceLoader->load('nt-1009t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13217,7 +13319,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/NT\-3702M/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\IconBit\IconBitNt3702m($useragent);
+        $device = $deviceLoader->load('nt-3702m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13227,7 +13329,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Philips W336/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Philips\PhilipsW336($useragent);
+        $device = $deviceLoader->load('w336', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13237,7 +13339,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/KianoIntelect7/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Kiano\KianoIntelect7($useragent);
+        $device = $deviceLoader->load('intelect 7 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13247,7 +13349,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SUPRA_M121G/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Supra\SupraM121g($useragent);
+        $device = $deviceLoader->load('m121g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13257,7 +13359,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/HW\-W718/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Haier\HaierW718($useragent);
+        $device = $deviceLoader->load('w718', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13267,7 +13369,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Micromax A59/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Micromax\MicromaxA59($useragent);
+        $device = $deviceLoader->load('a59', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13277,7 +13379,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AX512/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bmobile\BmobileAx512($useragent);
+        $device = $deviceLoader->load('ax512', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13287,7 +13389,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AX540/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bmobile\BmobileAx540($useragent);
+        $device = $deviceLoader->load('ax540', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13297,7 +13399,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/s4502m/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Dns\DnsS4502m($useragent);
+        $device = $deviceLoader->load('s4502m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13307,7 +13409,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/s4502/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Dns\DnsS4502($useragent);
+        $device = $deviceLoader->load('s4502', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13317,7 +13419,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/s4501m/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Dns\DnsS4501m($useragent);
+        $device = $deviceLoader->load('s4501m', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13327,7 +13429,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/s4503q/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Dns\DnsS4503q($useragent);
+        $device = $deviceLoader->load('s4503q', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13337,7 +13439,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PULID F11/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Pulid\PulidF11($useragent);
+        $device = $deviceLoader->load('f11', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13347,7 +13449,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PULID F15/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Pulid\PulidF15($useragent);
+        $device = $deviceLoader->load('f15', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13357,7 +13459,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/thl_4400/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Thl\Thl4400($useragent);
+        $device = $deviceLoader->load('4400', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13367,7 +13469,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/thl 2015/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Thl\Thl2015($useragent);
+        $device = $deviceLoader->load('2015', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13377,7 +13479,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ThL W7/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Thl\ThlW7($useragent);
+        $device = $deviceLoader->load('w7', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13387,7 +13489,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ThL W8/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Thl\ThlW8($useragent);
+        $device = $deviceLoader->load('w8', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13397,7 +13499,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/iDxD4/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Digma\DigmaIdxd4($useragent);
+        $device = $deviceLoader->load('idxd4 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13407,7 +13509,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PS1043MG/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Digma\DigmaPs1043mg($useragent);
+        $device = $deviceLoader->load('ps1043mg', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13417,7 +13519,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TT7026MW/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Digma\DigmaTt7026mw($useragent);
+        $device = $deviceLoader->load('tt7026mw', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13427,7 +13529,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/i\-mobile IQX OKU/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Imobile\ImobileIqxoku($useragent);
+        $device = $deviceLoader->load('iq x oku', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13437,7 +13539,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/i\-mobile IQ 6A/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Imobile\ImobileIq6a($useragent);
+        $device = $deviceLoader->load('iq 6a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13447,7 +13549,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/RMD\-757/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Ritmix\RitmixRmd757($useragent);
+        $device = $deviceLoader->load('rmd-757', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13457,7 +13559,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/RMD\-1040/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Ritmix\RitmixRmd1040($useragent);
+        $device = $deviceLoader->load('rmd-1040', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13467,7 +13569,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/A400/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Celkon\CelkonA400($useragent);
+        $device = $deviceLoader->load('a400', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13477,7 +13579,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T108/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Twinovo\TwinovoT108($useragent);
+        $device = $deviceLoader->load('t108', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13487,7 +13589,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T118/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Twinovo\TwinovoT118($useragent);
+        $device = $deviceLoader->load('t118', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13497,7 +13599,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/N\-06E/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Nec\NecN06e($useragent);
+        $device = $deviceLoader->load('n-06e', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13507,7 +13609,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/OK999/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Sunup\SunupOk999($useragent);
+        $device = $deviceLoader->load('ok999', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13517,7 +13619,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/PICOpad_S1\(7_3G\)/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Axioo\AxiooPicopadS13g($useragent);
+        $device = $deviceLoader->load('picopad s1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13527,7 +13629,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ ACE /', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGts5830($useragent);
+        $device = $deviceLoader->load('gt-s5830', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13540,7 +13642,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         && (preg_match('/Android/', $useragent) || preg_match('/UCWEB/', $useragent))
         && preg_match('/iphone[ ]?5c/i', $useragent)
     ) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Xianghe\XiangheIphone5c($useragent);
+        $device = $deviceLoader->load('iphone 5c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13553,7 +13655,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         && (preg_match('/Android/', $useragent) || preg_match('/UCWEB/', $useragent))
         && preg_match('/iphone[ ]?5/i', $useragent)
     ) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Xianghe\XiangheIphone5($useragent);
+        $device = $deviceLoader->load('iphone 5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13566,7 +13668,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         && preg_match('/Android/', $useragent)
         && preg_match('/iphone[ ]?6c/i', $useragent)
     ) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Xianghe\XiangheIphone6c($useragent);
+        $device = $deviceLoader->load('iphone 6c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13579,7 +13681,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         && preg_match('/Android/', $useragent)
         && preg_match('/iphone/i', $useragent)
     ) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Xianghe\XiangheIphone($useragent);
+        $device = $deviceLoader->load('iphone', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13589,7 +13691,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/DG800/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Doogee\DoogeeDg800($useragent);
+        $device = $deviceLoader->load('dg800', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13599,7 +13701,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/DG330/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Doogee\DoogeeDg330($useragent);
+        $device = $deviceLoader->load('dg330', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13609,7 +13711,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/DG2014/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Doogee\DoogeeDg2014($useragent);
+        $device = $deviceLoader->load('dg2014', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13619,7 +13721,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/F3_Pro/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Doogee\DoogeeF3pro($useragent);
+        $device = $deviceLoader->load('f3 pro', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13629,7 +13731,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TAB785DUAL/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Sunstech\SunstechTab785dual($useragent);
+        $device = $deviceLoader->load('tab785 dual', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13639,7 +13741,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Norma 2/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Keneksi\KeneksiNorma2($useragent);
+        $device = $deviceLoader->load('norma 2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13649,7 +13751,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Adi_5S/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Artel\ArtelAdi5s($useragent);
+        $device = $deviceLoader->load('adi5s', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13659,7 +13761,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/BRAVIS NP 844/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Bravis\BravisNp844($useragent);
+        $device = $deviceLoader->load('np 844', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13669,7 +13771,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/fnac 4\.5/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fnac\FnacPhablet45($useragent);
+        $device = $deviceLoader->load('phablet 4.5', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13679,7 +13781,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/T880G/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Etuline\EtulineT880g($useragent);
+        $device = $deviceLoader->load('t880g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13689,7 +13791,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TCL M2U/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Tcl\TclM2u($useragent);
+        $device = $deviceLoader->load('m2u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13699,7 +13801,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TCL S720T/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Tcl\TclS720t($useragent);
+        $device = $deviceLoader->load('s720t', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13709,7 +13811,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/radxa rock/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Radxa\RadxaRock($useragent);
+        $device = $deviceLoader->load('rock', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13719,7 +13821,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/DM015K/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Kyocera\KyoceraDm015k($useragent);
+        $device = $deviceLoader->load('dm015k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13729,7 +13831,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/KC\-S701/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Kyocera\KyoceraKcs701($useragent);
+        $device = $deviceLoader->load('kc-s701', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13739,7 +13841,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/FP1U/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fairphone\FairphoneFp1u($useragent);
+        $device = $deviceLoader->load('fp1u', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13749,7 +13851,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/FP1/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Fairphone\FairphoneFp1($useragent);
+        $device = $deviceLoader->load('fp1', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13759,7 +13861,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ImPAD 0413/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Impression\ImpressionImpad0413($useragent);
+        $device = $deviceLoader->load('impad 0413', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13769,7 +13871,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/ImPAD6213M_v2/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Impression\ImpressionImpad6213Mv2($useragent);
+        $device = $deviceLoader->load('impad 6213m v2', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13779,7 +13881,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/KFASWI/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Amazon\AmazonKfaswi($useragent);
+        $device = $deviceLoader->load('kfaswi', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13789,7 +13891,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/SD4930UR/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Amazon\AmazonSd4930urFirePhone($useragent);
+        $device = $deviceLoader->load('sd4930ur', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13799,7 +13901,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Art 3G/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Explay\ExplayArt3g($useragent);
+        $device = $deviceLoader->load('art 3g', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13809,7 +13911,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/R815/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oppo\OppoR815($useragent);
+        $device = $deviceLoader->load('r815', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13819,7 +13921,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TAB\-970/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Prology\PrologyTab970($useragent);
+        $device = $deviceLoader->load('tab-970', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13829,7 +13931,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IM\-A900K/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Pantech\PantechIma900k($useragent);
+        $device = $deviceLoader->load('im-a900k', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13839,7 +13941,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Pacific 800/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oysters\OystersPacific800($useragent);
+        $device = $deviceLoader->load('pacific 800', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13849,7 +13951,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Pacific800i/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Oysters\OystersPacific800i($useragent);
+        $device = $deviceLoader->load('pacific 800i', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13859,7 +13961,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TM\-7055HD/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Texet\TexetTm7055hd($useragent);
+        $device = $deviceLoader->load('tm-7055hd', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13869,7 +13971,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TM\-5204/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Texet\TexetTm5204($useragent);
+        $device = $deviceLoader->load('tm-5204', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13879,7 +13981,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AP\-804/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Assistant\AssistantAp804($useragent);
+        $device = $deviceLoader->load('ap-804', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13889,7 +13991,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Atlantis 1010A/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Blaupunkt\BlaupunktAtlantis1010a($useragent);
+        $device = $deviceLoader->load('atlantis 1010a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13899,7 +14001,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/AC0732C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\TriQ\TriQAc0732c($useragent);
+        $device = $deviceLoader->load('ac0732c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13909,7 +14011,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/RC9724C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\TriQ\TriQRc9724c($useragent);
+        $device = $deviceLoader->load('rc9724c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13919,7 +14021,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/MT0739D/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\TriQ\TriQMt0739d($useragent);
+        $device = $deviceLoader->load('mt0739d', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13929,7 +14031,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/LC0720C/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\TriQ\TriQLc0720c($useragent);
+        $device = $deviceLoader->load('lc0720c', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13939,7 +14041,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TBD1083/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zeki\ZekiTbd1083($useragent);
+        $device = $deviceLoader->load('tbd1083', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13949,7 +14051,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TBDC1093/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Zeki\ZekiTbdc1093($useragent);
+        $device = $deviceLoader->load('tbdc1093', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13959,7 +14061,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/A66A/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Evercoss\EvercossA66a($useragent);
+        $device = $deviceLoader->load('a66a', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13969,7 +14071,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/IP1020/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Dex\DexIp1020($useragent);
+        $device = $deviceLoader->load('ip1020', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13979,7 +14081,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Turbo Pad 500/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\TurboPad\TurboPadPad500($useragent);
+        $device = $deviceLoader->load('pad 500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13989,7 +14091,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Turbo X6/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\TurboPad\TurboPadTurboX6($useragent);
+        $device = $deviceLoader->load('turbo x6', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -13999,7 +14101,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Novo7Fire/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Ainol\AinolNovo7Fire($useragent);
+        $device = $deviceLoader->load('novo 7 fire', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14009,7 +14111,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/numy_note_9/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Ainol\AinolNumyNote9($useragent);
+        $device = $deviceLoader->load('numy note 9', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14019,7 +14121,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TX08/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Irbis\IrbisTx08($useragent);
+        $device = $deviceLoader->load('tx08', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14029,7 +14131,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/TX18/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Irbis\IrbisTx18($useragent);
+        $device = $deviceLoader->load('tx18', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14039,7 +14141,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/U25GT\-C4W/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Cube\CubeU25gtc4w($useragent);
+        $device = $deviceLoader->load('u25gt-c4w', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14049,7 +14151,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/iPad/', $useragent) && !preg_match('/tripadvisor/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Apple\Ipad($useragent);
+        $device = $deviceLoader->load('ipad', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14059,7 +14161,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/iPod/', $useragent) && !preg_match('/iPodder/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Apple\Ipod($useragent);
+        $device = $deviceLoader->load('ipod touch', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14069,7 +14171,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (!preg_match('/trident/i', $useragent) && preg_match('/iPhone/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Apple\Iphone($useragent);
+        $device = $deviceLoader->load('iphone', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14079,7 +14181,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Puffin\/[\d\.]+IT/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Apple\Ipad($useragent);
+        $device = $deviceLoader->load('ipad', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14089,7 +14191,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Puffin\/[\d\.]+IP/', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Apple\Iphone($useragent);
+        $device = $deviceLoader->load('iphone', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14099,7 +14201,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/Galaxy Nexus/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGalaxyNexus($useragent);
+        $device = $deviceLoader->load('galaxy nexus', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14109,7 +14211,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/galaxy tab 2 3g/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp3100($useragent);
+        $device = $deviceLoader->load('gt-p3100', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14119,7 +14221,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/galaxy tab 2/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGtp3110($useragent);
+        $device = $deviceLoader->load('gt-p3110', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14129,7 +14231,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/galaxy j5/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungSmJ500($useragent);
+        $device = $deviceLoader->load('sm-j500', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14139,7 +14241,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/OMNIA7/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Samsung\SamsungGti8700Omnia7($useragent);
+        $device = $deviceLoader->load('gt-i8700', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14149,7 +14251,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CCE SK352/i', $useragent)) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Cce\CceSk352($useragent);
+        $device = $deviceLoader->load('sk352', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14162,7 +14264,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         && !preg_match('/PodcastOne/i', $useragent)
         && !preg_match('/iOS/', $useragent)
     ) {
-        $device = new \BrowserDetector\Detector\Device\Mobile\Htc\HtcOne($useragent);
+        $device = $deviceLoader->load('m7', $useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
@@ -14172,7 +14274,7 @@ function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, 
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
     } elseif (preg_match('/CFNetwork/', $useragent)) {
-        $device = \BrowserDetector\Factory\Device\DarwinFactory::detect($useragent);
+        $device = (new \BrowserDetector\Factory\Device\DarwinFactory($cache, $deviceLoader))->detect($useragent);
 
         $deviceBrand       = $device->getBrand();
         $deviceCode        = $device->getDeviceName();
