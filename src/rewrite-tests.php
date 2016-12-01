@@ -67,23 +67,37 @@ foreach ($files as $filename) {
     echo '    checking ...', PHP_EOL;
 
     /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() !== 'php') {
+    if (!$file->isFile() || !in_array($file->getExtension(), ['php', 'json'])) {
         continue;
     }
 
     echo '    reading ...', PHP_EOL;
 
-    $tests = require_once $file->getPathname();
+    switch ($file->getExtension()) {
+        case 'php':
+            $tests = require_once $file->getPathname();
+            break;
+        case 'json':
+            $tests = json_decode(file_get_contents($file->getPathname()));
+            break;
+        default:
+            continue;
+    }
+
 
     if (empty($tests)) {
-        echo 'removing empty file ', $file->getBasename(), ' ...', PHP_EOL;
+        echo '    removing empty file', PHP_EOL;
         unlink($file->getPathname());
 
         continue;
     }
 
-    if (!is_array($tests)) {
-        echo 'file ', $file->getBasename(), ' does not contain test array', PHP_EOL;
+    if (is_array($tests)) {
+        $tests = (object) $tests;
+    }
+
+    if (empty($tests)) {
+        echo '    file does not contain test array', PHP_EOL;
         continue;
     }
 
@@ -160,7 +174,7 @@ file_put_contents($circleFile, $circleciContent);
 echo 'done', PHP_EOL;
 
 /**
- * @param array                             $tests
+ * @param \stdClass                         $tests
  * @param \SplFileInfo                      $file
  * @param \BrowserDetector\BrowserDetector  $detector
  * @param array                             $data
@@ -168,14 +182,14 @@ echo 'done', PHP_EOL;
  * @param \Psr\Cache\CacheItemPoolInterface $cache
  */
 function handleFile(
-    array $tests,
+    \stdClass $tests,
     \SplFileInfo $file,
     \BrowserDetector\BrowserDetector $detector,
     array &$data,
     array &$checks,
     \Psr\Cache\CacheItemPoolInterface $cache
 ) {
-    $outputDetector = "<?php\n\nreturn [\n";
+    $outputDetector = [];
 
     foreach ($tests as $key => $test) {
         if (isset($data[$key])) {
@@ -185,46 +199,48 @@ function handleFile(
             continue;
         }
 
-        if (isset($checks[$test['ua']])) {
+        if (is_array($test)) {
+            $test = (object) $test;
+        }
+
+        if (is_array($test->properties)) {
+            $test->properties = (object) $test->properties;
+        }
+
+        if (isset($checks[$test->ua])) {
             // UA was added more than once
-            echo '    UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "'
-                . $checks[$test['ua']] . '"', PHP_EOL;
+            echo '    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "'
+                . $checks[$test->ua] . '"', PHP_EOL;
             unset($tests[$key]);
             continue;
         }
 
-        $data[$key]          = $test;
-        $checks[$test['ua']] = $key;
+        $data[$key]        = $test;
+        $checks[$test->ua] = $key;
 
         echo '    processing Test ', $key, ' ...', PHP_EOL;
-        $outputDetector .= handleTest($test, $detector, $key, $cache);
+        $outputDetector += handleTest($test, $detector, $key, $cache);
     }
 
-    $basename = $file->getBasename();
+    $basename = $file->getBasename('.' . $file->getExtension());
 
-    if (empty($tests)) {
-        echo 'removing empty file ', $basename, ' ...', PHP_EOL;
-        unlink($file->getPathname());
+    echo '    removing old file', PHP_EOL;
+    unlink($file->getPathname());
 
-        return;
-    }
+    echo '    rewriting file', PHP_EOL;
 
-    $outputDetector .= "];\n";
-
-    echo 'writing file ', $basename, ' ...', PHP_EOL;
-
-    file_put_contents($file->getPath() . '/' . $basename, $outputDetector);
+    file_put_contents($file->getPath() . '/' . $basename . '.json', json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 }
 
 /**
- * @param array                             $test
+ * @param \stdClass                         $test
  * @param \BrowserDetector\BrowserDetector  $detector
  * @param string                            $key
  * @param \Psr\Cache\CacheItemPoolInterface $cache
  *
- * @return string
+ * @return array
  */
-function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
+function handleTest(\stdClass $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
 {
     /** rewrite test numbers */
 
@@ -246,50 +262,50 @@ function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $ke
             $cache
         );
     } catch (\BrowserDetector\Loader\NotFoundException $e) {
-        if (isset($test['properties']['Platform_Codename'])) {
-            $platformCodename = $test['properties']['Platform_Codename'];
-        } elseif (isset($test['properties']['Platform_Name'])) {
-            $platformCodename = $test['properties']['Platform_Name'];
+        if (isset($test->properties->Platform_Codename)) {
+            $platformCodename = $test->properties->Platform_Codename;
+        } elseif (isset($test->properties->Platform_Name)) {
+            $platformCodename = $test->properties->Platform_Name;
         } else {
-            echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+            echo '["' . $key . '"] platform name for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
             $platformCodename = 'unknown';
         }
 
-        if (isset($test['properties']['Platform_Marketingname'])) {
-            $platformMarketingname = $test['properties']['Platform_Marketingname'];
+        if (isset($test->properties->Platform_Marketingname)) {
+            $platformMarketingname = $test->properties->Platform_Marketingname;
         } else {
             $platformMarketingname = $platformCodename;
         }
 
-        if (isset($test['properties']['Platform_Version'])) {
-            $platformVersion = $test['properties']['Platform_Version'];
+        if (isset($test->properties->Platform_Version)) {
+            $platformVersion = $test->properties->Platform_Version;
         } else {
-            echo '["' . $key . '"] platform version for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+            echo '["' . $key . '"] platform version for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
             $platformVersion = 'unknown';
         }
 
-        if (isset($test['properties']['Platform_Bits'])) {
-            $platformBits = $test['properties']['Platform_Bits'];
+        if (isset($test->properties->Platform_Bits)) {
+            $platformBits = $test->properties->Platform_Bits;
         } else {
-            echo '["' . $key . '"] platform bits for UA "' . $test['ua'] . '" are missing, using "unknown" instead', PHP_EOL;
+            echo '["' . $key . '"] platform bits for UA "' . $test->ua . '" are missing, using "unknown" instead', PHP_EOL;
 
             $platformBits = 'unknown';
         }
 
-        if (isset($test['properties']['Platform_Maker'])) {
-            $platformMaker = $test['properties']['Platform_Maker'];
+        if (isset($test->properties->Platform_Maker)) {
+            $platformMaker = $test->properties->Platform_Maker;
         } else {
-            echo '["' . $key . '"] platform maker for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+            echo '["' . $key . '"] platform maker for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
             $platformMaker = 'unknown';
         }
 
-        if (isset($test['properties']['Platform_Brand_Name'])) {
-            $platformBrandname = $test['properties']['Platform_Brand_Name'];
+        if (isset($test->properties->Platform_Brand_Name)) {
+            $platformBrandname = $test->properties->Platform_Brand_Name;
         } else {
-            echo '["' . $key . '"] platform brand for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+            echo '["' . $key . '"] platform brand for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
             $platformBrandname = 'unknown';
         }
@@ -320,44 +336,44 @@ function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $ke
             $platformBrandname = $platform->getBrand();
         }
     } catch (\BrowserDetector\Loader\NotFoundException $e) {
-        if (isset($test['properties']['Device_Name'])) {
-            $deviceName = $test['properties']['Device_Name'];
+        if (isset($test->properties->Device_Name)) {
+            $deviceName = $test->properties->Device_Name;
         } else {
             $deviceName = 'unknown';
         }
 
-        if (isset($test['properties']['Device_Maker'])) {
-            $deviceMaker = $test['properties']['Device_Maker'];
+        if (isset($test->properties->Device_Maker)) {
+            $deviceMaker = $test->properties->Device_Maker;
         } else {
             $deviceMaker = 'unknown';
         }
 
-        if (isset($test['properties']['Device_Type'])) {
-            $deviceType = $test['properties']['Device_Type'];
+        if (isset($test->properties->Device_Type)) {
+            $deviceType = $test->properties->Device_Type;
         } else {
             $deviceType = 'unknown';
         }
 
-        if (isset($test['properties']['Device_Pointing_Method'])) {
-            $devicePointing = $test['properties']['Device_Pointing_Method'];
+        if (isset($test->properties->Device_Pointing_Method)) {
+            $devicePointing = $test->properties->Device_Pointing_Method;
         } else {
             $devicePointing = 'unknown';
         }
 
-        if (isset($test['properties']['Device_Code_Name'])) {
-            $deviceCode = $test['properties']['Device_Code_Name'];
+        if (isset($test->properties->Device_Code_Name)) {
+            $deviceCode = $test->properties->Device_Code_Name;
         } else {
             $deviceCode = 'unknown';
         }
 
-        if (isset($test['properties']['Device_Brand_Name'])) {
-            $deviceBrand = $test['properties']['Device_Brand_Name'];
+        if (isset($test->properties->Device_Brand_Name)) {
+            $deviceBrand = $test->properties->Device_Brand_Name;
         } else {
             $deviceBrand = 'unknown';
         }
 
-        if (isset($test['properties']['Device_Dual_Orientation'])) {
-            $deviceOrientation = $test['properties']['Device_Dual_Orientation'];
+        if (isset($test->properties->Device_Dual_Orientation)) {
+            $deviceOrientation = $test->properties->Device_Dual_Orientation;
         } else {
             $deviceOrientation = 'unknown';
         }
@@ -366,139 +382,96 @@ function handleTest(array $test, \BrowserDetector\BrowserDetector $detector, $ke
     }
 
     /** generate result */
-
-    return "    '$key' => [
-        'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
-        'properties' => [
-            'Browser_Name'            => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['Browser_Name']
-    ) . "',
-            'Browser_Type'            => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['Browser_Type']
-    ) . "',
-            'Browser_Bits'            => " . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['Browser_Bits']
-    ) . ",
-            'Browser_Maker'           => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['Browser_Maker']
-    ) . "',
-            'Browser_Modus'           => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['Browser_Modus']
-    ) . "',
-            'Browser_Version'         => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['Browser_Version']
-    ) . "',
-            'Platform_Codename'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformCodename) . "',
-            'Platform_Marketingname'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformMarketingname) . "',
-            'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformVersion) . "',
-            'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformBits) . ",
-            'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformMaker) . "',
-            'Platform_Brand_Name'     => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $platformBrandname) . "',
-            'Device_Name'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $deviceName) . "',
-            'Device_Maker'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $deviceMaker) . "',
-            'Device_Type'             => " . ($deviceType === null ? 'null' : "'" . str_replace(
-    ['\\', "'"],
-    ['\\\\', "\\'"],
-    $deviceType
-) . "'") . ",
-            'Device_Pointing_Method'  => " . ($devicePointing === null ? 'null' : "'" . str_replace(
-    ['\\', "'"],
-    ['\\\\', "\\'"],
-    $devicePointing
-) . "'") . ",
-            'Device_Dual_Orientation' => " . ($deviceOrientation === null ? 'null' : ($deviceOrientation ? 'true' : 'false')) . ",
-            'Device_Code_Name'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $deviceCode) . "',
-            'Device_Brand_Name'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $deviceBrand) . "',
-            'RenderingEngine_Name'    => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['RenderingEngine_Name']
-    ) . "',
-            'RenderingEngine_Version' => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['RenderingEngine_Version']
-    ) . "',
-            'RenderingEngine_Maker'   => '" . str_replace(
-        ['\\', "'"],
-        ['\\\\', "\\'"],
-        $test['properties']['RenderingEngine_Maker']
-    ) . "',
-        ],
-    ],\n";
+    return [
+         $key => [
+            'ua' => $test->ua,
+            'properties' => [
+                'Browser_Name'            => $test->properties->Browser_Name,
+                'Browser_Type'            => $test->properties->Browser_Type,
+                'Browser_Bits'            => $test->properties->Browser_Bits,
+                'Browser_Maker'           => $test->properties->Browser_Maker,
+                'Browser_Modus'           => $test->properties->Browser_Modus,
+                'Browser_Version'         => $test->properties->Browser_Version,
+                'Platform_Codename'       => $platformCodename,
+                'Platform_Marketingname'  => $platformMarketingname,
+                'Platform_Version'        => $platformVersion,
+                'Platform_Bits'           => $platformBits,
+                'Platform_Maker'          => $platformMaker,
+                'Platform_Brand_Name'     => $platformBrandname,
+                'Device_Name'             => $deviceName,
+                'Device_Maker'            => $deviceMaker,
+                'Device_Type'             => $deviceType,
+                'Device_Pointing_Method'  => $devicePointing,
+                'Device_Dual_Orientation' => $deviceOrientation,
+                'Device_Code_Name'        => $deviceCode,
+                'Device_Brand_Name'       => $deviceBrand,
+                'RenderingEngine_Name'    => $test->properties->RenderingEngine_Name,
+                'RenderingEngine_Version' => $test->properties->RenderingEngine_Version,
+                'RenderingEngine_Maker'   => $test->properties->RenderingEngine_Maker,
+            ],
+        ]
+    ];
 }
 
 /**
- * @param array                             $test
+ * @param \stdClass                         $test
  * @param \BrowserDetector\BrowserDetector  $detector
  * @param string                            $key
  * @param \Psr\Cache\CacheItemPoolInterface $cache
  *
  * @return array
  */
-function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
+function rewritePlatforms(\stdClass $test, \BrowserDetector\BrowserDetector $detector, $key, \Psr\Cache\CacheItemPoolInterface $cache)
 {
-    if (isset($test['properties']['Platform_Codename'])) {
-        $platformCodename = $test['properties']['Platform_Codename'];
-    } elseif (isset($test['properties']['Platform_Name'])) {
-        $platformCodename = $test['properties']['Platform_Name'];
+    if (isset($test->properties->Platform_Codename)) {
+        $platformCodename = $test->properties->Platform_Codename;
+    } elseif (isset($test->properties->Platform_Name)) {
+        $platformCodename = $test->properties->Platform_Name;
     } else {
-        echo '["' . $key . '"] platform name for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+        echo '["' . $key . '"] platform name for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
         $platformCodename = 'unknown';
     }
 
-    if (isset($test['properties']['Platform_Marketingname'])) {
-        $platformMarketingname = $test['properties']['Platform_Marketingname'];
+    if (isset($test->properties->Platform_Marketingname)) {
+        $platformMarketingname = $test->properties->Platform_Marketingname;
     } else {
         $platformMarketingname = $platformCodename;
     }
 
-    if (isset($test['properties']['Platform_Version'])) {
-        $platformVersion = $test['properties']['Platform_Version'];
+    if (isset($test->properties->Platform_Version)) {
+        $platformVersion = $test->properties->Platform_Version;
     } else {
-        echo '["' . $key . '"] platform version for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+        echo '["' . $key . '"] platform version for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
         $platformVersion = 'unknown';
     }
 
-    if (isset($test['properties']['Platform_Bits'])) {
-        $platformBits = $test['properties']['Platform_Bits'];
+    if (isset($test->properties->Platform_Bits)) {
+        $platformBits = $test->properties->Platform_Bits;
     } else {
-        echo '["' . $key . '"] platform bits for UA "' . $test['ua'] . '" are missing, using "unknown" instead', PHP_EOL;
+        echo '["' . $key . '"] platform bits for UA "' . $test->ua . '" are missing, using "unknown" instead', PHP_EOL;
 
         $platformBits = 'unknown';
     }
 
-    if (isset($test['properties']['Platform_Maker'])) {
-        $platformMaker = $test['properties']['Platform_Maker'];
+    if (isset($test->properties->Platform_Maker)) {
+        $platformMaker = $test->properties->Platform_Maker;
     } else {
-        echo '["' . $key . '"] platform maker for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+        echo '["' . $key . '"] platform maker for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
         $platformMaker = 'unknown';
     }
 
-    if (isset($test['properties']['Platform_Brand_Name'])) {
-        $platformBrandname = $test['properties']['Platform_Brand_Name'];
+    if (isset($test->properties->Platform_Brand_Name)) {
+        $platformBrandname = $test->properties->Platform_Brand_Name;
     } else {
-        echo '["' . $key . '"] platform brand for UA "' . $test['ua'] . '" is missing, using "unknown" instead', PHP_EOL;
+        echo '["' . $key . '"] platform brand for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
         $platformBrandname = 'unknown';
     }
 
-    $useragent = $test['ua'];
+    $useragent = $test->ua;
     $platformLoader = new \BrowserDetector\Loader\PlatformLoader($cache);
 
     // rewrite Darwin platform
@@ -1194,58 +1167,58 @@ function rewritePlatforms(array $test, \BrowserDetector\BrowserDetector $detecto
 }
 
 /**
- * @param array                             $test
+ * @param \stdClass                         $test
  * @param \BrowserDetector\BrowserDetector  $detector
  * @param \UaResult\Os\OsInterface          $platform
  * @param \Psr\Cache\CacheItemPoolInterface $cache
  *
  * @return array
  */
-function rewriteDevice(array $test, \BrowserDetector\BrowserDetector $detector, \UaResult\Os\OsInterface $platform, \Psr\Cache\CacheItemPoolInterface $cache)
+function rewriteDevice(\stdClass $test, \BrowserDetector\BrowserDetector $detector, \UaResult\Os\OsInterface $platform, \Psr\Cache\CacheItemPoolInterface $cache)
 {
-    if (isset($test['properties']['Device_Name'])) {
-        $deviceName = $test['properties']['Device_Name'];
+    if (isset($test->properties->Device_Name)) {
+        $deviceName = $test->properties->Device_Name;
     } else {
         $deviceName = 'unknown';
     }
 
-    if (isset($test['properties']['Device_Maker'])) {
-        $deviceMaker = $test['properties']['Device_Maker'];
+    if (isset($test->properties->Device_Maker)) {
+        $deviceMaker = $test->properties->Device_Maker;
     } else {
         $deviceMaker = 'unknown';
     }
 
-    if (isset($test['properties']['Device_Type'])) {
-        $deviceType = $test['properties']['Device_Type'];
+    if (isset($test->properties->Device_Type)) {
+        $deviceType = $test->properties->Device_Type;
     } else {
         $deviceType = 'unknown';
     }
 
-    if (isset($test['properties']['Device_Pointing_Method'])) {
-        $devicePointing = $test['properties']['Device_Pointing_Method'];
+    if (isset($test->properties->Device_Pointing_Method)) {
+        $devicePointing = $test->properties->Device_Pointing_Method;
     } else {
         $devicePointing = 'unknown';
     }
 
-    if (isset($test['properties']['Device_Code_Name'])) {
-        $deviceCode = $test['properties']['Device_Code_Name'];
+    if (isset($test->properties->Device_Code_Name)) {
+        $deviceCode = $test->properties->Device_Code_Name;
     } else {
         $deviceCode = 'unknown';
     }
 
-    if (isset($test['properties']['Device_Brand_Name'])) {
-        $deviceBrand = $test['properties']['Device_Brand_Name'];
+    if (isset($test->properties->Device_Brand_Name)) {
+        $deviceBrand = $test->properties->Device_Brand_Name;
     } else {
         $deviceBrand = 'unknown';
     }
 
-    if (isset($test['properties']['Device_Dual_Orientation'])) {
-        $deviceOrientation = $test['properties']['Device_Dual_Orientation'];
+    if (isset($test->properties->Device_Dual_Orientation)) {
+        $deviceOrientation = $test->properties->Device_Dual_Orientation;
     } else {
         $deviceOrientation = 'unknown';
     }
 
-    $useragent    = $test['ua'];
+    $useragent    = $test->ua;
     $deviceLoader = new \BrowserDetector\Loader\DeviceLoader($cache);
 
     if (preg_match('/redmi 3s/i', $useragent)) {

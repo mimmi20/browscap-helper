@@ -64,7 +64,7 @@ function handleTests(array $tests, $newname, $targetDirectory, &$counter)
             continue;
         }
 
-        $targetFilename = $newname . '-' . sprintf('%1$05d', (int) $chunkId) . '.php';
+        $targetFilename = $newname . '-' . sprintf('%1$05d', (int) $chunkId) . '.json';
 
         if (file_exists($targetDirectory . $targetFilename)) {
             continue;
@@ -76,8 +76,8 @@ function handleTests(array $tests, $newname, $targetDirectory, &$counter)
 
 function handleChunk(array $chunk, $targetFilename, $targetDirectory, &$counter)
 {
-    $output = "<?php\n\nreturn [\n";
-
+    $data = [];
+    
     foreach ($chunk as $key => $test) {
         if (isset($test['properties']['Platform'])) {
             $platform = $test['properties']['Platform'];
@@ -204,44 +204,42 @@ function handleChunk(array $chunk, $targetFilename, $targetDirectory, &$counter)
                 $marketingname = 'Mac OS X';
                 break;
         }
-
-        $output .= "    'browscap-$key' => [
-        'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
-        'properties' => [
-            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser']) . "',
-            'Browser_Type'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Type']) . "',
-            'Browser_Bits'            => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Bits']) . ",
-            'Browser_Maker'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Maker']) . "',
-            'Browser_Modus'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Modus']) . "',
-            'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Version']) . "',
-            'Platform_Codename'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $codename) . "',
-            'Platform_Marketingname'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $marketingname) . "',
-            'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $version) . "',
-            'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Bits']) . ",
-            'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Maker']) . "',
-            'Platform_Brand_Name'     => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Maker']) . "',
-            'Device_Name'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Name']) . "',
-            'Device_Maker'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Maker']) . "',
-            'Device_Type'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Type']) . "',
-            'Device_Pointing_Method'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Pointing_Method']) . "',
-            'Device_Dual_Orientation' => false,
-            'Device_Code_Name'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Code_Name']) . "',
-            'Device_Brand_Name'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Brand_Name']) . "',
-            'RenderingEngine_Name'    => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Name']) . "',
-            'RenderingEngine_Version' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Version']) . "',
-            'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
-        ],
-    ],\n";
+        
+        $data['browscap-' . $key] = [
+            'ua' => $test['ua'],
+            'properties' => [
+                'Browser_Name'            => $test['properties']['Browser'],
+                'Browser_Type'            => $test['properties']['Browser_Type'],
+                'Browser_Bits'            => $test['properties']['Browser_Bits'],
+                'Browser_Maker'           => $test['properties']['Browser_Maker'],
+                'Browser_Modus'           => $test['properties']['Browser_Modus'],
+                'Browser_Version'         => $test['properties']['Version'],
+                'Platform_Codename'       => $codename,
+                'Platform_Marketingname'  => $marketingname,
+                'Platform_Version'        => $version,
+                'Platform_Bits'           => $test['properties']['Platform_Bits'],
+                'Platform_Maker'          => $test['properties']['Platform_Maker'],
+                'Platform_Brand_Name'     => $test['properties']['Platform_Maker'],
+                'Device_Name'             => $test['properties']['Device_Name'],
+                'Device_Maker'            => $test['properties']['Device_Maker'],
+                'Device_Type'             => $test['properties']['Device_Type'],
+                'Device_Pointing_Method'  => $test['properties']['Device_Pointing_Method'],
+                'Device_Dual_Orientation' => false,
+                'Device_Code_Name'        => $test['properties']['Device_Code_Name'],
+                'Device_Brand_Name'       => $test['properties']['Device_Brand_Name'],
+                'RenderingEngine_Name'    => $test['properties']['RenderingEngine_Name'],
+                'RenderingEngine_Version' => $test['properties']['RenderingEngine_Version'],
+                'RenderingEngine_Maker'   => $test['properties']['RenderingEngine_Maker'],
+            ],
+        ];
 
         ++$counter;
     }
-
-    $output .= "];\n";
 
     echo 'writing file ', $targetFilename, ' ...', PHP_EOL;
 
     file_put_contents(
         $targetDirectory . $targetFilename,
-        $output
+        json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
     );
 }

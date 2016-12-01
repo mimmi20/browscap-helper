@@ -52,13 +52,13 @@ foreach ($files as $filename) {
     echo 'checking file ', $file->getBasename(), ' ...', PHP_EOL;
 
     /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() !== 'php') {
+    if (!$file->isFile() || $file->getExtension() !== 'json') {
         continue;
     }
 
     echo 'reading file ', $file->getBasename(), ' ...', PHP_EOL;
 
-    $tests  = require_once $file->getPathname();
+    $tests  = json_decode(file_get_contents($file->getPathname()));
     $chunks = array_chunk($tests, 100, true);
 
     if (count($chunks) <= 1) {
@@ -70,7 +70,7 @@ foreach ($files as $filename) {
 
 function handleFile(\SplFileInfo $file, array $chunks)
 {
-    $oldname  = $file->getBasename('.php');
+    $oldname  = $file->getBasename('.json');
     $basename = $oldname;
 
     echo 'removing file ', $file->getBasename(), ' ...', PHP_EOL;
@@ -108,44 +108,12 @@ function handleFile(\SplFileInfo $file, array $chunks)
 
 function handleChunk(\SplFileInfo $file, array $chunk, $chunkId, $basename)
 {
-    $outputDetector = "<?php\n\nreturn [\n";
-
-    foreach ($chunk as $key => $test) {
-        $outputDetector .= "    '$key' => [
-        'ua'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['ua']) . "',
-        'properties' => [
-            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Name']) . "',
-            'Browser_Type'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Type']) . "',
-            'Browser_Bits'            => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Bits']) . ",
-            'Browser_Maker'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Maker']) . "',
-            'Browser_Modus'           => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Modus']) . "',
-            'Browser_Version'         => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Browser_Version']) . "',
-            'Platform_Codename'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Codename']) . "',
-            'Platform_Marketingname'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Marketingname']) . "',
-            'Platform_Version'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Version']) . "',
-            'Platform_Bits'           => " . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Bits']) . ",
-            'Platform_Maker'          => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Platform_Maker']) . "',
-            'Device_Name'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Name']) . "',
-            'Device_Maker'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Maker']) . "',
-            'Device_Type'             => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Type']) . "',
-            'Device_Pointing_Method'  => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Pointing_Method']) . "',
-            'Device_Code_Name'        => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Code_Name']) . "',
-            'Device_Brand_Name'       => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['Device_Brand_Name']) . "',
-            'RenderingEngine_Name'    => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Name']) . "',
-            'RenderingEngine_Version' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Version']) . "',
-            'RenderingEngine_Maker'   => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $test['properties']['RenderingEngine_Maker']) . "',
-        ],
-    ],\n";
-    }
-
-    $outputDetector .= "];\n";
-
     $chunkNumber = sprintf('%1$05d', (int) $chunkId);
 
-    echo 'writing file ', $basename, '-', $chunkNumber, '.php', ' ...', PHP_EOL;
+    echo 'writing file ', $basename, '-', $chunkNumber, '.json', ' ...', PHP_EOL;
 
     file_put_contents(
-        $file->getPath() . '/' . $basename . '-' . $chunkNumber . '.php',
-        $outputDetector
+        $file->getPath() . '/' . $basename . '-' . $chunkNumber . '.json',
+        json_encode($chunk, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
     );
 }

@@ -96,7 +96,7 @@ echo "\nEs wurden $counter Tests exportiert\n";
 function parseFile(array $fileContents = [], $issue = '', &$checks = [])
 {
     $outputBrowscap = "<?php\n\nreturn [\n";
-    $outputDetector = "<?php\n\nreturn [\n";
+    $outputDetector = [];
     $counter        = 0;
 
     foreach ($fileContents as $i => $ua) {
@@ -114,15 +114,14 @@ function parseFile(array $fileContents = [], $issue = '', &$checks = [])
     }
 
     $outputBrowscap .= "];\n";
-    $outputDetector .= "];\n";
 
     file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
-    file_put_contents('results/browscap-issue-' . $issue . '.php', $outputDetector);
+    file_put_contents('results/browscap-issue-' . $issue . '.json', json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
     return $counter;
 }
 
-function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDetector, $issue)
+function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue)
 {
     $a              = intval(1 + ($i - 702) / 702);
     $numberBrowscap = ($i >= 702 ? chr(65 + intval(($i - 702) / 702)) : '') . ($i >= 26 ? chr(
@@ -2816,42 +2815,33 @@ function parseLine($ua, &$i, &$checks, &$counter, &$outputBrowscap, &$outputDete
     $formatedIssue   = sprintf('%1$05d', (int) $issue);
     $formatedCounter = sprintf('%1$05d', (int) $counter);
 
-    $outputDetector .= "    'browscap-issue-$formatedIssue-$formatedCounter' => [
-        'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
+    $outputDetector['browscap-issue-' . $formatedIssue . '-' . $formatedCounter] = [
+        'ua' => $ua,
         'properties' => [
-            'Browser_Name'            => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browserNameDetector) . "',
-            'Browser_Type'            => '$browserType',
+            'Browser_Name'            => $browserNameDetector,
+            'Browser_Type'            => $browserType,
             'Browser_Bits'            => $browserBits,
-            'Browser_Maker'           => '$browserMaker',
-            'Browser_Modus'           => '$browserModus',
-            'Browser_Version'         => '$browserVersion',
-            'Platform_Codename'       => '$platformCodenameDetector',
-            'Platform_Marketingname'  => '$platformMarketingnameDetector',
-            'Platform_Version'        => '$platformVersionDetector',
+            'Browser_Maker'           => $browserMaker,
+            'Browser_Modus'           => $browserModus,
+            'Browser_Version'         => $browserVersion,
+            'Platform_Codename'       => $platformCodenameDetector,
+            'Platform_Marketingname'  => $platformMarketingnameDetector,
+            'Platform_Version'        => $platformVersionDetector,
             'Platform_Bits'           => $platformBits,
-            'Platform_Maker'          => '$platformMakerNameDetector',
-            'Platform_Brand_Name'     => '$platformMakerBrandnameDetector',
-            'isMobileDevice'          => $mobileDevice,
-            'isTablet'                => " . (isset($devices[$device]['Device_Type']) && 'Tablet' === $devices[$device]['Device_Type'] ? 'true' : 'false') . ",
-            'Crawler'                 => $crawler,
-            'Device_Name'             => '" . (isset($devices[$device]) ? $devices[$device]['Device_Name']
-            : 'unknown') . "',
-            'Device_Maker'            => '" . (isset($devices[$device]) ? $devices[$device]['Device_Maker']
-            : 'unknown') . "',
-            'Device_Type'             => '" . (isset($devices[$device]) ? $devices[$device]['Device_Type']
-            : 'unknown') . "',
-            'Device_Pointing_Method'  => '" . (isset($devices[$device]) ? $devices[$device]['Device_Pointing_Method']
-            : 'unknown') . "',
+            'Platform_Maker'          => $platformMakerNameDetector,
+            'Platform_Brand_Name'     => $platformMakerBrandnameDetector,
+            'Device_Name'             => (isset($devices[$device]) ? $devices[$device]['Device_Name'] : 'unknown'),
+            'Device_Maker'            => (isset($devices[$device]) ? $devices[$device]['Device_Maker'] : 'unknown'),
+            'Device_Type'             => (isset($devices[$device]) ? $devices[$device]['Device_Type'] : 'unknown'),
+            'Device_Pointing_Method'  => (isset($devices[$device]) ? $devices[$device]['Device_Pointing_Method'] : 'unknown'),
             'Device_Dual_Orientation' => false,
-            'Device_Code_Name'        => '" . (isset($devices[$device]) ? $devices[$device]['Device_Code_Name']
-            : 'unknown') . "',
-            'Device_Brand_Name'       => '" . (isset($devices[$device]) ? $devices[$device]['Device_Brand_Name']
-            : 'unknown') . "',
-            'RenderingEngine_Name'    => '$engineName',
-            'RenderingEngine_Version' => '$engineVersion',
-            'RenderingEngine_Maker'   => '$engineMaker',
+            'Device_Code_Name'        => (isset($devices[$device]) ? $devices[$device]['Device_Code_Name'] : 'unknown'),
+            'Device_Brand_Name'       => (isset($devices[$device]) ? $devices[$device]['Device_Brand_Name'] : 'unknown'),
+            'RenderingEngine_Name'    => $engineName,
+            'RenderingEngine_Version' => $engineVersion,
+            'RenderingEngine_Maker'   => $engineMaker,
         ],
-    ],\n";
+    ];
 
     ++$counter;
 

@@ -22,11 +22,10 @@ $j = 0;
 
 $requests = [];
 
-$targetSqlFile  = $targetDirectory . date('Y-m-d') . '-testagents.sql';
 $targetBulkFile = $targetDirectory . date('Y-m-d') . '-testagents.txt';
 $targetInfoFile = $targetDirectory . date('Y-m-d') . '-testagents.info.txt';
 
-echo "writing to file '" . $targetSqlFile . "'\n";
+echo "writing to file '" . $targetBulkFile . "'\n";
 
 $loader = new Loader();
 
@@ -64,7 +63,7 @@ foreach ($files as $filename) {
         continue;
     }
 
-    $j += handleFile($loader, $filepath, $targetSqlFile, $targetInfoFile, $targetBulkFile, $file);
+    $j += handleFile($loader, $filepath, $targetInfoFile, $targetBulkFile, $file);
 }
 
 if (file_exists($targetBulkFile)) {
@@ -84,7 +83,6 @@ exit;
 /**
  * @param Loader      $loader
  * @param string      $filepath
- * @param string      $targetSqlFile
  * @param string      $targetInfoFile
  * @param string      $targetBulkFile
  * @param SplFileInfo $file
@@ -92,7 +90,7 @@ exit;
  * @throws \FileLoader\Exception
  * @return int
  */
-function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targetInfoFile, $targetBulkFile, \SplFileInfo $file)
+function handleFile(\FileLoader\Loader $loader, $filepath, $targetInfoFile, $targetBulkFile, \SplFileInfo $file)
 {
     $startTime = microtime(true);
 
@@ -108,9 +106,6 @@ function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targ
 
     $k      = 0;
     $agents = [];
-
-    file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . "\n\n", FILE_APPEND | LOCK_EX);
-    file_put_contents($targetSqlFile, "START TRANSACTION;\n", FILE_APPEND | LOCK_EX);
 
     $stream->rewind();
 
@@ -131,49 +126,28 @@ function handleFile(\FileLoader\Loader $loader, $filepath, $targetSqlFile, $targ
             $agentOfLine = trim(extractAgent($line));
         }
 
-        if (isset($lineMatches['time'])) {
-            try {
-                $datetime   = new DateTime($lineMatches['time']);
-                $timeOfLine = $datetime->format('Y-m-d H:i:s');
-            } catch (\Exception $e) {
-                file_put_contents($targetInfoFile, 'Exception with message "' . $e->getMessage() . '" in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
-                $timeOfLine = trim(extractTime($line));
-            }
-        } else {
-            $timeOfLine = trim(extractTime($line));
-        }
-
         if (!array_key_exists($agentOfLine, $agents)) {
-            $agents[$agentOfLine] = ['count' => 1, 'time' => $timeOfLine, 'file' => $targetSqlFile . ' / ' . $file->getFilename(), 'line' => $line];
+            $agents[$agentOfLine] = 1;
         } else {
-            ++$agents[$agentOfLine]['count'];
+            ++$agents[$agentOfLine];
         }
     }
-
-    file_put_contents($targetSqlFile, '-- ' . $file->getFilename() . ': UserAgents (' . count($agents) . " Pcs.)\n\n", FILE_APPEND | LOCK_EX);
 
     $sortCount = [];
     $sortTime  = [];
     $sortAgent = [];
 
-    foreach ($agents as $agentOfLine => $data) {
-        $sortCount[$agentOfLine] = $data['count'];
-        $sortTime[$agentOfLine]  = $data['time'];
+    foreach ($agents as $agentOfLine => $count) {
+        $sortCount[$agentOfLine] = $count;
         $sortAgent[$agentOfLine] = $agentOfLine;
     }
 
     array_multisort($sortCount, SORT_DESC, $sortTime, SORT_DESC, $sortAgent, SORT_ASC, $agents);
 
-    foreach ($agents as $agentOfLine => $data) {
-        $sql = "INSERT INTO `agents` (`agent`, `count`, `lastTimeFound`, `created`, `file`) VALUES ('" . addslashes($agentOfLine) . "', " . addslashes($data['count']) . ", '" . addslashes($data['time']) . "', '" . addslashes($data['time']) . "', '" . addslashes($data['file']) . "') ON DUPLICATE KEY UPDATE `count`=`count`+" . addslashes($data['count']) . ", `file`='" . addslashes($data['file']) . "',`lastTimeFound`='" . addslashes($data['time']) . "';\n";
-        file_put_contents($targetSqlFile, $sql, FILE_APPEND | LOCK_EX);
+    foreach (array_keys($agents) as $agentOfLine) {
         file_put_contents($targetBulkFile, $agentOfLine . "\n", FILE_APPEND | LOCK_EX);
         ++$k;
     }
-
-    file_put_contents($targetSqlFile, "\n\n", FILE_APPEND | LOCK_EX);
-
-    file_put_contents($targetSqlFile, "COMMIT;\n\n", FILE_APPEND | LOCK_EX);
 
     $dauer = microtime(true) - $startTime;
     echo ' - fertig [ ', ($k > 0 ? $k . ' neue' : 'keine neuen'), ($k === 1 ? 'r' : ''), ' Agent', ($k !== 1 ? 'en' : ''), ', ', number_format($dauer, 4, ',', '.'), ' sec ]', PHP_EOL;

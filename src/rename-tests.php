@@ -52,11 +52,11 @@ foreach ($files as $filename) {
     echo 'checking file ', $file->getBasename(), ' ...', PHP_EOL;
 
     /** @var $file \SplFileInfo */
-    if (!$file->isFile() || $file->getExtension() !== 'php') {
+    if (!$file->isFile() || $file->getExtension() !== 'json') {
         continue;
     }
 
-    $oldname = $file->getBasename('.php');
+    $oldname = $file->getBasename('.json');
     $newname = $oldname;
 
     if (preg_match('/^test\-\d{5}\-\d{5}$/', $oldname, $matches)) {
@@ -81,7 +81,7 @@ foreach ($files as $filename) {
         continue;
     }
 
-    echo 'renaming file ', $oldname, '.php', ' => ', $newname, '.php', ' ...', PHP_EOL;
+    echo 'renaming file ', $oldname, '.json', ' => ', $newname, '.json', ' ...', PHP_EOL;
 
-    rename($file->getPath() . '/' . $oldname . '.php', $file->getPath() . '/' . $newname . '.php');
+    rename($file->getPath() . '/' . $oldname . '.json', $file->getPath() . '/' . $newname . '.json');
 }
