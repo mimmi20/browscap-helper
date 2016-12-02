@@ -1381,7 +1381,7 @@ function rewriteDevice(\stdClass $test, \BrowserDetector\BrowserDetector $detect
         $deviceMaker       = $device->getManufacturer();
         $deviceName        = $device->getMarketingName();
         $deviceOrientation = $device->getDualOrientation();
-    } elseif (preg_match('/(lumia \d{3,4} xl)/i', $useragent)) {
+    } elseif (preg_match('/(lumia \d{3,4} xl)/i', $useragent, $matches)) {
         $device = $deviceLoader->load($matches[1],$useragent);
 
         $deviceBrand       = $device->getBrand();
