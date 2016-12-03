@@ -2,6 +2,8 @@
   "name": "mimmi20/browscap-helper",
   "description": "some small helper functions for working with Browscap",
   "require": {
+    "php": "^5.6 || ^7.0 || ^7.1",
+    "symfony/console": "^2.0 || ^3.0",
     "symfony/yaml": "^2.0 || ^3.0",
     "browscap/browscap": "dev-master",
     "mimmi20/browser-detector": "dev-master",
@@ -34,8 +36,9 @@
   ],
   "autoload": {
     "psr-4": {
-      "BrowscapHelper\\": ""
+      "BrowscapHelper\\": "src/"
     }
-  }
+  },
+  "bin": ["bin/browscap-helper.php"]
 }
 
