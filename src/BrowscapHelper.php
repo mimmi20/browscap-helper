@@ -40,6 +40,7 @@ class BrowscapHelper extends Application
 
         $commands = [
             new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory),
+            new Command\CopyTestsCommand(),
         ];
 
         foreach ($commands as $command) {
