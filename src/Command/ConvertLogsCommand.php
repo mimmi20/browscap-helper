@@ -17,9 +17,8 @@
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\FilePath;
-use BrowscapHelper\Helper\Regex;
-use FileLoader\Loader;
-use FileLoader\Psr7\Stream;
+use BrowscapHelper\Helper\Sorter;
+use BrowscapHelper\Reader\LogFileReader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -110,7 +109,7 @@ class ConvertLogsCommand extends Command
         $output->writeln("reading to directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
-        $loader = new Loader();
+        $reader = new LogFileReader();
 
         /*******************************************************************************
          * loading files
@@ -123,10 +122,10 @@ class ConvertLogsCommand extends Command
             $file = new \SplFileInfo($sourcesDirectory . $filename);
 
             ++$i;
-            $output->write('# ' . sprintf('%1$05d', (int) $i) . ' :' . strtolower($file->getPathname()) . ' [ bisher ' . ($j > 0 ? $j : 'keine') . ' Agent' . ($j !== 1 ? 'en' : '') . ' ]');
+            $output->write('# ' . sprintf('%1$05d', (int) $i) . ' :' . strtolower($file->getPathname()) . ' [ until now ' . ($j > 0 ? $j : 'no new') . ' agent' . ($j !== 1 ? 's' : '') . ' ]');
 
             if (!$file->isFile() || !$file->isReadable()) {
-                $output->writeln(' - ignoriert');
+                $output->writeln(' - skipped');
 
                 continue;
             }
@@ -134,13 +133,13 @@ class ConvertLogsCommand extends Command
             $excludedExtensions = ['filepart', 'sql', 'rename', 'txt', 'zip', 'rar', 'php', 'gitkeep'];
 
             if (in_array($file->getExtension(), $excludedExtensions)) {
-                $output->writeln(' - ignoriert');
+                $output->writeln(' - skipped');
 
                 continue;
             }
 
             if (null === ($filepath = (new FilePath())->getPath($file))) {
-                $output->writeln(' - ignoriert');
+                $output->writeln(' - skipped');
 
                 continue;
             }
@@ -148,22 +147,19 @@ class ConvertLogsCommand extends Command
             $startTime = microtime(true);
             $k         = 0;
 
-            $loader->setLocalFile($filepath);
+            $reader->setLocalFile($filepath);
+            $reader->setTargetInfoFile($targetInfoFile);
 
-            /** @var \GuzzleHttp\Psr7\Response $response */
-            $response = $loader->load();
+            $agents = $reader->getAgents();
+            $agents = (new Sorter())->sortAgents($agents);
 
-            /** @var \FileLoader\Psr7\Stream $stream */
-            $stream = $response->getBody();
-
-            $stream->read(1);
-            $stream->rewind();
-
-            $agents = $this->handleFile($stream, $targetInfoFile);
-            $k      = $this->sortAgents($k, $agents, $targetBulkFile);
+            foreach (array_keys($agents) as $agentOfLine) {
+                file_put_contents($targetBulkFile, $agentOfLine . "\n", FILE_APPEND | LOCK_EX);
+                ++$k;
+            }
 
             $dauer = microtime(true) - $startTime;
-            $output->writeln(' - fertig [ ' . ($k > 0 ? $k . ' neue' : 'keine neuen') . ($k === 1 ? 'r' : '') . ' Agent' . ($k !== 1 ? 'en' : '') . ', ' . number_format($dauer, 4, ',', '.') . ' sec ]');
+            $output->writeln(' - finished [ ' . ($k > 0 ? $k . ' new' : 'no new') . ($k === 1 ? 'r' : '') . ' agent' . ($k !== 1 ? 's' : '') . ', ' . number_format($dauer, 4, ',', '.') . ' sec ]');
 
             unlink($file->getPathname());
             $j += $k;
@@ -178,86 +174,6 @@ class ConvertLogsCommand extends Command
 
         $output->writeln('');
         $output->writeln('');
-        $output->writeln('lesen der Dateien beendet. ' . $j . ' neue Agenten hinzugefuegt');
-    }
-
-    /**
-     * @param \FileLoader\Psr7\Stream $stream
-     * @param string                  $targetInfoFile
-     *
-     * @return array
-     */
-    private function handleFile(Stream $stream, $targetInfoFile)
-    {
-        $agents = [];
-        $regex  = (new Regex())->getRegex();
-
-        while (!$stream->eof()) {
-            $line        = $stream->read(8192);
-            $lineMatches = [];
-
-            if (!preg_match($regex, $line, $lineMatches)) {
-                file_put_contents($targetInfoFile, 'no useragent found in line "' . $line . '"' . "\n", FILE_APPEND | LOCK_EX);
-
-                continue;
-            }
-
-            if (isset($lineMatches['userAgentString'])) {
-                $agentOfLine = trim($lineMatches['userAgentString']);
-            } else {
-                $agentOfLine = trim($this->extractAgent($line));
-            }
-
-            if (!array_key_exists($agentOfLine, $agents)) {
-                $agents[$agentOfLine] = 1;
-            } else {
-                ++$agents[$agentOfLine];
-            }
-        }
-
-        return $agents;
-    }
-
-    /**
-     * @param int    $k
-     * @param array  $agents
-     * @param string $targetBulkFile
-     *
-     * @return mixed
-     */
-    private function sortAgents($k, array $agents, $targetBulkFile)
-    {
-        $sortCount = [];
-        $sortTime  = [];
-        $sortAgent = [];
-
-        foreach ($agents as $agentOfLine => $count) {
-            $sortCount[$agentOfLine] = $count;
-            $sortAgent[$agentOfLine] = $agentOfLine;
-        }
-
-        array_multisort($sortCount, SORT_DESC, $sortTime, SORT_DESC, $sortAgent, SORT_ASC, $agents);
-
-        foreach (array_keys($agents) as $agentOfLine) {
-            file_put_contents($targetBulkFile, $agentOfLine . "\n", FILE_APPEND | LOCK_EX);
-            ++$k;
-        }
-
-        return $k;
-    }
-
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
-    private function extractAgent($text)
-    {
-        $parts = explode('"', $text);
-        array_pop($parts);
-
-        $userAgent = array_pop($parts);
-
-        return $userAgent;
+        $output->writeln('finished reading files. ' . $j . ' new  agents added');
     }
 }

@@ -75,10 +75,16 @@ foreach ($files as $filename) {
 
     switch ($file->getExtension()) {
         case 'php':
-            $tests = require_once $file->getPathname();
+            $reader = new \BrowscapHelper\Reader\BrowscapTestReader();
+            $reader->setLocalFile($file->getPathname());
+
+            $tests = $reader->getTests();
             break;
         case 'json':
-            $tests = json_decode(file_get_contents($file->getPathname()));
+            $reader = new \BrowscapHelper\Reader\DetectorTestReader();
+            $reader->setLocalFile($file->getPathname());
+
+            $tests = $reader->getTests();
             break;
         default:
             continue;
@@ -425,8 +431,6 @@ function rewritePlatforms(\stdClass $test, \BrowserDetector\BrowserDetector $det
 {
     if (isset($test->properties->Platform_Codename)) {
         $platformCodename = $test->properties->Platform_Codename;
-    } elseif (isset($test->properties->Platform_Name)) {
-        $platformCodename = $test->properties->Platform_Name;
     } else {
         echo '["' . $key . '"] platform name for UA "' . $test->ua . '" is missing, using "unknown" instead', PHP_EOL;
 
