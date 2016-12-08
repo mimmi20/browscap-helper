@@ -21,8 +21,12 @@ use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Reader\LogFileReader;
 use BrowscapHelper\Reader\YamlFileReader;
-use BrowserDetector\Bits\Browser;
-use BrowserDetector\Bits\Os;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Monolog\Logger;
+use Monolog\Handler;
+use BrowserDetector\BrowserDetector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -99,6 +103,14 @@ class CreateTestsCommand extends Command
         $browscapIssueIterator  = new \RecursiveDirectoryIterator($browscapIssueDirectory);
         $checks                 = [];
 
+        $logger = new Logger('browser-detector-helper');
+        $logger->pushHandler(new Handler\NullHandler());
+        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
+
+        $adapter  = new Local(__DIR__ . '/../../cache/');
+        $cache    = new FilesystemCachePool(new Filesystem($adapter));
+        //$detector = new BrowserDetector($cache, $logger);
+
         foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
             /** @var $file \SplFileInfo */
             if (!$file->isFile() || $file->getExtension() !== 'php') {
@@ -161,7 +173,7 @@ class CreateTestsCommand extends Command
 
             $output->writeln('    parsing ...');
 
-            $counter += $this->parseFile($output, $fileContents, $file->getBasename(), $checks);
+            $counter += $this->parseFile($output, $cache, $fileContents, $file->getBasename(), $checks);
         }
 
         $output->writeln('');
@@ -175,7 +187,7 @@ class CreateTestsCommand extends Command
      *
      * @return int
      */
-    private function parseFile(OutputInterface $output, array $fileContents = [], $issue = '', array &$checks = [])
+    private function parseFile(OutputInterface $output, \Psr\Cache\CacheItemPoolInterface $cache, array $fileContents = [], $issue = '', array &$checks = [])
     {
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
@@ -189,7 +201,7 @@ class CreateTestsCommand extends Command
             }
 
             $output->writeln('    handle useragent ' . $i . ' ...');
-            $this->parseLine($ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue);
+            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue);
         }
 
         $outputBrowscap .= "];\n";
@@ -209,7 +221,7 @@ class CreateTestsCommand extends Command
      * @param array  &$outputDetector
      * @param string $issue
      */
-    private function parseLine($ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue)
+    private function parseLine(\Psr\Cache\CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue)
     {
         $engineVersion = 'unknown';
 
@@ -248,7 +260,8 @@ class CreateTestsCommand extends Command
             $deviceCodename,
             $deviceBrandname,
             $mobileDevice,
-            $isTablet) = (new Device())->detect($ua);
+            $isTablet,
+            $deviceOrientation) = (new Device())->detect($cache, $ua);
 
         list(
             $engineName,
@@ -336,7 +349,7 @@ class CreateTestsCommand extends Command
                 'Device_Maker'            => $deviceMaker,
                 'Device_Type'             => $deviceType,
                 'Device_Pointing_Method'  => $pointingMethod,
-                'Device_Dual_Orientation' => false,
+                'Device_Dual_Orientation' => $deviceOrientation,
                 'Device_Code_Name'        => $deviceCodename,
                 'Device_Brand_Name'       => $deviceBrandname,
                 'RenderingEngine_Name'    => $engineName,
