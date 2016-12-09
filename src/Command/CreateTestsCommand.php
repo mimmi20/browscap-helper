@@ -22,15 +22,14 @@ use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Reader\LogFileReader;
 use BrowscapHelper\Reader\YamlFileReader;
+use BrowserDetector\BrowserDetector;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
-use Monolog\Logger;
 use Monolog\Handler;
-use BrowserDetector\BrowserDetector;
+use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -258,7 +257,7 @@ class CreateTestsCommand extends Command
             $platformBits) = (new Platform())->detect($ua);
 
         $platform = new Os('unknown', 'unknown', 'unknown', 'unknown');
-        
+
         list(
             $deviceName,
             $deviceMaker,
@@ -338,7 +337,7 @@ class CreateTestsCommand extends Command
         $formatedCounter = sprintf('%1$05d', (int) $counter);
 
         $outputDetector['browscap-issue-' . $formatedIssue . '-' . $formatedCounter] = [
-            'ua' => $ua,
+            'ua'         => $ua,
             'properties' => [
                 'Browser_Name'            => $browserNameDetector,
                 'Browser_Type'            => $browserType,

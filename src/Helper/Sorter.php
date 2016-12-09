@@ -25,7 +25,7 @@ namespace BrowscapHelper\Helper;
 class Sorter
 {
     /**
-     * @param array  $agents
+     * @param array $agents
      *
      * @return array
      */

@@ -81,7 +81,7 @@ class Engine
             $engineName,
             $engineMaker,
             $applets,
-            $activex
+            $activex,
         ];
     }
 }

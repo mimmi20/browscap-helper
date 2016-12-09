@@ -1609,7 +1609,7 @@ class Browser
             $browserVersion,
             $browserNameDetector,
             $lite,
-            $crawler
+            $crawler,
         ];
     }
 }

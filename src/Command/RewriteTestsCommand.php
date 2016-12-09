@@ -30,11 +30,8 @@ use Monolog\Handler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 use UaResult\Os\OsInterface;
 
 /**
@@ -77,14 +74,14 @@ class RewriteTestsCommand extends Command
         $logger->pushHandler(new Handler\NullHandler());
         $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
 
-        $adapter = new Local(__DIR__ . '/../../cache/');
-        $cache = new FilesystemCachePool(new Filesystem($adapter));
+        $adapter  = new Local(__DIR__ . '/../../cache/');
+        $cache    = new FilesystemCachePool(new Filesystem($adapter));
         $detector = new BrowserDetector($cache, $logger);
 
         $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
 
-        $filesArray = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
-        $files = [];
+        $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+        $files       = [];
         $testCounter = [];
 
         foreach ($filesArray as $filename) {
@@ -106,7 +103,7 @@ class RewriteTestsCommand extends Command
                 }
 
                 $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
-                $group = $filename;
+                $group   = $filename;
 
                 if ('00000-browscap' === $filename) {
                     $group = '00000';
@@ -117,7 +114,7 @@ class RewriteTestsCommand extends Command
         }
 
         $checks = [];
-        $data = [];
+        $data   = [];
 
         foreach ($files as $filename) {
             $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
@@ -157,7 +154,7 @@ class RewriteTestsCommand extends Command
             }
 
             if (is_array($tests)) {
-                $tests = (object)$tests;
+                $tests = (object) $tests;
             }
 
             if (empty($tests)) {
@@ -179,7 +176,7 @@ class RewriteTestsCommand extends Command
             $this->handleFile($output, $tests, $file, $detector, $data, $checks, $cache);
         }
 
-        $circleFile = 'vendor/mimmi20/browser-detector/circle.yml';
+        $circleFile      = 'vendor/mimmi20/browser-detector/circle.yml';
         $circleciContent = 'machine:
   php:
     version: 7.0.4
@@ -268,11 +265,11 @@ test:
             }
 
             if (is_array($test)) {
-                $test = (object)$test;
+                $test = (object) $test;
             }
 
             if (is_array($test->properties)) {
-                $test->properties = (object)$test->properties;
+                $test->properties = (object) $test->properties;
             }
 
             if (isset($checks[$test->ua])) {
@@ -282,7 +279,7 @@ test:
                 continue;
             }
 
-            $data[$key] = $test;
+            $data[$key]        = $test;
             $checks[$test->ua] = $key;
 
             $output->writeln('    processing Test ' . $key . ' ...');
@@ -318,11 +315,11 @@ test:
         /** rewrite test numbers */
 
         if (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$05d', (int)$matches[1]) . '-' . sprintf('%1$05d', (int)$matches[2]);
+            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
         } elseif (preg_match('/^test\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$05d', (int)$matches[1]) . '-00000';
+            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-00000';
         } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$05d', (int)$matches[1]) . '-' . sprintf('%1$05d', (int)$matches[2]);
+            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
         }
 
         /** rewrite platforms */
@@ -401,12 +398,12 @@ test:
             /** @var $device \UaResult\Device\DeviceInterface */
 
             if (null !== ($platform = $device->getPlatform())) {
-                $platformCodename = $platform->getName();
+                $platformCodename      = $platform->getName();
                 $platformMarketingname = $platform->getMarketingName();
-                $platformVersion = $platform->getVersion()->getVersion();
-                $platformBits = $platform->getBits();
-                $platformMaker = $platform->getManufacturer();
-                $platformBrandname = $platform->getBrand();
+                $platformVersion       = $platform->getVersion()->getVersion();
+                $platformBits          = $platform->getBits();
+                $platformMaker         = $platform->getManufacturer();
+                $platformBrandname     = $platform->getBrand();
             }
         } catch (NotFoundException $e) {
             if (isset($test->properties->Device_Name)) {
@@ -482,7 +479,7 @@ test:
                     'RenderingEngine_Version' => $test->properties->RenderingEngine_Version,
                     'RenderingEngine_Maker'   => $test->properties->RenderingEngine_Maker,
                 ],
-            ]
+            ],
         ];
     }
 
@@ -548,676 +545,676 @@ test:
             $platformBrandname = 'unknown';
         }
 
-        $useragent = $test->ua;
+        $useragent      = $test->ua;
         $platformLoader = new PlatformLoader($cache);
 
         // rewrite Darwin platform
         if ('Darwin' === $platformCodename) {
             $platform = (new Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif ('Windows' === $platformCodename) {
             $platform = (new Platform\WindowsFactory($cache, $platformLoader))->detect($useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif ('Android' === $platformCodename && preg_match('/windows phone/i', $useragent)) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/Puffin\/[\d\.]+I(T|P)/', $useragent)) {
             $platform = $platformLoader->load('ios', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/Puffin\/[\d\.]+A(T|P)/', $useragent)) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/Puffin\/[\d\.]+W(T|P)/', $useragent)) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'linux mint')) {
             $platform = $platformLoader->load('linux mint', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'kubuntu')) {
             $platform = $platformLoader->load('kubuntu', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'ubuntu')) {
             $platform = $platformLoader->load('ubuntu', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/HP\-UX/', $useragent)) {
             $platform = $platformLoader->load('hp-ux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif ('Windows' === $platformCodename && preg_match('/windows ce/i', $useragent)) {
             $platform = $platformLoader->load('windows ce', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/(red hat|redhat)/i', $useragent)) {
             $platform = $platformLoader->load('redhat linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif ('Windows Mobile OS' === $platformCodename && preg_match('/Windows Mobile; WCE/', $useragent)) {
             $platform = $platformLoader->load('windows ce', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows Phone')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'wds')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'wpdesktop')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'xblwp7')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'zunewp7')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Tizen')) {
             $platform = $platformLoader->load('tizen', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows CE')) {
             $platform = $platformLoader->load('windows ce', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/MIUI/', $useragent)) {
             $platform = $platformLoader->load('miui os', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Linux; Android')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Linux; U; Android')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'U; Adr')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Android') || false !== strpos($useragent, 'MTK')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'UCWEB/2.0 (Linux; U; Opera Mini')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Linux; GoogleTV')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'OpenBSD')) {
             $platform = $platformLoader->load('openbsd', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Symbian') || false !== strpos($useragent, 'Series 60')) {
             $platform = $platformLoader->load('symbian', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'MIDP')) {
             $platform = $platformLoader->load('java', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 10.0')) {
             $platform = $platformLoader->load('windows nt 10.0', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6.4')) {
             $platform = $platformLoader->load('windows nt 6.4', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6.3') && false !== strpos($useragent, 'ARM')) {
             $platform = $platformLoader->load('windows nt 6.3; arm', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6.3')) {
             $platform = $platformLoader->load('windows nt 6.3', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6.2') && false !== strpos($useragent, 'ARM')) {
             $platform = $platformLoader->load('windows nt 6.2; arm', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6.2')) {
             $platform = $platformLoader->load('windows nt 6.2', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6.1')) {
             $platform = $platformLoader->load('windows nt 6.1', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 6')) {
             $platform = $platformLoader->load('windows nt 6.0', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 5.3')) {
             $platform = $platformLoader->load('windows nt 5.3', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 5.2')) {
             $platform = $platformLoader->load('windows nt 5.2', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 5.1')) {
             $platform = $platformLoader->load('windows nt 5.1', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 5.01')) {
             $platform = $platformLoader->load('windows nt 5.01', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 5.0')) {
             $platform = $platformLoader->load('windows nt 5.0', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 4.10')) {
             $platform = $platformLoader->load('windows nt 4.10', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 4.1')) {
             $platform = $platformLoader->load('windows nt 4.1', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 4.0')) {
             $platform = $platformLoader->load('windows nt 4.0', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 3.5')) {
             $platform = $platformLoader->load('windows nt 3.5', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows NT 3.1')) {
             $platform = $platformLoader->load('windows nt 3.1', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Windows[ \-]NT')) {
             $platform = $platformLoader->load('windows nt', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'cygwin')) {
             $platform = $platformLoader->load('cygwin', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'CPU OS')) {
             $platform = $platformLoader->load('ios', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'CPU iPhone OS')) {
             $platform = $platformLoader->load('ios', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'CPU like Mac OS X')) {
             $platform = $platformLoader->load('ios', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'iOS')) {
             $platform = $platformLoader->load('ios', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Mac OS X')) {
             $platform = $platformLoader->load('mac os x', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'hpwOS')) {
             $platform = $platformLoader->load('webos', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Debian APT-HTTP')) {
             $platform = $platformLoader->load('debian', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/linux arm/i', $useragent)) {
             $platform = $platformLoader->load('linux smartphone os (maemo)', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'fedora')) {
             $platform = $platformLoader->load('fedora linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'suse')) {
             $platform = $platformLoader->load('suse linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'centos')) {
             $platform = $platformLoader->load('cent os linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'mandriva')) {
             $platform = $platformLoader->load('mandriva linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'gentoo')) {
             $platform = $platformLoader->load('gentoo linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'slackware')) {
             $platform = $platformLoader->load('slackware linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'CrOS')) {
             $platform = $platformLoader->load('chromeos', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'debian')) {
             $platform = $platformLoader->load('debian', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'android; linux arm')) {
             $platform = $platformLoader->load('android', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/(maemo|like android|linux\/x2\/r1|linux arm)/i', $useragent)) {
             $platform = $platformLoader->load('linux smartphone os (maemo)', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'moblin')) {
             $platform = $platformLoader->load('moblin', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== stripos($useragent, 'infegyatlas') || false !== stripos($useragent, 'jobboerse')) {
             $platform = $platformLoader->load('unknown', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/Puffin\/[\d\.]+(A|I|W|M)(T|P)?/', $useragent)) {
             $platform = $platformLoader->load('unknown', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'Linux')) {
             $platform = $platformLoader->load('linux', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (false !== strpos($useragent, 'SymbOS')) {
             $platform = $platformLoader->load('symbian', $useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } elseif (preg_match('/CFNetwork/', $useragent)) {
             $platform = (new Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
 
-            $platformCodename = $platform->getName();
+            $platformCodename      = $platform->getName();
             $platformMarketingname = $platform->getMarketingName();
-            $platformVersion = $platform->getVersion()->getVersion();
-            $platformBits = $platform->getBits();
-            $platformMaker = $platform->getManufacturer();
-            $platformBrandname = $platform->getBrand();
+            $platformVersion       = $platform->getVersion()->getVersion();
+            $platformBits          = $platform->getBits();
+            $platformMaker         = $platform->getManufacturer();
+            $platformBrandname     = $platform->getBrand();
         } else {
             $result = $detector->getBrowser($useragent);
 
@@ -1225,10 +1222,10 @@ test:
 
             if ($platformCodename === $platform->getName()) {
                 $platformMarketingname = $platform->getMarketingName();
-                $platformVersion = $platform->getVersion()->getVersion();
-                $platformBits = $platform->getBits();
-                $platformMaker = $platform->getManufacturer();
-                $platformBrandname = $platform->getBrand();
+                $platformVersion       = $platform->getVersion()->getVersion();
+                $platformBits          = $platform->getBits();
+                $platformMaker         = $platform->getManufacturer();
+                $platformBrandname     = $platform->getBrand();
             }
         }
 

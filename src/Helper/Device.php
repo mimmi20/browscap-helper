@@ -64,61 +64,61 @@ class Device
             $mobileDevice                   = true;
         } elseif (false !== strpos($useragent, 'Windows NT 10.0')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.4')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.3') && false !== strpos($useragent, 'ARM')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.3')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.2') && false !== strpos($useragent, 'ARM')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.2')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.1')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 6.0')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 5.3')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 5.2')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 5.1')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 5.01')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 5.0')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 4.1')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 4.0')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 3.5')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT 3.1')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Windows NT')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== stripos($useragent, 'cygwin')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('windows desktop', $useragent);
+            $device                         = $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== strpos($useragent, 'CPU OS')) {
             $mobileDevice                   = true;
 
@@ -163,31 +163,31 @@ class Device
             $device = $deviceLoader->load('macintosh', $useragent);
         } elseif (false !== stripos($useragent, 'kubuntu')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== stripos($useragent, 'ubuntu')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== stripos($useragent, 'fedora')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== stripos($useragent, 'suse')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== stripos($useragent, 'mandriva')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== stripos($useragent, 'gentoo')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== stripos($useragent, 'slackware')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== strpos($useragent, 'CrOS')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== strpos($useragent, 'Linux')) {
             $mobileDevice                   = false;
-            $device = $deviceLoader->load('linux desktop', $useragent);
+            $device                         = $deviceLoader->load('linux desktop', $useragent);
         } elseif (false !== strpos($useragent, 'SymbOS')) {
             $mobileDevice                   = true;
         } elseif (false !== strpos($useragent, 'hpwOS')) {
@@ -199,7 +199,7 @@ class Device
         }
 
         if (preg_match('/redmi 3s/i', $useragent)) {
-            $device = $deviceLoader->load('redmi 3s',$useragent);
+            $device = $deviceLoader->load('redmi 3s', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -209,7 +209,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/redmi 3/i', $useragent)) {
-            $device = $deviceLoader->load('redmi 3',$useragent);
+            $device = $deviceLoader->load('redmi 3', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -219,7 +219,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/Redmi Note 2/i', $useragent)) {
-            $device = $deviceLoader->load('redmi note 2',$useragent);
+            $device = $deviceLoader->load('redmi note 2', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -229,7 +229,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/Redmi_Note_3/i', $useragent)) {
-            $device = $deviceLoader->load('redmi note 3',$useragent);
+            $device = $deviceLoader->load('redmi note 3', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -239,7 +239,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/mi max/i', $useragent)) {
-            $device = $deviceLoader->load('mi max',$useragent);
+            $device = $deviceLoader->load('mi max', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -249,7 +249,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/mi 4lte/i', $useragent)) {
-            $device = $deviceLoader->load('mi 4 lte',$useragent);
+            $device = $deviceLoader->load('mi 4 lte', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -259,7 +259,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/mi 4w/i', $useragent)) {
-            $device = $deviceLoader->load('mi 4w',$useragent);
+            $device = $deviceLoader->load('mi 4w', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -269,7 +269,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/mi pad/i', $useragent)) {
-            $device = $deviceLoader->load('mi pad',$useragent);
+            $device = $deviceLoader->load('mi pad', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -279,7 +279,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/rm\-997/i', $useragent) && !preg_match('/(nokia|microsoft)/i', $useragent)) {
-            $device = $deviceLoader->load('ross&moor rm-997',$useragent);
+            $device = $deviceLoader->load('ross&moor rm-997', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -299,7 +299,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(rm\-1113|lumia 640 lte)/i', $useragent)) {
-            $device = $deviceLoader->load('rm-1113',$useragent);
+            $device = $deviceLoader->load('rm-1113', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -309,7 +309,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(rm\-1075|lumia 640 dual sim)/i', $useragent)) {
-            $device = $deviceLoader->load('rm-1075',$useragent);
+            $device = $deviceLoader->load('rm-1075', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -319,7 +319,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(rm\-1031|lumia 532)/i', $useragent)) {
-            $device = $deviceLoader->load('rm-1031',$useragent);
+            $device = $deviceLoader->load('rm-1031', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -329,7 +329,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(rm\-\d{3,4})/i', $useragent, $matches)) {
-            $device = $deviceLoader->load($matches[1],$useragent);
+            $device = $deviceLoader->load($matches[1], $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -339,7 +339,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(lumia 1020|nokia; 909|arm; 909)/i', $useragent)) {
-            $device = $deviceLoader->load('lumia 1020',$useragent);
+            $device = $deviceLoader->load('lumia 1020', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -349,7 +349,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(lumia|nokia) 925/i', $useragent)) {
-            $device = $deviceLoader->load('lumia 925',$useragent);
+            $device = $deviceLoader->load('lumia 925', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -359,7 +359,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(lumia 650|id336)/i', $useragent)) {
-            $device = $deviceLoader->load('lumia 650',$useragent);
+            $device = $deviceLoader->load('lumia 650', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -369,7 +369,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(lumia \d{3,4} xl)/i', $useragent, $matches)) {
-            $device = $deviceLoader->load($matches[1],$useragent);
+            $device = $deviceLoader->load($matches[1], $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -389,7 +389,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/8X by HTC/i', $useragent)) {
-            $device = $deviceLoader->load('8x',$useragent);
+            $device = $deviceLoader->load('8x', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -399,7 +399,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/8S by HTC/i', $useragent)) {
-            $device = $deviceLoader->load('8s',$useragent);
+            $device = $deviceLoader->load('8s', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -409,7 +409,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/radar( c110e|; orange)/i', $useragent)) {
-            $device = $deviceLoader->load('radar c110e',$useragent);
+            $device = $deviceLoader->load('radar c110e', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -419,7 +419,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/HUAWEI; W1\-U00/i', $useragent)) {
-            $device = $deviceLoader->load('w1-u00',$useragent);
+            $device = $deviceLoader->load('w1-u00', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -429,7 +429,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/HUAWEI; W2\-U00/i', $useragent)) {
-            $device = $deviceLoader->load('w2-u00',$useragent);
+            $device = $deviceLoader->load('w2-u00', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -439,7 +439,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/one[_ ]m9plus/i', $useragent)) {
-            $device = $deviceLoader->load('m9 plus',$useragent);
+            $device = $deviceLoader->load('m9 plus', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -449,7 +449,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/one[_ ]m9/i', $useragent)) {
-            $device = $deviceLoader->load('m9',$useragent);
+            $device = $deviceLoader->load('m9', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -459,7 +459,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/one[_ ]m8s/i', $useragent)) {
-            $device = $deviceLoader->load('m8s',$useragent);
+            $device = $deviceLoader->load('m8s', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -469,7 +469,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/one[_ ]m8/i', $useragent)) {
-            $device = $deviceLoader->load('htc m8',$useragent);
+            $device = $deviceLoader->load('htc m8', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
@@ -479,7 +479,7 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/pn07120/i', $useragent)) {
-            $device = $deviceLoader->load('pn07120',$useragent);
+            $device = $deviceLoader->load('pn07120', $useragent);
 
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();

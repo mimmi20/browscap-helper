@@ -16,8 +16,6 @@
 
 namespace BrowscapHelper\Reader;
 
-use BrowscapHelper\Helper\Regex;
-use FileLoader\Loader;
 use Symfony\Component\Yaml\Yaml;
 
 /**

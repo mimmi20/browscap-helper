@@ -16,9 +16,6 @@
 
 namespace BrowscapHelper\Reader;
 
-use BrowscapHelper\Helper\Regex;
-use FileLoader\Loader;
-
 /**
  * Class DiffCommand
  *

@@ -17,9 +17,7 @@
 namespace BrowscapHelper\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -280,7 +278,7 @@ class CopyTestsCommand extends Command
             }
 
             $data['browscap-' . $key] = [
-                'ua' => $test['ua'],
+                'ua'         => $test['ua'],
                 'properties' => [
                     'Browser_Name'            => $test['properties']['Browser'],
                     'Browser_Type'            => $test['properties']['Browser_Type'],

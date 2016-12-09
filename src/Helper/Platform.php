@@ -57,7 +57,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
         } elseif (false !== strpos($ua, 'wds')) {
@@ -67,7 +66,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -82,7 +80,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
         } elseif (false !== strpos($ua, 'Tizen')) {
@@ -92,7 +89,6 @@ class Platform
             $platformMakerBrowscap          = 'unknown';
             $platformMakerNameDetector      = 'unknown';
             $platformMakerBrandnameDetector = 'unknown';
-            
 
             $platformDescriptionBrowscap = 'unknown';
         } elseif (false !== strpos($ua, 'Windows CE')) {
@@ -102,7 +98,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'Windows CE';
         } elseif (false !== strpos($ua, 'Linux; Android')) {
@@ -112,7 +107,6 @@ class Platform
             $platformMakerBrowscap          = 'Google Inc';
             $platformMakerNameDetector      = 'Google Inc';
             $platformMakerBrandnameDetector = 'Google';
-            
 
             $platformDescriptionBrowscap = 'Android OS';
 
@@ -127,7 +121,6 @@ class Platform
             $platformMakerBrowscap          = 'Google Inc';
             $platformMakerNameDetector      = 'Google Inc';
             $platformMakerBrandnameDetector = 'Google';
-            
 
             $platformDescriptionBrowscap = 'Android OS';
 
@@ -142,7 +135,6 @@ class Platform
             $platformMakerBrowscap          = 'Google Inc';
             $platformMakerNameDetector      = 'Google Inc';
             $platformMakerBrandnameDetector = 'Google';
-            
 
             $platformDescriptionBrowscap = 'Android OS';
 
@@ -157,7 +149,6 @@ class Platform
             $platformMakerBrowscap          = 'Google Inc';
             $platformMakerNameDetector      = 'Google Inc';
             $platformMakerBrandnameDetector = 'Google';
-            
 
             $platformDescriptionBrowscap = 'Android OS';
         } elseif (false !== strpos($ua, 'OpenBSD')) {
@@ -173,7 +164,6 @@ class Platform
             $platformMakerBrowscap          = 'Symbian Foundation';
             $platformMakerNameDetector      = 'Symbian Foundation';
             $platformMakerBrandnameDetector = 'Symbian';
-            
 
             $platformDescriptionBrowscap = 'unknown';
         } elseif (false !== strpos($ua, 'MIDP')) {
@@ -183,7 +173,6 @@ class Platform
             $platformMakerBrowscap          = 'Oracle';
             $platformMakerNameDetector      = 'Oracle';
             $platformMakerBrandnameDetector = 'Oracle';
-            
 
             $platformDescriptionBrowscap = 'unknown';
         } elseif (false !== strpos($ua, 'Windows NT 10.0')) {
@@ -195,7 +184,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -215,7 +203,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -235,7 +222,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -255,7 +241,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -275,7 +260,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -295,7 +279,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -315,7 +298,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -335,7 +317,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -355,7 +336,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -375,7 +355,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -395,7 +374,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -415,7 +393,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -437,7 +414,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -459,7 +435,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -481,7 +456,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -503,7 +477,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -525,7 +498,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -547,7 +519,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -569,7 +540,6 @@ class Platform
             $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformMakerNameDetector      = 'Microsoft Corporation';
             $platformMakerBrandnameDetector = 'Microsoft';
-            
 
             $platformDescriptionBrowscap = 'unknown';
 
@@ -589,7 +559,6 @@ class Platform
             $platformMakerBrowscap          = 'Apple Inc';
             $platformMakerNameDetector      = 'Apple Inc';
             $platformMakerBrandnameDetector = 'Apple';
-            
 
             $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
@@ -604,7 +573,6 @@ class Platform
             $platformMakerBrowscap          = 'Apple Inc';
             $platformMakerNameDetector      = 'Apple Inc';
             $platformMakerBrandnameDetector = 'Apple';
-            
 
             $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
@@ -703,7 +671,6 @@ class Platform
             $platformMakerBrowscap          = 'Linux Foundation';
             $platformMakerNameDetector      = 'Mandriva';
             $platformMakerBrandnameDetector = 'Mandriva';
-            
 
             $platformDescriptionBrowscap = 'unknown';
         } elseif (false !== stripos($ua, 'gentoo')) {
@@ -777,7 +744,7 @@ class Platform
         }
 
         $platformBits = (new Os($ua))->getBits();
-        
+
         return [
             $platformNameBrowscap,
             $platformMakerBrowscap,
@@ -792,7 +759,7 @@ class Platform
             $platformMakerBrandnameDetector,
             $platformVersionDetector,
             $standard,
-            $platformBits
+            $platformBits,
         ];
     }
 }
