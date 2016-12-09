@@ -16,6 +16,9 @@
 
 namespace BrowscapHelper\Helper;
 
+use BrowserDetector\Loader\DeviceLoader;
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * Class DiffCommand
  *
@@ -25,73 +28,15 @@ namespace BrowscapHelper\Helper;
 class Device
 {
     /**
-     * @param string $useragent
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param string                            $useragent
      *
      * @return array
      */
-    public function detect(\Psr\Cache\CacheItemPoolInterface $cache, $useragent)
+    public function detect(CacheItemPoolInterface $cache, $useragent, \UaResult\Os\OsInterface $platform)
     {
         $mobileDevice = false;
-        $deviceLoader = new \BrowserDetector\Loader\DeviceLoader($cache);
-
-        $devices = [
-            '' => [
-                'Device_Name'            => 'unknown',
-                'Device_Maker'           => 'unknown',
-                'Device_Type'            => 'unknown',
-                'Device_Pointing_Method' => 'unknown',
-                'Device_Code_Name'       => 'unknown',
-                'Device_Brand_Name'      => 'unknown',
-            ],
-            'Windows Desktop' => [
-                'Device_Name'            => 'Windows Desktop',
-                'Device_Maker'           => 'Various',
-                'Device_Type'            => 'Desktop',
-                'Device_Pointing_Method' => 'mouse',
-                'Device_Code_Name'       => 'Windows Desktop',
-                'Device_Brand_Name'      => 'unknown',
-            ],
-            'Linux Desktop' => [
-                'Device_Name'            => 'Linux Desktop',
-                'Device_Maker'           => 'Various',
-                'Device_Type'            => 'Desktop',
-                'Device_Pointing_Method' => 'mouse',
-                'Device_Code_Name'       => 'Linux Desktop',
-                'Device_Brand_Name'      => 'unknown',
-            ],
-            'Macintosh' => [
-                'Device_Name'            => 'Macintosh',
-                'Device_Maker'           => 'Apple Inc',
-                'Device_Type'            => 'Desktop',
-                'Device_Pointing_Method' => 'mouse',
-                'Device_Code_Name'       => 'Macintosh',
-                'Device_Brand_Name'      => 'Apple',
-            ],
-            'iPhone' => [
-                'Device_Name'            => 'iPhone',
-                'Device_Maker'           => 'Apple Inc',
-                'Device_Type'            => 'Mobile Phone',
-                'Device_Pointing_Method' => 'touchscreen',
-                'Device_Code_Name'       => 'iPhone',
-                'Device_Brand_Name'      => 'Apple',
-            ],
-            'iPad' => [
-                'Device_Name'            => 'iPad',
-                'Device_Maker'           => 'Apple Inc',
-                'Device_Type'            => 'Tablet',
-                'Device_Pointing_Method' => 'touchscreen',
-                'Device_Code_Name'       => 'iPad',
-                'Device_Brand_Name'      => 'Apple',
-            ],
-            'iPod' => [
-                'Device_Name'            => 'iPod',
-                'Device_Maker'           => 'Apple Inc',
-                'Device_Type'            => 'Mobile Device',
-                'Device_Pointing_Method' => 'touchscreen',
-                'Device_Code_Name'       => 'iPod',
-                'Device_Brand_Name'      => 'Apple',
-            ],
-        ];
+        $deviceLoader = new DeviceLoader($cache);
 
         $device = null;
 

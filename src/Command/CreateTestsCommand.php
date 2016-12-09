@@ -16,6 +16,7 @@
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Helper\Browser;
 use BrowscapHelper\Helper\Device;
 use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
@@ -27,12 +28,14 @@ use League\Flysystem\Filesystem;
 use Monolog\Logger;
 use Monolog\Handler;
 use BrowserDetector\BrowserDetector;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
+use UaResult\Os\Os;
 
 /**
  * Class DiffCommand
@@ -49,7 +52,6 @@ class CreateTestsCommand extends Command
 
     /**
      * @param string $sourcesDirectory
-     * @param string $targetDirectory
      */
     public function __construct($sourcesDirectory)
     {
@@ -181,13 +183,15 @@ class CreateTestsCommand extends Command
     }
 
     /**
-     * @param array  $fileContents
-     * @param string $issue
-     * @param array  &$checks
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
+     * @param array                                             $fileContents
+     * @param string                                            $issue
+     * @param array                                             &$checks
      *
      * @return int
      */
-    private function parseFile(OutputInterface $output, \Psr\Cache\CacheItemPoolInterface $cache, array $fileContents = [], $issue = '', array &$checks = [])
+    private function parseFile(OutputInterface $output, CacheItemPoolInterface $cache, array $fileContents = [], $issue = '', array &$checks = [])
     {
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
@@ -213,15 +217,16 @@ class CreateTestsCommand extends Command
     }
 
     /**
-     * @param string $ua
-     * @param int    $i
-     * @param array  &$checks
-     * @param int    &$counter
-     * @param string &$outputBrowscap
-     * @param array  &$outputDetector
-     * @param string $issue
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param string                            $ua
+     * @param int                               $i
+     * @param array                             &$checks
+     * @param int                               &$counter
+     * @param string                            &$outputBrowscap
+     * @param array                             &$outputDetector
+     * @param string                            $issue
      */
-    private function parseLine(\Psr\Cache\CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue)
+    private function parseLine(CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue)
     {
         $engineVersion = 'unknown';
 
@@ -234,7 +239,7 @@ class CreateTestsCommand extends Command
             $browserVersion,
             $browserNameDetector,
             $lite,
-            $crawler) = (new \BrowscapHelper\Helper\Browser())->detect($ua);
+            $crawler) = (new Browser())->detect($ua);
 
         list(
             $platformNameBrowscap,
@@ -251,6 +256,8 @@ class CreateTestsCommand extends Command
             $platformVersionDetector,
             $standard,
             $platformBits) = (new Platform())->detect($ua);
+
+        $platform = new Os('unknown', 'unknown', 'unknown', 'unknown');
         
         list(
             $deviceName,
@@ -261,7 +268,7 @@ class CreateTestsCommand extends Command
             $deviceBrandname,
             $mobileDevice,
             $isTablet,
-            $deviceOrientation) = (new Device())->detect($cache, $ua);
+            $deviceOrientation) = (new Device())->detect($cache, $ua, $platform);
 
         list(
             $engineName,
