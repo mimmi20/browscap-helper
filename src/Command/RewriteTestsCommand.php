@@ -225,8 +225,12 @@ test:
         );
 
         foreach ($circleLines as $group => $count) {
-            $circleciContent .= '    #' . str_pad($count, 6, ' ',
-                    STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '') . PHP_EOL;
+            $circleciContent .= '    #' . str_pad(
+                $count,
+                6,
+                ' ',
+                STR_PAD_LEFT
+            ) . ' test' . ($count !== 1 ? 's' : '') . PHP_EOL;
             $circleciContent .= '    #- vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
             $circleciContent .= '    - vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
         }
@@ -293,8 +297,10 @@ test:
 
         $output->writeln('    rewriting file');
 
-        file_put_contents($file->getPath() . '/' . $basename . '.json',
-            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        file_put_contents(
+            $file->getPath() . '/' . $basename . '.json',
+            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
     }
 
     /**

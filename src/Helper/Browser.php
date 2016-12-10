@@ -603,9 +603,9 @@ class Browser
                 $lite = false;
             }
         } elseif (false !== strpos($ua, 'Safari') && false !== strpos($ua, 'Version') && false !== strpos(
-                $ua,
-                'Tizen'
-            )
+            $ua,
+            'Tizen'
+        )
         ) {
             $browserNameBrowscap = 'Samsung WebView';
             $browserNameDetector = 'Samsung WebView';

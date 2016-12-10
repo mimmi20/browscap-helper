@@ -13317,9 +13317,9 @@ class Device
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
             } elseif ('general Mobile Device' === $device->getDeviceName() && in_array(
-                    $deviceCode,
-                    ['general Mobile Phone', 'general Tablet']
-                )
+                $deviceCode,
+                ['general Mobile Phone', 'general Tablet']
+            )
             ) {
                 $deviceBrand       = $device->getBrand();
                 $deviceCode        = $device->getDeviceName();
