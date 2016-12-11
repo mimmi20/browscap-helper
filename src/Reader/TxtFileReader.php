@@ -25,7 +25,7 @@ use FileLoader\Loader;
  * @category   Browscap
  * @author     James Titcumb <james@asgrim.com>
  */
-class LogFileReader implements ReaderInterface
+class TxtFileReader implements ReaderInterface
 {
     /**
      * @var string|null
@@ -73,34 +73,14 @@ class LogFileReader implements ReaderInterface
         $stream->rewind();
 
         $agents = [];
-        $regex  = (new Regex())->getRegex();
 
         while (!$stream->eof()) {
-            $line        = $stream->read(8192);
-            $lineMatches = [];
+            $line = $stream->read(8192);
 
-            if (!preg_match($regex, $line, $lineMatches)) {
-                if (null !== $this->targetInfoFile) {
-                    file_put_contents(
-                        $this->targetInfoFile,
-                        'no useragent found in line "' . $line . '"' . "\n",
-                        FILE_APPEND | LOCK_EX
-                    );
-                }
-
-                continue;
-            }
-
-            if (isset($lineMatches['userAgentString'])) {
-                $agentOfLine = trim($lineMatches['userAgentString']);
+            if (!array_key_exists($line, $agents)) {
+                $agents[$line] = 1;
             } else {
-                $agentOfLine = trim($this->extractAgent($line));
-            }
-
-            if (!array_key_exists($agentOfLine, $agents)) {
-                $agents[$agentOfLine] = 1;
-            } else {
-                ++$agents[$agentOfLine];
+                ++$agents[$line];
             }
         }
 

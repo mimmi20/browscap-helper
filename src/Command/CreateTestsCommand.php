@@ -21,6 +21,7 @@ use BrowscapHelper\Helper\Device;
 use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Reader\LogFileReader;
+use BrowscapHelper\Reader\TxtFileReader;
 use BrowscapHelper\Reader\YamlFileReader;
 use BrowserDetector\BrowserDetector;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
@@ -153,13 +154,21 @@ class CreateTestsCommand extends Command
 
             switch ($file->getExtension()) {
                 case 'txt':
-                    $reader = new LogFileReader();
+                    $reader = new TxtFileReader();
                     $reader->setLocalFile($file->getPathname());
 
                     $fileContents = $reader->getAgents();
                     break;
                 case 'yaml':
                     $reader = new YamlFileReader();
+                    $reader->setLocalFile($file->getPathname());
+
+                    $fileContents = $reader->getAgents();
+                    break;
+                case 'gz':
+                case 'bz2':
+                case 'tgz':
+                    $reader = new LogFileReader();
                     $reader->setLocalFile($file->getPathname());
 
                     $fileContents = $reader->getAgents();
