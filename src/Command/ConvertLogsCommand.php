@@ -45,6 +45,8 @@ class ConvertLogsCommand extends Command
     /**
      * @param string $sourcesDirectory
      * @param string $targetDirectory
+     *
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
     public function __construct($sourcesDirectory, $targetDirectory)
     {

@@ -21,6 +21,7 @@ use BrowscapHelper\Reader\BrowscapTestReader;
 use BrowscapHelper\Reader\DetectorTestReader;
 use BrowserDetector\BrowserDetector;
 use BrowserDetector\Factory\Platform;
+use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Loader\PlatformLoader;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
@@ -231,8 +232,8 @@ test:
                 ' ',
                 STR_PAD_LEFT
             ) . ' test' . ($count !== 1 ? 's' : '') . PHP_EOL;
-            $circleciContent .= '    #- vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
-            $circleciContent .= '    - vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
+            //$circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
+            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
         }
 
         $output->writeln('writing ' . $circleFile . ' ...');
@@ -242,12 +243,13 @@ test:
     }
 
     /**
-     * @param \stdClass              $tests
-     * @param \SplFileInfo           $file
-     * @param BrowserDetector        $detector
-     * @param array                  $data
-     * @param array                  $checks
-     * @param CacheItemPoolInterface $cache
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \stdClass                                         $tests
+     * @param \SplFileInfo                                      $file
+     * @param BrowserDetector                                   $detector
+     * @param array                                             $data
+     * @param array                                             $checks
+     * @param CacheItemPoolInterface                            $cache
      */
     private function handleFile(
         OutputInterface $output,
@@ -304,10 +306,11 @@ test:
     }
 
     /**
-     * @param \stdClass              $test
-     * @param BrowserDetector        $detector
-     * @param string                 $key
-     * @param CacheItemPoolInterface $cache
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \stdClass                                         $test
+     * @param BrowserDetector                                   $detector
+     * @param string                                            $key
+     * @param CacheItemPoolInterface                            $cache
      *
      * @return array
      */
@@ -398,7 +401,8 @@ test:
             list($deviceBrand, $deviceCode, $devicePointing, $deviceType, $deviceMaker, $deviceName, $deviceOrientation, $device) = $this->rewriteDevice(
                 $test,
                 $cache,
-                $platform
+                $platform,
+                $detector
             );
 
             /** @var $device \UaResult\Device\DeviceInterface */
@@ -496,6 +500,8 @@ test:
      * @param string                                            $key
      * @param CacheItemPoolInterface                            $cache
      *
+     * @throws \BrowserDetector\Loader\NotFoundException
+     * @throws \UnexpectedValueException
      * @return array
      */
     private function rewritePlatforms(
@@ -1250,11 +1256,55 @@ test:
      * @param \stdClass              $test
      * @param CacheItemPoolInterface $cache
      * @param OsInterface            $platform
+     * @param BrowserDetector        $detector
      *
+     * @throws \BrowserDetector\Loader\NotFoundException
      * @return array
      */
-    private function rewriteDevice(\stdClass $test, CacheItemPoolInterface $cache, OsInterface $platform)
+    private function rewriteDevice(\stdClass $test, CacheItemPoolInterface $cache, OsInterface $platform, BrowserDetector $detector)
     {
+        if (isset($test->properties->Device_Code_Name)) {
+            $deviceCode = $test->properties->Device_Code_Name;
+        } else {
+            $deviceCode = 'unknown';
+        }
+
+        if (isset($test->properties->Device_Brand_Name)) {
+            $deviceBrand = $test->properties->Device_Brand_Name;
+        } else {
+            $deviceBrand = 'unknown';
+        }
+
+        if (isset($test->properties->Device_Pointing_Method)) {
+            $devicePointing = $test->properties->Device_Pointing_Method;
+        } else {
+            $devicePointing = 'unknown';
+        }
+
+        if (isset($test->properties->Device_Type)) {
+            $deviceType = $test->properties->Device_Type;
+        } else {
+            $deviceType = 'unknown';
+        }
+
+        if (isset($test->properties->Device_Maker)) {
+            $deviceMaker = $test->properties->Device_Maker;
+        } else {
+            $deviceMaker = 'unknown';
+        }
+
+        if (isset($test->properties->Device_Name)) {
+            $deviceName = $test->properties->Device_Name;
+        } else {
+            $deviceName = 'unknown';
+        }
+
+        if (isset($test->properties->Device_Dual_Orientation)) {
+            $deviceOrientation = $test->properties->Device_Dual_Orientation;
+        } else {
+            $deviceOrientation = 'unknown';
+        }
+
         list(
             $deviceName,
             $deviceMaker,
@@ -1263,34 +1313,34 @@ test:
             $deviceCode,
             $deviceBrand, , ,
             $deviceOrientation,
-            $device) = (new Device())->detect($cache, $test->ua, $platform);
+            $device) = (new Device())->detect(
+            $cache,
+            $test->ua,
+            $platform,
+            $detector,
+            $deviceCode,
+            $deviceBrand,
+            $devicePointing,
+            $deviceType,
+            $deviceMaker,
+            $deviceName,
+            $deviceOrientation
+        );
 
-        if ($deviceName === 'unknown') {
-            $deviceName = $test->properties->Device_Name;
-        }
+        if ($deviceCode === 'unknown'
+            || $deviceCode === null
+            || (false !== stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
+        ) {
+            $deviceLoader = new DeviceLoader($cache);
+            $device       = $deviceLoader->load('unknown', $test->ua);
 
-        if ($deviceMaker === 'unknown') {
-            $deviceMaker = $test->properties->Device_Maker;
-        }
-
-        if ($deviceType === 'unknown') {
-            $deviceType = $test->properties->Device_Type;
-        }
-
-        if ($devicePointing === 'unknown') {
-            $devicePointing = $test->properties->Device_Pointing_Method;
-        }
-
-        if ($deviceCode === 'unknown') {
-            $deviceCode = $test->properties->Device_Code_Name;
-        }
-
-        if ($deviceBrand === 'unknown') {
-            $deviceBrand = $test->properties->Device_Brand_Name;
-        }
-
-        if ('unknown' === $deviceOrientation) {
-            $deviceOrientation = $test->properties->Device_Dual_Orientation;
+            $deviceBrand       = $device->getBrand();
+            $deviceCode        = $device->getDeviceName();
+            $devicePointing    = $device->getPointingMethod();
+            $deviceType        = $device->getType()->getName();
+            $deviceMaker       = $device->getManufacturer();
+            $deviceName        = $device->getMarketingName();
+            $deviceOrientation = $device->getDualOrientation();
         }
 
         return [

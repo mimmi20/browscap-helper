@@ -33,7 +33,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 use UaResult\Os\Os;
 
 /**
@@ -51,6 +50,8 @@ class CreateTestsCommand extends Command
 
     /**
      * @param string $sourcesDirectory
+     *
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
     public function __construct($sourcesDirectory)
     {
@@ -110,7 +111,7 @@ class CreateTestsCommand extends Command
 
         $adapter  = new Local(__DIR__ . '/../../cache/');
         $cache    = new FilesystemCachePool(new Filesystem($adapter));
-        //$detector = new BrowserDetector($cache, $logger);
+        $detector = new BrowserDetector($cache, $logger);
 
         foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
             /** @var $file \SplFileInfo */
@@ -174,7 +175,7 @@ class CreateTestsCommand extends Command
 
             $output->writeln('    parsing ...');
 
-            $counter += $this->parseFile($output, $cache, $fileContents, $file->getBasename(), $checks);
+            $counter += $this->parseFile($output, $cache, $fileContents, $file->getBasename(), $checks, $detector);
         }
 
         $output->writeln('');
@@ -187,10 +188,11 @@ class CreateTestsCommand extends Command
      * @param array                                             $fileContents
      * @param string                                            $issue
      * @param array                                             &$checks
+     * @param \BrowserDetector\BrowserDetector                  $detector
      *
      * @return int
      */
-    private function parseFile(OutputInterface $output, CacheItemPoolInterface $cache, array $fileContents = [], $issue = '', array &$checks = [])
+    private function parseFile(OutputInterface $output, CacheItemPoolInterface $cache, array $fileContents = [], $issue = '', array &$checks = [], BrowserDetector $detector)
     {
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
@@ -204,7 +206,7 @@ class CreateTestsCommand extends Command
             }
 
             $output->writeln('    handle useragent ' . $i . ' ...');
-            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue);
+            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue, $detector);
         }
 
         $outputBrowscap .= "];\n";
@@ -224,8 +226,9 @@ class CreateTestsCommand extends Command
      * @param string                            &$outputBrowscap
      * @param array                             &$outputDetector
      * @param string                            $issue
+     * @param \BrowserDetector\BrowserDetector  $detector
      */
-    private function parseLine(CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue)
+    private function parseLine(CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue, BrowserDetector $detector)
     {
         $engineVersion = 'unknown';
 
@@ -256,7 +259,8 @@ class CreateTestsCommand extends Command
             $standard,
             $platformBits) = (new Platform())->detect($ua);
 
-        $platform = new Os('unknown', 'unknown', 'unknown', 'unknown');
+        $platform   = new Os('unknown', 'unknown', 'unknown', 'unknown');
+        $deviceCode = 'unknown';
 
         list(
             $deviceName,
@@ -267,7 +271,7 @@ class CreateTestsCommand extends Command
             $deviceBrandname,
             $mobileDevice,
             $isTablet,
-            $deviceOrientation) = (new Device())->detect($cache, $ua, $platform);
+            $deviceOrientation) = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
 
         list(
             $engineName,

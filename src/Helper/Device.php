@@ -18,6 +18,8 @@ namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Loader\DeviceLoader;
 use Psr\Cache\CacheItemPoolInterface;
+use UaResult\Os\OsInterface;
+use BrowserDetector\BrowserDetector;
 
 /**
  * Class DiffCommand
@@ -30,15 +32,30 @@ class Device
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
+     * @param OsInterface $platform
+     * @param BrowserDetector                   $detector
+     * @param string $deviceCode
      *
      * @return array
      */
-    public function detect(CacheItemPoolInterface $cache, $useragent, \UaResult\Os\OsInterface $platform)
+    public function detect(
+        CacheItemPoolInterface $cache,
+        $useragent,
+        OsInterface $platform,
+        BrowserDetector $detector,
+        $deviceCode,
+        $deviceBrand       = null,
+        $devicePointing    = null,
+        $deviceType        = null,
+        $deviceMaker       = null,
+        $deviceName        = null,
+        $deviceOrientation = null,
+        $isTablet          = false,
+        $mobileDevice      = false
+    )
     {
-        $mobileDevice = false;
         $deviceLoader = new DeviceLoader($cache);
-
-        $device = null;
+        $device       = null;
 
         if (false !== strpos($useragent, 'Windows Phone')) {
             $mobileDevice                   = true;
@@ -192,9 +209,7 @@ class Device
             $mobileDevice                   = true;
         } elseif (false !== strpos($useragent, 'hpwOS')) {
             $mobileDevice                   = true;
-        }
-
-        if (false !== strpos($useragent, 'Silk') && false === strpos($useragent, 'Android')) {
+        } elseif (false !== strpos($useragent, 'Silk') && false === strpos($useragent, 'Android')) {
             $mobileDevice              = true;
         }
 
@@ -13376,15 +13391,30 @@ class Device
         }
 
         if ($device instanceof \UaResult\Device\DeviceInterface) {
-            $deviceBrand       = $device->getBrand();
-            $deviceCode        = $device->getDeviceName();
-            $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
-            $deviceMaker       = $device->getManufacturer();
-            $deviceName        = $device->getMarketingName();
-            $deviceOrientation = $device->getDualOrientation();
-            $mobileDevice      = $device->getType()->isMobile();
-            $isTablet          = $device->getType()->isTablet();
+            if (null === $deviceBrand) {
+                $deviceBrand       = $device->getBrand();
+            }
+            if (null === $deviceCode) {
+                $deviceCode        = $device->getDeviceName();
+            }
+            if (null === $devicePointing) {
+                $devicePointing    = $device->getPointingMethod();
+            }
+            if (null === $deviceType) {
+                $deviceType        = $device->getType()->getName();
+            }
+            if (null === $deviceMaker) {
+                $deviceMaker       = $device->getManufacturer();
+            }
+            if (null === $deviceName) {
+                $deviceName        = $device->getMarketingName();
+            }
+            if (null === $deviceOrientation) {
+                $deviceOrientation = $device->getDualOrientation();
+            }
+            if (null === $isTablet) {
+                $isTablet = $device->getType()->isTablet();
+            }
         } else {
             $deviceBrand       = 'unknown';
             $deviceCode        = 'unknown';
