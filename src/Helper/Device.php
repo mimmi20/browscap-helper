@@ -219,7 +219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -229,7 +229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -239,7 +239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -249,7 +249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -259,7 +259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -269,7 +269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -279,7 +279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -289,7 +289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -299,7 +299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -309,7 +309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -319,7 +319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -329,7 +329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -339,7 +339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -349,7 +349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -359,7 +359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -369,7 +369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -379,7 +379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -389,7 +389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -399,7 +399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -409,7 +409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -419,7 +419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -429,7 +429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -439,7 +439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -449,7 +449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -459,7 +459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -469,7 +469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -479,7 +479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -489,7 +489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -499,7 +499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -509,7 +509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -519,7 +519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -529,7 +529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -539,7 +539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -549,7 +549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -559,7 +559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -569,7 +569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -579,7 +579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -589,7 +589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -599,7 +599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -609,7 +609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -619,7 +619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -629,7 +629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -639,7 +639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -649,7 +649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -659,7 +659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -669,7 +669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -679,7 +679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -689,7 +689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -699,7 +699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -709,7 +709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -719,7 +719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -729,7 +729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -739,7 +739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -749,7 +749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -759,7 +759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -769,7 +769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -779,7 +779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -789,7 +789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -799,7 +799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -809,7 +809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -819,7 +819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -829,7 +829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -839,7 +839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -849,7 +849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -859,7 +859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -869,7 +869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -879,7 +879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -889,7 +889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -899,7 +899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -909,7 +909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -919,7 +919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -929,7 +929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -939,7 +939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -949,7 +949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -959,7 +959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -969,7 +969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -979,7 +979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -989,7 +989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -999,7 +999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1009,7 +1009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1019,7 +1019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1029,7 +1029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1039,7 +1039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1049,7 +1049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1059,7 +1059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1069,7 +1069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1079,7 +1079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1089,7 +1089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1099,7 +1099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1109,7 +1109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1119,7 +1119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1129,7 +1129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1139,7 +1139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1149,7 +1149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1159,7 +1159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1169,7 +1169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1179,7 +1179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1189,7 +1189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1199,7 +1199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1209,7 +1209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1219,7 +1219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1229,7 +1229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1239,7 +1239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1249,7 +1249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1259,7 +1259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1269,7 +1269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1279,7 +1279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1289,7 +1289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1299,7 +1299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1309,7 +1309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1319,7 +1319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1329,7 +1329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1339,7 +1339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1349,7 +1349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1359,7 +1359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1369,7 +1369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1379,7 +1379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1389,7 +1389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1399,7 +1399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1409,7 +1409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1419,7 +1419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1429,7 +1429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1439,7 +1439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1449,7 +1449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1459,7 +1459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1469,7 +1469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1479,7 +1479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1489,7 +1489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1499,7 +1499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1509,7 +1509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1519,7 +1519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1529,7 +1529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1539,7 +1539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1549,7 +1549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1559,7 +1559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1569,7 +1569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1579,7 +1579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1589,7 +1589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1599,7 +1599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1609,7 +1609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1619,7 +1619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1629,7 +1629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1639,7 +1639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1649,7 +1649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1659,7 +1659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1669,7 +1669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1679,7 +1679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1689,7 +1689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1699,7 +1699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1709,7 +1709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1719,7 +1719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1729,7 +1729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1739,7 +1739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1749,7 +1749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1759,7 +1759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1769,7 +1769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1779,7 +1779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1789,7 +1789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1799,7 +1799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1809,7 +1809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1819,7 +1819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1829,7 +1829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1839,7 +1839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1849,7 +1849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1859,7 +1859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1869,7 +1869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1879,7 +1879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1889,7 +1889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1899,7 +1899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1909,7 +1909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1919,7 +1919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1929,7 +1929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1939,7 +1939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1949,7 +1949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1959,7 +1959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1969,7 +1969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1979,7 +1979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1989,7 +1989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -1999,7 +1999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2009,7 +2009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2019,7 +2019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2029,7 +2029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2039,7 +2039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2049,7 +2049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2059,7 +2059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2069,7 +2069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2079,7 +2079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2089,7 +2089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2099,7 +2099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2109,7 +2109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2119,7 +2119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2129,7 +2129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2139,7 +2139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2149,7 +2149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2159,7 +2159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2169,7 +2169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2179,7 +2179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2189,7 +2189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2199,7 +2199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2209,7 +2209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2219,7 +2219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2229,7 +2229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2239,7 +2239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2249,7 +2249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2259,7 +2259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2269,7 +2269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2279,7 +2279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2289,7 +2289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2299,7 +2299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2309,7 +2309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2319,7 +2319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2329,7 +2329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2339,7 +2339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2349,7 +2349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2359,7 +2359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2369,7 +2369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2379,7 +2379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2389,7 +2389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2399,7 +2399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2409,7 +2409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2419,7 +2419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2429,7 +2429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2439,7 +2439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2449,7 +2449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2459,7 +2459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2469,7 +2469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2479,7 +2479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2489,7 +2489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2499,7 +2499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2509,7 +2509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2519,7 +2519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2529,7 +2529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2539,7 +2539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2549,7 +2549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2559,7 +2559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2569,7 +2569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2579,7 +2579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2589,7 +2589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2599,7 +2599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2609,7 +2609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2619,7 +2619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2629,7 +2629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2639,7 +2639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2649,7 +2649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2659,7 +2659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2669,7 +2669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2679,7 +2679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2689,7 +2689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2699,7 +2699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2709,7 +2709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2719,7 +2719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2729,7 +2729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2739,7 +2739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2749,7 +2749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2759,7 +2759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2769,7 +2769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2779,7 +2779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2789,7 +2789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2799,7 +2799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2809,7 +2809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2819,7 +2819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2829,7 +2829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2839,7 +2839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2849,7 +2849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2859,7 +2859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2869,7 +2869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2879,7 +2879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2889,7 +2889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2899,7 +2899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2909,7 +2909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2919,7 +2919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2929,7 +2929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2939,7 +2939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2949,7 +2949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2959,7 +2959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2969,7 +2969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2979,7 +2979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2989,7 +2989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -2999,7 +2999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3009,7 +3009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3019,7 +3019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3029,7 +3029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3039,7 +3039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3049,7 +3049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3059,7 +3059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3069,7 +3069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3079,7 +3079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3089,7 +3089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3099,7 +3099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3109,7 +3109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3119,7 +3119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3129,7 +3129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3139,7 +3139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3149,7 +3149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3159,7 +3159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3169,7 +3169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3179,7 +3179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3189,7 +3189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3199,7 +3199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3209,7 +3209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3219,7 +3219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3229,7 +3229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3239,7 +3239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3249,7 +3249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3259,7 +3259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3269,7 +3269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3279,7 +3279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3289,7 +3289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3299,7 +3299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3309,7 +3309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3319,7 +3319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3329,7 +3329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3339,7 +3339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3349,7 +3349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3359,7 +3359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3369,7 +3369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3379,7 +3379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3389,7 +3389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3399,7 +3399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3409,7 +3409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3419,7 +3419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3429,7 +3429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3439,7 +3439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3449,7 +3449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3459,7 +3459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3469,7 +3469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3479,7 +3479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3489,7 +3489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3499,7 +3499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3509,7 +3509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3519,7 +3519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3529,7 +3529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3539,7 +3539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3549,7 +3549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3559,7 +3559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3569,7 +3569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3579,7 +3579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3589,7 +3589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3599,7 +3599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3609,7 +3609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3619,7 +3619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3629,7 +3629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3639,7 +3639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3649,7 +3649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3659,7 +3659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3669,7 +3669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3679,7 +3679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3689,7 +3689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3699,7 +3699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3709,7 +3709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3719,7 +3719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3729,7 +3729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3739,7 +3739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3749,7 +3749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3759,7 +3759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3769,7 +3769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3779,7 +3779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3789,7 +3789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3799,7 +3799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3809,7 +3809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3819,7 +3819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3829,7 +3829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3839,7 +3839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3849,7 +3849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3859,7 +3859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3869,7 +3869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3879,7 +3879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3889,7 +3889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3899,7 +3899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3909,7 +3909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3919,7 +3919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3929,7 +3929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3939,7 +3939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3949,7 +3949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3959,7 +3959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3969,7 +3969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3979,7 +3979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3989,7 +3989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -3999,7 +3999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4009,7 +4009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4019,7 +4019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4029,7 +4029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4039,7 +4039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4049,7 +4049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4059,7 +4059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4069,7 +4069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4079,7 +4079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4089,7 +4089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4099,7 +4099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4109,7 +4109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4119,7 +4119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4129,7 +4129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4139,7 +4139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4149,7 +4149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4159,7 +4159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4169,7 +4169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4179,7 +4179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4189,7 +4189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4199,7 +4199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4209,7 +4209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4219,7 +4219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4229,7 +4229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4239,7 +4239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4249,7 +4249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4259,7 +4259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4269,7 +4269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4279,7 +4279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4289,7 +4289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4299,7 +4299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4309,7 +4309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4319,7 +4319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4329,7 +4329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4339,7 +4339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4349,7 +4349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4359,7 +4359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4369,7 +4369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4379,7 +4379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4389,7 +4389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4399,7 +4399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4409,7 +4409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4419,7 +4419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4429,7 +4429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4439,7 +4439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4449,7 +4449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4459,7 +4459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4469,7 +4469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4479,7 +4479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4489,7 +4489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4499,7 +4499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4509,7 +4509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4519,7 +4519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4529,7 +4529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4539,7 +4539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4549,7 +4549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4559,7 +4559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4569,7 +4569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4579,7 +4579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4589,7 +4589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4599,7 +4599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4609,7 +4609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4619,7 +4619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4629,7 +4629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4639,7 +4639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4649,7 +4649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4659,7 +4659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4669,7 +4669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4679,7 +4679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4689,7 +4689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4699,7 +4699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4709,7 +4709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4719,7 +4719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4729,7 +4729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4739,7 +4739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4749,7 +4749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4759,7 +4759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4769,7 +4769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4779,7 +4779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4789,7 +4789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4799,7 +4799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4809,7 +4809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4819,7 +4819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4829,7 +4829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4839,7 +4839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4849,7 +4849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4859,7 +4859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4869,7 +4869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4879,7 +4879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4889,7 +4889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4899,7 +4899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4909,7 +4909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4919,7 +4919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4929,7 +4929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4939,7 +4939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4949,7 +4949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4959,7 +4959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4969,7 +4969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4979,7 +4979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4989,7 +4989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -4999,7 +4999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5009,7 +5009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5019,7 +5019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5029,7 +5029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5039,7 +5039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5049,7 +5049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5059,7 +5059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5069,7 +5069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5079,7 +5079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5089,7 +5089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5099,7 +5099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5109,7 +5109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5119,7 +5119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5129,7 +5129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5139,7 +5139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5149,7 +5149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5159,7 +5159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5169,7 +5169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5179,7 +5179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5189,7 +5189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5199,7 +5199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5209,7 +5209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5219,7 +5219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5229,7 +5229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5239,7 +5239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5249,7 +5249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5259,7 +5259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5269,7 +5269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5279,7 +5279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5289,7 +5289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5299,7 +5299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5309,7 +5309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5319,7 +5319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5329,7 +5329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5339,7 +5339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5349,7 +5349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5359,7 +5359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5369,7 +5369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5379,7 +5379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5389,7 +5389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5399,7 +5399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5409,7 +5409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5419,7 +5419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5429,7 +5429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5439,7 +5439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5449,7 +5449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5459,7 +5459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5469,7 +5469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5479,7 +5479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5489,7 +5489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5499,7 +5499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5509,7 +5509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5519,7 +5519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5529,7 +5529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5539,7 +5539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5549,7 +5549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5559,7 +5559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5569,7 +5569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5579,7 +5579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5589,7 +5589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5599,7 +5599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5609,7 +5609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5619,7 +5619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5629,7 +5629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5639,7 +5639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5649,7 +5649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5659,7 +5659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5669,7 +5669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5679,7 +5679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5689,7 +5689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5699,7 +5699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5709,7 +5709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5719,7 +5719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5729,7 +5729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5739,7 +5739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5749,7 +5749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5759,7 +5759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5769,7 +5769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5779,7 +5779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5789,7 +5789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5799,7 +5799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5809,7 +5809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5819,7 +5819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5829,7 +5829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5839,7 +5839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5849,7 +5849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5859,7 +5859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5869,7 +5869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5879,7 +5879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5889,7 +5889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5899,7 +5899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5909,7 +5909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5919,7 +5919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5929,7 +5929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5939,7 +5939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5949,7 +5949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5959,7 +5959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5969,7 +5969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5979,7 +5979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5989,7 +5989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -5999,7 +5999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6009,7 +6009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6019,7 +6019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6029,7 +6029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6039,7 +6039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6049,7 +6049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6059,7 +6059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6069,7 +6069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6079,7 +6079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6089,7 +6089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6099,7 +6099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6109,7 +6109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6119,7 +6119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6129,7 +6129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6139,7 +6139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6149,7 +6149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6159,7 +6159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6169,7 +6169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6179,7 +6179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6189,7 +6189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6199,7 +6199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6209,7 +6209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6219,7 +6219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6229,7 +6229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6239,7 +6239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6249,7 +6249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6259,7 +6259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6269,7 +6269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6279,7 +6279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6289,7 +6289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6299,7 +6299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6309,7 +6309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6319,7 +6319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6329,7 +6329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6339,7 +6339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6349,7 +6349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6359,7 +6359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6369,7 +6369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6379,7 +6379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6389,7 +6389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6399,7 +6399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6409,7 +6409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6419,7 +6419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6429,7 +6429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6439,7 +6439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6449,7 +6449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6459,7 +6459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6469,7 +6469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6479,7 +6479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6489,7 +6489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6499,7 +6499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6509,7 +6509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6519,7 +6519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6529,7 +6529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6539,7 +6539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6549,7 +6549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6559,7 +6559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6569,7 +6569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6579,7 +6579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6589,7 +6589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6599,7 +6599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6609,7 +6609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6619,7 +6619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6629,7 +6629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6639,7 +6639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6649,7 +6649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6659,7 +6659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6669,7 +6669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6679,7 +6679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6689,7 +6689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6699,7 +6699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6709,7 +6709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6719,7 +6719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6729,7 +6729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6739,7 +6739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6749,7 +6749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6759,7 +6759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6769,7 +6769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6779,7 +6779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6789,7 +6789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6799,7 +6799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6809,7 +6809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6819,7 +6819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6829,7 +6829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6839,7 +6839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6849,7 +6849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6859,7 +6859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6869,7 +6869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6879,7 +6879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6889,7 +6889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6899,7 +6899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6909,7 +6909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6919,7 +6919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6929,7 +6929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6939,7 +6939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6949,7 +6949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6959,7 +6959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6969,7 +6969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6979,7 +6979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6989,7 +6989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -6999,7 +6999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7009,7 +7009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7019,7 +7019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7029,7 +7029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7039,7 +7039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7049,7 +7049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7059,7 +7059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7069,7 +7069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7079,7 +7079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7089,7 +7089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7099,7 +7099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7109,7 +7109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7119,7 +7119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7129,7 +7129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7139,7 +7139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7149,7 +7149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7159,7 +7159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7169,7 +7169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7179,7 +7179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7189,7 +7189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7199,7 +7199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7209,7 +7209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7219,7 +7219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7229,7 +7229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7239,7 +7239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7249,7 +7249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7259,7 +7259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7269,7 +7269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7279,7 +7279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7289,7 +7289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7299,7 +7299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7309,7 +7309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7319,7 +7319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7329,7 +7329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7339,7 +7339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7349,7 +7349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7359,7 +7359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7369,7 +7369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7379,7 +7379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7389,7 +7389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7399,7 +7399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7409,7 +7409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7419,7 +7419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7429,7 +7429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7439,7 +7439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7449,7 +7449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7459,7 +7459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7469,7 +7469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7479,7 +7479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7489,7 +7489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7499,7 +7499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7509,7 +7509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7519,7 +7519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7529,7 +7529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7539,7 +7539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7549,7 +7549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7559,7 +7559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7569,7 +7569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7579,7 +7579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7589,7 +7589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7599,7 +7599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7609,7 +7609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7619,7 +7619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7629,7 +7629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7639,7 +7639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7649,7 +7649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7659,7 +7659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7669,7 +7669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7679,7 +7679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7689,7 +7689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7699,7 +7699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7709,7 +7709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7719,7 +7719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7729,7 +7729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7739,7 +7739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7749,7 +7749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7759,7 +7759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7769,7 +7769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7779,7 +7779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7789,7 +7789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7799,7 +7799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7809,7 +7809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7819,7 +7819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7829,7 +7829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7839,7 +7839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7849,7 +7849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7859,7 +7859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7869,7 +7869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7879,7 +7879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7889,7 +7889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7899,7 +7899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7909,7 +7909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7919,7 +7919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7929,7 +7929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7939,7 +7939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7949,7 +7949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7959,7 +7959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7969,7 +7969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7979,7 +7979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7989,7 +7989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -7999,7 +7999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8009,7 +8009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8019,7 +8019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8029,7 +8029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8039,7 +8039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8049,7 +8049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8059,7 +8059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8069,7 +8069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8079,7 +8079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8089,7 +8089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8099,7 +8099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8109,7 +8109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8119,7 +8119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8129,7 +8129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8139,7 +8139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8149,7 +8149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8159,7 +8159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8169,7 +8169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8179,7 +8179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8189,7 +8189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8199,7 +8199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8209,7 +8209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8219,7 +8219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8229,7 +8229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8239,7 +8239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8249,7 +8249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8259,7 +8259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8269,7 +8269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8279,7 +8279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8289,7 +8289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8299,7 +8299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8309,7 +8309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8319,7 +8319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8329,7 +8329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8339,7 +8339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8349,7 +8349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8359,7 +8359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8369,7 +8369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8379,7 +8379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8389,7 +8389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8399,7 +8399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8409,7 +8409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8419,7 +8419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8429,7 +8429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8439,7 +8439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8449,7 +8449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8459,7 +8459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8469,7 +8469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8479,7 +8479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8489,7 +8489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8499,7 +8499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8509,7 +8509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8519,7 +8519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8529,7 +8529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8539,7 +8539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8549,7 +8549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8559,7 +8559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8569,7 +8569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8579,7 +8579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8589,7 +8589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8599,7 +8599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8609,7 +8609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8619,7 +8619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8629,7 +8629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8639,7 +8639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8649,7 +8649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8659,7 +8659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8669,7 +8669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8679,7 +8679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8689,7 +8689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8699,7 +8699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8709,7 +8709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8719,7 +8719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8729,7 +8729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8739,7 +8739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8749,7 +8749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8759,7 +8759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8769,7 +8769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8779,7 +8779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8789,7 +8789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8799,7 +8799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8809,7 +8809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8819,7 +8819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8829,7 +8829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8839,7 +8839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8849,7 +8849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8859,7 +8859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8869,7 +8869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8879,7 +8879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8889,7 +8889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8899,7 +8899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8909,7 +8909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8919,7 +8919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8929,7 +8929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8939,7 +8939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8949,7 +8949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8959,7 +8959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8969,7 +8969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8979,7 +8979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8989,7 +8989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -8999,7 +8999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9009,7 +9009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9019,7 +9019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9029,7 +9029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9039,7 +9039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9049,7 +9049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9059,7 +9059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9069,7 +9069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9079,7 +9079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9089,7 +9089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9099,7 +9099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9109,7 +9109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9119,7 +9119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9129,7 +9129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9139,7 +9139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9149,7 +9149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9159,7 +9159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9169,7 +9169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9179,7 +9179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9189,7 +9189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9199,7 +9199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9209,7 +9209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9219,7 +9219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9229,7 +9229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9239,7 +9239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9249,7 +9249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9259,7 +9259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9269,7 +9269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9279,7 +9279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9289,7 +9289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9299,7 +9299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9309,7 +9309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9319,7 +9319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9329,7 +9329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9339,7 +9339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9349,7 +9349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9359,7 +9359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9369,7 +9369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9379,7 +9379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9389,7 +9389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9399,7 +9399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9409,7 +9409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9419,7 +9419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9429,7 +9429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9439,7 +9439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9449,7 +9449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9459,7 +9459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9469,7 +9469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9479,7 +9479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9489,7 +9489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9499,7 +9499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9509,7 +9509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9519,7 +9519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9529,7 +9529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9539,7 +9539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9549,7 +9549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9559,7 +9559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9569,7 +9569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9579,7 +9579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9589,7 +9589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9599,7 +9599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9609,7 +9609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9619,7 +9619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9629,7 +9629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9639,7 +9639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9649,7 +9649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9659,7 +9659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9669,7 +9669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9679,7 +9679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9689,7 +9689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9699,7 +9699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9709,7 +9709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9719,7 +9719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9729,7 +9729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9739,7 +9739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9749,7 +9749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9759,7 +9759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9769,7 +9769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9779,7 +9779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9789,7 +9789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9799,7 +9799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9809,7 +9809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9819,7 +9819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9829,7 +9829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9839,7 +9839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9849,7 +9849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9859,7 +9859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9869,7 +9869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9879,7 +9879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9889,7 +9889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9899,7 +9899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9909,7 +9909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9919,7 +9919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9929,7 +9929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9939,7 +9939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9949,7 +9949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9959,7 +9959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9969,7 +9969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9979,7 +9979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9989,7 +9989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -9999,7 +9999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10009,7 +10009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10019,7 +10019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10029,7 +10029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10039,7 +10039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10049,7 +10049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10059,7 +10059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10069,7 +10069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10079,7 +10079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10089,7 +10089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10099,7 +10099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10109,7 +10109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10119,7 +10119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10129,7 +10129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10139,7 +10139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10149,7 +10149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10159,7 +10159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10169,7 +10169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10179,7 +10179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10189,7 +10189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10199,7 +10199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10209,7 +10209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10219,7 +10219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10229,7 +10229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10239,7 +10239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10249,7 +10249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10259,7 +10259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10269,7 +10269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10279,7 +10279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10289,7 +10289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10299,7 +10299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10309,7 +10309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10319,7 +10319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10329,7 +10329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10339,7 +10339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10349,7 +10349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10359,7 +10359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10369,7 +10369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10379,7 +10379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10389,7 +10389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10399,7 +10399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10409,7 +10409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10419,7 +10419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10429,7 +10429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10439,7 +10439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10449,7 +10449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10459,7 +10459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10469,7 +10469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10479,7 +10479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10489,7 +10489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10499,7 +10499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10509,7 +10509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10519,7 +10519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10529,7 +10529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10539,7 +10539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10549,7 +10549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10559,7 +10559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10569,7 +10569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10579,7 +10579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10589,7 +10589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10599,7 +10599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10609,7 +10609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10619,7 +10619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10629,7 +10629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10639,7 +10639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10649,7 +10649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10659,7 +10659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10669,7 +10669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10679,7 +10679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10689,7 +10689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10699,7 +10699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10709,7 +10709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10719,7 +10719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10729,7 +10729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10739,7 +10739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10749,7 +10749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10759,7 +10759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10769,7 +10769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10779,7 +10779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10789,7 +10789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10799,7 +10799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10809,7 +10809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10819,7 +10819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10829,7 +10829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10839,7 +10839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10849,7 +10849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10859,7 +10859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10869,7 +10869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10879,7 +10879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10889,7 +10889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10899,7 +10899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10909,7 +10909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10919,7 +10919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10929,7 +10929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10939,7 +10939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10949,7 +10949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10959,7 +10959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10969,7 +10969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10979,7 +10979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10989,7 +10989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -10999,7 +10999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11009,7 +11009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11019,7 +11019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11029,7 +11029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11039,7 +11039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11049,7 +11049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11059,7 +11059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11069,7 +11069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11079,7 +11079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11089,7 +11089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11099,7 +11099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11109,7 +11109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11119,7 +11119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11129,7 +11129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11139,7 +11139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11149,7 +11149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11159,7 +11159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11169,7 +11169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11179,7 +11179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11189,7 +11189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11199,7 +11199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11209,7 +11209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11219,7 +11219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11229,7 +11229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11239,7 +11239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11249,7 +11249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11259,7 +11259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11269,7 +11269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11279,7 +11279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11289,7 +11289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11299,7 +11299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11309,7 +11309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11319,7 +11319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11329,7 +11329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11339,7 +11339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11349,7 +11349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11359,7 +11359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11369,7 +11369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11379,7 +11379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11389,7 +11389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11399,7 +11399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11409,7 +11409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11419,7 +11419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11429,7 +11429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11439,7 +11439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11449,7 +11449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11459,7 +11459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11469,7 +11469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11479,7 +11479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11489,7 +11489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11499,7 +11499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11509,7 +11509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11519,7 +11519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11529,7 +11529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11539,7 +11539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11549,7 +11549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11559,7 +11559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11569,7 +11569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11579,7 +11579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11589,7 +11589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11599,7 +11599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11609,7 +11609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11619,7 +11619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11629,7 +11629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11639,7 +11639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11649,7 +11649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11659,7 +11659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11669,7 +11669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11679,7 +11679,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11689,7 +11689,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11699,7 +11699,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11709,7 +11709,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11719,7 +11719,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11729,7 +11729,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11739,7 +11739,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11749,7 +11749,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11759,7 +11759,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11769,7 +11769,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11779,7 +11779,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11789,7 +11789,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11799,7 +11799,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11809,7 +11809,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11819,7 +11819,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11829,7 +11829,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11839,7 +11839,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11849,7 +11849,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11859,7 +11859,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11869,7 +11869,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11879,7 +11879,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11889,7 +11889,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11899,7 +11899,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11909,7 +11909,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11919,7 +11919,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11929,7 +11929,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11939,7 +11939,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11949,7 +11949,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11959,7 +11959,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11969,7 +11969,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11979,7 +11979,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11989,7 +11989,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -11999,7 +11999,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12009,7 +12009,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12019,7 +12019,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12029,7 +12029,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12039,7 +12039,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12049,7 +12049,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12059,7 +12059,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12069,7 +12069,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12079,7 +12079,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12089,7 +12089,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12099,7 +12099,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12109,7 +12109,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12119,7 +12119,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12129,7 +12129,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12139,7 +12139,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12149,7 +12149,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12159,7 +12159,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12169,7 +12169,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12179,7 +12179,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12189,7 +12189,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12199,7 +12199,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12209,7 +12209,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12219,7 +12219,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12229,7 +12229,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12239,7 +12239,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12249,7 +12249,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12259,7 +12259,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12269,7 +12269,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12279,7 +12279,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12289,7 +12289,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12299,7 +12299,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12309,7 +12309,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12319,7 +12319,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12329,7 +12329,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12339,7 +12339,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12349,7 +12349,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12359,7 +12359,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12369,7 +12369,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12379,7 +12379,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12389,7 +12389,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12399,7 +12399,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12409,7 +12409,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12419,7 +12419,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12429,7 +12429,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12439,7 +12439,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12449,7 +12449,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12459,7 +12459,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12469,7 +12469,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12479,7 +12479,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12489,7 +12489,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12499,7 +12499,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12509,7 +12509,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12519,7 +12519,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12529,7 +12529,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12539,7 +12539,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12549,7 +12549,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12559,7 +12559,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12569,7 +12569,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12579,7 +12579,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12589,7 +12589,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12599,7 +12599,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12609,7 +12609,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12619,7 +12619,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12629,7 +12629,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12639,7 +12639,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12649,7 +12649,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12659,7 +12659,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12669,7 +12669,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12682,7 +12682,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12695,7 +12695,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12708,7 +12708,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12721,7 +12721,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12731,7 +12731,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12741,7 +12741,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12751,7 +12751,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12761,7 +12761,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12771,7 +12771,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12781,7 +12781,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12791,7 +12791,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12801,7 +12801,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12811,7 +12811,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12821,7 +12821,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12831,7 +12831,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12841,7 +12841,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12851,7 +12851,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12861,7 +12861,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12871,7 +12871,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12881,7 +12881,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12891,7 +12891,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12901,7 +12901,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12911,7 +12911,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12921,7 +12921,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12931,7 +12931,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12941,7 +12941,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12951,7 +12951,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12961,7 +12961,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12971,7 +12971,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12981,7 +12981,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -12991,7 +12991,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13001,7 +13001,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13011,7 +13011,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13021,7 +13021,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13031,7 +13031,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13041,7 +13041,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13051,7 +13051,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13061,7 +13061,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13071,7 +13071,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13081,7 +13081,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13091,7 +13091,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13101,7 +13101,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13111,7 +13111,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13121,7 +13121,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13131,7 +13131,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13141,7 +13141,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13151,7 +13151,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13161,7 +13161,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13171,7 +13171,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13181,7 +13181,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13191,7 +13191,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13201,7 +13201,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13211,7 +13211,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13221,7 +13221,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13231,7 +13231,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13241,7 +13241,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13251,7 +13251,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13261,7 +13261,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13271,7 +13271,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13281,7 +13281,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13291,7 +13291,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13304,7 +13304,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13314,7 +13314,7 @@ class Device
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
@@ -13327,7 +13327,7 @@ class Device
             if ($deviceCode === $device->getDeviceName()) {
                 $deviceBrand       = $device->getBrand();
                 $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
                 $deviceMaker       = $device->getManufacturer();
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
@@ -13339,7 +13339,7 @@ class Device
                 $deviceBrand       = $device->getBrand();
                 $deviceCode        = $device->getDeviceName();
                 $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
                 $deviceMaker       = $device->getManufacturer();
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
@@ -13347,7 +13347,7 @@ class Device
                 $deviceBrand       = $device->getBrand();
                 $deviceCode        = $device->getDeviceName();
                 $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
                 $deviceMaker       = $device->getManufacturer();
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
@@ -13361,7 +13361,7 @@ class Device
                 $deviceBrand       = $device->getBrand();
                 $deviceCode        = $device->getDeviceName();
                 $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
                 $deviceMaker       = $device->getManufacturer();
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
@@ -13372,7 +13372,7 @@ class Device
                 $deviceBrand       = $device->getBrand();
                 $deviceCode        = $device->getDeviceName();
                 $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
                 $deviceMaker       = $device->getManufacturer();
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
@@ -13383,7 +13383,7 @@ class Device
                 $deviceBrand       = $device->getBrand();
                 $deviceCode        = $device->getDeviceName();
                 $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
                 $deviceMaker       = $device->getManufacturer();
                 $deviceName        = $device->getMarketingName();
                 $deviceOrientation = $device->getDualOrientation();
@@ -13401,7 +13401,7 @@ class Device
                 $devicePointing    = $device->getPointingMethod();
             }
             if (null === $deviceType) {
-                $deviceType        = $device->getType()->getName();
+                $deviceType        = $device->getType();
             }
             if (null === $deviceMaker) {
                 $deviceMaker       = $device->getManufacturer();
@@ -13418,8 +13418,8 @@ class Device
         } else {
             $deviceBrand       = 'unknown';
             $deviceCode        = 'unknown';
-            $devicePointing    = 'unknown';
-            $deviceType        = 'unknown';
+            $devicePointing    = null;
+            $deviceType        = null;
             $deviceMaker       = 'unknown';
             $deviceName        = 'unknown';
             $deviceOrientation = false;
