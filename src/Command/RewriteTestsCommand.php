@@ -163,13 +163,17 @@ class RewriteTestsCommand extends Command
                 continue;
             }
 
+            $counter = count(get_object_vars($tests));
+
+            $output->writeln('    contains ' . $counter . ' tests');
+
             foreach ($testCounter as $group => $filesinGroup) {
                 foreach (array_keys($filesinGroup) as $fileinGroup) {
                     if ($fileinGroup !== $filename) {
                         continue;
                     }
 
-                    $testCounter[$group][$fileinGroup] += count($tests);
+                    $testCounter[$group][$fileinGroup] += $counter;
                 }
             }
 
@@ -301,7 +305,7 @@ test:
 
         file_put_contents(
             $file->getPath() . '/' . $basename . '.json',
-            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
         );
     }
 
@@ -405,6 +409,7 @@ test:
                 $detector
             );
 
+            /** @var $deviceType \UaDeviceType\TypeInterface */
             /** @var $device \UaResult\Device\DeviceInterface */
 
             if (null !== ($platform = $device->getPlatform())) {
@@ -431,13 +436,13 @@ test:
             if (isset($test->properties->Device_Type)) {
                 $deviceType = $test->properties->Device_Type;
             } else {
-                $deviceType = 'unknown';
+                $deviceType = null;
             }
 
             if (isset($test->properties->Device_Pointing_Method)) {
                 $devicePointing = $test->properties->Device_Pointing_Method;
             } else {
-                $devicePointing = 'unknown';
+                $devicePointing = null;
             }
 
             if (isset($test->properties->Device_Code_Name)) {
@@ -455,7 +460,7 @@ test:
             if (isset($test->properties->Device_Dual_Orientation)) {
                 $deviceOrientation = $test->properties->Device_Dual_Orientation;
             } else {
-                $deviceOrientation = 'unknown';
+                $deviceOrientation = false;
             }
 
             $device = null;
@@ -480,7 +485,7 @@ test:
                     'Platform_Brand_Name'     => $platformBrandname,
                     'Device_Name'             => $deviceName,
                     'Device_Maker'            => $deviceMaker,
-                    'Device_Type'             => $deviceType,
+                    'Device_Type'             => get_class($deviceType),
                     'Device_Pointing_Method'  => $devicePointing,
                     'Device_Dual_Orientation' => $deviceOrientation,
                     'Device_Code_Name'        => $deviceCode,
@@ -1278,13 +1283,13 @@ test:
         if (isset($test->properties->Device_Pointing_Method)) {
             $devicePointing = $test->properties->Device_Pointing_Method;
         } else {
-            $devicePointing = 'unknown';
+            $devicePointing = null;
         }
 
         if (isset($test->properties->Device_Type)) {
             $deviceType = $test->properties->Device_Type;
         } else {
-            $deviceType = 'unknown';
+            $deviceType = null;
         }
 
         if (isset($test->properties->Device_Maker)) {
@@ -1302,7 +1307,7 @@ test:
         if (isset($test->properties->Device_Dual_Orientation)) {
             $deviceOrientation = $test->properties->Device_Dual_Orientation;
         } else {
-            $deviceOrientation = 'unknown';
+            $deviceOrientation = false;
         }
 
         list(
@@ -1326,6 +1331,7 @@ test:
             $deviceName,
             $deviceOrientation
         );
+        /** @var $deviceType \UaDeviceType\TypeInterface */
 
         if ($deviceCode === 'unknown'
             || $deviceCode === null
@@ -1337,7 +1343,7 @@ test:
             $deviceBrand       = $device->getBrand();
             $deviceCode        = $device->getDeviceName();
             $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType()->getName();
+            $deviceType        = $device->getType();
             $deviceMaker       = $device->getManufacturer();
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
