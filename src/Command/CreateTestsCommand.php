@@ -21,7 +21,6 @@ use BrowscapHelper\Helper\Device;
 use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Reader\LogFileReader;
-use BrowscapHelper\Reader\TxtFileReader;
 use BrowscapHelper\Reader\YamlFileReader;
 use BrowserDetector\BrowserDetector;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
@@ -155,21 +154,13 @@ class CreateTestsCommand extends Command
 
             switch ($file->getExtension()) {
                 case 'txt':
-                    $reader = new TxtFileReader();
+                    $reader = new LogFileReader();
                     $reader->setLocalFile($file->getPathname());
 
                     $fileContents = $reader->getAgents();
                     break;
                 case 'yaml':
                     $reader = new YamlFileReader();
-                    $reader->setLocalFile($file->getPathname());
-
-                    $fileContents = $reader->getAgents();
-                    break;
-                case 'gz':
-                case 'bz2':
-                case 'tgz':
-                    $reader = new LogFileReader();
                     $reader->setLocalFile($file->getPathname());
 
                     $fileContents = $reader->getAgents();
@@ -221,7 +212,10 @@ class CreateTestsCommand extends Command
         $outputBrowscap .= "];\n";
 
         file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
-        file_put_contents('results/browscap-issue-' . $issue . '.json', json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        file_put_contents(
+            'results/browscap-issue-' . $issue . '.json',
+            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
+        );
 
         return $counter;
     }
@@ -271,6 +265,7 @@ class CreateTestsCommand extends Command
         $platform   = new Os('unknown', 'unknown', 'unknown', 'unknown');
         $deviceCode = 'unknown';
 
+        /** @var $deviceType \UaDeviceType\TypeInterface */
         list(
             $deviceName,
             $deviceMaker,
@@ -334,7 +329,7 @@ class CreateTestsCommand extends Command
             'AolVersion' => '0',
             'Device_Name' => '" . $deviceName . "',
             'Device_Maker' => '" . $deviceMaker . "',
-            'Device_Type' => '" . $deviceType . "',
+            'Device_Type' => '" . $deviceType->getName() . "',
             'Device_Pointing_Method' => '" . $pointingMethod . "',
             'Device_Code_Name' => '" . $deviceCodename . "',
             'Device_Brand_Name' => '" . $deviceBrandname . "',
@@ -366,7 +361,7 @@ class CreateTestsCommand extends Command
                 'Platform_Brand_Name'     => $platformMakerBrandnameDetector,
                 'Device_Name'             => $deviceName,
                 'Device_Maker'            => $deviceMaker,
-                'Device_Type'             => $deviceType,
+                'Device_Type'             => get_class($deviceType),
                 'Device_Pointing_Method'  => $pointingMethod,
                 'Device_Dual_Orientation' => $deviceOrientation,
                 'Device_Code_Name'        => $deviceCodename,
