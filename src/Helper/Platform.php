@@ -17,6 +17,10 @@
 namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Bits\Os;
+use BrowserDetector\Loader\PlatformLoader;
+use BrowserDetector\Factory;
+use Psr\Cache\CacheItemPoolInterface;
+use BrowserDetector\BrowserDetector;
 
 /**
  * Class DiffCommand
@@ -27,165 +31,362 @@ use BrowserDetector\Bits\Os;
 class Platform
 {
     /**
-     * @param string $ua
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param string                            $useragent
+     * @param \BrowserDetector\BrowserDetector  $detector
+     * @param string                            $platformCodenameDetector
+     * @param string                            $platformMarketingnameDetector
+     * @param string                            $platformMakerNameDetector
+     * @param string                            $platformMakerBrandnameDetector
+     * @param string                            $platformVersionDetector
      *
+     * @throws \BrowserDetector\Loader\NotFoundException
+     * @throws \UnexpectedValueException
      * @return array
      */
-    public function detect($ua)
+    public function detect(
+        CacheItemPoolInterface $cache,
+        $useragent,
+        BrowserDetector $detector,
+        $platformCodenameDetector,
+        $platformMarketingnameDetector  = 'unknown',
+        $platformMakerNameDetector      = 'unknown',
+        $platformMakerBrandnameDetector = 'unknown',
+        $platformVersionDetector        = 'unknown'
+    )
     {
         $platformNameBrowscap           = 'unknown';
-        $platformCodenameDetector       = 'unknown';
-        $platformMarketingnameDetector  = 'unknown';
         $platformVersionBrowscap        = 'unknown';
-        $platformVersionDetector        = 'unknown';
         $platformMakerBrowscap          = 'unknown';
-        $platformMakerNameDetector      = 'unknown';
-        $platformMakerBrandnameDetector = 'unknown';
         $platformDescriptionBrowscap    = 'unknown';
 
-        $platformBits = (new Os($ua))->getBits();
+        $platformLoader = new PlatformLoader($cache);
+        $platformBits   = (new Os($useragent))->getBits();
 
         $win16    = false;
         $win32    = false;
         $win64    = false;
         $standard = true;
 
-        if (false !== strpos($ua, 'Windows Phone')) {
-            $platformNameBrowscap           = 'WinPhone';
-            $platformCodenameDetector       = 'Windows Phone OS';
-            $platformMarketingnameDetector  = 'Windows Phone OS';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
+        if (preg_match('/windows phone/i', $useragent)) {
+            $platform = $platformLoader->load('windows phone', $useragent);
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'wds')) {
-            $platformNameBrowscap           = 'Windows Phone OS';
-            $platformCodenameDetector       = 'Windows Phone OS';
-            $platformMarketingnameDetector  = 'Windows Phone OS';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
+            $platformNameBrowscap        = 'WinPhone';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
 
-            if (preg_match('/wds (\d+\.\d+)/', $ua, $matches)) {
-                $platformVersionBrowscap = $matches[1];
-                $platformVersionDetector = $matches[1];
-            }
-        } elseif (false !== stripos($ua, 'wpdesktop')) {
-            $platformNameBrowscap           = 'WinPhone';
-            $platformCodenameDetector       = 'Windows Phone OS';
-            $platformMarketingnameDetector  = 'Windows Phone OS';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/Puffin\/[\d\.]+I(T|P)/', $useragent)) {
+            $platform = $platformLoader->load('ios', $useragent);
 
+            $platformNameBrowscap           = 'iOS';
+            $platformMakerBrowscap          = 'Apple Inc';
+            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/Puffin\/[\d\.]+A(T|P)/', $useragent)) {
+            $platform = $platformLoader->load('android', $useragent);
+
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
+            $platformDescriptionBrowscap = 'Android OS';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/Puffin\/[\d\.]+W(T|P)/', $useragent)) {
+            $platform = $platformLoader->load('windows phone', $useragent);
+
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'Ubuntu Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Windows Phone')) {
+            $platform = $platformLoader->load('windows phone', $useragent);
+
+            $platformNameBrowscap        = 'WinPhone';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'Tizen')) {
-            $platformNameBrowscap           = 'Tizen';
-            $platformCodenameDetector       = 'Tizen';
-            $platformMarketingnameDetector  = 'Tizen';
-            $platformMakerBrowscap          = 'unknown';
-            $platformMakerNameDetector      = 'unknown';
-            $platformMakerBrandnameDetector = 'unknown';
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'Windows CE')) {
-            $platformNameBrowscap           = 'WinCE';
-            $platformCodenameDetector       = 'Windows CE';
-            $platformMarketingnameDetector  = 'Windows CE';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/Windows Mobile; WCE/', $useragent)) {
+            $platform = $platformLoader->load('windows ce', $useragent);
 
+            $platformNameBrowscap        = 'WinCE';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'Windows CE';
-        } elseif (false !== strpos($ua, 'Linux; Android')) {
-            $platformNameBrowscap           = 'Android';
-            $platformCodenameDetector       = 'Android';
-            $platformMarketingnameDetector  = 'Android';
-            $platformMakerBrowscap          = 'Google Inc';
-            $platformMakerNameDetector      = 'Google Inc';
-            $platformMakerBrandnameDetector = 'Google';
 
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/windows ce/i', $useragent)) {
+            $platform = $platformLoader->load('windows ce', $useragent);
 
-            if (preg_match('/Linux; Android (\d+\.\d+)/', $ua, $matches)) {
+            $platformNameBrowscap        = 'WinCE';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
+            $platformDescriptionBrowscap = 'Windows CE';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'wds')) {
+            $platform = $platformLoader->load('windows phone', $useragent);
+
+            $platformNameBrowscap        = 'WinPhone';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/wds (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
                 $platformVersionDetector = $matches[1];
             }
-        } elseif (false !== strpos($ua, 'Linux; U; Android')) {
-            $platformNameBrowscap           = 'Android';
-            $platformCodenameDetector       = 'Android';
-            $platformMarketingnameDetector  = 'Android';
-            $platformMakerBrowscap          = 'Google Inc';
-            $platformMakerNameDetector      = 'Google Inc';
-            $platformMakerBrandnameDetector = 'Google';
+        } elseif (false !== stripos($useragent, 'wpdesktop')) {
+            $platform = $platformLoader->load('windows phone', $useragent);
 
+            $platformNameBrowscap        = 'WinPhone';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'xblwp7')) {
+            $platform = $platformLoader->load('windows phone', $useragent);
+
+            $platformNameBrowscap        = 'WinPhone';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'zunewp7')) {
+            $platform = $platformLoader->load('windows phone', $useragent);
+
+            $platformNameBrowscap        = 'WinPhone';
+            $platformMakerBrowscap       = 'Microsoft Corporation';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Tizen')) {
+            $platform = $platformLoader->load('tizen', $useragent);
+
+            $platformNameBrowscap           = 'Tizen';
+            $platformMakerBrowscap          = 'unknown';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/MIUI/', $useragent)) {
+            $platform = $platformLoader->load('miui os', $useragent);
+
+            $platformNameBrowscap        = 'Miui OS';
+            $platformMakerBrowscap       = 'Xiaomi Tech';
+            $platformDescriptionBrowscap = 'a fork of Android OS by Xiaomi';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Linux; Android')) {
+            $platform = $platformLoader->load('android', $useragent);
+
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap = 'Android OS';
 
-            if (preg_match('/Linux; U; Android (\d+\.\d+)/', $ua, $matches)) {
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/Linux; Android (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
                 $platformVersionDetector = $matches[1];
             }
-        } elseif (false !== strpos($ua, 'U; Adr')) {
-            $platformNameBrowscap           = 'Android';
-            $platformCodenameDetector       = 'Android';
-            $platformMarketingnameDetector  = 'Android';
-            $platformMakerBrowscap          = 'Google Inc';
-            $platformMakerNameDetector      = 'Google Inc';
-            $platformMakerBrandnameDetector = 'Google';
+        } elseif (false !== strpos($useragent, 'Linux; U; Android')) {
+            $platform = $platformLoader->load('android', $useragent);
 
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap = 'Android OS';
 
-            if (preg_match('/U; Adr (\d+\.\d+)/', $ua, $matches)) {
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/Linux; U; Android (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
                 $platformVersionDetector = $matches[1];
             }
-        } elseif (false !== strpos($ua, 'Android') || false !== strpos($ua, 'MTK')) {
-            $platformNameBrowscap           = 'Android';
-            $platformCodenameDetector       = 'Android';
-            $platformMarketingnameDetector  = 'Android';
-            $platformMakerBrowscap          = 'Google Inc';
-            $platformMakerNameDetector      = 'Google Inc';
-            $platformMakerBrandnameDetector = 'Google';
+        } elseif (false !== strpos($useragent, 'U; Adr')) {
+            $platform = $platformLoader->load('android', $useragent);
 
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap = 'Android OS';
-        } elseif (false !== strpos($ua, 'OpenBSD')) {
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/U; Adr (\d+\.\d+)/', $useragent, $matches)) {
+                $platformVersionBrowscap = $matches[1];
+                $platformVersionDetector = $matches[1];
+            }
+        } elseif (false !== strpos($useragent, 'Android') || false !== strpos($useragent, 'MTK')) {
+            $platform = $platformLoader->load('android', $useragent);
+
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
+            $platformDescriptionBrowscap = 'Android OS';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'UCWEB/2.0 (Linux; U; Opera Mini')) {
+            $platform = $platformLoader->load('android', $useragent);
+
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
+            $platformDescriptionBrowscap = 'Android OS';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Linux; GoogleTV')) {
+            $platform = $platformLoader->load('android', $useragent);
+
+            $platformNameBrowscap           = 'Android';
+            $platformMakerBrowscap          = 'Google Inc';
+            $platformDescriptionBrowscap = 'Android OS';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'OpenBSD')) {
+            $platform = $platformLoader->load('openbsd', $useragent);
+
             $platformNameBrowscap          = 'OpenBSD';
-            $platformCodenameDetector      = 'OpenBSD';
-            $platformMarketingnameDetector = 'OpenBSD';
-
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'Symbian') || false !== strpos($ua, 'Series 60')) {
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Symbian') || false !== strpos($useragent, 'Series 60')) {
+            $platform = $platformLoader->load('symbian', $useragent);
+
             $platformNameBrowscap           = 'SymbianOS';
-            $platformCodenameDetector       = 'Symbian OS';
-            $platformMarketingnameDetector  = 'Symbian OS';
             $platformMakerBrowscap          = 'Symbian Foundation';
-            $platformMakerNameDetector      = 'Symbian Foundation';
-            $platformMakerBrandnameDetector = 'Symbian';
-
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'MIDP')) {
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'MIDP')) {
+            $platform = $platformLoader->load('java', $useragent);
+
             $platformNameBrowscap           = 'JAVA';
-            $platformCodenameDetector       = 'Java';
-            $platformMarketingnameDetector  = 'Java';
             $platformMakerBrowscap          = 'Oracle';
-            $platformMakerNameDetector      = 'Oracle';
-            $platformMakerBrandnameDetector = 'Oracle';
-
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'Windows NT 10.0')) {
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Windows NT 10.0')) {
+            $platform = $platformLoader->load('windows nt 10.0', $useragent);
+
             $platformNameBrowscap           = 'Win10';
-            $platformCodenameDetector       = 'Windows NT 10.0';
-            $platformMarketingnameDetector  = 'Windows 10';
             $platformVersionBrowscap        = '10.0';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -194,17 +395,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.4')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6.4')) {
+            $platform = $platformLoader->load('windows nt 6.4', $useragent);
+
             $platformNameBrowscap           = 'Win10';
-            $platformCodenameDetector       = 'Windows NT 6.4';
-            $platformMarketingnameDetector  = 'Windows 10';
             $platformVersionBrowscap        = '6.4';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -213,17 +417,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.3') && false !== strpos($ua, 'ARM')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6.3') && false !== strpos($useragent, 'ARM')) {
+            $platform = $platformLoader->load('windows nt 6.3; arm', $useragent);
+
             $platformNameBrowscap           = 'Win8.1';
-            $platformCodenameDetector       = 'Windows RT 8.1';
-            $platformMarketingnameDetector  = 'Windows RT 8.1';
             $platformVersionBrowscap        = '6.3';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -232,17 +439,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.3')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6.3')) {
+            $platform = $platformLoader->load('windows nt 6.3', $useragent);
+
             $platformNameBrowscap           = 'Win8.1';
-            $platformCodenameDetector       = 'Windows NT 6.3';
-            $platformMarketingnameDetector  = 'Windows 8.1';
             $platformVersionBrowscap        = '6.3';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -251,17 +461,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.2') && false !== strpos($ua, 'ARM')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6.2') && false !== strpos($useragent, 'ARM')) {
+            $platform = $platformLoader->load('windows nt 6.2; arm', $useragent);
+
             $platformNameBrowscap           = 'Win8';
-            $platformCodenameDetector       = 'Windows RT 8';
-            $platformMarketingnameDetector  = 'Windows RT 8';
             $platformVersionBrowscap        = '6.2';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -270,17 +483,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.2')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6.2')) {
+            $platform = $platformLoader->load('windows nt 6.2', $useragent);
+
             $platformNameBrowscap           = 'Win8';
-            $platformCodenameDetector       = 'Windows NT 6.2';
-            $platformMarketingnameDetector  = 'Windows 8';
             $platformVersionBrowscap        = '6.2';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -289,17 +505,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.1')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6.1')) {
+            $platform = $platformLoader->load('windows nt 6.1', $useragent);
+
             $platformNameBrowscap           = 'Win7';
-            $platformCodenameDetector       = 'Windows NT 6.1';
-            $platformMarketingnameDetector  = 'Windows 7';
             $platformVersionBrowscap        = '6.1';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -308,17 +527,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 6.0')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 6')) {
+            $platform = $platformLoader->load('windows nt 6.0', $useragent);
+
             $platformNameBrowscap           = 'WinVista';
-            $platformCodenameDetector       = 'Windows NT 6.0';
-            $platformMarketingnameDetector  = 'Windows Vista';
             $platformVersionBrowscap        = '6.0';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -327,17 +549,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 5.3')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 5.3')) {
+            $platform = $platformLoader->load('windows nt 5.3', $useragent);
+
             $platformNameBrowscap           = 'WinXP';
-            $platformCodenameDetector       = 'Windows NT 5.3';
-            $platformMarketingnameDetector  = 'Windows XP';
             $platformVersionBrowscap        = '5.3';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -346,17 +571,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 5.2')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 5.2')) {
+            $platform = $platformLoader->load('windows nt 5.2', $useragent);
+
             $platformNameBrowscap           = 'WinXP';
-            $platformCodenameDetector       = 'Windows NT 5.2';
-            $platformMarketingnameDetector  = 'Windows XP';
             $platformVersionBrowscap        = '5.2';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -365,17 +593,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 5.1')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 5.1')) {
+            $platform = $platformLoader->load('windows nt 5.1', $useragent);
+
             $platformNameBrowscap           = 'WinXP';
-            $platformCodenameDetector       = 'Windows NT 5.1';
-            $platformMarketingnameDetector  = 'Windows XP';
             $platformVersionBrowscap        = '5.1';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -384,17 +615,20 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($ua, 'Windows NT 5.01')) {
-            $platformNameBrowscap           = 'Win2000';
-            $platformCodenameDetector       = 'Windows NT 5.01';
-            $platformMarketingnameDetector  = 'Windows 2000';
-            $platformVersionBrowscap        = '5.0';
-            $platformVersionDetector        = '0.0.0';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
+        } elseif (false !== strpos($useragent, 'Windows NT 5.01')) {
+            $platform = $platformLoader->load('windows nt 5.01', $useragent);
 
+            $platformNameBrowscap           = 'Win2000';
+            $platformVersionBrowscap        = '5.0';
+            $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -405,17 +639,20 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'Windows NT 5.0')) {
-            $platformNameBrowscap           = 'Win2000';
-            $platformCodenameDetector       = 'Windows NT 5.0';
-            $platformMarketingnameDetector  = 'Windows 2000';
-            $platformVersionBrowscap        = '5.0';
-            $platformVersionDetector        = '0.0.0';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
+        } elseif (false !== strpos($useragent, 'Windows NT 5.0')) {
+            $platform = $platformLoader->load('windows nt 5.0', $useragent);
 
+            $platformNameBrowscap           = 'Win2000';
+            $platformVersionBrowscap        = '5.0';
+            $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -426,17 +663,20 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'Windows NT 4.1')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 4.10')) {
+            $platform = $platformLoader->load('windows nt 4.10', $useragent);
+
             $platformNameBrowscap           = 'WinNT';
-            $platformCodenameDetector       = 'Windows NT 4.1';
-            $platformMarketingnameDetector  = 'Windows NT';
             $platformVersionBrowscap        = '4.1';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -447,17 +687,44 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'Windows NT 4.0')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 4.1')) {
+            $platform = $platformLoader->load('windows nt 4.1', $useragent);
+
             $platformNameBrowscap           = 'WinNT';
-            $platformCodenameDetector       = 'Windows NT 4.0';
-            $platformMarketingnameDetector  = 'Windows NT';
+            $platformVersionBrowscap        = '4.1';
+            $platformMakerBrowscap          = 'Microsoft Corporation';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if ($platformBits === 64) {
+                $win64 = true;
+            } elseif ($platformBits === 32) {
+                $win32 = true;
+            } elseif ($platformBits === 16) {
+                $win16 = true;
+            }
+
+            $standard = false;
+        } elseif (false !== strpos($useragent, 'Windows NT 4.0')) {
+            $platform = $platformLoader->load('windows nt 4.0', $useragent);
+
+            $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = '4.0';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -468,17 +735,20 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'Windows NT 3.5')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 3.5')) {
+            $platform = $platformLoader->load('windows nt 3.5', $useragent);
+
             $platformNameBrowscap           = 'WinNT';
-            $platformCodenameDetector       = 'Windows NT 3.5';
-            $platformMarketingnameDetector  = 'Windows NT';
             $platformVersionBrowscap        = '3.5';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -489,17 +759,20 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'Windows NT 3.1')) {
+        } elseif (false !== strpos($useragent, 'Windows NT 3.1')) {
+            $platform = $platformLoader->load('windows nt 3.1', $useragent);
+
             $platformNameBrowscap           = 'WinNT';
-            $platformCodenameDetector       = 'Windows NT 3.1';
-            $platformMarketingnameDetector  = 'Windows NT';
             $platformVersionBrowscap        = '3.1';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -510,17 +783,20 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'Windows NT')) {
+        } elseif (false !== strpos($useragent, 'Windows[ \-]NT')) {
+            $platform = $platformLoader->load('windows nt', $useragent);
+
             $platformNameBrowscap           = 'WinNT';
-            $platformCodenameDetector       = 'Windows NT';
-            $platformMarketingnameDetector  = 'Windows NT';
             $platformVersionBrowscap        = 'unknown';
-            $platformVersionDetector        = '0.0.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
-
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -531,17 +807,20 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== stripos($ua, 'cygwin')) {
-            $platformNameBrowscap           = 'Cygwin';
-            $platformCodenameDetector       = 'Cygwin';
-            $platformMarketingnameDetector  = 'Cygwin';
-            $platformVersionBrowscap        = 'unknown';
-            $platformVersionDetector        = '0.0.0';
-            $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformMakerNameDetector      = 'Microsoft Corporation';
-            $platformMakerBrandnameDetector = 'Microsoft';
+        } elseif (false !== stripos($useragent, 'cygwin')) {
+            $platform = $platformLoader->load('cygwin', $useragent);
 
+            $platformNameBrowscap           = 'CygWin';
+            $platformVersionBrowscap        = 'unknown';
+            $platformMakerBrowscap          = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if ($platformBits === 64) {
                 $win64 = true;
@@ -552,68 +831,88 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($ua, 'CPU OS')) {
-            $platformNameBrowscap           = 'iOS';
-            $platformCodenameDetector       = 'iOS';
-            $platformMarketingnameDetector  = 'iOS';
-            $platformMakerBrowscap          = 'Apple Inc';
-            $platformMakerNameDetector      = 'Apple Inc';
-            $platformMakerBrandnameDetector = 'Apple';
+        } elseif (false !== strpos($useragent, 'CPU OS')) {
+            $platform = $platformLoader->load('ios', $useragent);
 
+            $platformNameBrowscap           = 'iOS';
+            $platformMakerBrowscap          = 'Apple Inc';
             $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
-            if (preg_match('/CPU OS (\d+\_\d+)/', $ua, $matches)) {
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/CPU OS (\d+\_\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
                 $platformVersionDetector = str_replace('_', '.', $matches[1]);
             }
-        } elseif (false !== strpos($ua, 'CPU iPhone OS')) {
-            $platformNameBrowscap           = 'iOS';
-            $platformCodenameDetector       = 'iOS';
-            $platformMarketingnameDetector  = 'iOS';
-            $platformMakerBrowscap          = 'Apple Inc';
-            $platformMakerNameDetector      = 'Apple Inc';
-            $platformMakerBrandnameDetector = 'Apple';
+        } elseif (false !== strpos($useragent, 'CPU iPhone OS')) {
+            $platform = $platformLoader->load('ios', $useragent);
 
+            $platformNameBrowscap           = 'iOS';
+            $platformMakerBrowscap          = 'Apple Inc';
             $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
-            if (preg_match('/CPU iPhone OS (\d+\_\d+)/', $ua, $matches)) {
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/CPU iPhone OS (\d+\_\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
                 $platformVersionDetector = str_replace('_', '.', $matches[1]);
             }
-        } elseif (false !== strpos($ua, 'CPU like Mac OS X')) {
-            $platformNameBrowscap           = 'iOS';
-            $platformCodenameDetector       = 'iOS';
-            $platformMarketingnameDetector  = 'iOS';
-            $platformMakerBrowscap          = 'Apple Inc';
-            $platformMakerNameDetector      = 'Apple Inc';
-            $platformMakerBrandnameDetector = 'Apple';
+        } elseif (false !== strpos($useragent, 'CPU like Mac OS X')) {
+            $platform = $platformLoader->load('ios', $useragent);
 
+            $platformNameBrowscap           = 'iOS';
+            $platformMakerBrowscap          = 'Apple Inc';
             $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
 
-            if (preg_match('/CPU like Mac OS X (\d+\_\d+)/', $ua, $matches)) {
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+
+            if (preg_match('/CPU like Mac OS X (\d+\_\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
                 $platformVersionDetector = str_replace('_', '.', $matches[1]);
             }
-        } elseif (false !== strpos($ua, 'iOS')) {
-            $platformNameBrowscap           = 'iOS';
-            $platformCodenameDetector       = 'iOS';
-            $platformMarketingnameDetector  = 'iOS';
-            $platformMakerBrowscap          = 'Apple Inc';
-            $platformMakerNameDetector      = 'Apple Inc';
-            $platformMakerBrandnameDetector = 'Apple';
+        } elseif (false !== strpos($useragent, 'iOS')) {
+            $platform = $platformLoader->load('ios', $useragent);
 
-            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
-        } elseif (false !== strpos($ua, 'Mac OS X')) {
+            $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
-            $platformMakerNameDetector      = 'Apple Inc';
-            $platformMakerBrandnameDetector = 'Apple';
+            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Mac OS X')) {
+            $platform = $platformLoader->load('mac os x', $useragent);
+
+            $platformMakerBrowscap          = 'Apple Inc';
 
             $platformDescriptionBrowscap = 'Mac OS X';
 
-            if (preg_match('/Mac OS X (\d+[\_\.]\d+)/', $ua, $matches)) {
+            if (preg_match('/Mac OS X (\d+[\_\.]\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
-                $platformVersionDetector = str_replace('_', '.', $matches[1]);
             }
+
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
 
             if (version_compare((float) $platformVersionBrowscap, 10.12, '>=')) {
                 $platformNameBrowscap = 'macOS';
@@ -628,122 +927,359 @@ class Platform
                 $platformCodenameDetector      = 'Mac OS X';
                 $platformMarketingnameDetector = 'Mac OS X';
             }
-        } elseif (false !== stripos($ua, 'kubuntu')) {
-            $platformNameBrowscap           = 'Ubuntu';
-            $platformCodenameDetector       = 'Kubuntu';
-            $platformMarketingnameDetector  = 'Kubuntu';
-            $platformMakerBrowscap          = 'Canonical Foundation';
-            $platformMakerNameDetector      = 'Canonical Foundation';
-            $platformMakerBrandnameDetector = 'Canonical';
+        } elseif (false !== stripos($useragent, 'kubuntu')) {
+            $platform = $platformLoader->load('kubuntu', $useragent);
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($ua, 'ubuntu')) {
-            $platformNameBrowscap           = 'Ubuntu';
-            $platformCodenameDetector       = 'Ubuntu';
-            $platformMarketingnameDetector  = 'Ubuntu';
-            $platformMakerBrowscap          = 'Canonical Foundation';
-            $platformMakerNameDetector      = 'Canonical Foundation';
-            $platformMakerBrandnameDetector = 'Canonical';
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'Ubuntu Linux';
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($ua, 'fedora')) {
-            $platformNameBrowscap           = 'Linux';
-            $platformCodenameDetector       = 'Fedora Linux';
-            $platformMarketingnameDetector  = 'Fedora Linux';
-            $platformMakerBrowscap          = 'Linux Foundation';
-            $platformMakerNameDetector      = 'Red Hat Inc';
-            $platformMakerBrandnameDetector = 'Red Hat';
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'ubuntu')) {
+            $platform = $platformLoader->load('ubuntu', $useragent);
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($ua, 'suse')) {
-            $platformNameBrowscap           = 'Linux';
-            $platformCodenameDetector       = 'Suse Linux';
-            $platformMarketingnameDetector  = 'Suse Linux';
-            $platformMakerBrowscap          = 'Linux Foundation';
-            $platformMakerNameDetector      = 'Suse';
-            $platformMakerBrandnameDetector = 'Suse';
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'Ubuntu Linux';
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($ua, 'mandriva')) {
-            $platformNameBrowscap           = 'Linux';
-            $platformCodenameDetector       = 'Mandriva Linux';
-            $platformMarketingnameDetector  = 'Mandriva Linux';
-            $platformMakerBrowscap          = 'Linux Foundation';
-            $platformMakerNameDetector      = 'Mandriva';
-            $platformMakerBrandnameDetector = 'Mandriva';
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'android; linux arm')) {
+            $platform = $platformLoader->load('android', $useragent);
 
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($ua, 'gentoo')) {
-            $platformNameBrowscap           = 'Linux';
-            $platformCodenameDetector       = 'Gentoo Linux';
-            $platformMarketingnameDetector  = 'Gentoo Linux';
-            $platformMakerBrowscap          = 'Linux Foundation';
-            $platformMakerNameDetector      = 'Gentoo Foundation Inc';
-            $platformMakerBrandnameDetector = 'Gentoo';
-
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($ua, 'slackware')) {
-            $platformNameBrowscap           = 'Linux';
-            $platformCodenameDetector       = 'Slackware Linux';
-            $platformMarketingnameDetector  = 'Slackware Linux';
-            $platformMakerBrowscap          = 'Linux Foundation';
-            $platformMakerNameDetector      = 'Slackware Linux Inc';
-            $platformMakerBrandnameDetector = 'Slackware';
-
-            $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'CrOS')) {
-            $platformNameBrowscap           = 'ChromeOS';
-            $platformCodenameDetector       = 'ChromeOS';
-            $platformMarketingnameDetector  = 'ChromeOS';
+            $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformMakerNameDetector      = 'Google Inc';
-            $platformMakerBrandnameDetector = 'Google';
+            $platformDescriptionBrowscap = 'Android OS';
 
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/(maemo|like android|linux\/x2\/r1|linux arm)/i', $useragent)) {
+            $platform = $platformLoader->load('linux smartphone os (maemo)', $useragent);
+
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($ua, 'Linux')) {
-            $platformNameBrowscap           = 'Linux';
-            $platformCodenameDetector       = 'Linux';
-            $platformMarketingnameDetector  = 'Linux';
-            $platformMakerBrowscap          = 'Linux Foundation';
-            $platformMakerNameDetector      = 'Linux Foundation';
-            $platformMakerBrandnameDetector = 'Linux Foundation';
 
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'moblin')) {
+            $platform = $platformLoader->load('moblin', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== strpos($ua, 'SymbOS')) {
-            $platformNameBrowscap           = 'SymbianOS';
-            $platformCodenameDetector       = 'Symbian OS';
-            $platformMarketingnameDetector  = 'Symbian OS';
-            $platformMakerBrowscap          = 'Symbian Foundation';
-            $platformMakerNameDetector      = 'Symbian Foundation';
-            $platformMakerBrandnameDetector = 'Symbian';
 
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'infegyatlas') || false !== stripos($useragent, 'jobboerse')) {
+            $platform = $platformLoader->load('unknown', $useragent);
+
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'Ubuntu';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/linux arm/i', $useragent)) {
+            $platform = $platformLoader->load('linux smartphone os (maemo)', $useragent);
+
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'fedora')) {
+            $platform = $platformLoader->load('fedora linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/(red hat|redhat)/i', $useragent)) {
+            $platform = $platformLoader->load('redhat linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'suse')) {
+            $platform = $platformLoader->load('suse linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'centos')) {
+            $platform = $platformLoader->load('cent os linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'mandriva')) {
+            $platform = $platformLoader->load('mandriva linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'gentoo')) {
+            $platform = $platformLoader->load('gentoo linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'slackware')) {
+            $platform = $platformLoader->load('slackware linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'CrOS')) {
+            $platform = $platformLoader->load('chromeos', $useragent);
+
+            $platformNameBrowscap           = 'ChromeOS';
+            $platformMakerBrowscap          = 'Google Inc';
+            $platformDescriptionBrowscap = 'unknown';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'linux mint')) {
+            $platform = $platformLoader->load('linux mint', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'kubuntu')) {
+            $platform = $platformLoader->load('kubuntu', $useragent);
+
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'Ubuntu Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'ubuntu')) {
+            $platform = $platformLoader->load('ubuntu', $useragent);
+
+            $platformNameBrowscap        = 'Ubuntu';
+            $platformMakerBrowscap       = 'Canonical Foundation';
+            $platformDescriptionBrowscap = 'Ubuntu Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Debian APT-HTTP')) {
+            $platform = $platformLoader->load('debian', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== stripos($useragent, 'debian')) {
+            $platform = $platformLoader->load('debian', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'Linux')) {
+            $platform = $platformLoader->load('linux', $useragent);
+
+            $platformNameBrowscap        = 'Linux';
+            $platformMakerBrowscap       = 'Linux Foundation';
+            $platformDescriptionBrowscap = 'Linux';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'SymbOS')) {
+            $platform = $platformLoader->load('symbian', $useragent);
+
+            $platformNameBrowscap        = 'SymbianOS';
+            $platformMakerBrowscap       = 'Symbian Foundation';
             $platformDescriptionBrowscap = 'Symbian OS';
-        } elseif (false !== strpos($ua, 'hpwOS')) {
-            $platformNameBrowscap           = 'webOS';
-            $platformCodenameDetector       = 'webOS';
-            $platformMarketingnameDetector  = 'webOS';
-            $platformMakerBrowscap          = 'HP';
-            $platformMakerNameDetector      = 'HP';
-            $platformMakerBrandnameDetector = 'HP';
 
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (false !== strpos($useragent, 'hpwOS')) {
+            $platform = $platformLoader->load('webos', $useragent);
+
+            $platformNameBrowscap        = 'webOS';
+            $platformMakerBrowscap       = 'HP';
             $platformDescriptionBrowscap = 'webOS';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/CFNetwork/', $useragent)) {
+            $platform = (new Factory\Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
+
+            $platformNameBrowscap        = 'Darwin';
+            $platformMakerBrowscap       = 'Apple Inc';
+            $platformDescriptionBrowscap = 'Darwin is a Core Component of MacOSX and iOS';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } elseif (preg_match('/HP\-UX/', $useragent)) {
+            $platform = $platformLoader->load('hp-ux', $useragent);
+
+            $platformNameBrowscap        = 'HP-UX';
+            $platformMakerBrowscap       = 'HP';
+            $platformDescriptionBrowscap = 'HP-UX';
+
+            $platformCodenameDetector       = $platform->getName();
+            $platformMarketingnameDetector  = $platform->getMarketingName();
+            $platformVersionDetector        = $platform->getVersion()->getVersion();
+            $platformBits                   = $platform->getBits();
+            $platformMakerNameDetector      = $platform->getManufacturer();
+            $platformMakerBrandnameDetector = $platform->getBrand();
+        } else {
+            $result = $detector->getBrowser($useragent);
+
+            $platform = $result->getOs();
+
+            if ($platformCodenameDetector === $platform->getName()) {
+                $platformCodenameDetector       = $platform->getName();
+                $platformMarketingnameDetector  = $platform->getMarketingName();
+                $platformVersionDetector        = $platform->getVersion()->getVersion();
+                $platformBits                   = $platform->getBits();
+                $platformMakerNameDetector      = $platform->getManufacturer();
+                $platformMakerBrandnameDetector = $platform->getBrand();
+            }
         }
 
-        if (false !== strpos($ua, 'Silk') && false === strpos($ua, 'Android')) {
+        if (false !== strpos($useragent, 'Silk') && false === strpos($useragent, 'Android')) {
             $platformNameBrowscap      = 'Android';
             $platformCodenameDetector  = 'Android';
             $platformMakerBrowscap     = 'Google Inc';
             $platformMakerNameDetector = 'Google Inc';
 
             $platformDescriptionBrowscap = 'Android OS';
-        } elseif (false !== strpos($ua, 'Safari')
-            && false !== strpos($ua, 'Version')
-            && false !== strpos($ua, 'Android')
+        } elseif (false !== strpos($useragent, 'Safari')
+            && false !== strpos($useragent, 'Version')
+            && false !== strpos($useragent, 'Android')
         ) {
             $platformDescriptionBrowscap = 'Android OS';
         }
-
-        $platformBits = (new Os($ua))->getBits();
 
         return [
             $platformNameBrowscap,
@@ -760,6 +1296,7 @@ class Platform
             $platformVersionDetector,
             $standard,
             $platformBits,
+            $platform
         ];
     }
 }

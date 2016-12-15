@@ -246,6 +246,8 @@ class CreateTestsCommand extends Command
             $lite,
             $crawler) = (new Browser())->detect($ua);
 
+        $platformCodename = 'unknown';
+
         list(
             $platformNameBrowscap,
             $platformMakerBrowscap,
@@ -260,7 +262,7 @@ class CreateTestsCommand extends Command
             $platformMakerBrandnameDetector,
             $platformVersionDetector,
             $standard,
-            $platformBits) = (new Platform())->detect($ua);
+            $platformBits) = (new Platform())->detect($cache, $ua, $detector, $platformCodename);
 
         $platform   = new Os('unknown', 'unknown', 'unknown', 'unknown');
         $deviceCode = 'unknown';
