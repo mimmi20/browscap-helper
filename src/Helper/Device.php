@@ -344,15 +344,19 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(rm\-\d{3,4})/i', $useragent, $matches)) {
-            $device = $deviceLoader->load($matches[1], $useragent);
+            try {
+                $device = $deviceLoader->load($matches[1], $useragent);
 
-            $deviceBrand       = $device->getBrand();
-            $deviceCode        = $device->getDeviceName();
-            $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType();
-            $deviceMaker       = $device->getManufacturer();
-            $deviceName        = $device->getMarketingName();
-            $deviceOrientation = $device->getDualOrientation();
+                $deviceBrand       = $device->getBrand();
+                $deviceCode        = $device->getDeviceName();
+                $devicePointing    = $device->getPointingMethod();
+                $deviceType        = $device->getType();
+                $deviceMaker       = $device->getManufacturer();
+                $deviceName        = $device->getMarketingName();
+                $deviceOrientation = $device->getDualOrientation();
+            } catch (\Exception $e) {
+                $device = null;
+            }
         } elseif (preg_match('/(lumia 1020|nokia; 909|arm; 909)/i', $useragent)) {
             $device = $deviceLoader->load('lumia 1020', $useragent);
 
@@ -384,25 +388,33 @@ class Device
             $deviceName        = $device->getMarketingName();
             $deviceOrientation = $device->getDualOrientation();
         } elseif (preg_match('/(lumia \d{3,4} xl)/i', $useragent, $matches)) {
-            $device = $deviceLoader->load($matches[1], $useragent);
+            try {
+                $device = $deviceLoader->load($matches[1], $useragent);
 
-            $deviceBrand       = $device->getBrand();
-            $deviceCode        = $device->getDeviceName();
-            $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType();
-            $deviceMaker       = $device->getManufacturer();
-            $deviceName        = $device->getMarketingName();
-            $deviceOrientation = $device->getDualOrientation();
+                $deviceBrand       = $device->getBrand();
+                $deviceCode        = $device->getDeviceName();
+                $devicePointing    = $device->getPointingMethod();
+                $deviceType        = $device->getType();
+                $deviceMaker       = $device->getManufacturer();
+                $deviceName        = $device->getMarketingName();
+                $deviceOrientation = $device->getDualOrientation();
+            } catch (\Exception $e) {
+                $device = null;
+            }
         } elseif (preg_match('/(lumia \d{3,4})/i', $useragent, $matches)) {
-            $device = $deviceLoader->load($matches[1], $useragent);
+            try {
+                $device = $deviceLoader->load($matches[1], $useragent);
 
-            $deviceBrand       = $device->getBrand();
-            $deviceCode        = $device->getDeviceName();
-            $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType();
-            $deviceMaker       = $device->getManufacturer();
-            $deviceName        = $device->getMarketingName();
-            $deviceOrientation = $device->getDualOrientation();
+                $deviceBrand       = $device->getBrand();
+                $deviceCode        = $device->getDeviceName();
+                $devicePointing    = $device->getPointingMethod();
+                $deviceType        = $device->getType();
+                $deviceMaker       = $device->getManufacturer();
+                $deviceName        = $device->getMarketingName();
+                $deviceOrientation = $device->getDualOrientation();
+            } catch (\Exception $e) {
+                $device = null;
+            }
         } elseif (preg_match('/8X by HTC/i', $useragent)) {
             $device = $deviceLoader->load('8x', $useragent);
 
@@ -13320,73 +13332,77 @@ class Device
             $deviceOrientation = $device->getDualOrientation();
         } else {
             /** @var \UaResult\Result\Result $result */
-            $result = $detector->getBrowser($useragent);
+            try {
+                $result = $detector->getBrowser($useragent);
 
-            $device = $result->getDevice();
+                $device = $result->getDevice();
 
-            if ($deviceCode === $device->getDeviceName()) {
-                $deviceBrand       = $device->getBrand();
-                $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType();
-                $deviceMaker       = $device->getManufacturer();
-                $deviceName        = $device->getMarketingName();
-                $deviceOrientation = $device->getDualOrientation();
-            } elseif ('general Mobile Device' === $device->getDeviceName() && in_array(
-                $deviceCode,
-                ['general Mobile Phone', 'general Tablet']
-            )
-            ) {
-                $deviceBrand       = $device->getBrand();
-                $deviceCode        = $device->getDeviceName();
-                $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType();
-                $deviceMaker       = $device->getManufacturer();
-                $deviceName        = $device->getMarketingName();
-                $deviceOrientation = $device->getDualOrientation();
-            } elseif ('Windows RT Tablet' === $device->getDeviceName() && $deviceCode === 'general Tablet') {
-                $deviceBrand       = $device->getBrand();
-                $deviceCode        = $device->getDeviceName();
-                $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType();
-                $deviceMaker       = $device->getManufacturer();
-                $deviceName        = $device->getMarketingName();
-                $deviceOrientation = $device->getDualOrientation();
-            } elseif ('Windows Desktop' === $device->getDeviceName()
-                && $deviceCode === 'unknown'
-                && in_array(
-                    $platform->getMarketingName(),
-                    ['Windows 7', 'Windows 8', 'Windows 8.1', 'Windows 10', 'Windows XP', 'Windows Vista']
-                )
-            ) {
-                $deviceBrand       = $device->getBrand();
-                $deviceCode        = $device->getDeviceName();
-                $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType();
-                $deviceMaker       = $device->getManufacturer();
-                $deviceName        = $device->getMarketingName();
-                $deviceOrientation = $device->getDualOrientation();
-            } elseif ('Linux Desktop' === $device->getDeviceName()
-                && $deviceCode === 'unknown'
-                && in_array($platform->getMarketingName(), ['Linux'])
-            ) {
-                $deviceBrand       = $device->getBrand();
-                $deviceCode        = $device->getDeviceName();
-                $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType();
-                $deviceMaker       = $device->getManufacturer();
-                $deviceName        = $device->getMarketingName();
-                $deviceOrientation = $device->getDualOrientation();
-            } elseif ('Macintosh' === $device->getDeviceName()
-                && $deviceCode === 'unknown'
-                && in_array($platform->getMarketingName(), ['Mac OS X', 'macOS'])
-            ) {
-                $deviceBrand       = $device->getBrand();
-                $deviceCode        = $device->getDeviceName();
-                $devicePointing    = $device->getPointingMethod();
-                $deviceType        = $device->getType();
-                $deviceMaker       = $device->getManufacturer();
-                $deviceName        = $device->getMarketingName();
-                $deviceOrientation = $device->getDualOrientation();
+                if ($deviceCode === $device->getDeviceName()) {
+                    $deviceBrand       = $device->getBrand();
+                    $devicePointing    = $device->getPointingMethod();
+                    $deviceType        = $device->getType();
+                    $deviceMaker       = $device->getManufacturer();
+                    $deviceName        = $device->getMarketingName();
+                    $deviceOrientation = $device->getDualOrientation();
+                } elseif ('general Mobile Device' === $device->getDeviceName() && in_array(
+                        $deviceCode,
+                        ['general Mobile Phone', 'general Tablet']
+                    )
+                ) {
+                    $deviceBrand       = $device->getBrand();
+                    $deviceCode        = $device->getDeviceName();
+                    $devicePointing    = $device->getPointingMethod();
+                    $deviceType        = $device->getType();
+                    $deviceMaker       = $device->getManufacturer();
+                    $deviceName        = $device->getMarketingName();
+                    $deviceOrientation = $device->getDualOrientation();
+                } elseif ('Windows RT Tablet' === $device->getDeviceName() && $deviceCode === 'general Tablet') {
+                    $deviceBrand       = $device->getBrand();
+                    $deviceCode        = $device->getDeviceName();
+                    $devicePointing    = $device->getPointingMethod();
+                    $deviceType        = $device->getType();
+                    $deviceMaker       = $device->getManufacturer();
+                    $deviceName        = $device->getMarketingName();
+                    $deviceOrientation = $device->getDualOrientation();
+                } elseif ('Windows Desktop' === $device->getDeviceName()
+                    && $deviceCode === 'unknown'
+                    && in_array(
+                        $platform->getMarketingName(),
+                        ['Windows 7', 'Windows 8', 'Windows 8.1', 'Windows 10', 'Windows XP', 'Windows Vista']
+                    )
+                ) {
+                    $deviceBrand       = $device->getBrand();
+                    $deviceCode        = $device->getDeviceName();
+                    $devicePointing    = $device->getPointingMethod();
+                    $deviceType        = $device->getType();
+                    $deviceMaker       = $device->getManufacturer();
+                    $deviceName        = $device->getMarketingName();
+                    $deviceOrientation = $device->getDualOrientation();
+                } elseif ('Linux Desktop' === $device->getDeviceName()
+                    && $deviceCode === 'unknown'
+                    && in_array($platform->getMarketingName(), ['Linux'])
+                ) {
+                    $deviceBrand       = $device->getBrand();
+                    $deviceCode        = $device->getDeviceName();
+                    $devicePointing    = $device->getPointingMethod();
+                    $deviceType        = $device->getType();
+                    $deviceMaker       = $device->getManufacturer();
+                    $deviceName        = $device->getMarketingName();
+                    $deviceOrientation = $device->getDualOrientation();
+                } elseif ('Macintosh' === $device->getDeviceName()
+                    && $deviceCode === 'unknown'
+                    && in_array($platform->getMarketingName(), ['Mac OS X', 'macOS'])
+                ) {
+                    $deviceBrand       = $device->getBrand();
+                    $deviceCode        = $device->getDeviceName();
+                    $devicePointing    = $device->getPointingMethod();
+                    $deviceType        = $device->getType();
+                    $deviceMaker       = $device->getManufacturer();
+                    $deviceName        = $device->getMarketingName();
+                    $deviceOrientation = $device->getDualOrientation();
+                }
+            } catch (\Exception $e) {
+                $device = null;
             }
         }
 

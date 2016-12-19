@@ -16,7 +16,6 @@
 
 namespace BrowscapHelper\Reader;
 
-use BrowscapHelper\Helper\Regex;
 use FileLoader\Loader;
 
 /**
@@ -28,11 +27,6 @@ use FileLoader\Loader;
 class TxtFileReader implements ReaderInterface
 {
     /**
-     * @var string|null
-     */
-    private $targetInfoFile = null;
-
-    /**
      * @var \FileLoader\Loader
      */
     private $loader = null;
@@ -40,14 +34,6 @@ class TxtFileReader implements ReaderInterface
     public function __construct()
     {
         $this->loader = new Loader();
-    }
-
-    /**
-     * @param string $targetInfoFile
-     */
-    public function setTargetInfoFile($targetInfoFile)
-    {
-        $this->targetInfoFile = $targetInfoFile;
     }
 
     /**
@@ -77,6 +63,12 @@ class TxtFileReader implements ReaderInterface
         while (!$stream->eof()) {
             $line = $stream->read(8192);
 
+            if (!is_string($line)) {
+                continue;
+            }
+
+            $line = trim($line);
+
             if (!array_key_exists($line, $agents)) {
                 $agents[$line] = 1;
             } else {
@@ -85,20 +77,5 @@ class TxtFileReader implements ReaderInterface
         }
 
         return $agents;
-    }
-
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
-    private function extractAgent($text)
-    {
-        $parts = explode('"', $text);
-        array_pop($parts);
-
-        $userAgent = array_pop($parts);
-
-        return $userAgent;
     }
 }

@@ -97,6 +97,12 @@ class LogFileReader implements ReaderInterface
                 $agentOfLine = trim($this->extractAgent($line));
             }
 
+            if (!is_string($agentOfLine)) {
+                continue;
+            }
+
+            $agentOfLine = trim($agentOfLine);
+
             if (!array_key_exists($agentOfLine, $agents)) {
                 $agents[$agentOfLine] = 1;
             } else {

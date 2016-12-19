@@ -197,16 +197,21 @@ class CreateTestsCommand extends Command
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
         $counter        = 0;
+        $i              = 0;
 
-        foreach ($fileContents as $i => $ua) {
+        foreach ($fileContents as $ua => $count) {
+            $output->writeln('    checking #' . $i . ' ...');
+
             $ua = trim($ua);
 
             if (isset($checks[$ua])) {
+                $output->writeln('    useragent ' . $i . ' already checked, found in ' . $checks[$ua]);
                 continue;
             }
 
             $output->writeln('    handle useragent ' . $i . ' ...');
             $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue, $detector);
+            ++$i;
         }
 
         $outputBrowscap .= "];\n";
