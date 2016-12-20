@@ -433,7 +433,7 @@ test:
             if (isset($test->properties->Device_Type)) {
                 $className = '\UaDeviceType\\' . $test->properties->Device_Type;
                 if (class_exists($className)) {
-                    /$deviceType = new $className();
+                    $deviceType = new $className();
                 } else {
                     $deviceType = new \UaDeviceType\Unknown();
                 }

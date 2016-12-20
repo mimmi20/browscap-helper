@@ -175,7 +175,7 @@ class CreateTestsCommand extends Command
 
             $output->writeln('    parsing ...');
 
-            $counter += $this->parseFile($output, $cache, $fileContents, $file->getBasename(), $checks, $detector);
+            $counter += $this->parseFile($output, $cache, $fileContents, $file, $checks, $detector);
         }
 
         $output->writeln('');
@@ -186,13 +186,13 @@ class CreateTestsCommand extends Command
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \Psr\Cache\CacheItemPoolInterface                 $cache
      * @param array                                             $fileContents
-     * @param string                                            $issue
+     * @param \SplFileInfo                                      $file
      * @param array                                             &$checks
      * @param \BrowserDetector\BrowserDetector                  $detector
      *
      * @return int
      */
-    private function parseFile(OutputInterface $output, CacheItemPoolInterface $cache, array $fileContents = [], $issue = '', array &$checks = [], BrowserDetector $detector)
+    private function parseFile(OutputInterface $output, CacheItemPoolInterface $cache, array $fileContents = [], \SplFileInfo $file = null, array &$checks = [], BrowserDetector $detector)
     {
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
@@ -210,17 +210,46 @@ class CreateTestsCommand extends Command
             }
 
             $output->writeln('    handle useragent ' . $i . ' ...');
-            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue, $detector);
+            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $file->getBasename(), $detector);
             ++$i;
         }
 
         $outputBrowscap .= "];\n";
 
-        file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
-        file_put_contents(
-            'results/browscap-issue-' . $issue . '.json',
-            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
-        );
+        $basename = $file->getBasename('.' . $file->getExtension());
+
+        file_put_contents('results/issue-' . $basename . '.php', $outputBrowscap);
+
+        $chunks = array_chunk($outputDetector, 100, true);
+
+        if (count($chunks) <= 1) {
+            file_put_contents(
+                'results/' . $basename . '.json',
+                json_encode(
+                    $outputDetector,
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                ) . PHP_EOL
+            );
+
+            return $counter;
+        }
+
+        foreach ($chunks as $chunkId => $chunk) {
+            if (!count($chunk)) {
+                $output->writeln('    skip empty chunk ' . $chunkId);
+                continue;
+            }
+
+            $chunkNumber = sprintf('%1$05d', (int) $chunkId);
+
+            file_put_contents(
+                'results/' . $basename . '-' . $chunkNumber . '.json',
+                json_encode(
+                    $chunk,
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                ) . PHP_EOL
+            );
+        }
 
         return $counter;
     }
