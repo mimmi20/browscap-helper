@@ -134,7 +134,6 @@ function handleFile(\FileLoader\Loader $loader, $filepath, $targetInfoFile, $tar
     }
 
     $sortCount = [];
-    $sortTime  = [];
     $sortAgent = [];
 
     foreach ($agents as $agentOfLine => $count) {
@@ -142,7 +141,7 @@ function handleFile(\FileLoader\Loader $loader, $filepath, $targetInfoFile, $tar
         $sortAgent[$agentOfLine] = $agentOfLine;
     }
 
-    array_multisort($sortCount, SORT_DESC, $sortTime, SORT_DESC, $sortAgent, SORT_ASC, $agents);
+    array_multisort($sortCount, SORT_DESC, $sortAgent, SORT_ASC, $agents);
 
     foreach (array_keys($agents) as $agentOfLine) {
         file_put_contents($targetBulkFile, $agentOfLine . "\n", FILE_APPEND | LOCK_EX);
