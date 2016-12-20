@@ -431,9 +431,14 @@ test:
             }
 
             if (isset($test->properties->Device_Type)) {
-                $deviceType = $test->properties->Device_Type;
+                $className = '\UaDeviceType\\' . $test->properties->Device_Type;
+                if (class_exists($className)) {
+                    /$deviceType = new $className();
+                } else {
+                    $deviceType = new \UaDeviceType\Unknown();
+                }
             } else {
-                $deviceType = null;
+                $deviceType = new \UaDeviceType\Unknown();
             }
 
             if (isset($test->properties->Device_Pointing_Method)) {
@@ -461,6 +466,10 @@ test:
             }
 
             $device = null;
+        }
+
+        if (!($deviceType instanceof \UaDeviceType\TypeInterface)) {
+            $deviceType = new \UaDeviceType\Unknown();
         }
 
         /** generate result */
