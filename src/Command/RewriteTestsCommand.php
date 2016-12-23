@@ -179,14 +179,15 @@ test:
         );
 
         foreach ($circleLines as $group => $count) {
+            $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . str_pad(
                 $count,
                 6,
                 ' ',
                 STR_PAD_LEFT
             ) . ' test' . ($count !== 1 ? 's' : '') . PHP_EOL;
-            //$circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 --test-suffix=' . $group . 'Test.php' . PHP_EOL;
+            //$circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 tests/RegexesTest/T' . $group . 'Test.php' . PHP_EOL;
+            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php' . PHP_EOL;
         }
 
         $output->writeln('writing ' . $circleFile . ' ...');
