@@ -57,7 +57,7 @@ class CopyTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/00000-browscap/';
+        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/00000/';
         $counter         = 0;
 
         /*******************************************************************************

@@ -103,10 +103,6 @@ class RewriteTestsCommand extends Command
                 $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
                 $group   = $filename;
 
-                if ('00000-browscap' === $filename) {
-                    $group = '00000';
-                }
-
                 $testCounter[$group][$filename . DIRECTORY_SEPARATOR . $subdirFilename] = 0;
             }
         }
