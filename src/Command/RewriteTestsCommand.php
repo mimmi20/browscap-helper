@@ -117,52 +117,11 @@ class RewriteTestsCommand extends Command
         foreach ($files as $filename) {
             $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
 
-            $output->writeln('file ' . $file->getBasename());
-            $output->writeln('    checking ...');
+            $counter = $this->handleFile($output, $file, $detector, $data, $checks, $cache);
 
-            /** @var $file \SplFileInfo */
-            if (!$file->isFile() || !in_array($file->getExtension(), ['php', 'json'])) {
+            if (!$counter) {
                 continue;
             }
-
-            $output->writeln('    reading ...');
-
-            switch ($file->getExtension()) {
-                case 'php':
-                    $reader = new Reader\BrowscapTestReader();
-                    $reader->setLocalFile($file->getPathname());
-
-                    $tests = $reader->getTests();
-                    break;
-                case 'json':
-                    $reader = new Reader\DetectorTestReader();
-                    $reader->setLocalFile($file->getPathname());
-
-                    $tests = $reader->getTests();
-                    break;
-                default:
-                    continue;
-            }
-
-            if (empty($tests)) {
-                $output->writeln('    removing empty file');
-                unlink($file->getPathname());
-
-                continue;
-            }
-
-            if (is_array($tests)) {
-                $tests = (object) $tests;
-            }
-
-            if (empty($tests)) {
-                $output->writeln('    file does not contain any test');
-                continue;
-            }
-
-            $counter = count(get_object_vars($tests));
-
-            $output->writeln('    contains ' . $counter . ' tests');
 
             foreach ($testCounter as $group => $filesinGroup) {
                 foreach (array_keys($filesinGroup) as $fileinGroup) {
@@ -173,9 +132,6 @@ class RewriteTestsCommand extends Command
                     $testCounter[$group][$fileinGroup] += $counter;
                 }
             }
-
-            $output->writeln('    processing ...');
-            $this->handleFile($output, $tests, $file, $detector, $data, $checks, $cache);
         }
 
         $circleFile      = 'vendor/mimmi20/browser-detector/circle.yml';
@@ -245,22 +201,80 @@ test:
 
     /**
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \stdClass                                         $tests
      * @param \SplFileInfo                                      $file
      * @param BrowserDetector                                   $detector
      * @param array                                             $data
      * @param array                                             $checks
      * @param CacheItemPoolInterface                            $cache
+     *
+     * @return int
      */
     private function handleFile(
         OutputInterface $output,
-        \stdClass $tests,
         \SplFileInfo $file,
         BrowserDetector $detector,
         array &$data,
         array &$checks,
         CacheItemPoolInterface $cache
     ) {
+
+        $output->writeln('file ' . $file->getBasename());
+        $output->writeln('    checking ...');
+
+        /** @var $file \SplFileInfo */
+        if (!$file->isFile() || !in_array($file->getExtension(), ['php', 'json'])) {
+            return 0;
+        }
+
+        $output->writeln('    reading ...');
+
+        switch ($file->getExtension()) {
+            case 'php':
+                $reader = new Reader\BrowscapTestReader();
+                $reader->setLocalFile($file->getPathname());
+
+                $tests = $reader->getTests();
+                break;
+            case 'json':
+                $reader = new Reader\DetectorTestReader();
+                $reader->setLocalFile($file->getPathname());
+
+                $tests = $reader->getTests();
+                break;
+            default:
+                return 0;
+        }
+
+        if (empty($tests)) {
+            $output->writeln('    removing empty file');
+            unlink($file->getPathname());
+
+            return 0;
+        }
+
+        if (is_array($tests)) {
+            $tests = (object) $tests;
+        }
+
+        if (empty($tests)) {
+            $output->writeln('    file does not contain any test');
+            unlink($file->getPathname());
+
+            return 0;
+        }
+
+        $counter = count(get_object_vars($tests));
+
+        $output->writeln('    contains ' . $counter . ' tests');
+
+        if ($counter < 1) {
+            $output->writeln('    file does not contain any test');
+            unlink($file->getPathname());
+
+            return 0;
+        }
+
+        $output->writeln('    processing ...');
         $outputDetector = [];
 
         foreach ($tests as $key => $test) {
@@ -289,8 +303,20 @@ test:
             $data[$key]        = $test;
             $checks[$test->ua] = $key;
 
-            $output->writeln('    processing Test ' . $key . ' ...');
             $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache);
+        }
+
+        $newCounter = count($outputDetector);
+
+        $output->writeln('    contains now ' . $newCounter . ' tests');
+
+        if ($newCounter < 1) {
+            $output->writeln('    all tests are removed from the file');
+            unlink($file->getPathname());
+
+            return 0;
+        } elseif ($newCounter < $counter) {
+            $output->writeln('    ' . ($counter - $newCounter) . ' test(s) is/are removed from the file');
         }
 
         $basename = $file->getBasename('.' . $file->getExtension());
@@ -304,6 +330,8 @@ test:
             $file->getPath() . '/' . $basename . '.json',
             json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
         );
+
+        return $newCounter;
     }
 
     /**
@@ -322,6 +350,9 @@ test:
         $key,
         CacheItemPoolInterface $cache
     ) {
+        $output->writeln('    processing Test ' . $key . ' ...');
+        $output->writeln('        ua: ' . $test->ua);
+
         /** rewrite test numbers */
 
         if (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
@@ -333,6 +364,8 @@ test:
         }
 
         /** rewrite platforms */
+
+        $output->writeln('        rewriting platform');
 
         try {
             list($platformCodename, $platformMarketingname, $platformVersion, $platformBits, $platformMaker, $platformBrandname, $platform) = $this->rewritePlatforms(
@@ -396,6 +429,8 @@ test:
 
         /** @var $platform OsInterface|null */
 
+        $output->writeln('        rewriting device');
+
         /** rewrite devices */
 
         try {
@@ -432,6 +467,7 @@ test:
 
             if (isset($test->properties->Device_Type)) {
                 $className = '\UaDeviceType\\' . $test->properties->Device_Type;
+
                 if (class_exists($className)) {
                     $deviceType = new $className();
                 } else {
@@ -469,8 +505,20 @@ test:
         }
 
         if (!($deviceType instanceof \UaDeviceType\TypeInterface)) {
-            $deviceType = new \UaDeviceType\Unknown();
+            if (is_string($deviceType)) {
+                $className = '\UaDeviceType\\' . $test->properties->Device_Type;
+
+                if (class_exists($className)) {
+                    $deviceType = new $className();
+                } else {
+                    $deviceType = new \UaDeviceType\Unknown();
+                }
+            } else {
+                $deviceType = new \UaDeviceType\Unknown();
+            }
         }
+
+        $output->writeln('        generating result');
 
         /** generate result */
         return [
