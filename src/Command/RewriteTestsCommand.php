@@ -262,7 +262,11 @@ test:
 
         $counter = count(get_object_vars($tests));
 
-        $output->writeln('    contains ' . $counter . ' tests');
+        if (1 === $counter) {
+            $output->writeln('    contains 1 test');
+        } else {
+            $output->writeln('    contains ' . $counter . ' tests');
+        }
 
         if ($counter < 1) {
             $output->writeln('    file does not contain any test');
@@ -278,7 +282,7 @@ test:
             if (isset($data[$key])) {
                 // Test data is duplicated for key
                 $output->writeln('    Test data is duplicated for key "' . $key . '"');
-                unset($tests[$key]);
+                unset($tests->$key);
                 continue;
             }
 
@@ -293,7 +297,7 @@ test:
             if (isset($checks[$test->ua])) {
                 // UA was added more than once
                 $output->writeln('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
-                unset($tests[$key]);
+                unset($tests->$key);
                 continue;
             }
 
