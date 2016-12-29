@@ -175,7 +175,35 @@ class CreateTestsCommand extends Command
 
             $output->writeln('    parsing ...');
 
-            $counter += $this->parseFile($output, $cache, $fileContents, $file, $checks, $detector);
+            $chunks = array_chunk($fileContents, 10000, true);
+
+            if (count($chunks) > 1) {
+                $output->writeln('    found too many user agnets, will create ' . count($chunks) . ' files ...');
+            }
+
+            foreach ($chunks as $chunkId => $chunk) {
+                if (count($chunks) > 1) {
+                    $output->writeln('    processing file ' . $chunkId . ' ...');
+                }
+
+                $basename = $file->getBasename('.' . $file->getExtension());
+                $matches  = [];
+
+                if (preg_match('/test\-(\d+)/', $basename, $matches)) {
+                    $number = (int) $matches[1] + $chunkId;
+                } else {
+                    $number = 0;
+                }
+
+                $counter += $this->parseFile(
+                    $output,
+                    $cache,
+                    $chunk,
+                    $number,
+                    $checks,
+                    $detector
+                );
+            }
         }
 
         $output->writeln('');
@@ -186,52 +214,47 @@ class CreateTestsCommand extends Command
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \Psr\Cache\CacheItemPoolInterface                 $cache
      * @param array                                             $fileContents
-     * @param \SplFileInfo                                      $file
+     * @param int                                               $testNumber
      * @param array                                             &$checks
      * @param \BrowserDetector\BrowserDetector                  $detector
      *
      * @return int
      */
-    private function parseFile(OutputInterface $output, CacheItemPoolInterface $cache, array $fileContents = [], \SplFileInfo $file = null, array &$checks = [], BrowserDetector $detector)
-    {
+    private function parseFile(
+        OutputInterface $output,
+        CacheItemPoolInterface $cache,
+        array $fileContents = [],
+        $testNumber = 0,
+        array &$checks = [],
+        BrowserDetector $detector
+    ) {
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
         $counter        = 0;
         $i              = 0;
+        $issue          = 'test-' . sprintf('%1$08d', $testNumber);
 
         foreach ($fileContents as $ua => $count) {
-            $output->writeln('    checking #' . $i . ' ...');
-
             $ua = trim($ua);
 
             if (isset($checks[$ua])) {
-                $output->writeln('    useragent ' . $i . ' already checked, found in ' . $checks[$ua]);
+                $output->writeln('        useragent ' . $i . ' was already checked, found in ' . $checks[$ua]);
                 continue;
             }
 
-            $output->writeln('    handle useragent ' . $i . ' ...');
-            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $file->getBasename(), $detector);
+            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue, $detector);
+            $checks[$ua] = $issue;
             ++$i;
         }
 
         $outputBrowscap .= "];\n";
 
-        $basename = $file->getBasename('.' . $file->getExtension());
+        file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
 
-        file_put_contents('results/issue-' . $basename . '.php', $outputBrowscap);
-
-        $chunks = array_chunk($outputDetector, 100, true);
-
-        if (count($chunks) <= 1) {
-            file_put_contents(
-                'results/' . $basename . '.json',
-                json_encode(
-                    $outputDetector,
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                ) . PHP_EOL
-            );
-
-            return $counter;
+        $chunks          = array_chunk($outputDetector, 100, true);
+        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/' . sprintf('%1$05d', $testNumber) . '/';
+        if (!file_exists($targetDirectory)) {
+            mkdir($targetDirectory);
         }
 
         foreach ($chunks as $chunkId => $chunk) {
@@ -240,10 +263,10 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $chunkNumber = sprintf('%1$05d', (int) $chunkId);
+            $chunkNumber = sprintf('%1$08d', (int) $chunkId);
 
             file_put_contents(
-                'results/' . $basename . '-' . $chunkNumber . '.json',
+                $targetDirectory . $issue . '-' . $chunkNumber . '.json',
                 json_encode(
                     $chunk,
                     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
@@ -377,8 +400,8 @@ class CreateTestsCommand extends Command
         'standard' => " . ($standard ? 'true' : 'false') . ",
     ],\n";
 
-        $formatedIssue   = sprintf('%1$05d', (int) $issue);
-        $formatedCounter = sprintf('%1$05d', (int) $counter);
+        $formatedIssue   = sprintf('%1$08d', (int) $issue);
+        $formatedCounter = sprintf('%1$08d', (int) $counter);
 
         $outputDetector['browscap-issue-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'         => $ua,

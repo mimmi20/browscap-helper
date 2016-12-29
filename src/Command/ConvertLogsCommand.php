@@ -123,7 +123,7 @@ class ConvertLogsCommand extends Command
             $file = new \SplFileInfo($sourcesDirectory . $filename);
 
             ++$i;
-            $output->write('# ' . sprintf('%1$05d', (int) $i) . ' :' . strtolower($file->getPathname()) . ' [ until now ' . ($j > 0 ? $j : 'no new') . ' agent' . ($j !== 1 ? 's' : '') . ' ]');
+            $output->write('# ' . sprintf('%1$08d', (int) $i) . ' :' . strtolower($file->getPathname()) . ' [ until now ' . ($j > 0 ? $j : 'no new') . ' agent' . ($j !== 1 ? 's' : '') . ' ]');
 
             if (!$file->isFile() || !$file->isReadable()) {
                 $output->writeln(' - skipped');

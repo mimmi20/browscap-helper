@@ -357,11 +357,11 @@ test:
         /** rewrite test numbers */
 
         if (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
         } elseif (preg_match('/^test\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-00000';
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-00000000';
         } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$05d', (int) $matches[1]) . '-' . sprintf('%1$05d', (int) $matches[2]);
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
         }
 
         /** rewrite platforms */

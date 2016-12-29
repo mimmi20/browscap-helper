@@ -85,21 +85,21 @@ class CopyTestsCommand extends Command
                 continue;
             }
 
+            $oldname = $file->getBasename('.php');
+            $tests   = require_once $file->getPathname();
+
+            if (empty($tests)) {
+                $output->writeln(' - ignored');
+                continue;
+            }
+
             $output->writeln('');
             $output->writeln('    processing ...');
 
-            $oldname = $file->getBasename('.php');
             $newname = 'browscap-' . $oldname;
 
             if (preg_match('/issue\-(\d+)/', $oldname, $matches)) {
-                $newname = sprintf('browscap-issue-%1$05d', (int) $matches[1]);
-            }
-
-            $tests = require_once $file->getPathname();
-
-            if (empty($tests)) {
-                $output->writeln('ignored - no tests found');
-                continue;
+                $newname = sprintf('browscap-issue-%1$08d', (int) $matches[1]);
             }
 
             $this->handleTests($output, $tests, $newname, $targetDirectory, $counter);
@@ -128,7 +128,7 @@ class CopyTestsCommand extends Command
                 continue;
             }
 
-            $targetFilename = $newname . '-' . sprintf('%1$05d', (int) $chunkId) . '.json';
+            $targetFilename = $newname . '-' . sprintf('%1$08d', (int) $chunkId) . '.json';
 
             if (file_exists($targetDirectory . $targetFilename)) {
                 $output->writeln('    target file for chunk ' . $chunkId . ' already exists');
