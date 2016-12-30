@@ -135,6 +135,28 @@ class CreateTestsCommand extends Command
             }
         }
 
+        $output->writeln('detect next test number ...');
+
+        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
+        $filesArray      = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
+        $number          = 0;
+
+        foreach ($filesArray as $filename) {
+            if (in_array($filename, ['.', '..'])) {
+                continue;
+            }
+
+            $file     = new \SplFileInfo($targetDirectory . $filename);
+            $basename = $file->getBasename('.' . $file->getExtension());
+
+            if ((int) $basename > $number) {
+                $number = (int) $basename;
+            }
+        }
+
+        ++$number;
+        $output->writeln('nexst test: ' . $number);
+
         $output->writeln('reading new files ...');
 
         $sourcesDirectory = $input->getOption('resources');
@@ -175,7 +197,7 @@ class CreateTestsCommand extends Command
 
             $output->writeln('    parsing ...');
 
-            $chunks = array_chunk($fileContents, 10000, true);
+            $chunks = array_chunk($fileContents, 20000, true);
 
             if (count($chunks) > 1) {
                 $output->writeln('    found too many user agnets, will create ' . count($chunks) . ' files ...');
@@ -186,20 +208,11 @@ class CreateTestsCommand extends Command
                     $output->writeln('    processing file ' . $chunkId . ' ...');
                 }
 
-                $basename = $file->getBasename('.' . $file->getExtension());
-                $matches  = [];
-
-                if (preg_match('/test\-(\d+)/', $basename, $matches)) {
-                    $number = (int) $matches[1] + $chunkId;
-                } else {
-                    $number = 0;
-                }
-
                 $counter += $this->parseFile(
                     $output,
                     $cache,
                     $chunk,
-                    $number,
+                    $number + $chunkId,
                     $checks,
                     $detector
                 );
