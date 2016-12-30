@@ -204,8 +204,10 @@ class CreateTestsCommand extends Command
             }
 
             foreach ($chunks as $chunkId => $chunk) {
+                $nextTest = $number + $chunkId;
+
                 if (count($chunks) > 1) {
-                    $output->writeln('    processing file ' . $chunkId . ' ...');
+                    $output->writeln('    processing test ' . $nextTest . ' ...');
                 }
 
                 $counter += $this->parseFile(
