@@ -81,6 +81,7 @@ class RewriteTestsCommand extends Command
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
         $testCounter = [];
+        $groups      = [];
 
         foreach ($filesArray as $filename) {
             if (in_array($filename, ['.', '..'])) {
@@ -100,34 +101,36 @@ class RewriteTestsCommand extends Command
                     continue;
                 }
 
-                $files[] = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
-                $group   = $filename;
+                $fullFilename = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
+                $files[]      = $fullFilename;
+                $group        = $filename;
 
-                $testCounter[$group][$filename . DIRECTORY_SEPARATOR . $subdirFilename] = 0;
+                $groups[$fullFilename]              = $group;
+                $testCounter[$group][$fullFilename] = 0;
             }
         }
 
         $checks = [];
         $data   = [];
+        $g      = null;
+        $c      = 0;
 
-        foreach ($files as $filename) {
-            $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
+        foreach ($files as $fullFilename) {
+            $file  = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $fullFilename);
+            $group = $groups[$fullFilename];
 
-            $counter = $this->handleFile($output, $file, $detector, $data, $checks, $cache);
+            if ($g !== $group) {
+                $c = 0;
+                $g = $group;
+            }
+
+            $counter = $this->handleFile($output, $file, $detector, $data, $checks, $cache, $c);
 
             if (!$counter) {
                 continue;
             }
 
-            foreach ($testCounter as $group => $filesinGroup) {
-                foreach (array_keys($filesinGroup) as $fileinGroup) {
-                    if ($fileinGroup !== $filename) {
-                        continue;
-                    }
-
-                    $testCounter[$group][$fileinGroup] += $counter;
-                }
-            }
+            $testCounter[$group][$fullFilename] += $counter;
         }
 
         $circleFile      = 'vendor/mimmi20/browser-detector/circle.yml';
@@ -203,6 +206,7 @@ test:
      * @param array                                             $data
      * @param array                                             $checks
      * @param CacheItemPoolInterface                            $cache
+     * @param int                                               $c
      *
      * @return int
      */
@@ -212,7 +216,8 @@ test:
         BrowserDetector $detector,
         array &$data,
         array &$checks,
-        CacheItemPoolInterface $cache
+        CacheItemPoolInterface $cache,
+        &$c
     ) {
 
         $output->writeln('file ' . $file->getBasename());
@@ -277,7 +282,6 @@ test:
 
         $output->writeln('    processing ...');
         $outputDetector = [];
-        $counter        = 0;
 
         foreach ($tests as $key => $test) {
             if (isset($data[$key])) {
@@ -305,8 +309,8 @@ test:
             $data[$key]        = $test;
             $checks[$test->ua] = $key;
 
-            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache, $counter);
-            ++$counter;
+            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache, $c);
+            ++$c;
         }
 
         $newCounter = count($outputDetector);
