@@ -362,8 +362,9 @@ class CreateTestsCommand extends Command
         $minVersion = (isset($v[1]) ? $v[1] : '0');
 
         $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
+        $formatedCounter = sprintf('%1$05d', (int) $i);
 
-        $outputBrowscap .= "    'issue-$formatedIssue-$i' => [
+        $outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
         'properties' => [
             'Comment' => 'Default Browser',
@@ -420,7 +421,7 @@ class CreateTestsCommand extends Command
         $formatedIssue   = sprintf('%1$08d', (int) $testNumber);
         $formatedCounter = sprintf('%1$08d', (int) $counter);
 
-        $outputDetector['browscap-issue-' . $formatedIssue . '-' . $formatedCounter] = [
+        $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'         => $ua,
             'properties' => [
                 'Browser_Name'            => $browserNameDetector,

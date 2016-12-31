@@ -356,10 +356,14 @@ test:
 
         /** rewrite test numbers */
 
-        if (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
+        if (preg_match('/^browscap\-issue\-(\d+)\-(\d+)$/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
+        } elseif (preg_match('/^browscap\-issue\-(\d+)$/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', 0);
+        } elseif (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
         } elseif (preg_match('/^test\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-00000000';
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', 0);
         } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
         }
