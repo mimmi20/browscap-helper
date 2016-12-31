@@ -257,7 +257,7 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $issue, $detector);
+            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $testNumber, $detector);
             $checks[$ua] = $issue;
             ++$i;
         }
@@ -300,10 +300,10 @@ class CreateTestsCommand extends Command
      * @param int                               &$counter
      * @param string                            &$outputBrowscap
      * @param array                             &$outputDetector
-     * @param string                            $issue
+     * @param int                               $testNumber
      * @param \BrowserDetector\BrowserDetector  $detector
      */
-    private function parseLine(CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $issue, BrowserDetector $detector)
+    private function parseLine(CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector)
     {
         $engineVersion = 'unknown';
 
@@ -361,7 +361,9 @@ class CreateTestsCommand extends Command
         $maxVersion = $v[0];
         $minVersion = (isset($v[1]) ? $v[1] : '0');
 
-        $outputBrowscap .= "    'issue-$issue-$i' => [
+        $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
+
+        $outputBrowscap .= "    'issue-$formatedIssue-$i' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
         'properties' => [
             'Comment' => 'Default Browser',
@@ -415,7 +417,7 @@ class CreateTestsCommand extends Command
         'standard' => " . ($standard ? 'true' : 'false') . ",
     ],\n";
 
-        $formatedIssue   = sprintf('%1$08d', (int) $issue);
+        $formatedIssue   = sprintf('%1$08d', (int) $testNumber);
         $formatedCounter = sprintf('%1$08d', (int) $counter);
 
         $outputDetector['browscap-issue-' . $formatedIssue . '-' . $formatedCounter] = [
