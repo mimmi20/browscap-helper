@@ -277,6 +277,7 @@ test:
 
         $output->writeln('    processing ...');
         $outputDetector = [];
+        $counter        = 0;
 
         foreach ($tests as $key => $test) {
             if (isset($data[$key])) {
@@ -304,7 +305,8 @@ test:
             $data[$key]        = $test;
             $checks[$test->ua] = $key;
 
-            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache);
+            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache, $counter);
+            ++$counter;
         }
 
         $newCounter = count($outputDetector);
@@ -341,6 +343,7 @@ test:
      * @param BrowserDetector                                   $detector
      * @param string                                            $key
      * @param CacheItemPoolInterface                            $cache
+     * @param int                                               $counter
      *
      * @return array
      */
@@ -349,7 +352,8 @@ test:
         \stdClass $test,
         BrowserDetector $detector,
         $key,
-        CacheItemPoolInterface $cache
+        CacheItemPoolInterface $cache,
+        $counter
     ) {
         $output->writeln('    processing Test ' . $key . ' ...');
         $output->writeln('        ua: ' . $test->ua);
@@ -360,6 +364,10 @@ test:
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
         } elseif (preg_match('/^browscap\-issue\-(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', 0);
+        } elseif (preg_match('/^browscap\-issue\-([^\-]+)\-(.*)$/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$08d', 0) . '-' . sprintf('%1$08d', $counter);
+        } elseif (preg_match('/^browscap\-issue\-(\d+)\-(.*)$/', $key, $matches)) {
+            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', $counter);
         } elseif (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
         } elseif (preg_match('/^test\-(\d+)$/', $key, $matches)) {
