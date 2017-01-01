@@ -49,10 +49,10 @@ class Platform
         $useragent,
         BrowserDetector $detector,
         $platformCodenameDetector,
-        $platformMarketingnameDetector  = 'unknown',
-        $platformMakerNameDetector      = 'unknown',
+        $platformMarketingnameDetector = 'unknown',
+        $platformMakerNameDetector = 'unknown',
         $platformMakerBrandnameDetector = 'unknown',
-        $platformVersionDetector        = 'unknown'
+        $platformVersionDetector = 'unknown'
     ) {
         $platformNameBrowscap           = 'unknown';
         $platformVersionBrowscap        = 'unknown';

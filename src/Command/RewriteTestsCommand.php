@@ -766,18 +766,18 @@ class T' . $group . 'Test extends UserAgentsTest
             $deviceBrand, , ,
             $deviceOrientation,
             $device) = (new Helper\Device())->detect(
-            $cache,
-            $test->ua,
-            $platform,
-            $detector,
-            $deviceCode,
-            $deviceBrand,
-            $devicePointing,
-            $deviceType,
-            $deviceMaker,
-            $deviceName,
-            $deviceOrientation
-        );
+                $cache,
+                $test->ua,
+                $platform,
+                $detector,
+                $deviceCode,
+                $deviceBrand,
+                $devicePointing,
+                $deviceType,
+                $deviceMaker,
+                $deviceName,
+                $deviceOrientation
+            );
         /** @var $deviceType \UaDeviceType\TypeInterface */
 
         if ($deviceCode === 'unknown'

@@ -44,14 +44,14 @@ class Device
         OsInterface $platform,
         BrowserDetector $detector,
         $deviceCode,
-        $deviceBrand       = null,
-        $devicePointing    = null,
-        $deviceType        = null,
-        $deviceMaker       = null,
-        $deviceName        = null,
+        $deviceBrand = null,
+        $devicePointing = null,
+        $deviceType = null,
+        $deviceMaker = null,
+        $deviceName = null,
         $deviceOrientation = null,
-        $isTablet          = false,
-        $mobileDevice      = false
+        $isTablet = false,
+        $mobileDevice = false
     ) {
         $deviceLoader = new DeviceLoader($cache);
         $device       = null;
@@ -13344,9 +13344,9 @@ class Device
                     $deviceName        = $device->getMarketingName();
                     $deviceOrientation = $device->getDualOrientation();
                 } elseif ('general Mobile Device' === $device->getDeviceName() && in_array(
-                        $deviceCode,
-                        ['general Mobile Phone', 'general Tablet']
-                    )
+                    $deviceCode,
+                    ['general Mobile Phone', 'general Tablet']
+                )
                 ) {
                     $deviceBrand       = $device->getBrand();
                     $deviceCode        = $device->getDeviceName();
