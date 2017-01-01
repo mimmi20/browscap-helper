@@ -16,6 +16,7 @@
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Helper;
 use BrowscapHelper\Reader;
 use BrowserDetector\BrowserDetector;
 use BrowserDetector\Loader\DeviceLoader;
@@ -30,7 +31,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Os\OsInterface;
-use BrowscapHelper\Helper;
 
 /**
  * Class DiffCommand
@@ -279,7 +279,6 @@ class T' . $group . 'Test extends UserAgentsTest
         CacheItemPoolInterface $cache,
         &$c
     ) {
-
         $output->writeln('file ' . $file->getBasename());
         $output->writeln('    checking ...');
 
@@ -685,13 +684,12 @@ class T' . $group . 'Test extends UserAgentsTest
             $platformBrandname = 'unknown';
         }
 
-        list(
-            ,,,,,,,
+        list(, , , , , , ,
             $platformCodename,
             $platformMarketingname,
             $platformMaker,
             $platformBrandname,
-            $platformVersion,,
+            $platformVersion, ,
             $platformBits,
             $platform) = (new Helper\Platform())->detect($cache, $test->ua, $detector, $platformCodename, $platformMarketingname, $platformMaker, $platformBrandname, $platformVersion);
 

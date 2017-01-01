@@ -16,10 +16,10 @@
 
 namespace BrowscapHelper\Helper;
 
+use BrowserDetector\BrowserDetector;
 use BrowserDetector\Loader\DeviceLoader;
 use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Os\OsInterface;
-use BrowserDetector\BrowserDetector;
 
 /**
  * Class DiffCommand
@@ -32,9 +32,9 @@ class Device
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
-     * @param OsInterface $platform
+     * @param OsInterface                       $platform
      * @param BrowserDetector                   $detector
-     * @param string $deviceCode
+     * @param string                            $deviceCode
      *
      * @return array
      */
@@ -52,8 +52,7 @@ class Device
         $deviceOrientation = null,
         $isTablet          = false,
         $mobileDevice      = false
-    )
-    {
+    ) {
         $deviceLoader = new DeviceLoader($cache);
         $device       = null;
 

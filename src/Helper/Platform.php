@@ -17,10 +17,10 @@
 namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Bits\Os;
-use BrowserDetector\Loader\PlatformLoader;
-use BrowserDetector\Factory;
-use Psr\Cache\CacheItemPoolInterface;
 use BrowserDetector\BrowserDetector;
+use BrowserDetector\Factory;
+use BrowserDetector\Loader\PlatformLoader;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class DiffCommand
@@ -53,8 +53,7 @@ class Platform
         $platformMakerNameDetector      = 'unknown',
         $platformMakerBrandnameDetector = 'unknown',
         $platformVersionDetector        = 'unknown'
-    )
-    {
+    ) {
         $platformNameBrowscap           = 'unknown';
         $platformVersionBrowscap        = 'unknown';
         $platformMakerBrowscap          = 'unknown';
@@ -86,7 +85,7 @@ class Platform
 
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
-            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+            $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -99,7 +98,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -221,7 +220,7 @@ class Platform
 
             $platformNameBrowscap           = 'Tizen';
             $platformMakerBrowscap          = 'unknown';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -247,7 +246,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -265,7 +264,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -283,7 +282,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -301,7 +300,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -314,7 +313,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -327,7 +326,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -339,7 +338,7 @@ class Platform
             $platform = $platformLoader->load('openbsd', $useragent);
 
             $platformNameBrowscap          = 'OpenBSD';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap   = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -352,7 +351,7 @@ class Platform
 
             $platformNameBrowscap           = 'SymbianOS';
             $platformMakerBrowscap          = 'Symbian Foundation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -365,7 +364,7 @@ class Platform
 
             $platformNameBrowscap           = 'JAVA';
             $platformMakerBrowscap          = 'Oracle';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -379,7 +378,7 @@ class Platform
             $platformNameBrowscap           = 'Win10';
             $platformVersionBrowscap        = '10.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -401,7 +400,7 @@ class Platform
             $platformNameBrowscap           = 'Win10';
             $platformVersionBrowscap        = '6.4';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -423,7 +422,7 @@ class Platform
             $platformNameBrowscap           = 'Win8.1';
             $platformVersionBrowscap        = '6.3';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -445,7 +444,7 @@ class Platform
             $platformNameBrowscap           = 'Win8.1';
             $platformVersionBrowscap        = '6.3';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -467,7 +466,7 @@ class Platform
             $platformNameBrowscap           = 'Win8';
             $platformVersionBrowscap        = '6.2';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -489,7 +488,7 @@ class Platform
             $platformNameBrowscap           = 'Win8';
             $platformVersionBrowscap        = '6.2';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -511,7 +510,7 @@ class Platform
             $platformNameBrowscap           = 'Win7';
             $platformVersionBrowscap        = '6.1';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -533,7 +532,7 @@ class Platform
             $platformNameBrowscap           = 'WinVista';
             $platformVersionBrowscap        = '6.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -555,7 +554,7 @@ class Platform
             $platformNameBrowscap           = 'WinXP';
             $platformVersionBrowscap        = '5.3';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -577,7 +576,7 @@ class Platform
             $platformNameBrowscap           = 'WinXP';
             $platformVersionBrowscap        = '5.2';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -599,7 +598,7 @@ class Platform
             $platformNameBrowscap           = 'WinXP';
             $platformVersionBrowscap        = '5.1';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -621,7 +620,7 @@ class Platform
             $platformNameBrowscap           = 'Win2000';
             $platformVersionBrowscap        = '5.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -645,7 +644,7 @@ class Platform
             $platformNameBrowscap           = 'Win2000';
             $platformVersionBrowscap        = '5.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -669,7 +668,7 @@ class Platform
             $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = '4.1';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -693,7 +692,7 @@ class Platform
             $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = '4.1';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -717,7 +716,7 @@ class Platform
             $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = '4.0';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -741,7 +740,7 @@ class Platform
             $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = '3.5';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -765,7 +764,7 @@ class Platform
             $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = '3.1';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -789,7 +788,7 @@ class Platform
             $platformNameBrowscap           = 'WinNT';
             $platformVersionBrowscap        = 'unknown';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -813,7 +812,7 @@ class Platform
             $platformNameBrowscap           = 'CygWin';
             $platformVersionBrowscap        = 'unknown';
             $platformMakerBrowscap          = 'Microsoft Corporation';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -836,7 +835,7 @@ class Platform
 
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
-            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+            $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -854,7 +853,7 @@ class Platform
 
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
-            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+            $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -872,7 +871,7 @@ class Platform
 
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
-            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+            $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -890,7 +889,7 @@ class Platform
 
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
-            $platformDescriptionBrowscap = 'iPod, iPhone & iPad';
+            $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -958,7 +957,7 @@ class Platform
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'Android OS';
+            $platformDescriptionBrowscap    = 'Android OS';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -1114,7 +1113,7 @@ class Platform
 
             $platformNameBrowscap           = 'ChromeOS';
             $platformMakerBrowscap          = 'Google Inc';
-            $platformDescriptionBrowscap = 'unknown';
+            $platformDescriptionBrowscap    = 'unknown';
 
             $platformCodenameDetector       = $platform->getName();
             $platformMarketingnameDetector  = $platform->getMarketingName();
@@ -1296,7 +1295,7 @@ class Platform
             $platformVersionDetector,
             $standard,
             $platformBits,
-            $platform
+            $platform,
         ];
     }
 }
