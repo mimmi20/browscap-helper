@@ -68,15 +68,20 @@ class RewriteTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('init logger ...');
         $logger = new Logger('browser-detector-helper');
         $logger->pushHandler(new Handler\NullHandler());
         $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
 
+        $output->writeln('init cache ...');
         $adapter  = new Local(__DIR__ . '/../../cache/');
         $cache    = new FilesystemCachePool(new Filesystem($adapter));
+
+        $output->writeln('init detector ...');
         $detector = new BrowserDetector($cache, $logger);
 
-        $sourceDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
+        //@todo: read from test sources
+        $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
@@ -133,7 +138,7 @@ class RewriteTestsCommand extends Command
             $testCounter[$group][$fullFilename] += $counter;
         }
 
-        $circleFile      = 'vendor/mimmi20/browser-detector/circle.yml';
+        $circleFile      = 'vendor/mimmi20/browser-detector-tests/circle.yml';
         $circleciContent = 'machine:
   php:
     version: 7.0.4
@@ -145,11 +150,7 @@ dependencies:
     - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-interaction --no-progress
 
 test:
-  override:
-    - mkdir -p $CIRCLE_TEST_REPORTS/phpunit
-    - vendor/bin/phpunit -c phpunit.library.xml --exclude-group useragenttest --coverage-text --colors=auto --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml
-    #- vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group useragenttest --colors=auto
-';
+  override:';
 
         $circleLines = [];
 
@@ -249,7 +250,7 @@ class T' . $group . 'Test extends UserAgentsTest
     }
 }
 ';
-            $testFile = 'vendor/mimmi20/browser-detector/tests/UserAgentsTest/T' . $group . 'Test.php';
+            $testFile = 'vendor/mimmi20/browser-detector-tests/tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
         }
 

@@ -20,6 +20,7 @@ use BrowscapHelper\Helper\Browser;
 use BrowscapHelper\Helper\Device;
 use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
+use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Reader\TxtFileReader;
 use BrowscapHelper\Reader\YamlFileReader;
 use BrowserDetector\BrowserDetector;
@@ -99,19 +100,24 @@ class CreateTestsCommand extends Command
          * loading files
          ******************************************************************************/
 
+        $output->writeln('init logger ...');
+        $logger = new Logger('browser-detector-helper');
+        $logger->pushHandler(new Handler\NullHandler());
+        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
+
+        $output->writeln('init cache ...');
+        $adapter  = new Local(__DIR__ . '/../../cache/');
+        $cache    = new FilesystemCachePool(new Filesystem($adapter));
+
+        $output->writeln('init detector ...');
+        $detector = new BrowserDetector($cache, $logger);
+
+        //@todo: read from test sources
         $output->writeln('reading files from browscap ...');
 
         $browscapIssueDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
         $browscapIssueIterator  = new \RecursiveDirectoryIterator($browscapIssueDirectory);
         $checks                 = [];
-
-        $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\NullHandler());
-        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
-
-        $adapter  = new Local(__DIR__ . '/../../cache/');
-        $cache    = new FilesystemCachePool(new Filesystem($adapter));
-        $detector = new BrowserDetector($cache, $logger);
 
         foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
             /** @var $file \SplFileInfo */
@@ -135,27 +141,14 @@ class CreateTestsCommand extends Command
             }
         }
 
-        $output->writeln('detect next test number ...');
+        try {
+            $number = (new TargetDirectory())->getNextTest($output);
+        } catch (\League\Flysystem\UnreadableFileException $e) {
+            $logger->critical($e);
+            $output->writeln($e->getMessage());
 
-        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/';
-        $filesArray      = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
-        $number          = 0;
-
-        foreach ($filesArray as $filename) {
-            if (in_array($filename, ['.', '..'])) {
-                continue;
-            }
-
-            $file     = new \SplFileInfo($targetDirectory . $filename);
-            $basename = $file->getBasename('.' . $file->getExtension());
-
-            if ((int) $basename > $number) {
-                $number = (int) $basename;
-            }
+            return;
         }
-
-        ++$number;
-        $output->writeln('nexst test: ' . $number);
 
         $output->writeln('reading new files ...');
 
@@ -241,7 +234,7 @@ class CreateTestsCommand extends Command
         array $fileContents = [],
         $testNumber = 0,
         array &$checks = [],
-        BrowserDetector $detector
+        BrowserDetector $detector = null
     ) {
         $outputBrowscap = "<?php\n\nreturn [\n";
         $outputDetector = [];
@@ -249,7 +242,7 @@ class CreateTestsCommand extends Command
         $i              = 0;
         $issue          = 'test-' . sprintf('%1$08d', $testNumber);
 
-        foreach ($fileContents as $ua => $count) {
+        foreach (array_keys($fileContents) as $ua) {
             $ua = trim($ua);
 
             if (isset($checks[$ua])) {
@@ -267,7 +260,7 @@ class CreateTestsCommand extends Command
         file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
 
         $chunks          = array_chunk($outputDetector, 100, true);
-        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/' . sprintf('%1$05d', $testNumber) . '/';
+        $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$05d', $testNumber) . '/';
         if (!file_exists($targetDirectory)) {
             mkdir($targetDirectory);
         }

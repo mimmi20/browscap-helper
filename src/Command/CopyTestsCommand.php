@@ -16,6 +16,9 @@
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Helper\TargetDirectory;
+use Monolog\Handler;
+use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,8 +59,22 @@ class CopyTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('init logger ...');
+        $logger = new Logger('browser-detector-helper');
+        $logger->pushHandler(new Handler\NullHandler());
+        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
+
+        try {
+            $targetDirectory = (new TargetDirectory())->getPath($output);
+        } catch (\League\Flysystem\UnreadableFileException $e) {
+            $logger->critical($e);
+            $output->writeln($e->getMessage());
+
+            return;
+        }
+
+        //@todo: read from test sources
         $sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-        $targetDirectory = 'vendor/mimmi20/browser-detector/tests/issues/00000/';
         $counter         = 0;
 
         /*******************************************************************************
