@@ -73,7 +73,12 @@ class CopyTestsCommand extends Command
             return;
         }
 
+        if (!file_exists($targetDirectory)) {
+            mkdir($targetDirectory);
+        }
+
         //@todo: read from test sources
+        //@todo: only write uas which are not written yet
         $sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
         $counter         = 0;
 
