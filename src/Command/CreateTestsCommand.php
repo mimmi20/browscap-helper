@@ -113,6 +113,7 @@ class CreateTestsCommand extends Command
         $detector = new BrowserDetector($cache, $logger);
 
         //@todo: read from test sources
+        //@todo: only write uas which are not written yet
         $output->writeln('reading files from browscap ...');
 
         $browscapIssueDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
