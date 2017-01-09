@@ -23,6 +23,8 @@ use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Reader\TxtFileReader;
 use BrowscapHelper\Reader\YamlFileReader;
+use BrowscapHelper\Source\DetectorSource;
+use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\BrowserDetector;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
@@ -112,34 +114,15 @@ class CreateTestsCommand extends Command
         $output->writeln('init detector ...');
         $detector = new BrowserDetector($cache, $logger);
 
-        //@todo: read from test sources
-        //@todo: only write uas which are not written yet
-        $output->writeln('reading files from browscap ...');
+        $output->writeln('reading already existing tests ...');
+        $checks = [];
 
-        $browscapIssueDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-        $browscapIssueIterator  = new \RecursiveDirectoryIterator($browscapIssueDirectory);
-        $checks                 = [];
-
-        foreach (new \RecursiveIteratorIterator($browscapIssueIterator) as $file) {
-            /** @var $file \SplFileInfo */
-            if (!$file->isFile() || $file->getExtension() !== 'php') {
+        foreach ((new DetectorSource())->getUserAgents($logger, $output) as $useragent) {
+            if (isset($checks[$useragent])) {
                 continue;
             }
 
-            $tests = require_once $file->getPathname();
-
-            foreach ($tests as $key => $test) {
-                if (isset($data[$key])) {
-                    continue;
-                }
-
-                if (isset($checks[$test['ua']])) {
-                    continue;
-                }
-
-                $data[$key]          = $test;
-                $checks[$test['ua']] = $key;
-            }
+            $checks[$useragent] = $useragent;
         }
 
         try {
@@ -154,106 +137,21 @@ class CreateTestsCommand extends Command
         $output->writeln('reading new files ...');
 
         $sourcesDirectory = $input->getOption('resources');
-        $sourcesIterator  = new \RecursiveDirectoryIterator($sourcesDirectory);
+        $outputBrowscap   = "<?php\n\nreturn [\n";
+        $outputDetector   = [];
         $counter          = 0;
+        $issue            = 'test-' . sprintf('%1$08d', $number);
 
-        foreach (new \RecursiveIteratorIterator($sourcesIterator) as $file) {
-            /** @var $file \SplFileInfo */
-            if (!$file->isFile()) {
+        foreach ((new DirectorySource($sourcesDirectory))->getUserAgents($logger, $output) as $useragent) {
+            $useragent = trim($useragent);
+
+            if (isset($checks[$useragent])) {
                 continue;
             }
 
-            $output->writeln('file ' . $file->getBasename());
-            $output->writeln('    checking ...');
-
-            $fileContents = [];
-
-            switch ($file->getExtension()) {
-                case 'txt':
-                    $reader = new TxtFileReader();
-                    $reader->setLocalFile($file->getPathname());
-
-                    $fileContents = $reader->getAgents();
-                    break;
-                case 'yaml':
-                    $reader = new YamlFileReader();
-                    $reader->setLocalFile($file->getPathname());
-
-                    $fileContents = $reader->getAgents();
-                    break;
-                default:
-                    continue;
-            }
-
-            if (empty($fileContents)) {
-                continue;
-            }
-
-            $output->writeln('    parsing ...');
-
-            $chunks = array_chunk($fileContents, 20000, true);
-
-            if (count($chunks) > 1) {
-                $output->writeln('    found too many user agnets, will create ' . count($chunks) . ' files ...');
-            }
-
-            foreach ($chunks as $chunkId => $chunk) {
-                $nextTest = $number + $chunkId;
-
-                if (count($chunks) > 1) {
-                    $output->writeln('    processing test ' . $nextTest . ' ...');
-                }
-
-                $counter += $this->parseFile(
-                    $output,
-                    $cache,
-                    $chunk,
-                    $number + $chunkId,
-                    $checks,
-                    $detector
-                );
-            }
-        }
-
-        $output->writeln('');
-        $output->writeln('Es wurden ' . $counter . ' Tests exportiert');
-    }
-
-    /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
-     * @param array                                             $fileContents
-     * @param int                                               $testNumber
-     * @param array                                             &$checks
-     * @param \BrowserDetector\BrowserDetector                  $detector
-     *
-     * @return int
-     */
-    private function parseFile(
-        OutputInterface $output,
-        CacheItemPoolInterface $cache,
-        array $fileContents = [],
-        $testNumber = 0,
-        array &$checks = [],
-        BrowserDetector $detector = null
-    ) {
-        $outputBrowscap = "<?php\n\nreturn [\n";
-        $outputDetector = [];
-        $counter        = 0;
-        $i              = 0;
-        $issue          = 'test-' . sprintf('%1$08d', $testNumber);
-
-        foreach (array_keys($fileContents) as $ua) {
-            $ua = trim($ua);
-
-            if (isset($checks[$ua])) {
-                $output->writeln('        useragent ' . $i . ' was already checked, found in ' . $checks[$ua]);
-                continue;
-            }
-
-            $this->parseLine($cache, $ua, $i, $checks, $counter, $outputBrowscap, $outputDetector, $testNumber, $detector);
-            $checks[$ua] = $issue;
-            ++$i;
+            $this->parseLine($cache, $useragent,  $counter, $outputBrowscap, $outputDetector, $number, $detector);
+            $checks[$useragent] = $issue;
+            ++$counter;
         }
 
         $outputBrowscap .= "];\n";
@@ -261,14 +159,13 @@ class CreateTestsCommand extends Command
         file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
 
         $chunks          = array_chunk($outputDetector, 100, true);
-        $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$05d', $testNumber) . '/';
+        $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$05d', $number) . '/';
         if (!file_exists($targetDirectory)) {
             mkdir($targetDirectory);
         }
 
         foreach ($chunks as $chunkId => $chunk) {
             if (!count($chunk)) {
-                $output->writeln('    skip empty chunk ' . $chunkId);
                 continue;
             }
 
@@ -283,21 +180,20 @@ class CreateTestsCommand extends Command
             );
         }
 
-        return $counter;
+        $output->writeln('');
+        $output->writeln($counter . ' tests exported');
     }
 
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $ua
-     * @param int                               $i
-     * @param array                             &$checks
-     * @param int                               &$counter
+     * @param int                               $counter
      * @param string                            &$outputBrowscap
      * @param array                             &$outputDetector
      * @param int                               $testNumber
      * @param \BrowserDetector\BrowserDetector  $detector
      */
-    private function parseLine(CacheItemPoolInterface $cache, $ua, $i, array &$checks, &$counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector)
+    private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector)
     {
         $engineVersion = 'unknown';
 
@@ -356,7 +252,7 @@ class CreateTestsCommand extends Command
         $minVersion = (isset($v[1]) ? $v[1] : '0');
 
         $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
-        $formatedCounter = sprintf('%1$05d', (int) $i);
+        $formatedCounter = sprintf('%1$05d', (int) $counter);
 
         $outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
@@ -442,10 +338,6 @@ class CreateTestsCommand extends Command
                 'RenderingEngine_Maker'   => $engineMaker,
             ],
         ];
-
-        ++$counter;
-
-        $checks[$ua] = $i;
 
         return;
     }

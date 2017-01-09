@@ -17,6 +17,12 @@
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\TargetDirectory;
+use BrowscapHelper\Source\BrowscapSource;
+use BrowscapHelper\Source\DetectorSource;
+use BrowscapHelper\Source\PiwikSource;
+use BrowscapHelper\Source\UapCoreSource;
+use BrowscapHelper\Source\WhichBrowserSource;
+use BrowscapHelper\Source\WootheeSource;
 use Monolog\Handler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -65,6 +71,15 @@ class CopyTestsCommand extends Command
         $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
 
         try {
+            $number = (new TargetDirectory())->getNextTest($output);
+        } catch (\League\Flysystem\UnreadableFileException $e) {
+            $logger->critical($e);
+            $output->writeln($e->getMessage());
+
+            return;
+        }
+
+        try {
             $targetDirectory = (new TargetDirectory())->getPath($output);
         } catch (\League\Flysystem\UnreadableFileException $e) {
             $logger->critical($e);
@@ -77,55 +92,35 @@ class CopyTestsCommand extends Command
             mkdir($targetDirectory);
         }
 
-        //@todo: read from test sources
-        //@todo: only write uas which are not written yet
-        $sourceDirectory = 'vendor/browscap/browscap/tests/fixtures/issues/';
-        $counter         = 0;
+        $existingTests = array_flip((new DetectorSource())->getUserAgents($logger, $output));
 
-        /*******************************************************************************
-         * loading files
-         ******************************************************************************/
+        $counter = 0;
+        $sources = [
+            new BrowscapSource(),
+            new PiwikSource(),
+            new UapCoreSource(),
+            new WhichBrowserSource(),
+            new WootheeSource(),
+        ];
 
-        $files = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
+        $tests = [];
 
-        foreach ($files as $filename) {
-            /** @var $file \SplFileInfo */
-            $file = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $filename);
+        foreach ($sources as $source) {
+            /** @var \BrowscapHelper\Source\SourceInterface $source */
+            foreach ($source->getTests($logger, $output) as $ua => $test) {
+                $ua = trim($ua);
 
-            $output->writeln('file ' . $file->getBasename());
-            $output->write('    checking ...');
+                if (isset($existingTests[$ua])) {
+                    continue;
+                }
 
-            if (!$file->isFile() || !$file->isReadable()) {
-                $output->writeln(' - ignored');
-
-                continue;
+                $tests[$ua] = $test;
             }
-
-            /** @var $file \SplFileInfo */
-            if ($file->getExtension() !== 'php') {
-                $output->writeln(' - ignored');
-                continue;
-            }
-
-            $oldname = $file->getBasename('.php');
-            $tests   = require_once $file->getPathname();
-
-            if (empty($tests)) {
-                $output->writeln(' - ignored');
-                continue;
-            }
-
-            $output->writeln('');
-            $output->writeln('    processing ...');
-
-            $newname = 'browscap-' . $oldname;
-
-            if (preg_match('/issue\-(\d+)/', $oldname, $matches)) {
-                $newname = sprintf('browscap-issue-%1$08d', (int) $matches[1]);
-            }
-
-            $this->handleTests($output, $tests, $newname, $targetDirectory, $counter);
         }
+
+        $issue = 'test-' . sprintf('%1$08d', $number);
+
+        $this->handleTests($output, $tests, $issue, $targetDirectory, $counter);
 
         $output->writeln('');
         $output->writeln('Es wurden ' . $counter . ' Tests exportiert');
@@ -299,7 +294,7 @@ class CopyTestsCommand extends Command
                     break;
             }
 
-            $data['browscap-' . $key] = [
+            $data[$key] = [
                 'ua'         => $test['ua'],
                 'properties' => [
                     'Browser_Name'            => $test['properties']['Browser'],

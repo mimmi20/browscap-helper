@@ -284,28 +284,16 @@ class T' . $group . 'Test extends UserAgentsTest
         $output->writeln('    checking ...');
 
         /** @var $file \SplFileInfo */
-        if (!$file->isFile() || !in_array($file->getExtension(), ['php', 'json'])) {
+        if (!$file->isFile() || $file->getExtension() !== 'json') {
             return 0;
         }
 
         $output->writeln('    reading ...');
 
-        switch ($file->getExtension()) {
-            case 'php':
-                $reader = new Reader\BrowscapTestReader();
-                $reader->setLocalFile($file->getPathname());
+        $reader = new Reader\DetectorTestReader();
+        $reader->setLocalFile($file->getPathname());
 
-                $tests = $reader->getTests();
-                break;
-            case 'json':
-                $reader = new Reader\DetectorTestReader();
-                $reader->setLocalFile($file->getPathname());
-
-                $tests = $reader->getTests();
-                break;
-            default:
-                return 0;
-        }
+        $tests = $reader->getTests();
 
         if (empty($tests)) {
             $output->writeln('    removing empty file');
@@ -438,6 +426,56 @@ class T' . $group . 'Test extends UserAgentsTest
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', 0);
         } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
             $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
+        }
+
+        /** rewrite browsers */
+
+        if (isset($test->properties->Browser_Name)) {
+            $browserName = $test->properties->Browser_Name;
+        } else {
+            $output->writeln('["' . $key . '"] browser name for UA "' . $test->ua . '" is missing, using "unknown" instead');
+
+            $browserName = 'unknown';
+        }
+
+        if (isset($test->properties->Browser_Type)) {
+            $browserType = $test->properties->Browser_Type;
+        } else {
+            $output->writeln('["' . $key . '"] browser type for UA "' . $test->ua . '" is missing, using "unknown" instead');
+
+            $browserType = 'unknown';
+        }
+
+        if (isset($test->properties->Browser_Bits)) {
+            $browserBits = $test->properties->Browser_Bits;
+        } else {
+            $output->writeln('["' . $key . '"] browser bits for UA "' . $test->ua . '" is missing, using "0" instead');
+
+            $browserBits = 0;
+        }
+
+        if (isset($test->properties->Browser_Maker)) {
+            $browserMaker = $test->properties->Browser_Maker;
+        } else {
+            $output->writeln('["' . $key . '"] browser maker for UA "' . $test->ua . '" is missing, using "unknown" instead');
+
+            $browserMaker = 'unknown';
+        }
+
+        if (isset($test->properties->Browser_Modus)) {
+            $browserModus = $test->properties->Browser_Modus;
+        } else {
+            $output->writeln('["' . $key . '"] browser modus for UA "' . $test->ua . '" is missing, using "unknown" instead');
+
+            $browserModus = 'unknown';
+        }
+
+        if (isset($test->properties->Browser_Version)) {
+            $browserVersion = $test->properties->Browser_Version;
+        } else {
+            $output->writeln('["' . $key . '"] browser version for UA "' . $test->ua . '" is missing, using "0.0.0" instead');
+
+            $browserVersion = '0.0.0';
         }
 
         /** rewrite platforms */
@@ -595,6 +633,32 @@ class T' . $group . 'Test extends UserAgentsTest
             }
         }
 
+        /** rewrite engines */
+
+        if (isset($test->properties->RenderingEngine_Name)) {
+            $engineName = $test->properties->RenderingEngine_Name;
+        } else {
+            $output->writeln('["' . $key . '"] engine name for UA "' . $test->ua . '" is missing, using "unknown" instead');
+
+            $engineName = 'unknown';
+        }
+
+        if (isset($test->properties->RenderingEngine_Version)) {
+            $engineVersion = $test->properties->RenderingEngine_Version;
+        } else {
+            $output->writeln('["' . $key . '"] engine version for UA "' . $test->ua . '" is missing, using "0.0.0" instead');
+
+            $engineVersion = '0.0.0';
+        }
+
+        if (isset($test->properties->RenderingEngine_Maker)) {
+            $engineMaker = $test->properties->RenderingEngine_Maker;
+        } else {
+            $output->writeln('["' . $key . '"] engine maker for UA "' . $test->ua . '" is missing, using "unknown" instead');
+
+            $engineMaker = 'unknown';
+        }
+
         $output->writeln('        generating result');
 
         /** generate result */
@@ -602,12 +666,12 @@ class T' . $group . 'Test extends UserAgentsTest
             $key => [
                 'ua'         => $test->ua,
                 'properties' => [
-                    'Browser_Name'            => $test->properties->Browser_Name,
-                    'Browser_Type'            => $test->properties->Browser_Type,
-                    'Browser_Bits'            => $test->properties->Browser_Bits,
-                    'Browser_Maker'           => $test->properties->Browser_Maker,
-                    'Browser_Modus'           => $test->properties->Browser_Modus,
-                    'Browser_Version'         => $test->properties->Browser_Version,
+                    'Browser_Name'            => $browserName,
+                    'Browser_Type'            => $browserType,
+                    'Browser_Bits'            => $browserBits,
+                    'Browser_Maker'           => $browserMaker,
+                    'Browser_Modus'           => $browserModus,
+                    'Browser_Version'         => $browserVersion,
                     'Platform_Codename'       => $platformCodename,
                     'Platform_Marketingname'  => $platformMarketingname,
                     'Platform_Version'        => $platformVersion,
@@ -621,9 +685,9 @@ class T' . $group . 'Test extends UserAgentsTest
                     'Device_Dual_Orientation' => $deviceOrientation,
                     'Device_Code_Name'        => $deviceCode,
                     'Device_Brand_Name'       => $deviceBrand,
-                    'RenderingEngine_Name'    => $test->properties->RenderingEngine_Name,
-                    'RenderingEngine_Version' => $test->properties->RenderingEngine_Version,
-                    'RenderingEngine_Maker'   => $test->properties->RenderingEngine_Maker,
+                    'RenderingEngine_Name'    => $engineName,
+                    'RenderingEngine_Version' => $engineVersion,
+                    'RenderingEngine_Maker'   => $engineMaker,
                 ],
             ],
         ];
