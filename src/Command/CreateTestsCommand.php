@@ -21,8 +21,6 @@ use BrowscapHelper\Helper\Device;
 use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Helper\TargetDirectory;
-use BrowscapHelper\Reader\TxtFileReader;
-use BrowscapHelper\Reader\YamlFileReader;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\BrowserDetector;

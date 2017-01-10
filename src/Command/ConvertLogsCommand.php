@@ -107,7 +107,7 @@ class ConvertLogsCommand extends Command
         $targetBulkFile = $targetDirectory . date('Y-m-d') . '-testagents.txt';
         $targetInfoFile = $targetDirectory . date('Y-m-d') . '-testagents.info.txt';
 
-        $output->writeln("reading to directory '" . $sourcesDirectory . "'");
+        $output->writeln("reading from directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
         $reader = new LogFileReader();
