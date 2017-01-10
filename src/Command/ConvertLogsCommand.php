@@ -160,7 +160,7 @@ class ConvertLogsCommand extends Command
             }
 
             $dauer = microtime(true) - $startTime;
-            $output->writeln(' - finished [ ' . ($k > 0 ? $k . ' new' : 'no new') . ($k === 1 ? 'r' : '') . ' agent' . ($k !== 1 ? 's' : '') . ', ' . number_format($dauer, 4, ',', '.') . ' sec ]');
+            $output->writeln(' - finished [ ' . ($k > 0 ? $k : 'no') . ' new agent' . ($k !== 1 ? 's' : '') . ', ' . number_format($dauer, 4, ',', '.') . ' sec ]');
 
             unlink($file->getPathname());
             $j += $k;
