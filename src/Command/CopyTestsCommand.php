@@ -18,6 +18,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
+use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
@@ -95,27 +96,25 @@ class CopyTestsCommand extends Command
         $existingTests = array_flip((new DetectorSource())->getUserAgents($logger, $output));
 
         $counter = 0;
-        $sources = [
-            new BrowscapSource(),
-            new PiwikSource(),
-            new UapCoreSource(),
-            new WhichBrowserSource(),
-            new WootheeSource(),
-        ];
+        $tests   = [];
+        $source  = new CollectionSource(
+            [
+                new BrowscapSource(),
+                new PiwikSource(),
+                new UapCoreSource(),
+                new WhichBrowserSource(),
+                new WootheeSource(),
+            ]
+        );
 
-        $tests = [];
+        foreach ($source->getTests($logger, $output) as $ua => $test) {
+            $ua = trim($ua);
 
-        foreach ($sources as $source) {
-            /** @var \BrowscapHelper\Source\SourceInterface $source */
-            foreach ($source->getTests($logger, $output) as $ua => $test) {
-                $ua = trim($ua);
-
-                if (isset($existingTests[$ua])) {
-                    continue;
-                }
-
-                $tests[$ua] = $test;
+            if (isset($existingTests[$ua])) {
+                continue;
             }
+
+            $tests[$ua] = $test;
         }
 
         $issue = 'test-' . sprintf('%1$08d', $number);

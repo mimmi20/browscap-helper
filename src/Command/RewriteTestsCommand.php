@@ -17,7 +17,6 @@
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper;
-use BrowscapHelper\Reader;
 use BrowserDetector\BrowserDetector;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
@@ -80,7 +79,6 @@ class RewriteTestsCommand extends Command
         $output->writeln('init detector ...');
         $detector = new BrowserDetector($cache, $logger);
 
-        //@todo: read from test sources
         $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
@@ -115,27 +113,27 @@ class RewriteTestsCommand extends Command
             }
         }
 
-        $checks = [];
-        $data   = [];
-        $g      = null;
-        $c      = 0;
+        $checks  = [];
+        $data    = [];
+        $g       = null;
+        $counter = 0;
 
         foreach ($files as $fullFilename) {
             $file  = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $fullFilename);
             $group = $groups[$fullFilename];
 
             if ($g !== $group) {
-                $c = 0;
-                $g = $group;
+                $counter = 0;
+                $g       = $group;
             }
 
-            $counter = $this->handleFile($output, $file, $detector, $data, $checks, $cache, $c);
+            $newCounter = $this->handleFile($output, $file, $detector, $data, $checks, $cache, $counter, $group);
 
-            if (!$counter) {
+            if (!$newCounter) {
                 continue;
             }
 
-            $testCounter[$group][$fullFilename] += $counter;
+            $testCounter[$group][$fullFilename] += $newCounter;
         }
 
         $circleFile      = 'vendor/mimmi20/browser-detector-tests/circle.yml';
@@ -184,14 +182,11 @@ test:
 
         foreach ($circleLines as $group => $count) {
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #' . str_pad(
-                $count,
-                6,
-                ' ',
-                STR_PAD_LEFT
-            ) . ' test' . ($count !== 1 ? 's' : '') . PHP_EOL;
-            //$circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.regex.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 tests/RegexesTest/T' . $group . 'Test.php' . PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ' . $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php' . PHP_EOL;
+            $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+            $circleciContent .= PHP_EOL;
+            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ';
+            $circleciContent .= $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php';
+            $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
 /**
@@ -267,7 +262,8 @@ class T' . $group . 'Test extends UserAgentsTest
      * @param array                                             $data
      * @param array                                             $checks
      * @param CacheItemPoolInterface                            $cache
-     * @param int                                               $c
+     * @param int                                               $counter
+     * @param int                                               $group
      *
      * @return int
      */
@@ -278,7 +274,8 @@ class T' . $group . 'Test extends UserAgentsTest
         array &$data,
         array &$checks,
         CacheItemPoolInterface $cache,
-        &$c
+        &$counter,
+        $group
     ) {
         $output->writeln('file ' . $file->getBasename());
         $output->writeln('    checking ...');
@@ -290,10 +287,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $output->writeln('    reading ...');
 
-        $reader = new Reader\DetectorTestReader();
-        $reader->setLocalFile($file->getPathname());
-
-        $tests = $reader->getTests();
+        $tests = json_decode(file_get_contents($file->getPathname()));
 
         if (empty($tests)) {
             $output->writeln('    removing empty file');
@@ -313,19 +307,19 @@ class T' . $group . 'Test extends UserAgentsTest
             return 0;
         }
 
-        $counter = count(get_object_vars($tests));
+        $oldCounter = count(get_object_vars($tests));
 
-        if ($counter < 1) {
+        if ($oldCounter < 1) {
             $output->writeln('    file does not contain any test');
             unlink($file->getPathname());
 
             return 0;
         }
 
-        if (1 === $counter) {
+        if (1 === $oldCounter) {
             $output->writeln('    contains 1 test');
         } else {
-            $output->writeln('    contains ' . $counter . ' tests');
+            $output->writeln('    contains ' . $oldCounter . ' tests');
         }
 
         $output->writeln('    processing ...');
@@ -357,8 +351,8 @@ class T' . $group . 'Test extends UserAgentsTest
             $data[$key]        = $test;
             $checks[$test->ua] = $key;
 
-            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache, $c);
-            ++$c;
+            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache, $counter, $group);
+            ++$counter;
         }
 
         $newCounter = count($outputDetector);
@@ -370,11 +364,9 @@ class T' . $group . 'Test extends UserAgentsTest
             unlink($file->getPathname());
 
             return 0;
-        } elseif ($newCounter < $counter) {
-            $output->writeln('    ' . ($counter - $newCounter) . ' test(s) is/are removed from the file');
+        } elseif ($newCounter < $oldCounter) {
+            $output->writeln('    ' . ($oldCounter - $newCounter) . ' test(s) is/are removed from the file');
         }
-
-        $basename = $file->getBasename('.' . $file->getExtension());
 
         $output->writeln('    removing old file');
         unlink($file->getPathname());
@@ -382,7 +374,7 @@ class T' . $group . 'Test extends UserAgentsTest
         $output->writeln('    rewriting file');
 
         file_put_contents(
-            $file->getPath() . '/' . $basename . '.json',
+            $file->getPathname(),
             json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
         );
 
@@ -396,6 +388,7 @@ class T' . $group . 'Test extends UserAgentsTest
      * @param string                                            $key
      * @param CacheItemPoolInterface                            $cache
      * @param int                                               $counter
+     * @param int                                               $group
      *
      * @return array
      */
@@ -405,28 +398,15 @@ class T' . $group . 'Test extends UserAgentsTest
         BrowserDetector $detector,
         $key,
         CacheItemPoolInterface $cache,
-        $counter
+        $counter,
+        $group
     ) {
         $output->writeln('    processing Test ' . $key . ' ...');
         $output->writeln('        ua: ' . $test->ua);
 
         /** rewrite test numbers */
 
-        if (preg_match('/^browscap\-issue\-(\d+)\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
-        } elseif (preg_match('/^browscap\-issue\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', 0);
-        } elseif (preg_match('/^browscap\-issue\-([^\-]+)\-(.*)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', 0) . '-' . sprintf('%1$08d', $counter);
-        } elseif (preg_match('/^browscap\-issue\-(\d+)\-(.*)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', $counter);
-        } elseif (preg_match('/^test\-(\d+)\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
-        } elseif (preg_match('/^test\-(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', 0);
-        } elseif (preg_match('/^test\-(\d+)\-test(\d+)$/', $key, $matches)) {
-            $key = 'test-' . sprintf('%1$08d', (int) $matches[1]) . '-' . sprintf('%1$08d', (int) $matches[2]);
-        }
+        $key = 'test-' . sprintf('%1$08d', (int) $group) . '-' . sprintf('%1$08d', $counter);
 
         /** rewrite browsers */
 

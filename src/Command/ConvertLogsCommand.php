@@ -16,9 +16,9 @@
 
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper\FilePath;
-use BrowscapHelper\Helper\Sorter;
-use BrowscapHelper\Reader\LogFileReader;
+use BrowscapHelper\Source\LogFileSource;
+use Monolog\Handler;
+use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -101,81 +101,24 @@ class ConvertLogsCommand extends Command
         $targetDirectory  = $input->getOption('target');
         $sourcesDirectory = $input->getOption('resources');
 
-        $i = 0;
-        $j = 0;
+        $logger = new Logger('browser-detector-helper');
+        $logger->pushHandler(new Handler\NullHandler());
+        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
 
+        $counter        = 0;
         $targetBulkFile = $targetDirectory . date('Y-m-d') . '-testagents.txt';
-        $targetInfoFile = $targetDirectory . date('Y-m-d') . '-testagents.info.txt';
 
         $output->writeln("reading from directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
-        $reader = new LogFileReader();
-
-        /*******************************************************************************
-         * loading files
-         ******************************************************************************/
-
-        $files = scandir($sourcesDirectory, SCANDIR_SORT_ASCENDING);
-
-        foreach ($files as $filename) {
-            /** @var $file \SplFileInfo */
-            $file = new \SplFileInfo($sourcesDirectory . $filename);
-
-            ++$i;
-            $output->write('# ' . sprintf('%1$08d', (int) $i) . ' :' . strtolower($file->getPathname()) . ' [ until now ' . ($j > 0 ? $j : 'no new') . ' agent' . ($j !== 1 ? 's' : '') . ' ]');
-
-            if (!$file->isFile() || !$file->isReadable()) {
-                $output->writeln(' - skipped');
-
-                continue;
-            }
-
-            $excludedExtensions = ['filepart', 'sql', 'rename', 'txt', 'zip', 'rar', 'php', 'gitkeep'];
-
-            if (in_array($file->getExtension(), $excludedExtensions)) {
-                $output->writeln(' - skipped');
-
-                continue;
-            }
-
-            if (null === ($filepath = (new FilePath())->getPath($file))) {
-                $output->writeln(' - skipped');
-
-                continue;
-            }
-
-            $startTime = microtime(true);
-            $k         = 0;
-
-            $reader->setLocalFile($filepath);
-            $reader->setTargetInfoFile($targetInfoFile);
-
-            $agents = $reader->getAgents();
-            $agents = (new Sorter())->sortAgents($agents);
-
-            foreach (array_keys($agents) as $agentOfLine) {
-                file_put_contents($targetBulkFile, $agentOfLine . "\n", FILE_APPEND | LOCK_EX);
-                ++$k;
-            }
-
-            $dauer = microtime(true) - $startTime;
-            $output->writeln(' - finished [ ' . ($k > 0 ? $k : 'no') . ' new agent' . ($k !== 1 ? 's' : '') . ', ' . number_format($dauer, 4, ',', '.') . ' sec ]');
-
-            unlink($file->getPathname());
-            $j += $k;
-        }
-
-        if (file_exists($targetBulkFile)) {
-            $data = file($targetBulkFile, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
-            $data = array_unique($data);
-
-            file_put_contents($targetBulkFile, implode("\n", $data), LOCK_EX);
+        foreach ((new LogFileSource($sourcesDirectory))->getUserAgents($logger, $output) as $agent) {
+            file_put_contents($targetBulkFile, $agent . "\n", FILE_APPEND | LOCK_EX);
+            ++$counter;
         }
 
         $output->writeln('');
         $output->writeln('finished reading files.');
         $output->writeln('');
-        $output->writeln($j . ' new  agents added');
+        $output->writeln($counter . ' new  agents added');
     }
 }
