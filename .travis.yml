@@ -24,7 +24,7 @@ before_script:
   - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $PREFER_LOWEST
 
 script:
-  - vendor/bin/phpunit --colors --verbose --coverage-text --coverage-clover=coverage.clover
+  - vendor/bin/phpunit --colors --coverage-clover=coverage.clover
   - php -n -d memory_limit=768M vendor/bin/phpcs
   - php -n -d memory_limit=768M vendor/bin/php-cs-fixer fix --dry-run -vv
 
