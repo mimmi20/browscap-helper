@@ -227,17 +227,8 @@ class CreateTestsCommand extends Command
         $platform   = new Os('unknown', 'unknown', 'unknown', 'unknown');
         $deviceCode = 'unknown';
 
-        /** @var $deviceType \UaDeviceType\TypeInterface */
-        list(
-            $deviceName,
-            $deviceMaker,
-            $deviceType,
-            $pointingMethod,
-            $deviceCodename,
-            $deviceBrandname,
-            $mobileDevice,
-            $isTablet,
-            $deviceOrientation) = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
+        /** @var \UaResult\Device\DeviceInterface $device */
+        $device = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
 
         list(
             $engineName,
@@ -292,12 +283,12 @@ class CreateTestsCommand extends Command
             'isModified' => false,
             'CssVersion' => '0',
             'AolVersion' => '0',
-            'Device_Name' => '" . $deviceName . "',
-            'Device_Maker' => '" . $deviceMaker . "',
-            'Device_Type' => '" . $deviceType->getName() . "',
-            'Device_Pointing_Method' => '" . $pointingMethod . "',
-            'Device_Code_Name' => '" . $deviceCodename . "',
-            'Device_Brand_Name' => '" . $deviceBrandname . "',
+            'Device_Name' => '" . $device->getMarketingName() . "',
+            'Device_Maker' => '" . $device->getManufacturer() . "',
+            'Device_Type' => '" . $device->getType()->getName() . "',
+            'Device_Pointing_Method' => '" . $device->getPointingMethod() . "',
+            'Device_Code_Name' => '" . $device->getDeviceName() . "',
+            'Device_Brand_Name' => '" . $device->getBrand() . "',
             'RenderingEngine_Name' => '$engineName',
             'RenderingEngine_Version' => '$engineVersion',
             'RenderingEngine_Maker' => '$engineMaker',

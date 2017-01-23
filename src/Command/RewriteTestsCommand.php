@@ -29,6 +29,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaResult\Device\Device;
 use UaResult\Os\OsInterface;
 
 /**
@@ -310,7 +311,7 @@ class T' . $group . 'Test extends UserAgentsTest
         $oldCounter = count(get_object_vars($tests));
 
         if ($oldCounter < 1) {
-            $output->writeln('    file does not contain any test');
+            $output->writeln('    file does not contain any test, removing');
             unlink($file->getPathname());
 
             return 0;
@@ -529,7 +530,7 @@ class T' . $group . 'Test extends UserAgentsTest
         /** rewrite devices */
 
         try {
-            list($deviceBrand, $deviceCode, $devicePointing, $deviceType, $deviceMaker, $deviceName, $deviceOrientation, $device) = $this->rewriteDevice(
+            $device = $this->rewriteDevice(
                 $test,
                 $cache,
                 $platform,
@@ -596,21 +597,19 @@ class T' . $group . 'Test extends UserAgentsTest
                 $deviceOrientation = false;
             }
 
-            $device = null;
-        }
-
-        if (!($deviceType instanceof \UaDeviceType\TypeInterface)) {
-            if (is_string($deviceType)) {
-                $className = '\UaDeviceType\\' . $test->properties->Device_Type;
-
-                if (class_exists($className)) {
-                    $deviceType = new $className();
-                } else {
-                    $deviceType = new \UaDeviceType\Unknown();
-                }
-            } else {
-                $deviceType = new \UaDeviceType\Unknown();
-            }
+            $device = new Device(
+                $deviceCode,
+                $deviceName,
+                $deviceMaker,
+                $deviceBrand,
+                null,
+                $platform,
+                $deviceType,
+                $devicePointing,
+                null,
+                null,
+                $deviceOrientation
+            );
         }
 
         /** rewrite engines */
@@ -658,8 +657,8 @@ class T' . $group . 'Test extends UserAgentsTest
                     'Platform_Bits'           => $platformBits,
                     'Platform_Maker'          => $platformMaker,
                     'Platform_Brand_Name'     => $platformBrandname,
-                    'Device_Name'             => $deviceName,
-                    'Device_Maker'            => $deviceMaker,
+                    'Device_Name'             => $device->getMarketingName(),
+                    'Device_Maker'            => $device->getManufacturer(),
                     'Device_Type'             => get_class($deviceType),
                     'Device_Pointing_Method'  => $devicePointing,
                     'Device_Dual_Orientation' => $deviceOrientation,
@@ -756,7 +755,7 @@ class T' . $group . 'Test extends UserAgentsTest
      * @param BrowserDetector        $detector
      *
      * @throws \BrowserDetector\Loader\NotFoundException
-     * @return array
+     * @return \UaResult\Device\DeviceInterface
      */
     private function rewriteDevice(\stdClass $test, CacheItemPoolInterface $cache, OsInterface $platform, BrowserDetector $detector)
     {
@@ -802,15 +801,8 @@ class T' . $group . 'Test extends UserAgentsTest
             $deviceOrientation = false;
         }
 
-        list(
-            $deviceName,
-            $deviceMaker,
-            $deviceType,
-            $devicePointing,
-            $deviceCode,
-            $deviceBrand, , ,
-            $deviceOrientation,
-            $device) = (new Helper\Device())->detect(
+        /** @var \UaResult\Device\DeviceInterface $device */
+        $device = (new Helper\Device())->detect(
                 $cache,
                 $test->ua,
                 $platform,
@@ -831,25 +823,8 @@ class T' . $group . 'Test extends UserAgentsTest
         ) {
             $deviceLoader = new DeviceLoader($cache);
             $device       = $deviceLoader->load('unknown', $test->ua);
-
-            $deviceBrand       = $device->getBrand();
-            $deviceCode        = $device->getDeviceName();
-            $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType();
-            $deviceMaker       = $device->getManufacturer();
-            $deviceName        = $device->getMarketingName();
-            $deviceOrientation = $device->getDualOrientation();
         }
 
-        return [
-            $deviceBrand,
-            $deviceCode,
-            $devicePointing,
-            $deviceType,
-            $deviceMaker,
-            $deviceName,
-            $deviceOrientation,
-            $device,
-        ];
+        return $device;
     }
 }
