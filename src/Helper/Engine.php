@@ -16,6 +16,10 @@
 
 namespace BrowscapHelper\Helper;
 
+use BrowserDetector\BrowserDetector;
+use BrowserDetector\Loader\EngineLoader;
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * Class DiffCommand
  *
@@ -25,61 +29,57 @@ namespace BrowscapHelper\Helper;
 class Engine
 {
     /**
-     * @param string $ua
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param string                            $useragent
      *
      * @return array
      */
-    public function detect($ua)
+    public function detect(
+        CacheItemPoolInterface $cache,
+        $useragent
+    )
     {
-        $engineName  = 'unknown';
-        $engineMaker = 'unknown';
+        $loader = new EngineLoader($cache);
 
-        $applets      = false;
-        $activex      = false;
+        $applets = false;
+        $activex = false;
 
         $chromeVersion = 0;
 
-        if (false !== strpos($ua, 'Chrome')) {
-            if (preg_match('/Chrome\/(\d+\.\d+)/', $ua, $matches)) {
+        if (false !== strpos($useragent, 'Chrome')) {
+            if (preg_match('/Chrome\/(\d+\.\d+)/', $useragent, $matches)) {
                 $chromeVersion = (float) $matches[1];
             }
         }
 
-        if (false !== strpos($ua, ' U3/')) {
-            $engineName  = 'U3';
-            $engineMaker = 'UC Web';
-        } elseif (false !== strpos($ua, ' U2/')) {
-            $engineName  = 'U2';
-            $engineMaker = 'UC Web';
-        } elseif (false !== strpos($ua, ' T5/')) {
-            $engineName  = 'T5';
-            $engineMaker = 'Baidu';
-        } elseif (false !== strpos($ua, 'AppleWebKit')) {
+        if (false !== strpos($useragent, ' U3/')) {
+            $engine = $loader->load('u3');
+        } elseif (false !== strpos($useragent, ' U2/')) {
+            $engine = $loader->load('u2');
+        } elseif (false !== strpos($useragent, ' T5/')) {
+            $engine = $loader->load('t5');
+        } elseif (false !== strpos($useragent, 'AppleWebKit')) {
             if ($chromeVersion >= 28.0) {
-                $engineName  = 'Blink';
-                $engineMaker = 'Google Inc';
+                $engine = $loader->load('blink');
             } else {
-                $engineName  = 'WebKit';
-                $engineMaker = 'Apple Inc';
+                $engine = $loader->load('webkit');
                 $applets     = true;
             }
-        } elseif (false !== strpos($ua, 'Presto')) {
-            $engineName  = 'Presto';
-            $engineMaker = 'Opera Software ASA';
-        } elseif (false !== strpos($ua, 'Trident')) {
-            $engineName  = 'Trident';
-            $engineMaker = 'Microsoft Corporation';
+        } elseif (false !== strpos($useragent, 'Presto')) {
+            $engine = $loader->load('presto');
+        } elseif (false !== strpos($useragent, 'Trident')) {
+            $engine = $loader->load('trident');
             $applets     = true;
             $activex     = true;
-        } elseif (false !== strpos($ua, 'Gecko')) {
-            $engineName  = 'Gecko';
-            $engineMaker = 'Mozilla Foundation';
+        } elseif (false !== strpos($useragent, 'Gecko')) {
+            $engine = $loader->load('gecko');
             $applets     = true;
+        } else {
+            $engine = $loader->load('unknown');
         }
 
         return [
-            $engineName,
-            $engineMaker,
+            $engine,
             $applets,
             $activex,
         ];

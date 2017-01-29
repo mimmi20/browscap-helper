@@ -209,6 +209,7 @@ test:
 namespace BrowserDetectorTest\UserAgentsTest;
 
 use BrowserDetectorTest\UserAgentsTest;
+use UaResult\Result\Result;
 
 /**
  * Class UserAgentsTest
@@ -228,21 +229,17 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @dataProvider userAgentDataProvider
      *
-     * @param string $userAgent
-     * @param array  $expectedProperties
+     * @param string                  $userAgent
+     * @param \UaResult\Result\Result $expectedResult
      *
      * @throws \\Exception
      * @group  integration
      * @group  useragenttest
      * @group  ' . $group . '
      */
-    public function testUserAgents($userAgent, $expectedProperties)
+    public function testUserAgents($userAgent, Result $expectedResult)
     {
-        if (!is_array($expectedProperties) || !count($expectedProperties)) {
-            self::markTestSkipped(\'Could not run test - no properties were defined to test\');
-        }
-
-        parent::testUserAgents($userAgent, $expectedProperties);
+        parent::testUserAgents($userAgent, $expectedResult);
     }
 }
 ';
@@ -464,7 +461,7 @@ class T' . $group . 'Test extends UserAgentsTest
         $output->writeln('        rewriting platform');
 
         try {
-            list($platformCodename, $platformMarketingname, $platformVersion, $platformBits, $platformMaker, $platformBrandname, $platform) = $this->rewritePlatforms(
+            $platform = $this->rewritePlatforms(
                 $output,
                 $test,
                 $detector,
@@ -512,15 +509,7 @@ class T' . $group . 'Test extends UserAgentsTest
                 $platformMaker = 'unknown';
             }
 
-            if (isset($test->properties->Platform_Brand_Name)) {
-                $platformBrandname = $test->properties->Platform_Brand_Name;
-            } else {
-                $output->writeln('["' . $key . '"] platform brand for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-                $platformBrandname = 'unknown';
-            }
-
-            $platform = null;
+            $platform = new \UaResult\Os\Os($platformCodename, $platformMarketingname, $platformMaker, $platformVersion, $platformBits);
         }
 
         /** @var $platform OsInterface|null */
@@ -540,13 +529,8 @@ class T' . $group . 'Test extends UserAgentsTest
             /** @var $deviceType \UaDeviceType\TypeInterface */
             /** @var $device \UaResult\Device\DeviceInterface */
 
-            if (null !== ($platform = $device->getPlatform())) {
-                $platformCodename      = $platform->getName();
-                $platformMarketingname = $platform->getMarketingName();
-                $platformVersion       = $platform->getVersion()->getVersion();
-                $platformBits          = $platform->getBits();
-                $platformMaker         = $platform->getManufacturer();
-                $platformBrandname     = $platform->getBrand();
+            if (null !== $device->getPlatform()) {
+                $platform = $device->getPlatform();
             }
         } catch (NotFoundException $e) {
             if (isset($test->properties->Device_Name)) {
@@ -644,26 +628,25 @@ class T' . $group . 'Test extends UserAgentsTest
         return [
             $key => [
                 'ua'         => $test->ua,
-                'properties' => [
+                'result' => [
                     'Browser_Name'            => $browserName,
                     'Browser_Type'            => $browserType,
                     'Browser_Bits'            => $browserBits,
                     'Browser_Maker'           => $browserMaker,
                     'Browser_Modus'           => $browserModus,
                     'Browser_Version'         => $browserVersion,
-                    'Platform_Codename'       => $platformCodename,
-                    'Platform_Marketingname'  => $platformMarketingname,
-                    'Platform_Version'        => $platformVersion,
-                    'Platform_Bits'           => $platformBits,
-                    'Platform_Maker'          => $platformMaker,
-                    'Platform_Brand_Name'     => $platformBrandname,
+                    'Platform_Codename'       => $platform->getName(),
+                    'Platform_Marketingname'  => $platform->getMarketingName(),
+                    'Platform_Version'        => $platform->getVersion()->getVersion(),
+                    'Platform_Bits'           => $platform->getBits(),
+                    'Platform_Maker'          => $platform->getManufacturer(),
                     'Device_Name'             => $device->getMarketingName(),
                     'Device_Maker'            => $device->getManufacturer(),
                     'Device_Type'             => get_class($deviceType),
-                    'Device_Pointing_Method'  => $devicePointing,
-                    'Device_Dual_Orientation' => $deviceOrientation,
-                    'Device_Code_Name'        => $deviceCode,
-                    'Device_Brand_Name'       => $deviceBrand,
+                    'Device_Pointing_Method'  => $device->getPointingMethod(),
+                    'Device_Dual_Orientation' => $device->getDualOrientation(),
+                    'Device_Code_Name'        => $device->getDeviceName(),
+                    'Device_Brand_Name'       => $device->getBrand(),
                     'RenderingEngine_Name'    => $engineName,
                     'RenderingEngine_Version' => $engineVersion,
                     'RenderingEngine_Maker'   => $engineMaker,
@@ -681,7 +664,7 @@ class T' . $group . 'Test extends UserAgentsTest
      *
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \UnexpectedValueException
-     * @return array
+     * @return \UaResult\Os\OsInterface
      */
     private function rewritePlatforms(
         OutputInterface $output,
@@ -720,32 +703,9 @@ class T' . $group . 'Test extends UserAgentsTest
             $platformMaker = 'unknown';
         }
 
-        if (isset($test->properties->Platform_Brand_Name)) {
-            $platformBrandname = $test->properties->Platform_Brand_Name;
-        } else {
-            $output->writeln('["' . $key . '"] platform brand for UA "' . $test->ua . '" is missing, using "unknown" instead');
+        list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($cache, $test->ua, $detector, $platformCodename, $platformMarketingname, $platformMaker, $platformVersion);
 
-            $platformBrandname = 'unknown';
-        }
-
-        list(, , , , , , ,
-            $platformCodename,
-            $platformMarketingname,
-            $platformMaker,
-            $platformBrandname,
-            $platformVersion, ,
-            $platformBits,
-            $platform) = (new Helper\Platform())->detect($cache, $test->ua, $detector, $platformCodename, $platformMarketingname, $platformMaker, $platformBrandname, $platformVersion);
-
-        return [
-            $platformCodename,
-            $platformMarketingname,
-            $platformVersion,
-            $platformBits,
-            $platformMaker,
-            $platformBrandname,
-            $platform,
-        ];
+        return $platform;
     }
 
     /**

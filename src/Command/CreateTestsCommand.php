@@ -24,6 +24,8 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\BrowserDetector;
+use BrowserDetector\Loader\CompanyLoader;
+use BrowserDetector\Version\VersionFactory;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -34,7 +36,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaDeviceType\TypeLoader;
 use UaResult\Os\Os;
+use UaResult\Result\Result;
+use Wurfl\Request\GenericRequest;
+use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DiffCommand
@@ -193,19 +199,6 @@ class CreateTestsCommand extends Command
      */
     private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector)
     {
-        $engineVersion = 'unknown';
-
-        list(
-            $browserNameBrowscap,
-            $browserType,
-            $browserBits,
-            $browserMaker,
-            $browserModus,
-            $browserVersion,
-            $browserNameDetector,
-            $lite,
-            $crawler) = (new Browser())->detect($ua);
-
         $platformCodename = 'unknown';
 
         list(
@@ -216,25 +209,35 @@ class CreateTestsCommand extends Command
             $win64,
             $win32,
             $win16,
-            $platformCodenameDetector,
-            $platformMarketingnameDetector,
-            $platformMakerNameDetector,
-            $platformMakerBrandnameDetector,
-            $platformVersionDetector,
             $standard,
-            $platformBits) = (new Platform())->detect($cache, $ua, $detector, $platformCodename);
+            $platformBits,
+            $platform) = (new Platform())->detect($cache, $ua, $detector, $platformCodename);
 
-        $platform   = new Os('unknown', 'unknown', 'unknown', 'unknown');
         $deviceCode = 'unknown';
 
         /** @var \UaResult\Device\DeviceInterface $device */
         $device = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
 
+        /** @var \UaResult\Engine\EngineInterface $engine */
         list(
-            $engineName,
-            $engineMaker,
+            $engine,
             $applets,
-            $activex) = (new Engine())->detect($ua);
+            $activex) = (new Engine())->detect($cache, $ua);
+
+        $browserNameDetector = 'unknown';
+
+        list(
+            $browserNameBrowscap,
+            $browserType,
+            $browserBits,
+            $browserMaker,
+            $browserModus,
+            $browserVersion,
+            $browserNameDetector,
+            $lite,
+            $crawler) = (new Browser())->detect($cache, $ua, $detector, $engine, $browserNameDetector);
+
+
 
         $v          = explode('.', $browserVersion, 2);
         $maxVersion = $v[0];
@@ -274,8 +277,8 @@ class CreateTestsCommand extends Command
             'VBScript' => " . ($activex ? 'true' : 'false') . ",
             'JavaApplets' => " . ($applets ? 'true' : 'false') . ",
             'ActiveXControls' => " . ($activex ? 'true' : 'false') . ",
-            'isMobileDevice' => " . ($mobileDevice ? 'true' : 'false') . ",
-            'isTablet' => " . ($isTablet ? 'true' : 'false') . ",
+            'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
+            'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
             'isSyndicationReader' => false,
             'Crawler' => " . ($crawler ? 'true' : 'false') . ",
             'isFake' => false,
@@ -289,9 +292,9 @@ class CreateTestsCommand extends Command
             'Device_Pointing_Method' => '" . $device->getPointingMethod() . "',
             'Device_Code_Name' => '" . $device->getDeviceName() . "',
             'Device_Brand_Name' => '" . $device->getBrand() . "',
-            'RenderingEngine_Name' => '$engineName',
-            'RenderingEngine_Version' => '$engineVersion',
-            'RenderingEngine_Maker' => '$engineMaker',
+            'RenderingEngine_Name' => '". $engine->getName() . "',
+            'RenderingEngine_Version' => 'unknown',
+            'RenderingEngine_Maker' => '". $engine->getManufacturer() . "',
         ],
         'lite' => " . ($lite ? 'true' : 'false') . ",
         'standard' => " . ($standard ? 'true' : 'false') . ",
@@ -300,32 +303,25 @@ class CreateTestsCommand extends Command
         $formatedIssue   = sprintf('%1$08d', (int) $testNumber);
         $formatedCounter = sprintf('%1$08d', (int) $counter);
 
+        $request = (new GenericRequestFactory())->createRequestForUserAgent($ua);
+
+        $browser = new \UaResult\Browser\Browser(
+            $browserNameDetector,
+            (new CompanyLoader($cache))->load($browserMaker),
+            (new VersionFactory())->set($browserVersion),
+            $engine,
+            (new \UaBrowserType\TypeLoader($cache))->load($browserType),
+            $browserBits,
+            false,
+            false,
+            $browserModus
+        );
+
+        $result = new Result($request, $device, $platform, $browser, $engine);
+
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'         => $ua,
-            'properties' => [
-                'Browser_Name'            => $browserNameDetector,
-                'Browser_Type'            => $browserType,
-                'Browser_Bits'            => $browserBits,
-                'Browser_Maker'           => $browserMaker,
-                'Browser_Modus'           => $browserModus,
-                'Browser_Version'         => $browserVersion,
-                'Platform_Codename'       => $platformCodenameDetector,
-                'Platform_Marketingname'  => $platformMarketingnameDetector,
-                'Platform_Version'        => $platformVersionDetector,
-                'Platform_Bits'           => $platformBits,
-                'Platform_Maker'          => $platformMakerNameDetector,
-                'Platform_Brand_Name'     => $platformMakerBrandnameDetector,
-                'Device_Name'             => $deviceName,
-                'Device_Maker'            => $deviceMaker,
-                'Device_Type'             => get_class($deviceType),
-                'Device_Pointing_Method'  => $pointingMethod,
-                'Device_Dual_Orientation' => $deviceOrientation,
-                'Device_Code_Name'        => $deviceCodename,
-                'Device_Brand_Name'       => $deviceBrandname,
-                'RenderingEngine_Name'    => $engineName,
-                'RenderingEngine_Version' => $engineVersion,
-                'RenderingEngine_Maker'   => $engineMaker,
-            ],
+            'result' => $result->toArray(),
         ];
 
         return;
