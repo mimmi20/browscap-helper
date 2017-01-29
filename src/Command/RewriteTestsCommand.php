@@ -185,7 +185,7 @@ test:
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ';
+            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage --group ';
             $circleciContent .= $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php';
             $circleciContent .= PHP_EOL;
 
