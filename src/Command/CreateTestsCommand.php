@@ -36,10 +36,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaDeviceType\TypeLoader;
-use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequest;
 use Wurfl\Request\GenericRequestFactory;
 
 /**
@@ -172,8 +169,6 @@ class CreateTestsCommand extends Command
             if (!count($chunk)) {
                 continue;
             }
-
-            $chunkNumber = sprintf('%1$05d', (int) $chunkId);
 
             file_put_contents(
                 $targetDirectory . 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $chunkId) . '.json',
@@ -320,7 +315,7 @@ class CreateTestsCommand extends Command
         $result = new Result($request, $device, $platform, $browser, $engine);
 
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
-            'ua'         => $ua,
+            'ua'     => $ua,
             'result' => $result->toArray(),
         ];
 

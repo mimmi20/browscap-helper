@@ -24,11 +24,14 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowserDetector\Version\VersionFactory;
 use Monolog\Handler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaResult\Result\Result;
+use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DiffCommand
@@ -319,6 +322,26 @@ class CopyTestsCommand extends Command
                     'RenderingEngine_Version' => $test['properties']['RenderingEngine_Version'],
                     'RenderingEngine_Maker'   => $test['properties']['RenderingEngine_Maker'],
                 ],
+            ];
+
+            $request = (new GenericRequestFactory())->createRequestForUserAgent($test['ua']);
+
+            $browser = new \UaResult\Browser\Browser(
+                $test['properties']['Browser'],
+                (new CompanyLoader($cache))->load($browserMaker),
+                (new VersionFactory())->set($test['properties']['Version']),
+                (new \UaBrowserType\TypeLoader($cache))->load($browserType),
+                $test['properties']['Browser_Bits'],
+                false,
+                false,
+                $test['properties']['Browser_Modus']
+            );
+
+            $result = new Result($request, $device, $platform, $browser, $engine);
+
+            $data[$key] = [
+                'ua'     => $test['ua'],
+                'result' => $result->toArray(),
             ];
 
             ++$counter;
