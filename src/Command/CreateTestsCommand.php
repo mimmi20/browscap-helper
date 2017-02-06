@@ -160,7 +160,7 @@ class CreateTestsCommand extends Command
 
         $outputBrowscap .= "];\n";
 
-        file_put_contents('results/issue-' . $issue . '.php', $outputBrowscap);
+        file_put_contents('results/issue-' . sprintf('%1$05d', $number) . '.php', $outputBrowscap);
 
         $chunks          = array_chunk($outputDetector, 100, true);
         $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$05d', $number) . '/';
@@ -173,10 +173,10 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $chunkNumber = sprintf('%1$08d', (int) $chunkId);
+            $chunkNumber = sprintf('%1$05d', (int) $chunkId);
 
             file_put_contents(
-                $targetDirectory . $issue . '-' . $chunkNumber . '.json',
+                $targetDirectory . 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $chunkId) . '.json',
                 json_encode(
                     $chunk,
                     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE

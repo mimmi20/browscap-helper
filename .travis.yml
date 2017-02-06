@@ -10,17 +10,16 @@ os:
   - linux
 
 env:
-  - PREFER_LOWEST="--prefer-lowest"
-  - PREFER_LOWEST=""
+  - COMPOSER_FLAGS="--prefer-lowest"
+  - COMPOSER_FLAGS=""
 
 matrix:
   allow_failures:
     - php: nightly
-    - env: PREFER_LOWEST="--prefer-lowest"
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $PREFER_LOWEST
+  - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $COMPOSER_FLAGS
 
 script:
   - php -n -d memory_limit=768M vendor/bin/phpcs
