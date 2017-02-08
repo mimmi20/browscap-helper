@@ -35,6 +35,11 @@ class Device
      * @param OsInterface                       $platform
      * @param BrowserDetector                   $detector
      * @param string                            $deviceCode
+     * @param string|null                       $deviceBrand
+     * @param string|null                       $devicePointing
+     * @param string|null                       $deviceType
+     * @param string|null                       $deviceMaker
+     * @param string|null                       $deviceName
      *
      * @return \UaResult\Device\DeviceInterface
      */
@@ -48,10 +53,7 @@ class Device
         $devicePointing = null,
         $deviceType = null,
         $deviceMaker = null,
-        $deviceName = null,
-        $deviceOrientation = null,
-        $isTablet = false,
-        $mobileDevice = false
+        $deviceName = null
     ) {
         $deviceLoader = new DeviceLoader($cache);
         $device       = null;
@@ -2833,7 +2835,14 @@ class Device
         }
 
         if (null === $device) {
-            $device = new \UaResult\Device\Device($deviceCode, $deviceName, $deviceMaker, $deviceBrand, null, $platform, $deviceType, $devicePointing);
+            $device = new \UaResult\Device\Device(
+                $deviceCode,
+                $deviceName,
+                $deviceMaker,
+                $deviceBrand,
+                $deviceType,
+                $devicePointing
+            );
         }
 
         return $device;

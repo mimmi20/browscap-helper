@@ -50,8 +50,7 @@ class Browser
         $browserType = null,
         $browserMaker = 'unknown',
         $browserVersion = '0.0'
-    )
-    {
+    ) {
         $browserNameBrowscap = 'Default Browser';
         $browserType         = 'unknown';
 

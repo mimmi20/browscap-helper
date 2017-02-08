@@ -16,7 +16,6 @@
 
 namespace BrowscapHelper\Helper;
 
-use BrowserDetector\BrowserDetector;
 use BrowserDetector\Loader\EngineLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -37,8 +36,7 @@ class Engine
     public function detect(
         CacheItemPoolInterface $cache,
         $useragent
-    )
-    {
+    ) {
         $loader = new EngineLoader($cache);
 
         $applets = false;
@@ -62,17 +60,17 @@ class Engine
             if ($chromeVersion >= 28.0) {
                 $engine = $loader->load('blink');
             } else {
-                $engine = $loader->load('webkit');
+                $engine      = $loader->load('webkit');
                 $applets     = true;
             }
         } elseif (false !== strpos($useragent, 'Presto')) {
             $engine = $loader->load('presto');
         } elseif (false !== strpos($useragent, 'Trident')) {
-            $engine = $loader->load('trident');
+            $engine      = $loader->load('trident');
             $applets     = true;
             $activex     = true;
         } elseif (false !== strpos($useragent, 'Gecko')) {
-            $engine = $loader->load('gecko');
+            $engine      = $loader->load('gecko');
             $applets     = true;
         } else {
             $engine = $loader->load('unknown');

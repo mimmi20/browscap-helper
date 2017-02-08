@@ -24,11 +24,11 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\BrowserDetector;
-use BrowserDetector\Loader\CompanyLoader;
 use BrowserDetector\Version\VersionFactory;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use League\Flysystem\UnreadableFileException;
 use Monolog\Handler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -36,6 +36,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaBrowserType\TypeLoader;
+use UaResult\Company\CompanyLoader;
 use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
 
@@ -128,7 +130,7 @@ class CreateTestsCommand extends Command
 
         try {
             $number = (new TargetDirectory())->getNextTest($output);
-        } catch (\League\Flysystem\UnreadableFileException $e) {
+        } catch (UnreadableFileException $e) {
             $logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -150,7 +152,7 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $this->parseLine($cache, $useragent,  $counter, $outputBrowscap, $outputDetector, $number, $detector);
+            $this->parseLine($cache, $useragent, $counter, $outputBrowscap, $outputDetector, $number, $detector);
             $checks[$useragent] = $issue;
             ++$counter;
         }
@@ -232,8 +234,6 @@ class CreateTestsCommand extends Command
             $lite,
             $crawler) = (new Browser())->detect($cache, $ua, $detector, $engine, $browserNameDetector);
 
-
-
         $v          = explode('.', $browserVersion, 2);
         $maxVersion = $v[0];
         $minVersion = (isset($v[1]) ? $v[1] : '0');
@@ -287,9 +287,9 @@ class CreateTestsCommand extends Command
             'Device_Pointing_Method' => '" . $device->getPointingMethod() . "',
             'Device_Code_Name' => '" . $device->getDeviceName() . "',
             'Device_Brand_Name' => '" . $device->getBrand() . "',
-            'RenderingEngine_Name' => '". $engine->getName() . "',
+            'RenderingEngine_Name' => '" . $engine->getName() . "',
             'RenderingEngine_Version' => 'unknown',
-            'RenderingEngine_Maker' => '". $engine->getManufacturer() . "',
+            'RenderingEngine_Maker' => '" . $engine->getManufacturer() . "',
         ],
         'lite' => " . ($lite ? 'true' : 'false') . ",
         'standard' => " . ($standard ? 'true' : 'false') . ",
@@ -305,7 +305,7 @@ class CreateTestsCommand extends Command
             (new CompanyLoader($cache))->load($browserMaker),
             (new VersionFactory())->set($browserVersion),
             $engine,
-            (new \UaBrowserType\TypeLoader($cache))->load($browserType),
+            (new TypeLoader($cache))->load($browserType),
             $browserBits,
             false,
             false,

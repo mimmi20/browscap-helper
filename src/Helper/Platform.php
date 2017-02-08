@@ -765,7 +765,12 @@ class Platform
         }
 
         if (null === $platform) {
-            $platform = new \UaResult\Os\Os($platformCodenameDetector, $platformMarketingnameDetector, $platformMakerNameDetector, $platformVersionDetector);
+            $platform = new \UaResult\Os\Os(
+                $platformCodenameDetector,
+                $platformMarketingnameDetector,
+                $platformMakerNameDetector,
+                $platformVersionDetector
+            );
         }
 
         return [
