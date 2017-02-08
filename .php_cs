@@ -1,6 +1,6 @@
 <?php
 $header = <<<EOF
-This file is part of the BrowserDetector package.
+This file is part of the Browscap-Helper package.
 
 (c) Thomas Mueller <mimmi20@live.de>
 

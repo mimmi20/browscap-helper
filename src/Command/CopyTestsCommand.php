@@ -16,6 +16,7 @@
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Helper\Engine;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
@@ -24,11 +25,27 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowserDetector\Loader\NotFoundException;
+use BrowserDetector\Version\VersionFactory;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use League\Flysystem\UnreadableFileException;
 use Monolog\Handler;
 use Monolog\Logger;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaDataMapper\BrowserTypeMapper;
+use UaDataMapper\DeviceTypeMapper;
+use UaResult\Browser\Browser;
+use UaResult\Company\CompanyLoader;
+use UaResult\Device\Device;
+use UaResult\Os\Os;
+use UaResult\Result\Result;
+use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DiffCommand
@@ -71,9 +88,13 @@ class CopyTestsCommand extends Command
         $logger->pushHandler(new Handler\NullHandler());
         $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
 
+        $output->writeln('init cache ...');
+        $adapter  = new Local(__DIR__ . '/../../cache/');
+        $cache    = new FilesystemCachePool(new Filesystem($adapter));
+
         try {
             $number = (new TargetDirectory())->getNextTest($output);
-        } catch (\League\Flysystem\UnreadableFileException $e) {
+        } catch (UnreadableFileException $e) {
             $logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -82,7 +103,7 @@ class CopyTestsCommand extends Command
 
         try {
             $targetDirectory = (new TargetDirectory())->getPath($output);
-        } catch (\League\Flysystem\UnreadableFileException $e) {
+        } catch (UnreadableFileException $e) {
             $logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -119,20 +140,22 @@ class CopyTestsCommand extends Command
 
         $issue = 'test-' . sprintf('%1$08d', $number);
 
-        $this->handleTests($output, $tests, $issue, $targetDirectory, $counter);
+        $this->handleTests($cache, $logger, $output, $tests, $issue, $targetDirectory, $counter);
 
         $output->writeln('');
         $output->writeln('Es wurden ' . $counter . ' Tests exportiert');
     }
 
     /**
+     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
+     * @param \Psr\Log\LoggerInterface                          $logger
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param array                                             $tests
      * @param string                                            $newname
      * @param string                                            $targetDirectory
      * @param int                                               $counter
      */
-    private function handleTests(OutputInterface $output, array $tests, $newname, $targetDirectory, &$counter)
+    private function handleTests(CacheItemPoolInterface $cache, LoggerInterface $logger, OutputInterface $output, array $tests, $newname, $targetDirectory, &$counter)
     {
         $chunks = array_chunk($tests, 100, true);
 
@@ -151,26 +174,28 @@ class CopyTestsCommand extends Command
                 continue;
             }
 
-            $this->handleChunk($output, $chunk, $targetFilename, $targetDirectory, $counter);
+            $this->handleChunk($cache, $logger, $output, $chunk, $targetFilename, $targetDirectory, $counter);
         }
     }
 
     /**
+     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
+     * @param \Psr\Log\LoggerInterface                          $logger
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param array                                             $chunk
      * @param string                                            $targetFilename
      * @param string                                            $targetDirectory
      * @param int                                               $counter
      */
-    private function handleChunk(OutputInterface $output, array $chunk, $targetFilename, $targetDirectory, &$counter)
+    private function handleChunk(CacheItemPoolInterface $cache, LoggerInterface $logger, OutputInterface $output, array $chunk, $targetFilename, $targetDirectory, &$counter)
     {
         $data = [];
 
         foreach ($chunk as $key => $test) {
             if (isset($test['properties']['Platform'])) {
-                $platform = $test['properties']['Platform'];
+                $platformName = $test['properties']['Platform'];
             } else {
-                $platform = 'unknown';
+                $platformName = 'unknown';
             }
 
             if (isset($test['properties']['Platform_Version'])) {
@@ -179,10 +204,10 @@ class CopyTestsCommand extends Command
                 $version = '0.0.0';
             }
 
-            $codename      = $platform;
-            $marketingname = $platform;
+            $codename      = $platformName;
+            $marketingname = $platformName;
 
-            switch ($platform) {
+            switch ($platformName) {
                 case 'Win10':
                     if ('10.0' === $version) {
                         $codename      = 'Windows NT 10.0';
@@ -293,32 +318,78 @@ class CopyTestsCommand extends Command
                     break;
             }
 
+            $request = (new GenericRequestFactory())->createRequestForUserAgent($test['ua']);
+
+            try {
+                $browserType = (new BrowserTypeMapper())->mapBrowserType($cache, $test['properties']['Browser_Type']);
+            } catch (NotFoundException $e) {
+                $logger->critical($e);
+                $browserType = null;
+            }
+
+            try {
+                $browserMaker = (new CompanyLoader($cache))->load($test['properties']['Browser_Maker']);
+            } catch (NotFoundException $e) {
+                $logger->critical($e);
+                $browserMaker = null;
+            }
+
+            $browser = new Browser(
+                $test['properties']['Browser'],
+                $browserMaker,
+                (new VersionFactory())->set($test['properties']['Version']),
+                $browserType,
+                $test['properties']['Browser_Bits'],
+                false,
+                false,
+                $test['properties']['Browser_Modus']
+            );
+
+            try {
+                $deviceMaker = (new CompanyLoader($cache))->load($test['properties']['Device_Maker']);
+            } catch (NotFoundException $e) {
+                $logger->critical($e);
+                $deviceMaker = null;
+            }
+
+            try {
+                $deviceBrand = (new CompanyLoader($cache))->load($test['properties']['Device_Brand_Name']);
+            } catch (NotFoundException $e) {
+                $logger->critical($e);
+                $deviceBrand = null;
+            }
+
+            try {
+                $deviceType = (new DeviceTypeMapper())->mapDeviceType($cache, $test['properties']['Device_Type']);
+            } catch (NotFoundException $e) {
+                $logger->critical($e);
+                $deviceType = null;
+            }
+
+            $device = new Device(
+                $test['properties']['Device_Code_Name'],
+                $test['properties']['Device_Name'],
+                $deviceMaker,
+                $deviceBrand,
+                $deviceType,
+                $test['properties']['Device_Pointing_Method']
+            );
+
+            $platform = new Os(
+                $codename,
+                $marketingname,
+                $test['properties']['Platform_Maker'],
+                $version
+            );
+
+            /** @var \UaResult\Engine\EngineInterface $engine */
+            list($engine) = (new Engine())->detect($cache, $test['ua']);
+
+            $result = new Result($request, $device, $platform, $browser, $engine);
+
             $data[$key] = [
-                'ua'         => $test['ua'],
-                'properties' => [
-                    'Browser_Name'            => $test['properties']['Browser'],
-                    'Browser_Type'            => $test['properties']['Browser_Type'],
-                    'Browser_Bits'            => $test['properties']['Browser_Bits'],
-                    'Browser_Maker'           => $test['properties']['Browser_Maker'],
-                    'Browser_Modus'           => $test['properties']['Browser_Modus'],
-                    'Browser_Version'         => $test['properties']['Version'],
-                    'Platform_Codename'       => $codename,
-                    'Platform_Marketingname'  => $marketingname,
-                    'Platform_Version'        => $version,
-                    'Platform_Bits'           => $test['properties']['Platform_Bits'],
-                    'Platform_Maker'          => $test['properties']['Platform_Maker'],
-                    'Platform_Brand_Name'     => $test['properties']['Platform_Maker'],
-                    'Device_Name'             => $test['properties']['Device_Name'],
-                    'Device_Maker'            => $test['properties']['Device_Maker'],
-                    'Device_Type'             => $test['properties']['Device_Type'],
-                    'Device_Pointing_Method'  => $test['properties']['Device_Pointing_Method'],
-                    'Device_Dual_Orientation' => false,
-                    'Device_Code_Name'        => $test['properties']['Device_Code_Name'],
-                    'Device_Brand_Name'       => $test['properties']['Device_Brand_Name'],
-                    'RenderingEngine_Name'    => $test['properties']['RenderingEngine_Name'],
-                    'RenderingEngine_Version' => $test['properties']['RenderingEngine_Version'],
-                    'RenderingEngine_Maker'   => $test['properties']['RenderingEngine_Maker'],
-                ],
+                'ua'     => $test['ua'],
+                'result' => $result->toArray(),
             ];
 
             ++$counter;

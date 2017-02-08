@@ -26,10 +26,14 @@ use League\Flysystem\Filesystem;
 use Monolog\Handler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Os\OsInterface;
+use UaResult\Result\Result;
+use UaResult\Result\ResultFactory;
+use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DiffCommand
@@ -127,7 +131,7 @@ class RewriteTestsCommand extends Command
                 $g       = $group;
             }
 
-            $newCounter = $this->handleFile($output, $file, $detector, $data, $checks, $cache, $counter, $group);
+            $newCounter = $this->handleFile($output, $file, $detector, $data, $checks, $cache, $logger, $counter);
 
             if (!$newCounter) {
                 continue;
@@ -184,7 +188,7 @@ test:
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit -c phpunit.compare.xml --no-coverage --group ';
+            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage --group ';
             $circleciContent .= $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php';
             $circleciContent .= PHP_EOL;
 
@@ -208,6 +212,7 @@ test:
 namespace BrowserDetectorTest\UserAgentsTest;
 
 use BrowserDetectorTest\UserAgentsTest;
+use UaResult\Result\Result;
 
 /**
  * Class UserAgentsTest
@@ -227,21 +232,17 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @dataProvider userAgentDataProvider
      *
-     * @param string $userAgent
-     * @param array  $expectedProperties
+     * @param string                  $userAgent
+     * @param \UaResult\Result\Result $expectedResult
      *
      * @throws \\Exception
      * @group  integration
      * @group  useragenttest
      * @group  ' . $group . '
      */
-    public function testUserAgents($userAgent, $expectedProperties)
+    public function testUserAgents($userAgent, Result $expectedResult)
     {
-        if (!is_array($expectedProperties) || !count($expectedProperties)) {
-            self::markTestSkipped(\'Could not run test - no properties were defined to test\');
-        }
-
-        parent::testUserAgents($userAgent, $expectedProperties);
+        parent::testUserAgents($userAgent, $expectedResult);
     }
 }
 ';
@@ -261,9 +262,9 @@ class T' . $group . 'Test extends UserAgentsTest
      * @param BrowserDetector                                   $detector
      * @param array                                             $data
      * @param array                                             $checks
-     * @param CacheItemPoolInterface                            $cache
+     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
+     * @param \Psr\Log\LoggerInterface                          $logger
      * @param int                                               $counter
-     * @param int                                               $group
      *
      * @return int
      */
@@ -274,8 +275,8 @@ class T' . $group . 'Test extends UserAgentsTest
         array &$data,
         array &$checks,
         CacheItemPoolInterface $cache,
-        &$counter,
-        $group
+        LoggerInterface $logger,
+        &$counter
     ) {
         $output->writeln('file ' . $file->getBasename());
         $output->writeln('    checking ...');
@@ -289,22 +290,8 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $tests = json_decode(file_get_contents($file->getPathname()));
 
-        if (empty($tests)) {
-            $output->writeln('    removing empty file');
-            unlink($file->getPathname());
-
-            return 0;
-        }
-
         if (is_array($tests)) {
             $tests = (object) $tests;
-        }
-
-        if (empty($tests)) {
-            $output->writeln('    file does not contain any test');
-            unlink($file->getPathname());
-
-            return 0;
         }
 
         $oldCounter = count(get_object_vars($tests));
@@ -337,10 +324,6 @@ class T' . $group . 'Test extends UserAgentsTest
                 $test = (object) $test;
             }
 
-            if (is_array($test->properties)) {
-                $test->properties = (object) $test->properties;
-            }
-
             if (isset($checks[$test->ua])) {
                 // UA was added more than once
                 $output->writeln('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
@@ -348,10 +331,17 @@ class T' . $group . 'Test extends UserAgentsTest
                 continue;
             }
 
-            $data[$key]        = $test;
+            $data[$key]        = $test->ua;
             $checks[$test->ua] = $key;
 
-            $outputDetector += $this->handleTest($output, $test, $detector, $key, $cache, $counter, $group);
+            $output->writeln('    processing Test ' . $key . ' ...');
+
+            $outputDetector += [
+                $key => [
+                    'ua'     => $test->ua,
+                    'result' => $this->handleTest($output, $test, $detector, $cache, $logger)->toArray(),
+                ],
+            ];
             ++$counter;
         }
 
@@ -385,141 +375,36 @@ class T' . $group . 'Test extends UserAgentsTest
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \stdClass                                         $test
      * @param BrowserDetector                                   $detector
-     * @param string                                            $key
-     * @param CacheItemPoolInterface                            $cache
-     * @param int                                               $counter
-     * @param int                                               $group
+     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
+     * @param \Psr\Log\LoggerInterface                          $logger
      *
-     * @return array
+     * @return \UaResult\Result\Result
      */
     private function handleTest(
         OutputInterface $output,
         \stdClass $test,
         BrowserDetector $detector,
-        $key,
         CacheItemPoolInterface $cache,
-        $counter,
-        $group
+        LoggerInterface $logger
     ) {
-        $output->writeln('    processing Test ' . $key . ' ...');
         $output->writeln('        ua: ' . $test->ua);
 
-        /** rewrite test numbers */
-
-        $key = 'test-' . sprintf('%1$08d', (int) $group) . '-' . sprintf('%1$08d', $counter);
+        $result = (new ResultFactory())->fromArray($cache, $logger, (array) $test->result);
 
         /** rewrite browsers */
 
-        if (isset($test->properties->Browser_Name)) {
-            $browserName = $test->properties->Browser_Name;
-        } else {
-            $output->writeln('["' . $key . '"] browser name for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $browserName = 'unknown';
-        }
-
-        if (isset($test->properties->Browser_Type)) {
-            $browserType = $test->properties->Browser_Type;
-        } else {
-            $output->writeln('["' . $key . '"] browser type for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $browserType = 'unknown';
-        }
-
-        if (isset($test->properties->Browser_Bits)) {
-            $browserBits = $test->properties->Browser_Bits;
-        } else {
-            $output->writeln('["' . $key . '"] browser bits for UA "' . $test->ua . '" is missing, using "0" instead');
-
-            $browserBits = 0;
-        }
-
-        if (isset($test->properties->Browser_Maker)) {
-            $browserMaker = $test->properties->Browser_Maker;
-        } else {
-            $output->writeln('["' . $key . '"] browser maker for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $browserMaker = 'unknown';
-        }
-
-        if (isset($test->properties->Browser_Modus)) {
-            $browserModus = $test->properties->Browser_Modus;
-        } else {
-            $output->writeln('["' . $key . '"] browser modus for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $browserModus = 'unknown';
-        }
-
-        if (isset($test->properties->Browser_Version)) {
-            $browserVersion = $test->properties->Browser_Version;
-        } else {
-            $output->writeln('["' . $key . '"] browser version for UA "' . $test->ua . '" is missing, using "0.0.0" instead');
-
-            $browserVersion = '0.0.0';
-        }
+        $browser = $result->getBrowser();
 
         /** rewrite platforms */
 
         $output->writeln('        rewriting platform');
 
+        $platform = $result->getOs();
+
         try {
-            list($platformCodename, $platformMarketingname, $platformVersion, $platformBits, $platformMaker, $platformBrandname, $platform) = $this->rewritePlatforms(
-                $output,
-                $test,
-                $detector,
-                $key,
-                $cache
-            );
+            list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($cache, $test->ua, $detector, $platform->getName(), $platform->getMarketingName(), $platform->getManufacturer(), $platform->getVersion()->getVersion());
         } catch (NotFoundException $e) {
-            if (isset($test->properties->Platform_Codename)) {
-                $platformCodename = $test->properties->Platform_Codename;
-            } elseif (isset($test->properties->Platform_Name)) {
-                $platformCodename = $test->properties->Platform_Name;
-            } else {
-                $output->writeln('["' . $key . '"] platform name for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-                $platformCodename = 'unknown';
-            }
-
-            if (isset($test->properties->Platform_Marketingname)) {
-                $platformMarketingname = $test->properties->Platform_Marketingname;
-            } else {
-                $platformMarketingname = $platformCodename;
-            }
-
-            if (isset($test->properties->Platform_Version)) {
-                $platformVersion = $test->properties->Platform_Version;
-            } else {
-                $output->writeln('["' . $key . '"] platform version for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-                $platformVersion = 'unknown';
-            }
-
-            if (isset($test->properties->Platform_Bits)) {
-                $platformBits = $test->properties->Platform_Bits;
-            } else {
-                $output->writeln('["' . $key . '"] platform bits for UA "' . $test->ua . '" are missing, using "unknown" instead');
-
-                $platformBits = 'unknown';
-            }
-
-            if (isset($test->properties->Platform_Maker)) {
-                $platformMaker = $test->properties->Platform_Maker;
-            } else {
-                $output->writeln('["' . $key . '"] platform maker for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-                $platformMaker = 'unknown';
-            }
-
-            if (isset($test->properties->Platform_Brand_Name)) {
-                $platformBrandname = $test->properties->Platform_Brand_Name;
-            } else {
-                $output->writeln('["' . $key . '"] platform brand for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-                $platformBrandname = 'unknown';
-            }
-
-            $platform = null;
+            $logger->warning($e);
         }
 
         /** @var $platform OsInterface|null */
@@ -528,328 +413,47 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /** rewrite devices */
 
+        $device     = $result->getDevice();
+        $deviceCode = $device->getDeviceName();
+
         try {
-            list($deviceBrand, $deviceCode, $devicePointing, $deviceType, $deviceMaker, $deviceName, $deviceOrientation, $device) = $this->rewriteDevice(
-                $test,
-                $cache,
-                $platform,
-                $detector
-            );
-
-            /** @var $deviceType \UaDeviceType\TypeInterface */
-            /** @var $device \UaResult\Device\DeviceInterface */
-
-            if (null !== ($platform = $device->getPlatform())) {
-                $platformCodename      = $platform->getName();
-                $platformMarketingname = $platform->getMarketingName();
-                $platformVersion       = $platform->getVersion()->getVersion();
-                $platformBits          = $platform->getBits();
-                $platformMaker         = $platform->getManufacturer();
-                $platformBrandname     = $platform->getBrand();
-            }
-        } catch (NotFoundException $e) {
-            if (isset($test->properties->Device_Name)) {
-                $deviceName = $test->properties->Device_Name;
-            } else {
-                $deviceName = 'unknown';
-            }
-
-            if (isset($test->properties->Device_Maker)) {
-                $deviceMaker = $test->properties->Device_Maker;
-            } else {
-                $deviceMaker = 'unknown';
-            }
-
-            if (isset($test->properties->Device_Type)) {
-                $className = '\UaDeviceType\\' . $test->properties->Device_Type;
-
-                if (class_exists($className)) {
-                    $deviceType = new $className();
-                } else {
-                    $deviceType = new \UaDeviceType\Unknown();
-                }
-            } else {
-                $deviceType = new \UaDeviceType\Unknown();
-            }
-
-            if (isset($test->properties->Device_Pointing_Method)) {
-                $devicePointing = $test->properties->Device_Pointing_Method;
-            } else {
-                $devicePointing = null;
-            }
-
-            if (isset($test->properties->Device_Code_Name)) {
-                $deviceCode = $test->properties->Device_Code_Name;
-            } else {
-                $deviceCode = 'unknown';
-            }
-
-            if (isset($test->properties->Device_Brand_Name)) {
-                $deviceBrand = $test->properties->Device_Brand_Name;
-            } else {
-                $deviceBrand = 'unknown';
-            }
-
-            if (isset($test->properties->Device_Dual_Orientation)) {
-                $deviceOrientation = $test->properties->Device_Dual_Orientation;
-            } else {
-                $deviceOrientation = false;
-            }
-
-            $device = null;
-        }
-
-        if (!($deviceType instanceof \UaDeviceType\TypeInterface)) {
-            if (is_string($deviceType)) {
-                $className = '\UaDeviceType\\' . $test->properties->Device_Type;
-
-                if (class_exists($className)) {
-                    $deviceType = new $className();
-                } else {
-                    $deviceType = new \UaDeviceType\Unknown();
-                }
-            } else {
-                $deviceType = new \UaDeviceType\Unknown();
-            }
-        }
-
-        /** rewrite engines */
-
-        if (isset($test->properties->RenderingEngine_Name)) {
-            $engineName = $test->properties->RenderingEngine_Name;
-        } else {
-            $output->writeln('["' . $key . '"] engine name for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $engineName = 'unknown';
-        }
-
-        if (isset($test->properties->RenderingEngine_Version)) {
-            $engineVersion = $test->properties->RenderingEngine_Version;
-        } else {
-            $output->writeln('["' . $key . '"] engine version for UA "' . $test->ua . '" is missing, using "0.0.0" instead');
-
-            $engineVersion = '0.0.0';
-        }
-
-        if (isset($test->properties->RenderingEngine_Maker)) {
-            $engineMaker = $test->properties->RenderingEngine_Maker;
-        } else {
-            $output->writeln('["' . $key . '"] engine maker for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $engineMaker = 'unknown';
-        }
-
-        $output->writeln('        generating result');
-
-        /** generate result */
-        return [
-            $key => [
-                'ua'         => $test->ua,
-                'properties' => [
-                    'Browser_Name'            => $browserName,
-                    'Browser_Type'            => $browserType,
-                    'Browser_Bits'            => $browserBits,
-                    'Browser_Maker'           => $browserMaker,
-                    'Browser_Modus'           => $browserModus,
-                    'Browser_Version'         => $browserVersion,
-                    'Platform_Codename'       => $platformCodename,
-                    'Platform_Marketingname'  => $platformMarketingname,
-                    'Platform_Version'        => $platformVersion,
-                    'Platform_Bits'           => $platformBits,
-                    'Platform_Maker'          => $platformMaker,
-                    'Platform_Brand_Name'     => $platformBrandname,
-                    'Device_Name'             => $deviceName,
-                    'Device_Maker'            => $deviceMaker,
-                    'Device_Type'             => get_class($deviceType),
-                    'Device_Pointing_Method'  => $devicePointing,
-                    'Device_Dual_Orientation' => $deviceOrientation,
-                    'Device_Code_Name'        => $deviceCode,
-                    'Device_Brand_Name'       => $deviceBrand,
-                    'RenderingEngine_Name'    => $engineName,
-                    'RenderingEngine_Version' => $engineVersion,
-                    'RenderingEngine_Maker'   => $engineMaker,
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \stdClass                                         $test
-     * @param BrowserDetector                                   $detector
-     * @param string                                            $key
-     * @param CacheItemPoolInterface                            $cache
-     *
-     * @throws \BrowserDetector\Loader\NotFoundException
-     * @throws \UnexpectedValueException
-     * @return array
-     */
-    private function rewritePlatforms(
-        OutputInterface $output,
-        \stdClass $test,
-        BrowserDetector $detector,
-        $key,
-        CacheItemPoolInterface $cache
-    ) {
-        if (isset($test->properties->Platform_Codename)) {
-            $platformCodename = $test->properties->Platform_Codename;
-        } else {
-            $output->writeln('["' . $key . '"] platform name for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $platformCodename = 'unknown';
-        }
-
-        if (isset($test->properties->Platform_Marketingname)) {
-            $platformMarketingname = $test->properties->Platform_Marketingname;
-        } else {
-            $platformMarketingname = $platformCodename;
-        }
-
-        if (isset($test->properties->Platform_Version)) {
-            $platformVersion = $test->properties->Platform_Version;
-        } else {
-            $output->writeln('["' . $key . '"] platform version for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $platformVersion = 'unknown';
-        }
-
-        if (isset($test->properties->Platform_Maker)) {
-            $platformMaker = $test->properties->Platform_Maker;
-        } else {
-            $output->writeln('["' . $key . '"] platform maker for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $platformMaker = 'unknown';
-        }
-
-        if (isset($test->properties->Platform_Brand_Name)) {
-            $platformBrandname = $test->properties->Platform_Brand_Name;
-        } else {
-            $output->writeln('["' . $key . '"] platform brand for UA "' . $test->ua . '" is missing, using "unknown" instead');
-
-            $platformBrandname = 'unknown';
-        }
-
-        list(, , , , , , ,
-            $platformCodename,
-            $platformMarketingname,
-            $platformMaker,
-            $platformBrandname,
-            $platformVersion, ,
-            $platformBits,
-            $platform) = (new Helper\Platform())->detect($cache, $test->ua, $detector, $platformCodename, $platformMarketingname, $platformMaker, $platformBrandname, $platformVersion);
-
-        return [
-            $platformCodename,
-            $platformMarketingname,
-            $platformVersion,
-            $platformBits,
-            $platformMaker,
-            $platformBrandname,
-            $platform,
-        ];
-    }
-
-    /**
-     * @param \stdClass              $test
-     * @param CacheItemPoolInterface $cache
-     * @param OsInterface            $platform
-     * @param BrowserDetector        $detector
-     *
-     * @throws \BrowserDetector\Loader\NotFoundException
-     * @return array
-     */
-    private function rewriteDevice(\stdClass $test, CacheItemPoolInterface $cache, OsInterface $platform, BrowserDetector $detector)
-    {
-        if (isset($test->properties->Device_Code_Name)) {
-            $deviceCode = $test->properties->Device_Code_Name;
-        } else {
-            $deviceCode = 'unknown';
-        }
-
-        if (isset($test->properties->Device_Brand_Name)) {
-            $deviceBrand = $test->properties->Device_Brand_Name;
-        } else {
-            $deviceBrand = 'unknown';
-        }
-
-        if (isset($test->properties->Device_Pointing_Method)) {
-            $devicePointing = $test->properties->Device_Pointing_Method;
-        } else {
-            $devicePointing = null;
-        }
-
-        if (isset($test->properties->Device_Type)) {
-            $deviceType = $test->properties->Device_Type;
-        } else {
-            $deviceType = null;
-        }
-
-        if (isset($test->properties->Device_Maker)) {
-            $deviceMaker = $test->properties->Device_Maker;
-        } else {
-            $deviceMaker = 'unknown';
-        }
-
-        if (isset($test->properties->Device_Name)) {
-            $deviceName = $test->properties->Device_Name;
-        } else {
-            $deviceName = 'unknown';
-        }
-
-        if (isset($test->properties->Device_Dual_Orientation)) {
-            $deviceOrientation = $test->properties->Device_Dual_Orientation;
-        } else {
-            $deviceOrientation = false;
-        }
-
-        list(
-            $deviceName,
-            $deviceMaker,
-            $deviceType,
-            $devicePointing,
-            $deviceCode,
-            $deviceBrand, , ,
-            $deviceOrientation,
-            $device) = (new Helper\Device())->detect(
+            $device = (new Helper\Device())->detect(
                 $cache,
                 $test->ua,
                 $platform,
                 $detector,
                 $deviceCode,
-                $deviceBrand,
-                $devicePointing,
-                $deviceType,
-                $deviceMaker,
-                $deviceName,
-                $deviceOrientation
+                $device->getBrand()->getBrandName(),
+                $device->getPointingMethod(),
+                $device->getType()->getName(),
+                $device->getManufacturer()->getName(),
+                $device->getMarketingName(),
+                $device->getDualOrientation()
             );
-        /** @var $deviceType \UaDeviceType\TypeInterface */
+            /** @var $deviceType \UaDeviceType\TypeInterface */
 
-        if ($deviceCode === 'unknown'
-            || $deviceCode === null
-            || (false !== stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
-        ) {
-            $deviceLoader = new DeviceLoader($cache);
-            $device       = $deviceLoader->load('unknown', $test->ua);
+            if ($deviceCode === 'unknown'
+                || $deviceCode === null
+                || (false !== stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
+            ) {
+                $deviceLoader = new DeviceLoader($cache);
+                $device       = $deviceLoader->load('unknown', $test->ua);
+            }
 
-            $deviceBrand       = $device->getBrand();
-            $deviceCode        = $device->getDeviceName();
-            $devicePointing    = $device->getPointingMethod();
-            $deviceType        = $device->getType();
-            $deviceMaker       = $device->getManufacturer();
-            $deviceName        = $device->getMarketingName();
-            $deviceOrientation = $device->getDualOrientation();
+            /** @var $deviceType \UaDeviceType\TypeInterface */
+            /** @var $device \UaResult\Device\DeviceInterface */
+        } catch (NotFoundException $e) {
+            $logger->warning($e);
         }
 
-        return [
-            $deviceBrand,
-            $deviceCode,
-            $devicePointing,
-            $deviceType,
-            $deviceMaker,
-            $deviceName,
-            $deviceOrientation,
-            $device,
-        ];
+        /** rewrite engines */
+
+        $engine = $result->getEngine();
+
+        $output->writeln('        generating result');
+
+        $request = (new GenericRequestFactory())->createRequestForUserAgent($test->ua);
+
+        return new Result($request, $device, $platform, $browser, $engine);
     }
 }
