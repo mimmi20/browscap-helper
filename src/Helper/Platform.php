@@ -748,7 +748,7 @@ class Platform
                     $platform = null;
                 }
             } catch (\Exception $e) {
-                $device = null;
+                $platform = null;
             }
         }
 
@@ -767,9 +767,7 @@ class Platform
         if (null === $platform) {
             $platform = new \UaResult\Os\Os(
                 $platformCodenameDetector,
-                $platformMarketingnameDetector,
-                $platformMakerNameDetector,
-                $platformVersionDetector
+                $platformMarketingnameDetector
             );
         }
 
