@@ -24,8 +24,6 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\BrowserDetector;
-use BrowserDetector\Loader\NotFoundException;
-use BrowserDetector\Version\VersionFactory;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -37,8 +35,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaDataMapper\BrowserTypeMapper;
-use UaResult\Company\CompanyLoader;
 use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
 
@@ -233,18 +229,12 @@ class CreateTestsCommand extends Command
 
         $browserNameDetector = 'unknown';
 
+        /** @var \UaResult\Browser\Browser $browser */
         list(
-            $browserNameBrowscap,
-            $browserType,
-            $browserBits,
-            $browserMaker,
-            $browserModus,
-            $browserVersion,
-            $browserNameDetector,
-            $lite,
-            $crawler) = (new Browser())->detect($cache, $ua, $detector, $engine, $browserNameDetector);
+            $browser,
+            $lite) = (new Browser())->detect($cache, $ua, $detector, $browserNameDetector);
 
-        $v          = explode('.', $browserVersion, 2);
+        $v          = explode('.', $browser->getVersion()->getVersion(), 2);
         $maxVersion = $v[0];
         $minVersion = (isset($v[1]) ? $v[1] : '0');
 
@@ -257,15 +247,15 @@ class CreateTestsCommand extends Command
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browserNameBrowscap) . "',
-            'Browser_Type' => '$browserType',
-            'Browser_Bits' => '$browserBits',
-            'Browser_Maker' => '$browserMaker',
-            'Browser_Modus' => '$browserModus',
-            'Version' => '$browserVersion',
-            'MajorVer' => '$maxVersion',
-            'MinorVer' => '$minVersion',
-            'Platform' => '$platformNameBrowscap',
+            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browser->getName()) . "',
+            'Browser_Type' => '" . $browser->getType()->getName() . "',
+            'Browser_Bits' => '" . $browser->getBits() . "',
+            'Browser_Maker' => '" . $browser->getManufacturer()->getName() . "',
+            'Browser_Modus' => '" . $browser->getModus() . "',
+            'Version' => '" . $browser->getVersion()->getVersion() . "',
+            'MajorVer' => '" . $maxVersion . "',
+            'MinorVer' => '" . $minVersion . "',
+            'Platform' => '" . $platformNameBrowscap . "',
             'Platform_Version' => '$platformVersionBrowscap',
             'Platform_Description' => '$platformDescriptionBrowscap',
             'Platform_Bits' => '$platformBits',
@@ -287,7 +277,7 @@ class CreateTestsCommand extends Command
             'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
             'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
             'isSyndicationReader' => false,
-            'Crawler' => " . ($crawler ? 'true' : 'false') . ",
+            'Crawler' => " . ($browser->getType()->isBot() ? 'true' : 'false') . ",
             'isFake' => false,
             'isAnonymized' => false,
             'isModified' => false,
@@ -315,31 +305,6 @@ class CreateTestsCommand extends Command
         $output->writeln('      detecting request ...');
 
         $request = (new GenericRequestFactory())->createRequestForUserAgent($ua);
-
-        $output->writeln('      detecting browser ...');
-
-        try {
-            $browserMaker = (new CompanyLoader($cache))->load($browserMaker);
-        } catch (NotFoundException $e) {
-            $browserMaker = null;
-        }
-
-        try {
-            $browserType = (new BrowserTypeMapper())->mapBrowserType($cache, $browserType);
-        } catch (NotFoundException $e) {
-            $browserType = null;
-        }
-
-        $browser = new \UaResult\Browser\Browser(
-            $browserNameDetector,
-            $browserMaker,
-            (new VersionFactory())->set($browserVersion),
-            $browserType,
-            $browserBits,
-            false,
-            false,
-            $browserModus
-        );
 
         $result = new Result($request, $device, $platform, $browser, $engine);
 
