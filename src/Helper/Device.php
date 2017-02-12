@@ -41,7 +41,7 @@ class Device
      * @param string|null                       $deviceMaker
      * @param string|null                       $deviceName
      *
-     * @return \UaResult\Device\DeviceInterface
+     * @return array
      */
     public function detect(
         CacheItemPoolInterface $cache,
@@ -2803,13 +2803,13 @@ class Device
                 $device = $result->getDevice();
 
                 if ($deviceCode === $device->getDeviceName()) {
-                    return $device;
+                    return [$device, null];
                 } elseif ('general Mobile Device' === $device->getDeviceName()
                     && in_array($deviceCode, ['general Mobile Phone', 'general Tablet'])
                 ) {
-                    return $device;
+                    return [$device, null];
                 } elseif ('Windows RT Tablet' === $device->getDeviceName() && $deviceCode === 'general Tablet') {
-                    return $device;
+                    return [$device, null];
                 } elseif ('Windows Desktop' === $device->getDeviceName()
                     && $deviceCode === 'unknown'
                     && in_array(
@@ -2817,17 +2817,17 @@ class Device
                         ['Windows 7', 'Windows 8', 'Windows 8.1', 'Windows 10', 'Windows XP', 'Windows Vista']
                     )
                 ) {
-                    return $device;
+                    return [$device, null];
                 } elseif ('Linux Desktop' === $device->getDeviceName()
                     && $deviceCode === 'unknown'
                     && in_array($platform->getMarketingName(), ['Linux'])
                 ) {
-                    return $device;
+                    return [$device, null];
                 } elseif ('Macintosh' === $device->getDeviceName()
                     && $deviceCode === 'unknown'
                     && in_array($platform->getMarketingName(), ['Mac OS X', 'macOS'])
                 ) {
-                    return $device;
+                    return [$device, null];
                 }
             } catch (\Exception $e) {
                 $device = null;
@@ -2845,6 +2845,6 @@ class Device
             );
         }
 
-        return $device;
+        return [$device, null];
     }
 }

@@ -24,6 +24,7 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\BrowserDetector;
+use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionFactory;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
@@ -36,7 +37,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaBrowserType\TypeLoader;
+use UaDataMapper\BrowserTypeMapper;
 use UaResult\Company\CompanyLoader;
 use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
@@ -148,11 +149,13 @@ class CreateTestsCommand extends Command
         foreach ((new DirectorySource($sourcesDirectory))->getUserAgents($logger, $output) as $useragent) {
             $useragent = trim($useragent);
 
+            $output->writeln('    parsing ua ' . $useragent);
+
             if (isset($checks[$useragent])) {
                 continue;
             }
 
-            $this->parseLine($cache, $useragent, $counter, $outputBrowscap, $outputDetector, $number, $detector);
+            $this->parseLine($cache, $useragent, $counter, $outputBrowscap, $outputDetector, $number, $detector, $output);
             $checks[$useragent] = $issue;
             ++$counter;
         }
@@ -193,10 +196,13 @@ class CreateTestsCommand extends Command
      * @param array                             &$outputDetector
      * @param int                               $testNumber
      * @param \BrowserDetector\BrowserDetector  $detector
+     * @param OutputInterface                   $output
      */
-    private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector)
+    private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector, OutputInterface $output)
     {
         $platformCodename = 'unknown';
+
+        $output->writeln('      detecting platform ...');
 
         list(
             $platformNameBrowscap,
@@ -210,16 +216,20 @@ class CreateTestsCommand extends Command
             $platformBits,
             $platform) = (new Platform())->detect($cache, $ua, $detector, $platformCodename);
 
+        $output->writeln('      detecting device ...');
+
         $deviceCode = 'unknown';
 
         /** @var \UaResult\Device\DeviceInterface $device */
-        $device = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
+        list($device) = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         list(
             $engine,
             $applets,
             $activex) = (new Engine())->detect($cache, $ua);
+
+        $output->writeln('      detecting browser ...');
 
         $browserNameDetector = 'unknown';
 
@@ -240,6 +250,8 @@ class CreateTestsCommand extends Command
 
         $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
         $formatedCounter = sprintf('%1$05d', (int) $counter);
+
+        $output->writeln('      writing browscap data ...');
 
         $outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
@@ -282,30 +294,47 @@ class CreateTestsCommand extends Command
             'CssVersion' => '0',
             'AolVersion' => '0',
             'Device_Name' => '" . $device->getMarketingName() . "',
-            'Device_Maker' => '" . $device->getManufacturer() . "',
+            'Device_Maker' => '" . $device->getManufacturer()->getName() . "',
             'Device_Type' => '" . $device->getType()->getName() . "',
             'Device_Pointing_Method' => '" . $device->getPointingMethod() . "',
             'Device_Code_Name' => '" . $device->getDeviceName() . "',
-            'Device_Brand_Name' => '" . $device->getBrand() . "',
+            'Device_Brand_Name' => '" . $device->getBrand()->getBrandName() . "',
             'RenderingEngine_Name' => '" . $engine->getName() . "',
             'RenderingEngine_Version' => 'unknown',
-            'RenderingEngine_Maker' => '" . $engine->getManufacturer() . "',
+            'RenderingEngine_Maker' => '" . $engine->getManufacturer()->getName() . "',
         ],
         'lite' => " . ($lite ? 'true' : 'false') . ",
         'standard' => " . ($standard ? 'true' : 'false') . ",
     ],\n";
 
+        $output->writeln('      detecting test name ...');
+
         $formatedIssue   = sprintf('%1$08d', (int) $testNumber);
         $formatedCounter = sprintf('%1$08d', (int) $counter);
 
+        $output->writeln('      detecting request ...');
+
         $request = (new GenericRequestFactory())->createRequestForUserAgent($ua);
+
+        $output->writeln('      detecting browser ...');
+
+        try {
+            $browserMaker = (new CompanyLoader($cache))->load($browserMaker);
+        } catch (NotFoundException $e) {
+            $browserMaker = null;
+        }
+
+        try {
+            $browserType = (new BrowserTypeMapper())->mapBrowserType($cache, $browserType);
+        } catch (NotFoundException $e) {
+            $browserType = null;
+        }
 
         $browser = new \UaResult\Browser\Browser(
             $browserNameDetector,
-            (new CompanyLoader($cache))->load($browserMaker),
+            $browserMaker,
             (new VersionFactory())->set($browserVersion),
-            $engine,
-            (new TypeLoader($cache))->load($browserType),
+            $browserType,
             $browserBits,
             false,
             false,
