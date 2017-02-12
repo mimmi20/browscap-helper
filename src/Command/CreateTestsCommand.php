@@ -37,7 +37,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaBrowserType\TypeLoader;
 use UaDataMapper\BrowserTypeMapper;
 use UaResult\Company\CompanyLoader;
 use UaResult\Result\Result;
@@ -222,7 +221,7 @@ class CreateTestsCommand extends Command
         $deviceCode = 'unknown';
 
         /** @var \UaResult\Device\DeviceInterface $device */
-        list($device,) = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
+        list($device) = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         list(

@@ -417,7 +417,7 @@ class T' . $group . 'Test extends UserAgentsTest
         $deviceCode = $device->getDeviceName();
 
         try {
-            list($device,) = (new Helper\Device())->detect(
+            list($device) = (new Helper\Device())->detect(
                 $cache,
                 $test->ua,
                 $platform,
