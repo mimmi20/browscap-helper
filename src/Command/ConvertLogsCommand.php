@@ -111,7 +111,7 @@ class ConvertLogsCommand extends Command
         $output->writeln("reading from directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
-        foreach ((new LogFileSource($sourcesDirectory))->getUserAgents($logger, $output) as $agent) {
+        foreach ((new LogFileSource($logger, $output, $sourcesDirectory))->getUserAgents() as $agent) {
             file_put_contents($targetBulkFile, $agent . "\n", FILE_APPEND | LOCK_EX);
             ++$counter;
         }
