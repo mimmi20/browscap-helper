@@ -17,7 +17,7 @@
 namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Bits\Os;
-use BrowserDetector\BrowserDetector;
+use BrowserDetector\Detector;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\PlatformLoader;
 use Psr\Cache\CacheItemPoolInterface;
@@ -46,7 +46,7 @@ class Platform
     public function detect(
         CacheItemPoolInterface $cache,
         $useragent,
-        BrowserDetector $detector,
+        Detector $detector,
         $platformCodenameDetector,
         $platformMarketingnameDetector = 'unknown',
         $platformMakerNameDetector = 'unknown',

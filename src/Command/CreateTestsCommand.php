@@ -23,7 +23,7 @@ use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
-use BrowserDetector\BrowserDetector;
+use BrowserDetector\Detector;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -112,7 +112,7 @@ class CreateTestsCommand extends Command
         $cache    = new FilesystemCachePool(new Filesystem($adapter));
 
         $output->writeln('init detector ...');
-        $detector = new BrowserDetector($cache, $logger);
+        $detector = new Detector($cache, $logger);
 
         $output->writeln('reading already existing tests ...');
         $checks = [];
@@ -191,10 +191,10 @@ class CreateTestsCommand extends Command
      * @param string                            &$outputBrowscap
      * @param array                             &$outputDetector
      * @param int                               $testNumber
-     * @param \BrowserDetector\BrowserDetector  $detector
+     * @param \BrowserDetector\Detector         $detector
      * @param OutputInterface                   $output
      */
-    private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, BrowserDetector $detector, OutputInterface $output)
+    private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, Detector $detector, OutputInterface $output)
     {
         $platformCodename = 'unknown';
 

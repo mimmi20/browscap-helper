@@ -17,7 +17,7 @@
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper;
-use BrowserDetector\BrowserDetector;
+use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
@@ -81,7 +81,7 @@ class RewriteTestsCommand extends Command
         $cache    = new FilesystemCachePool(new Filesystem($adapter));
 
         $output->writeln('init detector ...');
-        $detector = new BrowserDetector($cache, $logger);
+        $detector = new Detector($cache, $logger);
 
         $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
@@ -271,7 +271,7 @@ class T' . $group . 'Test extends UserAgentsTest
     private function handleFile(
         OutputInterface $output,
         \SplFileInfo $file,
-        BrowserDetector $detector,
+        Detector $detector,
         array &$data,
         array &$checks,
         CacheItemPoolInterface $cache,
@@ -383,7 +383,7 @@ class T' . $group . 'Test extends UserAgentsTest
     private function handleTest(
         OutputInterface $output,
         \stdClass $test,
-        BrowserDetector $detector,
+        Detector $detector,
         CacheItemPoolInterface $cache,
         LoggerInterface $logger
     ) {

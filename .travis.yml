@@ -27,7 +27,7 @@ before_install:
   - travis_retry composer self-update
 
 install:
-  - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $COMPOSER_FLAGS
+  - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv $COMPOSER_FLAGS
 
 script:
 #  - if [[ $COVERAGE = yes ]]; then vendor/bin/phpunit --colors=auto --coverage-clover=coverage.clover; else vendor/bin/phpunit --no-coverage --colors=auto; fi

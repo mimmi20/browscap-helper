@@ -16,7 +16,7 @@
 
 namespace BrowscapHelper\Helper;
 
-use BrowserDetector\BrowserDetector;
+use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoader;
 use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Os\OsInterface;
@@ -47,7 +47,7 @@ class Device
         CacheItemPoolInterface $cache,
         $useragent,
         OsInterface $platform,
-        BrowserDetector $detector,
+        Detector $detector,
         $deviceCode,
         $deviceBrand = null,
         $devicePointing = null,
