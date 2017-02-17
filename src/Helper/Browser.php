@@ -16,7 +16,7 @@
 
 namespace BrowscapHelper\Helper;
 
-use BrowserDetector\BrowserDetector;
+use BrowserDetector\Detector;
 use BrowserDetector\Loader\BrowserLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -31,7 +31,7 @@ class Browser
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
-     * @param \BrowserDetector\BrowserDetector  $detector
+     * @param \BrowserDetector\Detector         $detector
      * @param string                            $browserName
      *
      * @return array
@@ -39,7 +39,7 @@ class Browser
     public function detect(
         CacheItemPoolInterface $cache,
         $useragent,
-        BrowserDetector $detector,
+        Detector $detector,
         $browserName
     ) {
         $loader = new BrowserLoader($cache);
