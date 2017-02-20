@@ -19,8 +19,6 @@ namespace BrowscapHelper\Helper;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoader;
 use Psr\Cache\CacheItemPoolInterface;
-use UaDataMapper\DeviceBrandnameMapper;
-use UaDataMapper\DeviceMakerMapper;
 use UaDataMapper\DeviceTypeMapper;
 use UaDeviceType\TypeInterface;
 use UaResult\Company\Company;
