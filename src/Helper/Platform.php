@@ -33,7 +33,7 @@ class Platform
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
-     * @param \BrowserDetector\BrowserDetector  $detector
+     * @param \BrowserDetector\Detector         $detector
      * @param string                            $platformCodenameDetector
      * @param string                            $platformMarketingnameDetector
      * @param string                            $platformMakerNameDetector

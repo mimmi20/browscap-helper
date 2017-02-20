@@ -437,7 +437,7 @@ class T' . $group . 'Test extends UserAgentsTest
                 || (false !== stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
             ) {
                 $deviceLoader = new DeviceLoader($cache);
-                $device       = $deviceLoader->load('unknown', $test->ua);
+                list($device) = $deviceLoader->load('unknown', $test->ua);
             }
 
             /** @var $deviceType \UaDeviceType\TypeInterface */

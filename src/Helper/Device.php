@@ -19,6 +19,9 @@ namespace BrowscapHelper\Helper;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoader;
 use Psr\Cache\CacheItemPoolInterface;
+use UaDataMapper\DeviceTypeMapper;
+use UaDeviceType\TypeInterface;
+use UaResult\Company\Company;
 use UaResult\Os\OsInterface;
 
 /**
@@ -33,7 +36,7 @@ class Device
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
      * @param OsInterface                       $platform
-     * @param BrowserDetector                   $detector
+     * @param \BrowserDetector\Detector         $detector
      * @param string                            $deviceCode
      * @param string|null                       $deviceBrand
      * @param string|null                       $devicePointing
@@ -2835,6 +2838,18 @@ class Device
         }
 
         if (null === $device) {
+            if (!$deviceType instanceof TypeInterface) {
+                $deviceType = (new DeviceTypeMapper())->mapDeviceType($cache, $deviceType);
+            }
+
+            if (!$deviceMaker instanceof Company) {
+                $deviceMaker = new Company('unknown', 'unknown');
+            }
+
+            if (!$deviceBrand instanceof Company) {
+                $deviceBrand = new Company('unknown', 'unknown');
+            }
+
             $device = new \UaResult\Device\Device(
                 $deviceCode,
                 $deviceName,
