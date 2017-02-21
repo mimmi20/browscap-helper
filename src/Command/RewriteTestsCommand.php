@@ -20,15 +20,12 @@ use BrowscapHelper\Helper;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
-use Cache\Adapter\Filesystem\FilesystemCachePool;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use Monolog\Handler;
+use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Os\OsInterface;
 use UaResult\Result\Result;
@@ -43,6 +40,35 @@ use Wurfl\Request\GenericRequestFactory;
  */
 class RewriteTestsCommand extends Command
 {
+    /**
+     * @var \Monolog\Logger
+     */
+    private $logger = null;
+
+    /**
+     * @var \Psr\Cache\CacheItemPoolInterface
+     */
+    private $cache = null;
+
+    /**
+     * @var \BrowserDetector\Detector
+     */
+    private $detector = null;
+
+    /**
+     * @param \Monolog\Logger                   $logger
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param \BrowserDetector\Detector         $detector
+     */
+    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector)
+    {
+        $this->logger   = $logger;
+        $this->cache    = $cache;
+        $this->detector = $detector;
+
+        parent::__construct();
+    }
+
     /**
      * Configures the current command.
      */
@@ -71,17 +97,8 @@ class RewriteTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('init logger ...');
-        $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\NullHandler());
-        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
-
-        $output->writeln('init cache ...');
-        $adapter  = new Local(__DIR__ . '/../../cache/');
-        $cache    = new FilesystemCachePool(new Filesystem($adapter));
-
-        $output->writeln('init detector ...');
-        $detector = new Detector($cache, $logger);
+        $consoleLogger = new ConsoleLogger($output);
+        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::INFO));
 
         $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
@@ -131,7 +148,7 @@ class RewriteTestsCommand extends Command
                 $g       = $group;
             }
 
-            $newCounter = $this->handleFile($output, $file, $detector, $data, $checks, $cache, $logger, $counter);
+            $newCounter = $this->handleFile($output, $file, $data, $checks, $counter);
 
             if (!$newCounter) {
                 continue;
@@ -259,11 +276,8 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \SplFileInfo                                      $file
-     * @param BrowserDetector                                   $detector
      * @param array                                             $data
      * @param array                                             $checks
-     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
-     * @param \Psr\Log\LoggerInterface                          $logger
      * @param int                                               $counter
      *
      * @return int
@@ -271,11 +285,8 @@ class T' . $group . 'Test extends UserAgentsTest
     private function handleFile(
         OutputInterface $output,
         \SplFileInfo $file,
-        Detector $detector,
         array &$data,
         array &$checks,
-        CacheItemPoolInterface $cache,
-        LoggerInterface $logger,
         &$counter
     ) {
         $output->writeln('file ' . $file->getBasename());
@@ -339,7 +350,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $outputDetector += [
                 $key => [
                     'ua'     => $test->ua,
-                    'result' => $this->handleTest($output, $test, $detector, $cache, $logger)->toArray(),
+                    'result' => $this->handleTest($output, $test)->toArray(),
                 ],
             ];
             ++$counter;
@@ -374,22 +385,16 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \stdClass                                         $test
-     * @param BrowserDetector                                   $detector
-     * @param \Psr\Cache\CacheItemPoolInterface                 $cache
-     * @param \Psr\Log\LoggerInterface                          $logger
      *
      * @return \UaResult\Result\Result
      */
     private function handleTest(
         OutputInterface $output,
-        \stdClass $test,
-        Detector $detector,
-        CacheItemPoolInterface $cache,
-        LoggerInterface $logger
+        \stdClass $test
     ) {
         $output->writeln('        ua: ' . $test->ua);
 
-        $result = (new ResultFactory())->fromArray($cache, $logger, (array) $test->result);
+        $result = (new ResultFactory())->fromArray($this->cache, $this->logger, (array) $test->result);
 
         /** rewrite browsers */
 
@@ -402,9 +407,9 @@ class T' . $group . 'Test extends UserAgentsTest
         $platform = $result->getOs();
 
         try {
-            list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($cache, $test->ua, $detector, $platform->getName(), $platform->getMarketingName(), $platform->getManufacturer(), $platform->getVersion()->getVersion());
+            list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($this->cache, $test->ua, $this->detector, $platform->getName(), $platform->getMarketingName(), $platform->getManufacturer(), $platform->getVersion()->getVersion());
         } catch (NotFoundException $e) {
-            $logger->warning($e);
+            $this->logger->warning($e);
         }
 
         /** @var $platform OsInterface|null */
@@ -418,10 +423,10 @@ class T' . $group . 'Test extends UserAgentsTest
 
         try {
             list($device) = (new Helper\Device())->detect(
-                $cache,
+                $this->cache,
                 $test->ua,
                 $platform,
-                $detector,
+                $this->detector,
                 $deviceCode,
                 $device->getBrand()->getBrandName(),
                 $device->getPointingMethod(),
@@ -436,14 +441,14 @@ class T' . $group . 'Test extends UserAgentsTest
                 || $deviceCode === null
                 || (false !== stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
             ) {
-                $deviceLoader = new DeviceLoader($cache);
+                $deviceLoader = new DeviceLoader($this->cache);
                 list($device) = $deviceLoader->load('unknown', $test->ua);
             }
 
             /** @var $deviceType \UaDeviceType\TypeInterface */
             /** @var $device \UaResult\Device\DeviceInterface */
         } catch (NotFoundException $e) {
-            $logger->warning($e);
+            $this->logger->warning($e);
         }
 
         /** rewrite engines */

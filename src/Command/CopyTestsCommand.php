@@ -24,14 +24,13 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use Cache\Adapter\Filesystem\FilesystemCachePool;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use League\Flysystem\UnreadableFileException;
-use Monolog\Handler;
+use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -42,6 +41,28 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CopyTestsCommand extends Command
 {
+    /**
+     * @var \Monolog\Logger
+     */
+    private $logger = null;
+
+    /**
+     * @var \Psr\Cache\CacheItemPoolInterface
+     */
+    private $cache = null;
+
+    /**
+     * @param \Monolog\Logger                   $logger
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     */
+    public function __construct(Logger $logger, CacheItemPoolInterface $cache)
+    {
+        $this->logger = $logger;
+        $this->cache  = $cache;
+
+        parent::__construct();
+    }
+
     /**
      * Configures the current command.
      */
@@ -70,14 +91,8 @@ class CopyTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('init logger ...');
-        $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\NullHandler());
-        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
-
-        $output->writeln('init cache ...');
-        $adapter  = new Local(__DIR__ . '/../../cache/');
-        $cache    = new FilesystemCachePool(new Filesystem($adapter));
+        $consoleLogger = new ConsoleLogger($output);
+        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::INFO));
 
         $targetDirectoryHelper = new TargetDirectory();
 
@@ -85,7 +100,7 @@ class CopyTestsCommand extends Command
         try {
             $number = $targetDirectoryHelper->getNextTest($output);
         } catch (UnreadableFileException $e) {
-            $logger->critical($e);
+            $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
             return;
@@ -95,7 +110,7 @@ class CopyTestsCommand extends Command
         try {
             $targetDirectory = $targetDirectoryHelper->getPath($output);
         } catch (UnreadableFileException $e) {
-            $logger->critical($e);
+            $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
             return;
@@ -107,7 +122,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('read existing tests ...');
         $existingTests = [];
-        foreach ((new DetectorSource($logger, $output, $cache))->getUserAgents() as $ua) {
+        foreach ((new DetectorSource($this->logger, $output, $this->cache))->getUserAgents() as $ua) {
             $ua = trim($ua);
 
             if (isset($existingTests[$ua])) {
@@ -121,11 +136,11 @@ class CopyTestsCommand extends Command
         $counter = 0;
         $source  = new CollectionSource(
             [
-                new BrowscapSource($logger, $output, $cache),
-                new PiwikSource($logger, $output),
-                new UapCoreSource($logger, $output),
-                new WhichBrowserSource($logger, $output),
-                new WootheeSource($logger, $output),
+                new BrowscapSource($this->logger, $output, $this->cache),
+                new PiwikSource($this->logger, $output),
+                new UapCoreSource($this->logger, $output),
+                new WhichBrowserSource($this->logger, $output),
+                new WootheeSource($this->logger, $output),
             ]
         );
 
