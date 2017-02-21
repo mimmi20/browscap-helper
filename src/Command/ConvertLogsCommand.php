@@ -102,8 +102,7 @@ class ConvertLogsCommand extends Command
         $sourcesDirectory = $input->getOption('resources');
 
         $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\NullHandler());
-        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
+        $logger->pushHandler(new Handler\StreamHandler('log/error.log', Logger::ERROR));
 
         $counter        = 0;
         $targetBulkFile = $targetDirectory . date('Y-m-d') . '-testagents.txt';

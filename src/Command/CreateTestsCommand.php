@@ -104,8 +104,7 @@ class CreateTestsCommand extends Command
 
         $output->writeln('init logger ...');
         $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\NullHandler());
-        $logger->pushHandler(new Handler\StreamHandler('error.log', Logger::ERROR));
+        $logger->pushHandler(new Handler\StreamHandler('log/error.log', Logger::ERROR));
 
         $output->writeln('init cache ...');
         $adapter  = new Local(__DIR__ . '/../../cache/');
