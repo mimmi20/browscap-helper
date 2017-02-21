@@ -17,11 +17,12 @@
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\LogFileSource;
-use Monolog\Handler;
+use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -43,15 +44,20 @@ class ConvertLogsCommand extends Command
     private $targetDirectory = '';
 
     /**
-     * @param string $sourcesDirectory
-     * @param string $targetDirectory
-     *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @var \Monolog\Logger
      */
-    public function __construct($sourcesDirectory, $targetDirectory)
+    private $logger = null;
+
+    /**
+     * @param \Monolog\Logger $logger
+     * @param string          $sourcesDirectory
+     * @param string          $targetDirectory
+     */
+    public function __construct(Logger $logger, $sourcesDirectory, $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;
+        $this->logger           = $logger;
 
         parent::__construct();
     }
@@ -98,11 +104,11 @@ class ConvertLogsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $consoleLogger = new ConsoleLogger($output);
+        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::NOTICE));
+
         $targetDirectory  = $input->getOption('target');
         $sourcesDirectory = $input->getOption('resources');
-
-        $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\StreamHandler('log/error.log', Logger::ERROR));
 
         $counter        = 0;
         $targetBulkFile = $targetDirectory . date('Y-m-d') . '-testagents.txt';
@@ -110,7 +116,7 @@ class ConvertLogsCommand extends Command
         $output->writeln("reading from directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
-        foreach ((new LogFileSource($logger, $output, $sourcesDirectory))->getUserAgents() as $agent) {
+        foreach ((new LogFileSource($this->logger, $output, $sourcesDirectory))->getUserAgents() as $agent) {
             file_put_contents($targetBulkFile, $agent . "\n", FILE_APPEND | LOCK_EX);
             ++$counter;
         }

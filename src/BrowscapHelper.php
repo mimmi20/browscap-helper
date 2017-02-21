@@ -16,6 +16,13 @@
 
 namespace BrowscapHelper;
 
+use BrowserDetector\Detector;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Monolog\ErrorHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\Console\Application;
 
 /**
@@ -38,11 +45,21 @@ class BrowscapHelper extends Application
         $sourcesDirectory = realpath(__DIR__ . '/../sources/') . '/';
         $targetDirectory  = realpath(__DIR__ . '/../results/') . '/';
 
+        $logger = new Logger('browser-detector-helper');
+        $logger->pushHandler(new StreamHandler(realpath(__DIR__ . '/../log/') . '/error.log', Logger::ERROR));
+        ErrorHandler::register($logger);
+
+        $adapter  = new Local('cache/');
+        $cache    = new FilesystemCachePool(new Filesystem($adapter));
+        $cache->setLogger($logger);
+
+        $detector = new Detector($cache, $logger);
+
         $commands = [
-            new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory),
-            new Command\CopyTestsCommand(),
-            new Command\CreateTestsCommand($sourcesDirectory),
-            new Command\RewriteTestsCommand(),
+            new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
+            new Command\CopyTestsCommand($logger, $cache),
+            new Command\CreateTestsCommand($logger, $cache, $detector, $sourcesDirectory),
+            new Command\RewriteTestsCommand($logger, $cache, $detector),
         ];
 
         foreach ($commands as $command) {

@@ -24,16 +24,14 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\Detector;
-use Cache\Adapter\Filesystem\FilesystemCachePool;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use League\Flysystem\UnreadableFileException;
-use Monolog\Handler;
+use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
@@ -52,13 +50,32 @@ class CreateTestsCommand extends Command
     private $sourcesDirectory = '';
 
     /**
-     * @param string $sourcesDirectory
-     *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @var \Monolog\Logger
      */
-    public function __construct($sourcesDirectory)
+    private $logger = null;
+
+    /**
+     * @var \Psr\Cache\CacheItemPoolInterface
+     */
+    private $cache = null;
+
+    /**
+     * @var \BrowserDetector\Detector
+     */
+    private $detector = null;
+
+    /**
+     * @param \Monolog\Logger                   $logger
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param \BrowserDetector\Detector         $detector
+     * @param string                            $sourcesDirectory
+     */
+    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector, $sourcesDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
+        $this->logger           = $logger;
+        $this->cache            = $cache;
+        $this->detector         = $detector;
 
         parent::__construct();
     }
@@ -98,25 +115,13 @@ class CreateTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /*******************************************************************************
-         * loading files
-         ******************************************************************************/
-
-        $output->writeln('init logger ...');
-        $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new Handler\StreamHandler('log/error.log', Logger::ERROR));
-
-        $output->writeln('init cache ...');
-        $adapter  = new Local(__DIR__ . '/../../cache/');
-        $cache    = new FilesystemCachePool(new Filesystem($adapter));
-
-        $output->writeln('init detector ...');
-        $detector = new Detector($cache, $logger);
+        $consoleLogger = new ConsoleLogger($output);
+        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::INFO));
 
         $output->writeln('reading already existing tests ...');
         $checks = [];
 
-        foreach ((new DetectorSource($logger, $output, $cache))->getUserAgents() as $useragent) {
+        foreach ((new DetectorSource($this->logger, $output, $this->cache))->getUserAgents() as $useragent) {
             if (isset($checks[$useragent])) {
                 continue;
             }
@@ -127,7 +132,7 @@ class CreateTestsCommand extends Command
         try {
             $number = (new TargetDirectory())->getNextTest($output);
         } catch (UnreadableFileException $e) {
-            $logger->critical($e);
+            $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
             return;
@@ -141,7 +146,7 @@ class CreateTestsCommand extends Command
         $counter          = 0;
         $issue            = 'test-' . sprintf('%1$08d', $number);
 
-        foreach ((new DirectorySource($logger, $output, $sourcesDirectory))->getUserAgents() as $useragent) {
+        foreach ((new DirectorySource($this->logger, $output, $sourcesDirectory))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
             $output->writeln('    parsing ua ' . $useragent);
@@ -150,7 +155,7 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $this->parseLine($cache, $useragent, $counter, $outputBrowscap, $outputDetector, $number, $detector, $output);
+            $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number, $output);
             $checks[$useragent] = $issue;
             ++$counter;
         }
@@ -184,16 +189,14 @@ class CreateTestsCommand extends Command
     }
 
     /**
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param string                            $ua
-     * @param int                               $counter
-     * @param string                            &$outputBrowscap
-     * @param array                             &$outputDetector
-     * @param int                               $testNumber
-     * @param \BrowserDetector\Detector         $detector
-     * @param OutputInterface                   $output
+     * @param string          $ua
+     * @param int             $counter
+     * @param string          &$outputBrowscap
+     * @param array           &$outputDetector
+     * @param int             $testNumber
+     * @param OutputInterface $output
      */
-    private function parseLine(CacheItemPoolInterface $cache, $ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, Detector $detector, OutputInterface $output)
+    private function parseLine($ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, OutputInterface $output)
     {
         $platformCodename = 'unknown';
 
@@ -209,20 +212,20 @@ class CreateTestsCommand extends Command
             $win16,
             $standard,
             $platformBits,
-            $platform) = (new Platform())->detect($cache, $ua, $detector, $platformCodename);
+            $platform) = (new Platform())->detect($this->cache, $ua, $this->detector, $platformCodename);
 
         $output->writeln('      detecting device ...');
 
         $deviceCode = 'unknown';
 
         /** @var \UaResult\Device\DeviceInterface $device */
-        list($device) = (new Device())->detect($cache, $ua, $platform, $detector, $deviceCode);
+        list($device) = (new Device())->detect($this->cache, $ua, $platform, $this->detector, $deviceCode);
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         list(
             $engine,
             $applets,
-            $activex) = (new Engine())->detect($cache, $ua);
+            $activex) = (new Engine())->detect($this->cache, $ua);
 
         $output->writeln('      detecting browser ...');
 
@@ -231,7 +234,7 @@ class CreateTestsCommand extends Command
         /** @var \UaResult\Browser\Browser $browser */
         list(
             $browser,
-            $lite) = (new Browser())->detect($cache, $ua, $detector, $browserNameDetector);
+            $lite) = (new Browser())->detect($this->cache, $ua, $this->detector, $browserNameDetector);
 
         $v          = explode('.', $browser->getVersion()->getVersion(), 2);
         $maxVersion = $v[0];
