@@ -105,7 +105,7 @@ class ConvertLogsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::NOTICE));
+        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $targetDirectory  = $input->getOption('target');
         $sourcesDirectory = $input->getOption('resources');

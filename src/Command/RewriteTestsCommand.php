@@ -98,7 +98,7 @@ class RewriteTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::INFO));
+        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
