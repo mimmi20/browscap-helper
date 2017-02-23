@@ -1,6 +1,6 @@
 <?php
 $header = <<<EOF
-This file is part of the Browscap-Helper package.
+This file is part of the browscap-helper package.
 
 (c) Thomas Mueller <mimmi20@live.de>
 
@@ -21,31 +21,46 @@ return Symfony\CS\Config\Config::create()
     ->level(\Symfony\CS\FixerInterface::PSR2_LEVEL)
     ->fixers(
         array(
-            'align_double_arrow',
-            'double_arrow_multiline_whitespaces',
-            'align_equals',
-            'braces',
-            'concat_with_spaces',
-            'duplicate_semicolon',
-            'elseif',
+        // PSR-0
+            'psr0',
+        // PSR-1
             'encoding',
+            'short_tag',
+            'full_opening_tag',
+        // PSR-2
+            'braces',
+            'elseif',
             'eof_ending',
-            'extra_empty_lines',
             'function_call_space',
             'function_declaration',
             'indentation',
-            'join_function',
             'line_after_namespace',
             'linefeed',
-            'list_commas',
             'lowercase_constants',
             'lowercase_keywords',
             'method_argument_space',
             'multiple_use',
-            'namespace_no_leading_whitespace',
-            'no_blank_lines_after_class_opening',
             'parenthesis',
             'php_closing_tag',
+            'single_line_after_imports',
+            'trailing_spaces',
+            'visibility',
+        // Symfony
+            'duplicate_semicolon',
+            'extra_empty_lines',
+            'join_function',
+            'object_operator',
+            'remove_lines_between_uses',
+            'standardize_not_equal',
+            'unused_use',
+            'whitespacy_lines',
+        // Contrib
+            'align_double_arrow',
+            'align_equals',
+            'concat_with_spaces',
+            'list_commas',
+            'namespace_no_leading_whitespace',
+            'no_blank_lines_after_class_opening',
             'phpdoc_indent',
             'phpdoc_no_access',
             'phpdoc_no_empty_return',
@@ -55,22 +70,14 @@ return Symfony\CS\Config\Config::create()
             'phpdoc_trim',
             'phpdoc_types',
             'phpdoc_var_without_name',
-            'remove_lines_between_uses',
             'return',
             'self_accessor',
             'short_array_syntax',
-            'short_tag',
-            'single_line_after_imports',
             'single_quote',
             'spaces_before_semicolon',
             'spaces_cast',
             'ternary_spaces',
-            'trailing_spaces',
             'trim_array_spaces',
-            'unused_use',
-            'visibility',
-            'whitespacy_lines',
-            'psr0',
             'array_element_no_space_before_comma',
             'array_element_white_space_after_comma',
             'blankline_after_open_tag',
@@ -78,7 +85,6 @@ return Symfony\CS\Config\Config::create()
             'include',
             'multiline_array_trailing_comma',
             'new_with_braces',
-            'object_operator',
             'operators_spaces',
             'phpdoc_inline_tag',
             'pre_increment',
@@ -87,7 +93,6 @@ return Symfony\CS\Config\Config::create()
             'short_bool_cast',
             'single_array_no_trailing_comma',
             'single_blank_line_before_namespace',
-            'standardize_not_equal',
             'ereg_to_preg',
             'multiline_spaces_before_semicolon',
             'newline_after_open_tag',
@@ -95,6 +100,11 @@ return Symfony\CS\Config\Config::create()
             'phpdoc_order',
             'short_echo_tag',
             'strict',
+            'combine_consecutive_unsets',
+            'no_useless_else',
+            'no_useless_return',
+            'php_unit_construct',
+            'php_unit_strict',
         )
     )
     ->finder($finder);

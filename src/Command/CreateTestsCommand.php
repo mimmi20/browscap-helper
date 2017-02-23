@@ -329,7 +329,5 @@ class CreateTestsCommand extends Command
             'ua'     => $ua,
             'result' => $result->toArray(),
         ];
-
-        return;
     }
 }
