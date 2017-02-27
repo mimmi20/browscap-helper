@@ -1,19 +1,14 @@
 <?php
 /**
- * Copyright (c) 1998-2014 Browser Capabilities Project
+ * This file is part of the browscap-helper package.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
- * Refer to the LICENSE file distributed with this package.
- *
- * @category   Browscap
- * @copyright  1998-2014 Browser Capabilities Project
- * @license    MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\Browser;
@@ -37,10 +32,11 @@ use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
 
 /**
- * Class DiffCommand
+ * Class CreateTestsCommand
  *
- * @category   Browscap
- * @author     James Titcumb <james@asgrim.com>
+ * @category   Browscap Helper
+ *
+ * @author     Thomas Müller <mimmi20@live.de>
  */
 class CreateTestsCommand extends Command
 {
@@ -109,14 +105,15 @@ class CreateTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \LogicException When this abstract method is not implemented
-     * @return null|int        null or 0 if everything went fine, or an error code
+     *
+     * @return null|int null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger, Logger::INFO));
+        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $output->writeln('reading already existing tests ...');
         $checks = [];
@@ -314,7 +311,5 @@ class CreateTestsCommand extends Command
             'ua'     => $ua,
             'result' => $result->toArray(),
         ];
-
-        return;
     }
 }

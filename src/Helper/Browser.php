@@ -1,19 +1,14 @@
 <?php
 /**
- * Copyright (c) 1998-2014 Browser Capabilities Project
+ * This file is part of the browscap-helper package.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
- * Refer to the LICENSE file distributed with this package.
- *
- * @category   Browscap
- * @copyright  1998-2014 Browser Capabilities Project
- * @license    MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Detector;
@@ -21,10 +16,11 @@ use BrowserDetector\Loader\BrowserLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Class DiffCommand
+ * Class Browser
  *
- * @category   Browscap
- * @author     James Titcumb <james@asgrim.com>
+ * @category   Browscap Helper
+ *
+ * @author     Thomas Mueller <mimmi20@live.de>
  */
 class Browser
 {
@@ -49,209 +45,209 @@ class Browser
         $browser        = null;
         $browserVersion = null;
 
-        if (false !== strpos($useragent, 'Chrome')) {
+        if (false !== mb_strpos($useragent, 'Chrome')) {
             if (preg_match('/Chrome\/(\d+\.\d+)/', $useragent, $matches)) {
                 $chromeVersion = (float) $matches[1];
             }
         }
 
-        if (false !== strpos($useragent, 'OPR') && false !== strpos($useragent, 'Android')) {
+        if (false !== mb_strpos($useragent, 'OPR') && false !== mb_strpos($useragent, 'Android')) {
             list($browser) = $loader->load('opera mobile', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Opera Mobi')) {
+        } elseif (false !== mb_strpos($useragent, 'Opera Mobi')) {
             list($browser) = $loader->load('opera mobile', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'OPR')) {
+        } elseif (false !== mb_strpos($useragent, 'OPR')) {
             list($browser) = $loader->load('opera', $useragent);
-        } elseif (false !== strpos($useragent, 'Opera')) {
+        } elseif (false !== mb_strpos($useragent, 'Opera')) {
             list($browser) = $loader->load('opera', $useragent);
-        } elseif (false !== strpos($useragent, 'Coast')) {
+        } elseif (false !== mb_strpos($useragent, 'Coast')) {
             list($browser) = $loader->load('coast', $useragent);
-        } elseif (false !== strpos($useragent, 'Mercury')) {
+        } elseif (false !== mb_strpos($useragent, 'Mercury')) {
             list($browser) = $loader->load('mercury', $useragent);
-        } elseif (false !== strpos($useragent, 'CommonCrawler Node')) {
+        } elseif (false !== mb_strpos($useragent, 'CommonCrawler Node')) {
             list($browser) = $loader->load('commoncrawler node', $useragent);
-        } elseif (false !== strpos($useragent, 'UCBrowser') || false !== strpos($useragent, 'UC Browser')) {
+        } elseif (false !== mb_strpos($useragent, 'UCBrowser') || false !== mb_strpos($useragent, 'UC Browser')) {
             list($browser) = $loader->load('ucbrowser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'iCab')) {
+        } elseif (false !== mb_strpos($useragent, 'iCab')) {
             list($browser) = $loader->load('icab', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Lunascape')) {
+        } elseif (false !== mb_strpos($useragent, 'Lunascape')) {
             list($browser) = $loader->load('lunascape', $useragent);
             $lite          = false;
-        } elseif (false !== stripos($useragent, 'midori')) {
+        } elseif (false !== mb_stripos($useragent, 'midori')) {
             list($browser) = $loader->load('midori', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'OmniWeb')) {
+        } elseif (false !== mb_strpos($useragent, 'OmniWeb')) {
             list($browser) = $loader->load('omniweb', $useragent);
             $lite          = false;
-        } elseif (false !== stripos($useragent, 'maxthon') || false !== strpos($useragent, 'MyIE2')) {
+        } elseif (false !== mb_stripos($useragent, 'maxthon') || false !== mb_strpos($useragent, 'MyIE2')) {
             list($browser) = $loader->load('maxthon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'PhantomJS')) {
+        } elseif (false !== mb_strpos($useragent, 'PhantomJS')) {
             list($browser) = $loader->load('phantomjs', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'YaBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'YaBrowser')) {
             list($browser) = $loader->load('yabrowser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Kamelio')) {
+        } elseif (false !== mb_strpos($useragent, 'Kamelio')) {
             list($browser) = $loader->load('kamelio app', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'FBAV')) {
+        } elseif (false !== mb_strpos($useragent, 'FBAV')) {
             list($browser) = $loader->load('facebook app', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'ACHEETAHI')) {
+        } elseif (false !== mb_strpos($useragent, 'ACHEETAHI')) {
             list($browser) = $loader->load('cm browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'bdbrowser_i18n')) {
+        } elseif (false !== mb_strpos($useragent, 'bdbrowser_i18n')) {
             list($browser) = $loader->load('baidu browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'bdbrowserhd_i18n')) {
+        } elseif (false !== mb_strpos($useragent, 'bdbrowserhd_i18n')) {
             list($browser) = $loader->load('baidu browser hd', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'bdbrowser_mini')) {
+        } elseif (false !== mb_strpos($useragent, 'bdbrowser_mini')) {
             list($browser) = $loader->load('baidu browser mini', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Puffin')) {
+        } elseif (false !== mb_strpos($useragent, 'Puffin')) {
             list($browser) = $loader->load('puffin', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'SamsungBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'SamsungBrowser')) {
             list($browser) = $loader->load('samsungbrowser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Silk')) {
+        } elseif (false !== mb_strpos($useragent, 'Silk')) {
             list($browser) = $loader->load('silk', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'coc_coc_browser')) {
+        } elseif (false !== mb_strpos($useragent, 'coc_coc_browser')) {
             list($browser) = $loader->load('coc_coc_browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'NaverMatome')) {
+        } elseif (false !== mb_strpos($useragent, 'NaverMatome')) {
             list($browser) = $loader->load('matome', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Flipboard')) {
+        } elseif (false !== mb_strpos($useragent, 'Flipboard')) {
             list($browser) = $loader->load('flipboard app', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Arora')) {
+        } elseif (false !== mb_strpos($useragent, 'Arora')) {
             list($browser) = $loader->load('arora', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Acoo Browser')) {
+        } elseif (false !== mb_strpos($useragent, 'Acoo Browser')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Acoo Browser
             $browser = null;
-        } elseif (false !== strpos($useragent, 'ABrowse')) {
+        } elseif (false !== mb_strpos($useragent, 'ABrowse')) {
             list($browser) = $loader->load('abrowse', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'AmigaVoyager')) {
+        } elseif (false !== mb_strpos($useragent, 'AmigaVoyager')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add AmigaVoyager
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Beonex')) {
+        } elseif (false !== mb_strpos($useragent, 'Beonex')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Beonex
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Stainless')) {
+        } elseif (false !== mb_strpos($useragent, 'Stainless')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Stainless
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Sundance')) {
+        } elseif (false !== mb_strpos($useragent, 'Sundance')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Sundance
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Sunrise')) {
+        } elseif (false !== mb_strpos($useragent, 'Sunrise')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Sunrise
             $browser = null;
-        } elseif (false !== strpos($useragent, 'SunriseBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'SunriseBrowser')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add SunriseBrowser
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Seznam.cz')) {
+        } elseif (false !== mb_strpos($useragent, 'Seznam.cz')) {
             list($browser) = $loader->load('seznam browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Aviator')) {
+        } elseif (false !== mb_strpos($useragent, 'Aviator')) {
             list($browser) = $loader->load('aviator', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Dragon')) {
+        } elseif (false !== mb_strpos($useragent, 'Dragon')) {
             list($browser) = $loader->load('dragon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Beamrise')) {
+        } elseif (false !== mb_strpos($useragent, 'Beamrise')) {
             list($browser) = $loader->load('beamrise', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Diglo')) {
+        } elseif (false !== mb_strpos($useragent, 'Diglo')) {
             list($browser) = $loader->load('diglo', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'APUSBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'APUSBrowser')) {
             list($browser) = $loader->load('apusbrowser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Chedot')) {
+        } elseif (false !== mb_strpos($useragent, 'Chedot')) {
             list($browser) = $loader->load('chedot', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Qword')) {
+        } elseif (false !== mb_strpos($useragent, 'Qword')) {
             list($browser) = $loader->load('qword browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Iridium')) {
+        } elseif (false !== mb_strpos($useragent, 'Iridium')) {
             list($browser) = $loader->load('iridium browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'MxNitro')) {
+        } elseif (false !== mb_strpos($useragent, 'MxNitro')) {
             list($browser) = $loader->load('maxthon nitro', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'MxBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'MxBrowser')) {
             list($browser) = $loader->load('maxthon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Maxthon')) {
+        } elseif (false !== mb_strpos($useragent, 'Maxthon')) {
             list($browser) = $loader->load('maxthon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Superbird') || false !== strpos($useragent, 'SuperBird')) {
+        } elseif (false !== mb_strpos($useragent, 'Superbird') || false !== mb_strpos($useragent, 'SuperBird')) {
             list($browser) = $loader->load('superbird', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'TinyBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'TinyBrowser')) {
             list($browser) = $loader->load('tinybrowser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Chrome') && false !== strpos($useragent, 'Version')) {
+        } elseif (false !== mb_strpos($useragent, 'Chrome') && false !== mb_strpos($useragent, 'Version')) {
             list($browser) = $loader->load('android webview', $useragent);
-        } elseif (false !== strpos($useragent, 'Safari') && false !== strpos($useragent, 'Version') && false !== strpos(
+        } elseif (false !== mb_strpos($useragent, 'Safari') && false !== mb_strpos($useragent, 'Version') && false !== mb_strpos(
             $useragent,
             'Tizen'
         )
         ) {
             list($browser) = $loader->load('samsung webview', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Chromium')) {
+        } elseif (false !== mb_strpos($useragent, 'Chromium')) {
             list($browser) = $loader->load('chromium', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Flock')) {
+        } elseif (false !== mb_strpos($useragent, 'Flock')) {
             list($browser) = $loader->load('flock', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Fluid')) {
+        } elseif (false !== mb_strpos($useragent, 'Fluid')) {
             list($browser) = $loader->load('fluid', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'ChromePlus')) {
+        } elseif (false !== mb_strpos($useragent, 'ChromePlus')) {
             list($browser) = $loader->load('coolnovo chrome plus', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'RockMelt')) {
+        } elseif (false !== mb_strpos($useragent, 'RockMelt')) {
             list($browser) = $loader->load('rockmelt', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Shiira')) {
+        } elseif (false !== mb_strpos($useragent, 'Shiira')) {
             list($browser) = $loader->load('shiira', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Iron')) {
+        } elseif (false !== mb_strpos($useragent, 'Iron')) {
             list($browser) = $loader->load('iron', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Chrome')) {
+        } elseif (false !== mb_strpos($useragent, 'Chrome')) {
             list($browser)       = $loader->load('chrome', $useragent);
             $browserVersion      = (string) $chromeVersion;
 
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'CriOS')) {
+        } elseif (false !== mb_strpos($useragent, 'CriOS')) {
             list($browser) = $loader->load('chrome', $useragent);
 
             if (preg_match('/CriOS\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -261,22 +257,22 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'OPiOS')) {
+        } elseif (false !== mb_strpos($useragent, 'OPiOS')) {
             list($browser) = $loader->load('opera mini', $useragent);
-        } elseif (false !== strpos($useragent, 'Opera Mini')) {
+        } elseif (false !== mb_strpos($useragent, 'Opera Mini')) {
             list($browser) = $loader->load('opera mini', $useragent);
-        } elseif (false !== strpos($useragent, 'FlyFlow')) {
+        } elseif (false !== mb_strpos($useragent, 'FlyFlow')) {
             list($browser) = $loader->load('flyflow', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Epiphany') || false !== strpos($useragent, 'epiphany')) {
+        } elseif (false !== mb_strpos($useragent, 'Epiphany') || false !== mb_strpos($useragent, 'epiphany')) {
             list($browser) = $loader->load('epiphany', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'GSA')) {
+        } elseif (false !== mb_strpos($useragent, 'GSA')) {
             list($browser) = $loader->load('google app', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Safari')
-            && false !== strpos($useragent, 'Version')
-            && false !== strpos($useragent, 'Android')
+        } elseif (false !== mb_strpos($useragent, 'Safari')
+            && false !== mb_strpos($useragent, 'Version')
+            && false !== mb_strpos($useragent, 'Android')
         ) {
             list($browser) = $loader->load('android webkit', $useragent);
 
@@ -287,159 +283,159 @@ class Browser
             if ($browserVersion !== '4.0') {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'BlackBerry') && false !== strpos($useragent, 'Version')) {
+        } elseif (false !== mb_strpos($useragent, 'BlackBerry') && false !== mb_strpos($useragent, 'Version')) {
             list($browser) = $loader->load('blackberry', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Safari') && false !== strpos($useragent, 'Version')) {
+        } elseif (false !== mb_strpos($useragent, 'Safari') && false !== mb_strpos($useragent, 'Version')) {
             list($browser) = $loader->load('safari', $useragent);
-        } elseif (false !== strpos($useragent, 'PaleMoon')) {
+        } elseif (false !== mb_strpos($useragent, 'PaleMoon')) {
             list($browser) = $loader->load('palemoon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Phoenix')) {
+        } elseif (false !== mb_strpos($useragent, 'Phoenix')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Phoenix
             $browser = null;
-        } elseif (false !== stripos($useragent, 'Prism')) {
+        } elseif (false !== mb_stripos($useragent, 'Prism')) {
             list($browser) = $loader->load('prism', $useragent);
             $lite          = false;
-        } elseif (false !== stripos($useragent, 'QtWeb Internet Browser')) {
+        } elseif (false !== mb_stripos($useragent, 'QtWeb Internet Browser')) {
             list($browser) = $loader->load('qtweb internet browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Waterfox')) {
+        } elseif (false !== mb_strpos($useragent, 'Waterfox')) {
             list($browser) = $loader->load('waterfox', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'QupZilla')) {
+        } elseif (false !== mb_strpos($useragent, 'QupZilla')) {
             list($browser) = $loader->load('qupzilla', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Thunderbird')) {
+        } elseif (false !== mb_strpos($useragent, 'Thunderbird')) {
             list($browser) = $loader->load('thunderbird', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'kontact')) {
+        } elseif (false !== mb_strpos($useragent, 'kontact')) {
             list($browser) = $loader->load('kontact', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Fennec')) {
+        } elseif (false !== mb_strpos($useragent, 'Fennec')) {
             list($browser) = $loader->load('fennec', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'myibrow')) {
+        } elseif (false !== mb_strpos($useragent, 'myibrow')) {
             list($browser) = $loader->load('my internet browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Daumoa')) {
+        } elseif (false !== mb_strpos($useragent, 'Daumoa')) {
             list($browser) = $loader->load('daumoa', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Camino')) {
+        } elseif (false !== mb_strpos($useragent, 'Camino')) {
             list($browser) = $loader->load('camino', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Cheshire')) {
+        } elseif (false !== mb_strpos($useragent, 'Cheshire')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Cheshire
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Classilla')) {
+        } elseif (false !== mb_strpos($useragent, 'Classilla')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Classilla
             $browser = null;
-        } elseif (false !== strpos($useragent, 'CometBird')) {
+        } elseif (false !== mb_strpos($useragent, 'CometBird')) {
             list($browser) = $loader->load('cometbird', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'EnigmaFox')) {
+        } elseif (false !== mb_strpos($useragent, 'EnigmaFox')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add EnigmaFox
             $browser = null;
-        } elseif (false !== strpos($useragent, 'conkeror') || false !== strpos($useragent, 'Conkeror')) {
+        } elseif (false !== mb_strpos($useragent, 'conkeror') || false !== mb_strpos($useragent, 'Conkeror')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Conkeror
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Galeon')) {
+        } elseif (false !== mb_strpos($useragent, 'Galeon')) {
             list($browser) = $loader->load('galeon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Hana')) {
+        } elseif (false !== mb_strpos($useragent, 'Hana')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Hana
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Iceape')) {
+        } elseif (false !== mb_strpos($useragent, 'Iceape')) {
             list($browser) = $loader->load('iceape', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'IceCat')) {
+        } elseif (false !== mb_strpos($useragent, 'IceCat')) {
             list($browser) = $loader->load('icecat', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Iceweasel')) {
+        } elseif (false !== mb_strpos($useragent, 'Iceweasel')) {
             list($browser) = $loader->load('iceweasel', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'K-Meleon')) {
+        } elseif (false !== mb_strpos($useragent, 'K-Meleon')) {
             list($browser) = $loader->load('k-meleon', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'K-Ninja')) {
+        } elseif (false !== mb_strpos($useragent, 'K-Ninja')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add K-Ninja
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Kapiko')) {
+        } elseif (false !== mb_strpos($useragent, 'Kapiko')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Kapiko
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Kazehakase')) {
+        } elseif (false !== mb_strpos($useragent, 'Kazehakase')) {
             list($browser) = $loader->load('kazehakase', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'KMLite')) {
+        } elseif (false !== mb_strpos($useragent, 'KMLite')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add KMLite
             $browser = null;
-        } elseif (false !== strpos($useragent, 'lolifox')) {
+        } elseif (false !== mb_strpos($useragent, 'lolifox')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add lolifox
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Konqueror')) {
+        } elseif (false !== mb_strpos($useragent, 'Konqueror')) {
             list($browser) = $loader->load('konqueror', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Leechcraft')) {
+        } elseif (false !== mb_strpos($useragent, 'Leechcraft')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Leechcraft
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Madfox')) {
+        } elseif (false !== mb_strpos($useragent, 'Madfox')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Madfox
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Netscape6')) {
+        } elseif (false !== mb_strpos($useragent, 'Netscape6')) {
             list($browser) = $loader->load('netscape', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Netscape')) {
+        } elseif (false !== mb_strpos($useragent, 'Netscape')) {
             list($browser) = $loader->load('netscape', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Navigator')) {
+        } elseif (false !== mb_strpos($useragent, 'Navigator')) {
             list($browser) = $loader->load('netscape navigator', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Orca')) {
+        } elseif (false !== mb_strpos($useragent, 'Orca')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Orca
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Sylera')) {
+        } elseif (false !== mb_strpos($useragent, 'Sylera')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Sylera
             $browser = null;
-        } elseif (false !== strpos($useragent, 'SeaMonkey')) {
+        } elseif (false !== mb_strpos($useragent, 'SeaMonkey')) {
             list($browser) = $loader->load('seamonkey', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'GoBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'GoBrowser')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add GoBrowser
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Minimo')) {
+        } elseif (false !== mb_strpos($useragent, 'Minimo')) {
             list($browser) = $loader->load('minimo', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'BonEcho')) {
+        } elseif (false !== mb_strpos($useragent, 'BonEcho')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/BonEcho\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -449,7 +445,7 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'Shiretoko')) {
+        } elseif (false !== mb_strpos($useragent, 'Shiretoko')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/Shiretoko\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -459,7 +455,7 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'Minefield')) {
+        } elseif (false !== mb_strpos($useragent, 'Minefield')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/Minefield\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -469,7 +465,7 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'Namoroka')) {
+        } elseif (false !== mb_strpos($useragent, 'Namoroka')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/Namoroka\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -479,7 +475,7 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'GranParadiso')) {
+        } elseif (false !== mb_strpos($useragent, 'GranParadiso')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/GranParadiso\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -489,7 +485,7 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'Firebird')) {
+        } elseif (false !== mb_strpos($useragent, 'Firebird')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/Firebird\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -499,7 +495,7 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== stripos($useragent, 'firefox')) {
+        } elseif (false !== mb_stripos($useragent, 'firefox')) {
             list($browser) = $loader->load('firefox', $useragent);
 
             if (preg_match('/Firefox\/(\d+\.\d+)/', $useragent, $matches)) {
@@ -509,90 +505,90 @@ class Browser
             if ($browserVersion < 30) {
                 $lite = false;
             }
-        } elseif (false !== strpos($useragent, 'FxiOS')) {
+        } elseif (false !== mb_strpos($useragent, 'FxiOS')) {
             list($browser) = $loader->load('firefox for ios', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Browzar')) {
+        } elseif (false !== mb_strpos($useragent, 'Browzar')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Browzar
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Crazy Browser')) {
+        } elseif (false !== mb_strpos($useragent, 'Crazy Browser')) {
             list($browser) = $loader->load('crazy browser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'GreenBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'GreenBrowser')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add GreenBrowser
             $browser = null;
-        } elseif (false !== strpos($useragent, 'KKman')) {
+        } elseif (false !== mb_strpos($useragent, 'KKman')) {
             list($browser) = $loader->load('kkman', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Lobo')) {
+        } elseif (false !== mb_strpos($useragent, 'Lobo')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Lobo
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Sleipnir')) {
+        } elseif (false !== mb_strpos($useragent, 'Sleipnir')) {
             list($browser) = $loader->load('sleipnir', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'SlimBrowser')) {
+        } elseif (false !== mb_strpos($useragent, 'SlimBrowser')) {
             list($browser) = $loader->load('slimbrowser', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'TencentTraveler')) {
+        } elseif (false !== mb_strpos($useragent, 'TencentTraveler')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add TencentTraveler
             $browser = null;
-        } elseif (false !== strpos($useragent, 'TheWorld')) {
+        } elseif (false !== mb_strpos($useragent, 'TheWorld')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add TheWorld
             $browser = null;
-        } elseif (false !== strpos($useragent, 'MSIE')) {
+        } elseif (false !== mb_strpos($useragent, 'MSIE')) {
             list($browser) = $loader->load('internet explorer', $useragent);
-        } elseif (false !== strpos($useragent, 'like Gecko') && false !== strpos($useragent, 'rv:11.0')) {
+        } elseif (false !== mb_strpos($useragent, 'like Gecko') && false !== mb_strpos($useragent, 'rv:11.0')) {
             list($browser) = $loader->load('internet explorer', $useragent);
-        } elseif (false !== strpos($useragent, 'SMTBot')) {
+        } elseif (false !== mb_strpos($useragent, 'SMTBot')) {
             list($browser) = $loader->load('smtbot', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'gvfs')) {
+        } elseif (false !== mb_strpos($useragent, 'gvfs')) {
             list($browser) = $loader->load('gvfs', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'luakit')) {
+        } elseif (false !== mb_strpos($useragent, 'luakit')) {
             list($browser) = $loader->load('luakit', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Cyberdog')) {
+        } elseif (false !== mb_strpos($useragent, 'Cyberdog')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Cyberdog
             $browser = null;
-        } elseif (false !== strpos($useragent, 'ELinks')) {
+        } elseif (false !== mb_strpos($useragent, 'ELinks')) {
             list($browser) = $loader->load('elinks', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Links')) {
+        } elseif (false !== mb_strpos($useragent, 'Links')) {
             list($browser) = $loader->load('links', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Galaxy')) {
+        } elseif (false !== mb_strpos($useragent, 'Galaxy')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Galaxy
             $browser = null;
-        } elseif (false !== strpos($useragent, 'iNet Browser')) {
+        } elseif (false !== mb_strpos($useragent, 'iNet Browser')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add iNet Browser
             $browser = null;
-        } elseif (false !== strpos($useragent, 'Dalvik')) {
+        } elseif (false !== mb_strpos($useragent, 'Dalvik')) {
             list($browser) = $loader->load('dalvik', $useragent);
             $lite          = false;
-        } elseif (false !== strpos($useragent, 'Uzbl')) {
+        } elseif (false !== mb_strpos($useragent, 'Uzbl')) {
             //list($browser) = $loader->load('opera mobile', $useragent);
             //$lite = false;
             //@todo add Uzbl
             $browser = null;
         } else {
-            /** @var \UaResult\Result\Result $result */
+            /* @var \UaResult\Result\Result $result */
             try {
                 $result = $detector->getBrowser($useragent);
 

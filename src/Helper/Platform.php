@@ -1,19 +1,14 @@
 <?php
 /**
- * Copyright (c) 1998-2014 Browser Capabilities Project
+ * This file is part of the browscap-helper package.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
- * Refer to the LICENSE file distributed with this package.
- *
- * @category   Browscap
- * @copyright  1998-2014 Browser Capabilities Project
- * @license    MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Bits\Os;
@@ -23,10 +18,11 @@ use BrowserDetector\Loader\PlatformLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Class DiffCommand
+ * Class Platform
  *
- * @category   Browscap
- * @author     James Titcumb <james@asgrim.com>
+ * @category   Browscap Helper
+ *
+ * @author     Thomas Mueller <mimmi20@live.de>
  */
 class Platform
 {
@@ -41,6 +37,7 @@ class Platform
      *
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \UnexpectedValueException
+     *
      * @return array
      */
     public function detect(
@@ -90,7 +87,7 @@ class Platform
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'Ubuntu Linux';
-        } elseif (false !== strpos($useragent, 'Windows Phone')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows Phone')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
             $platformNameBrowscap        = 'WinPhone';
@@ -108,7 +105,7 @@ class Platform
             $platformNameBrowscap        = 'WinCE';
             $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'Windows CE';
-        } elseif (false !== strpos($useragent, 'wds')) {
+        } elseif (false !== mb_strpos($useragent, 'wds')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
             $platformNameBrowscap        = 'WinPhone';
@@ -118,25 +115,25 @@ class Platform
             if (preg_match('/wds (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
             }
-        } elseif (false !== stripos($useragent, 'wpdesktop')) {
+        } elseif (false !== mb_stripos($useragent, 'wpdesktop')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
             $platformNameBrowscap        = 'WinPhone';
             $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($useragent, 'xblwp7')) {
+        } elseif (false !== mb_stripos($useragent, 'xblwp7')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
             $platformNameBrowscap        = 'WinPhone';
             $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($useragent, 'zunewp7')) {
+        } elseif (false !== mb_stripos($useragent, 'zunewp7')) {
             $platform = $platformLoader->load('windows phone', $useragent);
 
             $platformNameBrowscap        = 'WinPhone';
             $platformMakerBrowscap       = 'Microsoft Corporation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== strpos($useragent, 'Tizen')) {
+        } elseif (false !== mb_strpos($useragent, 'Tizen')) {
             $platform = $platformLoader->load('tizen', $useragent);
 
             $platformNameBrowscap           = 'Tizen';
@@ -148,7 +145,7 @@ class Platform
             $platformNameBrowscap        = 'Miui OS';
             $platformMakerBrowscap       = 'Xiaomi Tech';
             $platformDescriptionBrowscap = 'a fork of Android OS by Xiaomi';
-        } elseif (false !== strpos($useragent, 'Linux; Android')) {
+        } elseif (false !== mb_strpos($useragent, 'Linux; Android')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
@@ -158,7 +155,7 @@ class Platform
             if (preg_match('/Linux; Android (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
             }
-        } elseif (false !== strpos($useragent, 'Linux; U; Android')) {
+        } elseif (false !== mb_strpos($useragent, 'Linux; U; Android')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
@@ -168,7 +165,7 @@ class Platform
             if (preg_match('/Linux; U; Android (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
             }
-        } elseif (false !== strpos($useragent, 'U; Adr')) {
+        } elseif (false !== mb_strpos($useragent, 'U; Adr')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
@@ -178,42 +175,42 @@ class Platform
             if (preg_match('/U; Adr (\d+\.\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = $matches[1];
             }
-        } elseif (false !== strpos($useragent, 'Android') || false !== strpos($useragent, 'MTK')) {
+        } elseif (false !== mb_strpos($useragent, 'Android') || false !== mb_strpos($useragent, 'MTK')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap    = 'Android OS';
-        } elseif (false !== strpos($useragent, 'UCWEB/2.0 (Linux; U; Opera Mini')) {
+        } elseif (false !== mb_strpos($useragent, 'UCWEB/2.0 (Linux; U; Opera Mini')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap    = 'Android OS';
-        } elseif (false !== strpos($useragent, 'Linux; GoogleTV')) {
+        } elseif (false !== mb_strpos($useragent, 'Linux; GoogleTV')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
             $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap    = 'Android OS';
-        } elseif (false !== strpos($useragent, 'OpenBSD')) {
+        } elseif (false !== mb_strpos($useragent, 'OpenBSD')) {
             $platform = $platformLoader->load('openbsd', $useragent);
 
             $platformNameBrowscap          = 'OpenBSD';
             $platformDescriptionBrowscap   = 'unknown';
-        } elseif (false !== strpos($useragent, 'Symbian') || false !== strpos($useragent, 'Series 60')) {
+        } elseif (false !== mb_strpos($useragent, 'Symbian') || false !== mb_strpos($useragent, 'Series 60')) {
             $platform = $platformLoader->load('symbian', $useragent);
 
             $platformNameBrowscap           = 'SymbianOS';
             $platformMakerBrowscap          = 'Symbian Foundation';
             $platformDescriptionBrowscap    = 'unknown';
-        } elseif (false !== strpos($useragent, 'MIDP')) {
+        } elseif (false !== mb_strpos($useragent, 'MIDP')) {
             $platform = $platformLoader->load('java', $useragent);
 
             $platformNameBrowscap           = 'JAVA';
             $platformMakerBrowscap          = 'Oracle';
             $platformDescriptionBrowscap    = 'unknown';
-        } elseif (false !== strpos($useragent, 'Windows NT 10.0')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 10.0')) {
             $platform = $platformLoader->load('windows nt 10.0', $useragent);
 
             $platformNameBrowscap           = 'Win10';
@@ -228,7 +225,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6.4')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.4')) {
             $platform = $platformLoader->load('windows nt 6.4', $useragent);
 
             $platformNameBrowscap           = 'Win10';
@@ -243,7 +240,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6.3') && false !== strpos($useragent, 'ARM')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.3') && false !== mb_strpos($useragent, 'ARM')) {
             $platform = $platformLoader->load('windows nt 6.3; arm', $useragent);
 
             $platformNameBrowscap           = 'Win8.1';
@@ -258,7 +255,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6.3')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.3')) {
             $platform = $platformLoader->load('windows nt 6.3', $useragent);
 
             $platformNameBrowscap           = 'Win8.1';
@@ -273,7 +270,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6.2') && false !== strpos($useragent, 'ARM')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.2') && false !== mb_strpos($useragent, 'ARM')) {
             $platform = $platformLoader->load('windows nt 6.2; arm', $useragent);
 
             $platformNameBrowscap           = 'Win8';
@@ -288,7 +285,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6.2')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.2')) {
             $platform = $platformLoader->load('windows nt 6.2', $useragent);
 
             $platformNameBrowscap           = 'Win8';
@@ -303,7 +300,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6.1')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.1')) {
             $platform = $platformLoader->load('windows nt 6.1', $useragent);
 
             $platformNameBrowscap           = 'Win7';
@@ -318,7 +315,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 6')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6')) {
             $platform = $platformLoader->load('windows nt 6.0', $useragent);
 
             $platformNameBrowscap           = 'WinVista';
@@ -333,7 +330,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 5.3')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.3')) {
             $platform = $platformLoader->load('windows nt 5.3', $useragent);
 
             $platformNameBrowscap           = 'WinXP';
@@ -348,7 +345,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 5.2')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.2')) {
             $platform = $platformLoader->load('windows nt 5.2', $useragent);
 
             $platformNameBrowscap           = 'WinXP';
@@ -363,7 +360,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 5.1')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.1')) {
             $platform = $platformLoader->load('windows nt 5.1', $useragent);
 
             $platformNameBrowscap           = 'WinXP';
@@ -378,7 +375,7 @@ class Platform
             } elseif ($platformBits === 16) {
                 $win16 = true;
             }
-        } elseif (false !== strpos($useragent, 'Windows NT 5.01')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.01')) {
             $platform = $platformLoader->load('windows nt 5.01', $useragent);
 
             $platformNameBrowscap           = 'Win2000';
@@ -395,7 +392,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows NT 5.0')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.0')) {
             $platform = $platformLoader->load('windows nt 5.0', $useragent);
 
             $platformNameBrowscap           = 'Win2000';
@@ -412,7 +409,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows NT 4.10')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.10')) {
             $platform = $platformLoader->load('windows nt 4.10', $useragent);
 
             $platformNameBrowscap           = 'WinNT';
@@ -429,7 +426,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows NT 4.1')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.1')) {
             $platform = $platformLoader->load('windows nt 4.1', $useragent);
 
             $platformNameBrowscap           = 'WinNT';
@@ -446,7 +443,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows NT 4.0')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.0')) {
             $platform = $platformLoader->load('windows nt 4.0', $useragent);
 
             $platformNameBrowscap           = 'WinNT';
@@ -463,7 +460,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows NT 3.5')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 3.5')) {
             $platform = $platformLoader->load('windows nt 3.5', $useragent);
 
             $platformNameBrowscap           = 'WinNT';
@@ -480,7 +477,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows NT 3.1')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 3.1')) {
             $platform = $platformLoader->load('windows nt 3.1', $useragent);
 
             $platformNameBrowscap           = 'WinNT';
@@ -497,7 +494,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'Windows[ \-]NT')) {
+        } elseif (false !== mb_strpos($useragent, 'Windows[ \-]NT')) {
             $platform = $platformLoader->load('windows nt', $useragent);
 
             $platformNameBrowscap           = 'WinNT';
@@ -514,7 +511,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== stripos($useragent, 'cygwin')) {
+        } elseif (false !== mb_stripos($useragent, 'cygwin')) {
             $platform = $platformLoader->load('cygwin', $useragent);
 
             $platformNameBrowscap           = 'CygWin';
@@ -531,7 +528,7 @@ class Platform
             }
 
             $standard = false;
-        } elseif (false !== strpos($useragent, 'CPU OS')) {
+        } elseif (false !== mb_strpos($useragent, 'CPU OS')) {
             $platform = $platformLoader->load('ios', $useragent);
 
             $platformNameBrowscap           = 'iOS';
@@ -541,7 +538,7 @@ class Platform
             if (preg_match('/CPU OS (\d+\_\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
             }
-        } elseif (false !== strpos($useragent, 'CPU iPhone OS')) {
+        } elseif (false !== mb_strpos($useragent, 'CPU iPhone OS')) {
             $platform = $platformLoader->load('ios', $useragent);
 
             $platformNameBrowscap           = 'iOS';
@@ -551,7 +548,7 @@ class Platform
             if (preg_match('/CPU iPhone OS (\d+\_\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
             }
-        } elseif (false !== strpos($useragent, 'CPU like Mac OS X')) {
+        } elseif (false !== mb_strpos($useragent, 'CPU like Mac OS X')) {
             $platform = $platformLoader->load('ios', $useragent);
 
             $platformNameBrowscap           = 'iOS';
@@ -561,13 +558,13 @@ class Platform
             if (preg_match('/CPU like Mac OS X (\d+\_\d+)/', $useragent, $matches)) {
                 $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
             }
-        } elseif (false !== strpos($useragent, 'iOS')) {
+        } elseif (false !== mb_strpos($useragent, 'iOS')) {
             $platform = $platformLoader->load('ios', $useragent);
 
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
             $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
-        } elseif (false !== strpos($useragent, 'Mac OS X')) {
+        } elseif (false !== mb_strpos($useragent, 'Mac OS X')) {
             $platform = $platformLoader->load('mac os x', $useragent);
 
             $platformMakerBrowscap          = 'Apple Inc';
@@ -585,19 +582,19 @@ class Platform
             } else {
                 $platformNameBrowscap = 'MacOSX';
             }
-        } elseif (false !== stripos($useragent, 'kubuntu')) {
+        } elseif (false !== mb_stripos($useragent, 'kubuntu')) {
             $platform = $platformLoader->load('kubuntu', $useragent);
 
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'Ubuntu Linux';
-        } elseif (false !== stripos($useragent, 'ubuntu')) {
+        } elseif (false !== mb_stripos($useragent, 'ubuntu')) {
             $platform = $platformLoader->load('ubuntu', $useragent);
 
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'Ubuntu Linux';
-        } elseif (false !== stripos($useragent, 'android; linux arm')) {
+        } elseif (false !== mb_stripos($useragent, 'android; linux arm')) {
             $platform = $platformLoader->load('android', $useragent);
 
             $platformNameBrowscap           = 'Android';
@@ -609,13 +606,13 @@ class Platform
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($useragent, 'moblin')) {
+        } elseif (false !== mb_stripos($useragent, 'moblin')) {
             $platform = $platformLoader->load('moblin', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'infegyatlas') || false !== stripos($useragent, 'jobboerse')) {
+        } elseif (false !== mb_stripos($useragent, 'infegyatlas') || false !== mb_stripos($useragent, 'jobboerse')) {
             $platform = $platformLoader->load('unknown', $useragent);
 
             $platformNameBrowscap        = 'Ubuntu';
@@ -627,7 +624,7 @@ class Platform
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'unknown';
-        } elseif (false !== stripos($useragent, 'fedora')) {
+        } elseif (false !== mb_stripos($useragent, 'fedora')) {
             $platform = $platformLoader->load('fedora linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
@@ -639,85 +636,85 @@ class Platform
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'suse')) {
+        } elseif (false !== mb_stripos($useragent, 'suse')) {
             $platform = $platformLoader->load('suse linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'centos')) {
+        } elseif (false !== mb_stripos($useragent, 'centos')) {
             $platform = $platformLoader->load('cent os linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'mandriva')) {
+        } elseif (false !== mb_stripos($useragent, 'mandriva')) {
             $platform = $platformLoader->load('mandriva linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'gentoo')) {
+        } elseif (false !== mb_stripos($useragent, 'gentoo')) {
             $platform = $platformLoader->load('gentoo linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'slackware')) {
+        } elseif (false !== mb_stripos($useragent, 'slackware')) {
             $platform = $platformLoader->load('slackware linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== strpos($useragent, 'CrOS')) {
+        } elseif (false !== mb_strpos($useragent, 'CrOS')) {
             $platform = $platformLoader->load('chromeos', $useragent);
 
             $platformNameBrowscap           = 'ChromeOS';
             $platformMakerBrowscap          = 'Google Inc';
             $platformDescriptionBrowscap    = 'unknown';
-        } elseif (false !== stripos($useragent, 'linux mint')) {
+        } elseif (false !== mb_stripos($useragent, 'linux mint')) {
             $platform = $platformLoader->load('linux mint', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'kubuntu')) {
+        } elseif (false !== mb_stripos($useragent, 'kubuntu')) {
             $platform = $platformLoader->load('kubuntu', $useragent);
 
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'Ubuntu Linux';
-        } elseif (false !== stripos($useragent, 'ubuntu')) {
+        } elseif (false !== mb_stripos($useragent, 'ubuntu')) {
             $platform = $platformLoader->load('ubuntu', $useragent);
 
             $platformNameBrowscap        = 'Ubuntu';
             $platformMakerBrowscap       = 'Canonical Foundation';
             $platformDescriptionBrowscap = 'Ubuntu Linux';
-        } elseif (false !== strpos($useragent, 'Debian APT-HTTP')) {
+        } elseif (false !== mb_strpos($useragent, 'Debian APT-HTTP')) {
             $platform = $platformLoader->load('debian', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== stripos($useragent, 'debian')) {
+        } elseif (false !== mb_stripos($useragent, 'debian')) {
             $platform = $platformLoader->load('debian', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== strpos($useragent, 'Linux')) {
+        } elseif (false !== mb_strpos($useragent, 'Linux')) {
             $platform = $platformLoader->load('linux', $useragent);
 
             $platformNameBrowscap        = 'Linux';
             $platformMakerBrowscap       = 'Linux Foundation';
             $platformDescriptionBrowscap = 'Linux';
-        } elseif (false !== strpos($useragent, 'SymbOS')) {
+        } elseif (false !== mb_strpos($useragent, 'SymbOS')) {
             $platform = $platformLoader->load('symbian', $useragent);
 
             $platformNameBrowscap        = 'SymbianOS';
             $platformMakerBrowscap       = 'Symbian Foundation';
             $platformDescriptionBrowscap = 'Symbian OS';
-        } elseif (false !== strpos($useragent, 'hpwOS')) {
+        } elseif (false !== mb_strpos($useragent, 'hpwOS')) {
             $platform = $platformLoader->load('webos', $useragent);
 
             $platformNameBrowscap        = 'webOS';
@@ -736,7 +733,7 @@ class Platform
             $platformMakerBrowscap       = 'HP';
             $platformDescriptionBrowscap = 'HP-UX';
         } else {
-            /** @var \UaResult\Result\Result $result */
+            /* @var \UaResult\Result\Result $result */
             try {
                 $result = $detector->getBrowser($useragent);
 
@@ -752,14 +749,14 @@ class Platform
             }
         }
 
-        if (false !== strpos($useragent, 'Silk') && false === strpos($useragent, 'Android')) {
+        if (false !== mb_strpos($useragent, 'Silk') && false === mb_strpos($useragent, 'Android')) {
             $platformNameBrowscap      = 'Android';
             $platformMakerBrowscap     = 'Google Inc';
 
             $platformDescriptionBrowscap = 'Android OS';
-        } elseif (false !== strpos($useragent, 'Safari')
-            && false !== strpos($useragent, 'Version')
-            && false !== strpos($useragent, 'Android')
+        } elseif (false !== mb_strpos($useragent, 'Safari')
+            && false !== mb_strpos($useragent, 'Version')
+            && false !== mb_strpos($useragent, 'Android')
         ) {
             $platformDescriptionBrowscap = 'Android OS';
         }
