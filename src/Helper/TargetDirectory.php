@@ -1,29 +1,25 @@
 <?php
 /**
- * Copyright (c) 1998-2014 Browser Capabilities Project
+ * This file is part of the browscap-helper package.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
- * Refer to the LICENSE file distributed with this package.
- *
- * @category   Browscap
- * @copyright  1998-2014 Browser Capabilities Project
- * @license    MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use League\Flysystem\UnreadableFileException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class DiffCommand
+ * Class TargetDirectory
  *
- * @category   Browscap
- * @author     James Titcumb <james@asgrim.com>
+ * @category   Browscap Helper
+ *
+ * @author     Thomas Mueller <mimmi20@live.de>
  */
 class TargetDirectory
 {
@@ -31,6 +27,7 @@ class TargetDirectory
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
      * @throws \League\Flysystem\UnreadableFileException
+     *
      * @return string
      */
     public function getPath(OutputInterface $output)
@@ -44,6 +41,7 @@ class TargetDirectory
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
      * @throws \League\Flysystem\UnreadableFileException
+     *
      * @return int
      */
     public function getNextTest(OutputInterface $output)

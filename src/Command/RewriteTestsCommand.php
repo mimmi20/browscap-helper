@@ -1,34 +1,14 @@
 <?php
 /**
+ * This file is part of the browscap-helper package.
+ *
  * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @category  Browscap Helper
- *
- * @author    Thomas Mueller <mimmi20@live.de>
- * @copyright 2015-2017 Thomas Mueller
- * @license   http://www.opensource.org/licenses/MIT MIT License
- *
- * @link      https://github.com/mimmi20/browscap-helper
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper;
@@ -51,6 +31,7 @@ use Wurfl\Request\GenericRequestFactory;
  * Class RewriteTestsCommand
  *
  * @category   Browscap Helper
+ *
  * @author     Thomas Müller <mimmi20@live.de>
  */
 class RewriteTestsCommand extends Command
@@ -106,7 +87,8 @@ class RewriteTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \LogicException When this abstract method is not implemented
-     * @return null|int        null or 0 if everything went fine, or an error code
+     *
+     * @return null|int null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -415,7 +397,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $browser = $result->getBrowser();
 
-        /** rewrite platforms */
+        /* rewrite platforms */
 
         $output->writeln('        rewriting platform');
 
@@ -427,7 +409,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $this->logger->warning($e);
         }
 
-        /** @var $platform OsInterface|null */
+        /* @var $platform OsInterface|null */
 
         $output->writeln('        rewriting device');
 
@@ -450,18 +432,18 @@ class T' . $group . 'Test extends UserAgentsTest
                 $device->getMarketingName(),
                 $device->getDualOrientation()
             );
-            /** @var $deviceType \UaDeviceType\TypeInterface */
+            /* @var $deviceType \UaDeviceType\TypeInterface */
 
             if ($deviceCode === 'unknown'
                 || $deviceCode === null
-                || (false !== stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
+                || (false !== mb_stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
             ) {
                 $deviceLoader = new DeviceLoader($this->cache);
                 list($device) = $deviceLoader->load('unknown', $test->ua);
             }
 
-            /** @var $deviceType \UaDeviceType\TypeInterface */
-            /** @var $device \UaResult\Device\DeviceInterface */
+            /* @var $deviceType \UaDeviceType\TypeInterface */
+            /* @var $device \UaResult\Device\DeviceInterface */
         } catch (NotFoundException $e) {
             $this->logger->warning($e);
         }
