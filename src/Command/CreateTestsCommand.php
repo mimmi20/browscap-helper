@@ -118,7 +118,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $checks = [];
 
-        foreach ((new DetectorSource($this->logger, $output, $this->cache))->getUserAgents() as $useragent) {
+        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             if (isset($checks[$useragent])) {
                 continue;
             }
@@ -143,7 +143,7 @@ class CreateTestsCommand extends Command
         $counter          = 0;
         $issue            = 'test-' . sprintf('%1$08d', $number);
 
-        foreach ((new DirectorySource($this->logger, $output, $sourcesDirectory))->getUserAgents() as $useragent) {
+        foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
             $output->writeln('    parsing ua ' . $useragent);

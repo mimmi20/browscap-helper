@@ -132,20 +132,19 @@ class RewriteTestsCommand extends Command
         }
 
         $checks  = [];
-        $data    = [];
         $g       = null;
-        $counter = 0;
+        $groupCounter = 0;
 
         foreach ($files as $fullFilename) {
             $file  = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $fullFilename);
             $group = $groups[$fullFilename];
 
             if ($g !== $group) {
-                $counter = 0;
+                $groupCounter = 0;
                 $g       = $group;
             }
 
-            $newCounter = $this->handleFile($output, $file, $data, $checks, $counter);
+            $newCounter = $this->handleFile($output, $file, $checks, $groupCounter, $group);
 
             if (!$newCounter) {
                 continue;
@@ -200,7 +199,7 @@ test:
 
         foreach ($circleLines as $group => $count) {
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #' . str_pad($count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+            $circleciContent .= '    #' . str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage --group ';
             $circleciContent .= $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php';
@@ -273,18 +272,18 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \SplFileInfo                                      $file
-     * @param array                                             $data
      * @param array                                             $checks
-     * @param int                                               $counter
+     * @param int                                               $groupCounter
+     * @param int                                               $group
      *
      * @return int
      */
     private function handleFile(
         OutputInterface $output,
         \SplFileInfo $file,
-        array &$data,
         array &$checks,
-        &$counter
+        &$groupCounter,
+        $group
     ) {
         $output->writeln('file ' . $file->getBasename());
         $output->writeln('    checking ...');
@@ -321,13 +320,6 @@ class T' . $group . 'Test extends UserAgentsTest
         $outputDetector = [];
 
         foreach ($tests as $key => $test) {
-            if (isset($data[$key])) {
-                // Test data is duplicated for key
-                $output->writeln('    Test data is duplicated for key "' . $key . '"');
-                unset($tests->$key);
-                continue;
-            }
-
             if (is_array($test)) {
                 $test = (object) $test;
             }
@@ -339,18 +331,18 @@ class T' . $group . 'Test extends UserAgentsTest
                 continue;
             }
 
-            $data[$key]        = $test->ua;
-            $checks[$test->ua] = $key;
-
             $output->writeln('    processing Test ' . $key . ' ...');
 
+            $checks[$test->ua] = $key;
+            $newKey            = 'test-' . sprintf('%1$08d', $group) . '-' . sprintf('%1$08d', $groupCounter);
+
             $outputDetector += [
-                $key => [
+                $newKey => [
                     'ua'     => $test->ua,
                     'result' => $this->handleTest($output, $test)->toArray(),
                 ],
             ];
-            ++$counter;
+            ++$groupCounter;
         }
 
         $newCounter = count($outputDetector);

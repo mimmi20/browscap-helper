@@ -577,7 +577,7 @@ class Platform
 
             $platformBits = $platform->getBits();
 
-            if (version_compare((float) $platformVersionBrowscap, 10.12, '>=')) {
+            if (version_compare($platformVersionBrowscap, '10.12', '>=')) {
                 $platformNameBrowscap = 'macOS';
             } else {
                 $platformNameBrowscap = 'MacOSX';

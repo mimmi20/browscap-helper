@@ -43,8 +43,7 @@ class BrowscapHelper extends Application
         $targetDirectory  = realpath(__DIR__ . '/../results/') . '/';
 
         $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new StreamHandler('log/error.log', Logger::ERROR));
-        $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::ERROR));
+        $logger->pushHandler(new StreamHandler('log/error.log', Logger::NOTICE));
         ErrorHandler::register($logger);
 
         $adapter  = new Local('cache/');
