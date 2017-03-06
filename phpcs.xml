@@ -2,11 +2,19 @@
 <ruleset name="PHP_CodeSniffer">
     <description>browscap-helper</description>
 
-    <file>src</file>
-    <file>tests</file>
-
     <arg name="report" value="full" />
     <arg value="np" />
 
+    <!-- inherit rules from: -->
     <rule ref="PSR2" />
+
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+        <properties>
+            <property name="ignoreBlankLines" value="false"/>
+        </properties>
+    </rule>
+
+    <file>src</file>
+    <file>tests</file>
 </ruleset>

@@ -133,11 +133,11 @@ class CopyTestsCommand extends Command
         $counter = 0;
         $source  = new CollectionSource(
             [
-                new BrowscapSource($this->logger, $output, $this->cache),
-                new PiwikSource($this->logger, $output),
-                new UapCoreSource($this->logger, $output),
-                new WhichBrowserSource($this->logger, $output),
-                new WootheeSource($this->logger, $output),
+                new BrowscapSource($this->logger, $this->cache),
+                new PiwikSource($this->logger, $this->cache),
+                new UapCoreSource($this->logger),
+                new WhichBrowserSource($this->logger, $this->cache),
+                new WootheeSource($this->logger, $this->cache),
             ]
         );
 
@@ -170,13 +170,13 @@ class CopyTestsCommand extends Command
             ++$counter;
             ++$chunkCounter;
 
+            file_put_contents(
+                $targetDirectory . $targetFilename,
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            );
+
             if ($chunkCounter >= 100) {
                 $output->writeln('    writing file ' . $targetFilename);
-
-                file_put_contents(
-                    $targetDirectory . $targetFilename,
-                    json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-                );
 
                 $chunkCounter = 0;
                 $data         = [];

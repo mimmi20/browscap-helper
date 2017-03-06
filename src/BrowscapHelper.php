@@ -16,7 +16,6 @@ use Cache\Adapter\Filesystem\FilesystemCachePool;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Monolog\ErrorHandler;
-use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Application;
@@ -43,8 +42,7 @@ class BrowscapHelper extends Application
         $targetDirectory  = realpath(__DIR__ . '/../results/') . '/';
 
         $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler(new StreamHandler('log/error.log', Logger::ERROR));
-        $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::ERROR));
+        $logger->pushHandler(new StreamHandler('log/error.log', Logger::NOTICE));
         ErrorHandler::register($logger);
 
         $adapter  = new Local('cache/');
