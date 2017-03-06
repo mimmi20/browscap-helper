@@ -131,8 +131,8 @@ class RewriteTestsCommand extends Command
             }
         }
 
-        $checks  = [];
-        $g       = null;
+        $checks       = [];
+        $g            = null;
         $groupCounter = 0;
 
         foreach ($files as $fullFilename) {
@@ -141,7 +141,7 @@ class RewriteTestsCommand extends Command
 
             if ($g !== $group) {
                 $groupCounter = 0;
-                $g       = $group;
+                $g            = $group;
             }
 
             $newCounter = $this->handleFile($output, $file, $checks, $groupCounter, $group);
