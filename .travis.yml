@@ -2,7 +2,7 @@ language: php
 sudo: false
 
 php:
-  - 7.0
+  - 7.1
 
 os:
   - linux
@@ -13,7 +13,7 @@ env:
 
 matrix:
   include:
-    - php: 7.0
+    - php: 7.1
       env: EXECUTE_CS_CHECK=yes
 
 cache:

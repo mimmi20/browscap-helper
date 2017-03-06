@@ -3,9 +3,9 @@
   "description": "some small helper functions for working with Browscap",
   "require": {
     "php": "^7.0",
+    "psr/log": "^1.0",
+    "psr/cache": "^1.0",
     "symfony/console": "^3.2",
-    "monolog/monolog": "^1.20",
-    "cache/cache": "dev-master",
 
     "mimmi20/ua-data-mapper": "~2.0.3",
 
@@ -37,8 +37,10 @@
     "mimmi20/browscap-helper-source-woothee": "~2.0.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "^5.7",
-    "squizlabs/php_codesniffer": "^2.8",
+    "phpunit/phpunit": "^6.0",
+    "monolog/monolog": "^1.20",
+    "cache/cache": "dev-master",
+    "squizlabs/php_codesniffer": "^2.5",
     "friendsofphp/php-cs-fixer": "^2.1"
   },
   "license": "MIT",
