@@ -119,7 +119,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('read existing tests ...');
         $existingTests = [];
-        foreach ((new DetectorSource($this->logger, $output, $this->cache))->getUserAgents() as $ua) {
+        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $ua) {
             $ua = trim($ua);
 
             if (isset($existingTests[$ua])) {
