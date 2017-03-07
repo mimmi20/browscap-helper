@@ -156,8 +156,8 @@ class CopyTestsCommand extends Command
             $targetFilename = 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $fileCounter) . '.json';
 
             if (file_exists($targetDirectory . $targetFilename)) {
-                $output->writeln('    target file for chunk ' . $fileCounter . ' already exists');
-                continue;
+                $this->logger->emergency('    target file for chunk ' . $fileCounter . ' already exists');
+                exit;
             }
 
             $key = 'test-' . sprintf('%1$08d', $number) . '-' . sprintf('%1$08d', $chunkCounter);
@@ -172,7 +172,7 @@ class CopyTestsCommand extends Command
 
             file_put_contents(
                 $targetDirectory . $targetFilename,
-                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT)
             );
 
             if ($chunkCounter >= 100) {

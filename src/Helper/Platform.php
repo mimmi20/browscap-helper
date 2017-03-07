@@ -15,7 +15,9 @@ use BrowserDetector\Bits\Os;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\PlatformLoader;
+use BrowserDetector\Version\Version;
 use Psr\Cache\CacheItemPoolInterface;
+use UaResult\Company\CompanyLoader;
 
 /**
  * Class Platform
@@ -33,7 +35,7 @@ class Platform
      * @param string                            $platformCodenameDetector
      * @param string                            $platformMarketingnameDetector
      * @param string                            $platformMakerNameDetector
-     * @param string                            $platformVersionDetector
+     * @param \BrowserDetector\Version\Version  $platformVersionDetector
      *
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \UnexpectedValueException
@@ -47,7 +49,7 @@ class Platform
         $platformCodenameDetector,
         $platformMarketingnameDetector = 'unknown',
         $platformMakerNameDetector = 'unknown',
-        $platformVersionDetector = 'unknown'
+        Version $platformVersionDetector = null
     ) {
         $platformNameBrowscap           = 'unknown';
         $platformVersionBrowscap        = 'unknown';
@@ -735,8 +737,7 @@ class Platform
         } else {
             /* @var \UaResult\Result\Result $result */
             try {
-                $result = $detector->getBrowser($useragent);
-
+                $result   = $detector->getBrowser($useragent);
                 $platform = $result->getOs();
 
                 if ($platformCodenameDetector === $platform->getName()) {
@@ -762,10 +763,19 @@ class Platform
         }
 
         if (null === $platform) {
-            $platform = new \UaResult\Os\Os(
-                $platformCodenameDetector,
-                $platformMarketingnameDetector
-            );
+            try {
+                $platform = new \UaResult\Os\Os(
+                    $platformCodenameDetector,
+                    $platformMarketingnameDetector,
+                    (new CompanyLoader($cache))->loadByName($platformMakerNameDetector),
+                    $platformVersionDetector
+                );
+            } catch (\Exception $e) {
+                $platform = new \UaResult\Os\Os(
+                    $platformCodenameDetector,
+                    $platformMarketingnameDetector
+                );
+            }
         }
 
         return [

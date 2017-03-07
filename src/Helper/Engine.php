@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
+use BrowserDetector\Detector;
 use BrowserDetector\Loader\EngineLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -26,17 +27,22 @@ class Engine
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
+     * @param \BrowserDetector\Detector         $detector
+     * @param string                            $engineName
      *
      * @return array
      */
     public function detect(
         CacheItemPoolInterface $cache,
-        $useragent
+        $useragent,
+        Detector $detector,
+        $engineName
     ) {
         $loader = new EngineLoader($cache);
 
         $applets = false;
         $activex = false;
+        $engine  = null;
 
         $chromeVersion = 0;
 
@@ -69,6 +75,20 @@ class Engine
             $engine      = $loader->load('gecko');
             $applets     = true;
         } else {
+            /* @var \UaResult\Result\Result $result */
+            try {
+                $result = $detector->getBrowser($useragent);
+                $engine = $result->getEngine();
+
+                if ($engineName !== $engine->getName()) {
+                    $engine = null;
+                }
+            } catch (\Exception $e) {
+                $engine = null;
+            }
+        }
+
+        if (null === $engine) {
             $engine = $loader->load('unknown');
         }
 
