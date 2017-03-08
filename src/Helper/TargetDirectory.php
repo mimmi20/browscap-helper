@@ -46,8 +46,6 @@ class TargetDirectory
      */
     public function getNextTest(OutputInterface $output)
     {
-        $output->writeln('detect next test number ...');
-
         $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
         if (!is_readable($targetDirectory)) {
@@ -71,7 +69,6 @@ class TargetDirectory
         }
 
         ++$number;
-        $output->writeln('nexst test: ' . $number);
 
         return $number;
     }

@@ -135,6 +135,7 @@ class CreateTestsCommand extends Command
             return;
         }
 
+        $output->writeln('next test: ' . $number);
         $output->writeln('reading new files ...');
 
         $sourcesDirectory = $input->getOption('resources');
