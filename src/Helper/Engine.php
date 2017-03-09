@@ -53,26 +53,26 @@ class Engine
         }
 
         if (false !== mb_strpos($useragent, ' U3/')) {
-            $engine = $loader->load('u3');
+            $engine = $loader->load('u3', $useragent);
         } elseif (false !== mb_strpos($useragent, ' U2/')) {
-            $engine = $loader->load('u2');
+            $engine = $loader->load('u2', $useragent);
         } elseif (false !== mb_strpos($useragent, ' T5/')) {
-            $engine = $loader->load('t5');
+            $engine = $loader->load('t5', $useragent);
         } elseif (false !== mb_strpos($useragent, 'AppleWebKit')) {
             if ($chromeVersion >= 28.0) {
-                $engine = $loader->load('blink');
+                $engine = $loader->load('blink', $useragent);
             } else {
-                $engine      = $loader->load('webkit');
+                $engine      = $loader->load('webkit', $useragent);
                 $applets     = true;
             }
         } elseif (false !== mb_strpos($useragent, 'Presto')) {
-            $engine = $loader->load('presto');
+            $engine = $loader->load('presto', $useragent);
         } elseif (false !== mb_strpos($useragent, 'Trident')) {
-            $engine      = $loader->load('trident');
+            $engine      = $loader->load('trident', $useragent);
             $applets     = true;
             $activex     = true;
         } elseif (false !== mb_strpos($useragent, 'Gecko')) {
-            $engine      = $loader->load('gecko');
+            $engine      = $loader->load('gecko', $useragent);
             $applets     = true;
         } else {
             /* @var \UaResult\Result\Result $result */
@@ -89,7 +89,7 @@ class Engine
         }
 
         if (null === $engine) {
-            $engine = $loader->load('unknown');
+            $engine = $loader->load('unknown', $useragent);
         }
 
         return [
