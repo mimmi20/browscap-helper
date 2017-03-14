@@ -417,7 +417,7 @@ class T' . $group . 'Test extends UserAgentsTest
         /** rewrite devices */
 
         $device     = $result->getDevice();
-        $deviceCode = $device->getDeviceName();
+        $deviceCode = (string) $device->getDeviceName();
 
         try {
             list($device) = (new Helper\Device())->detect(
