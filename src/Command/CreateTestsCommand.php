@@ -146,11 +146,11 @@ class CreateTestsCommand extends Command
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            $output->writeln('    parsing ua ' . $useragent);
-
             if (isset($checks[$useragent])) {
                 continue;
             }
+
+            $output->writeln('    parsing ua ' . $useragent);
 
             $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number, $output);
             $checks[$useragent] = $issue;
