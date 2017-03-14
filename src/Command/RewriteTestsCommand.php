@@ -295,7 +295,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $output->writeln('    reading ...');
 
-        $tests = json_decode(file_get_contents($file->getPathname()));
+        $tests = json_decode(file_get_contents($file->getPathname()), false);
 
         if (is_array($tests)) {
             $tests = (object) $tests;
@@ -354,7 +354,9 @@ class T' . $group . 'Test extends UserAgentsTest
             unlink($file->getPathname());
 
             return 0;
-        } elseif ($newCounter < $oldCounter) {
+        }
+
+        if ($newCounter < $oldCounter) {
             $output->writeln('    ' . ($oldCounter - $newCounter) . ' test(s) is/are removed from the file');
         }
 
@@ -365,7 +367,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         file_put_contents(
             $file->getPathname(),
-            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
+            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT) . PHP_EOL
         );
 
         return $newCounter;
@@ -389,6 +391,13 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $browser = $result->getBrowser();
 
+        try {
+            /** @var \UaResult\Browser\Browser $browser */
+            list($browser) = (new Helper\Browser())->detect($this->cache, $test->ua, $this->detector, $browser->getName());
+        } catch (NotFoundException $e) {
+            $this->logger->warning($e);
+        }
+
         /* rewrite platforms */
 
         $output->writeln('        rewriting platform');
@@ -396,7 +405,7 @@ class T' . $group . 'Test extends UserAgentsTest
         $platform = $result->getOs();
 
         try {
-            list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($this->cache, $test->ua, $this->detector, $platform->getName(), $platform->getMarketingName(), $platform->getManufacturer(), $platform->getVersion()->getVersion());
+            list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($this->cache, $test->ua, $this->detector, $platform->getName(), $platform->getMarketingName(), $platform->getManufacturer(), $platform->getVersion());
         } catch (NotFoundException $e) {
             $this->logger->warning($e);
         }
@@ -408,7 +417,7 @@ class T' . $group . 'Test extends UserAgentsTest
         /** rewrite devices */
 
         $device     = $result->getDevice();
-        $deviceCode = $device->getDeviceName();
+        $deviceCode = (string) $device->getDeviceName();
 
         try {
             list($device) = (new Helper\Device())->detect(
@@ -443,6 +452,13 @@ class T' . $group . 'Test extends UserAgentsTest
         /** rewrite engines */
 
         $engine = $result->getEngine();
+
+        try {
+            /** @var \UaResult\Engine\EngineInterface $engine */
+            list($engine) = (new Helper\Engine())->detect($this->cache, $test->ua, $this->detector, $engine->getName());
+        } catch (NotFoundException $e) {
+            $this->logger->warning($e);
+        }
 
         $output->writeln('        generating result');
 

@@ -135,6 +135,7 @@ class CreateTestsCommand extends Command
             return;
         }
 
+        $output->writeln('next test: ' . $number);
         $output->writeln('reading new files ...');
 
         $sourcesDirectory = $input->getOption('resources');
@@ -176,7 +177,7 @@ class CreateTestsCommand extends Command
                 $targetDirectory . 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $chunkId) . '.json',
                 json_encode(
                     $chunk,
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
                 ) . PHP_EOL
             );
         }

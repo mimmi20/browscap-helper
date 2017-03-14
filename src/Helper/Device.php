@@ -2798,7 +2798,6 @@ class Device
             /* @var \UaResult\Result\Result $result */
             try {
                 $result = $detector->getBrowser($useragent);
-
                 $device = $result->getDevice();
 
                 if ($deviceCode === $device->getDeviceName()) {

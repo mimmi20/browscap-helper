@@ -103,7 +103,9 @@ class CopyTestsCommand extends Command
             return;
         }
 
+        $output->writeln('next test: ' . $number);
         $output->writeln('detect directory to write new tests ...');
+
         try {
             $targetDirectory = $targetDirectoryHelper->getPath($output);
         } catch (UnreadableFileException $e) {
@@ -112,6 +114,8 @@ class CopyTestsCommand extends Command
 
             return;
         }
+
+        $output->writeln('target directory: ' . $targetDirectory);
 
         if (!file_exists($targetDirectory)) {
             mkdir($targetDirectory);
@@ -145,6 +149,7 @@ class CopyTestsCommand extends Command
         $chunkCounter = 0;
         $fileCounter  = 0;
         $data         = [];
+        $fileCreated  = false;
 
         foreach ($source->getTests() as $ua => $result) {
             $ua = trim($ua);
@@ -155,9 +160,9 @@ class CopyTestsCommand extends Command
 
             $targetFilename = 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $fileCounter) . '.json';
 
-            if (file_exists($targetDirectory . $targetFilename)) {
-                $output->writeln('    target file for chunk ' . $fileCounter . ' already exists');
-                continue;
+            if (!$fileCreated && file_exists($targetDirectory . $targetFilename)) {
+                $this->logger->emergency('    target file for chunk ' . $fileCounter . ' already exists');
+                exit;
             }
 
             $key = 'test-' . sprintf('%1$08d', $number) . '-' . sprintf('%1$08d', $chunkCounter);
@@ -172,14 +177,17 @@ class CopyTestsCommand extends Command
 
             file_put_contents(
                 $targetDirectory . $targetFilename,
-                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT)
             );
+
+            $fileCreated = true;
 
             if ($chunkCounter >= 100) {
                 $output->writeln('    writing file ' . $targetFilename);
 
                 $chunkCounter = 0;
                 $data         = [];
+                $fileCreated  = false;
                 ++$fileCounter;
             }
 
@@ -187,6 +195,14 @@ class CopyTestsCommand extends Command
                 $fileCounter     = 0;
                 $number          = $targetDirectoryHelper->getNextTest($output);
                 $targetDirectory = $targetDirectoryHelper->getPath($output);
+                $fileCreated     = false;
+
+                $output->writeln('next test: ' . $number);
+                $output->writeln('target directory: ' . $targetDirectory);
+
+                if (!file_exists($targetDirectory)) {
+                    mkdir($targetDirectory);
+                }
             }
         }
 

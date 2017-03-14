@@ -590,8 +590,7 @@ class Browser
         } else {
             /* @var \UaResult\Result\Result $result */
             try {
-                $result = $detector->getBrowser($useragent);
-
+                $result  = $detector->getBrowser($useragent);
                 $browser = $result->getBrowser();
 
                 if ($browserName !== $browser->getName()) {

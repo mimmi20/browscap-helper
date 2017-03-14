@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
+use BrowserDetector\Detector;
 use BrowserDetector\Loader\EngineLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -26,17 +27,22 @@ class Engine
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param string                            $useragent
+     * @param \BrowserDetector\Detector         $detector
+     * @param string                            $engineName
      *
      * @return array
      */
     public function detect(
         CacheItemPoolInterface $cache,
-        $useragent
+        $useragent,
+        Detector $detector,
+        $engineName
     ) {
         $loader = new EngineLoader($cache);
 
         $applets = false;
         $activex = false;
+        $engine  = null;
 
         $chromeVersion = 0;
 
@@ -47,29 +53,43 @@ class Engine
         }
 
         if (false !== mb_strpos($useragent, ' U3/')) {
-            $engine = $loader->load('u3');
+            $engine = $loader->load('u3', $useragent);
         } elseif (false !== mb_strpos($useragent, ' U2/')) {
-            $engine = $loader->load('u2');
+            $engine = $loader->load('u2', $useragent);
         } elseif (false !== mb_strpos($useragent, ' T5/')) {
-            $engine = $loader->load('t5');
+            $engine = $loader->load('t5', $useragent);
         } elseif (false !== mb_strpos($useragent, 'AppleWebKit')) {
             if ($chromeVersion >= 28.0) {
-                $engine = $loader->load('blink');
+                $engine = $loader->load('blink', $useragent);
             } else {
-                $engine      = $loader->load('webkit');
+                $engine      = $loader->load('webkit', $useragent);
                 $applets     = true;
             }
         } elseif (false !== mb_strpos($useragent, 'Presto')) {
-            $engine = $loader->load('presto');
+            $engine = $loader->load('presto', $useragent);
         } elseif (false !== mb_strpos($useragent, 'Trident')) {
-            $engine      = $loader->load('trident');
+            $engine      = $loader->load('trident', $useragent);
             $applets     = true;
             $activex     = true;
         } elseif (false !== mb_strpos($useragent, 'Gecko')) {
-            $engine      = $loader->load('gecko');
+            $engine      = $loader->load('gecko', $useragent);
             $applets     = true;
         } else {
-            $engine = $loader->load('unknown');
+            /* @var \UaResult\Result\Result $result */
+            try {
+                $result = $detector->getBrowser($useragent);
+                $engine = $result->getEngine();
+
+                if ($engineName !== $engine->getName()) {
+                    $engine = null;
+                }
+            } catch (\Exception $e) {
+                $engine = null;
+            }
+        }
+
+        if (null === $engine) {
+            $engine = $loader->load('unknown', $useragent);
         }
 
         return [
