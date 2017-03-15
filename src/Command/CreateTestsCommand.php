@@ -219,11 +219,13 @@ class CreateTestsCommand extends Command
         /** @var \UaResult\Device\DeviceInterface $device */
         list($device) = (new Device())->detect($this->cache, $ua, $platform, $this->detector, $deviceCode);
 
+        $engineCode = 'unknown';
+
         /** @var \UaResult\Engine\EngineInterface $engine */
         list(
             $engine,
             $applets,
-            $activex) = (new Engine())->detect($this->cache, $ua);
+            $activex) = (new Engine())->detect($this->cache, $ua, $this->detector, $engineCode);
 
         $output->writeln('      detecting browser ...');
 
