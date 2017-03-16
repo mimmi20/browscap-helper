@@ -156,7 +156,7 @@ class RewriteTestsCommand extends Command
         $circleFile      = 'vendor/mimmi20/browser-detector-tests/circle.yml';
         $circleciContent = 'machine:
   php:
-    version: 7.0.4
+    version: 7.1.0
   timezone:
     Europe/Berlin
 
