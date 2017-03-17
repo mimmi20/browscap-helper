@@ -207,21 +207,15 @@ test:
 
             $testContent = '<?php
 /**
- * Copyright (c) 2012-' . date('Y') . ' Thomas Mueller
+ * This file is part of the browser-detector-tests package.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
- * Refer to the LICENSE file distributed with this package.
- *
- * @category   CompareTest
- *
- * @copyright 2012-' . date('Y') . ' Thomas Mueller
- * @license   http://www.opensource.org/licenses/MIT MIT License
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
 namespace BrowserDetectorTest\UserAgentsTest;
 
 use BrowserDetectorTest\UserAgentsTest;
@@ -234,6 +228,8 @@ use UaResult\Result\Result;
  *
  * @author     Thomas Mueller <mimmi20@live.de>
  * @group      useragenttest
+ * @group      integration
+ * @group      ' . $group . '
  */
 class T' . $group . 'Test extends UserAgentsTest
 {
