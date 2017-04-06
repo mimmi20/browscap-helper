@@ -587,6 +587,15 @@ class Browser
             //$lite = false;
             //@todo add Uzbl
             $browser = null;
+        } elseif (false !== mb_stripos($useragent, 'quicktime')) {
+            list($browser) = $loader->load('quicktime', $useragent);
+            $lite          = false;
+        } elseif (false !== mb_strpos($useragent, 'ZendHttpClient')
+            || false !== mb_strpos($useragent, 'Zend_Http_Client')
+            || false !== mb_strpos($useragent, 'Zend\\Http\\Client')
+        ) {
+            list($browser) = $loader->load('zend_http_client', $useragent);
+            $lite          = false;
         } else {
             /* @var \UaResult\Result\Result $result */
             try {
