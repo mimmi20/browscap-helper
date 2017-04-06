@@ -58,6 +58,9 @@ class Engine
             $engine = $loader->load('u2', $useragent);
         } elseif (false !== mb_strpos($useragent, ' T5/')) {
             $engine = $loader->load('t5', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'quicktime')) {
+            $engine  = $loader->load('webkit', $useragent);
+            $applets = true;
         } elseif (false !== mb_strpos($useragent, 'AppleWebKit')) {
             if ($chromeVersion >= 28.0) {
                 $engine = $loader->load('blink', $useragent);

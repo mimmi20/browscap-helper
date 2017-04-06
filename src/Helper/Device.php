@@ -14,6 +14,7 @@ namespace BrowscapHelper\Helper;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoader;
 use Psr\Cache\CacheItemPoolInterface;
+use Stringy\Stringy;
 use UaDataMapper\DeviceTypeMapper;
 use UaDeviceType\TypeInterface;
 use UaResult\Company\Company;
@@ -56,98 +57,7 @@ class Device
     ) {
         $deviceLoader = new DeviceLoader($cache);
         $device       = null;
-
-        if (false !== mb_strpos($useragent, 'Windows NT 10.0')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.4')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.3') && false !== mb_strpos($useragent, 'ARM')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.3')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.2') && false !== mb_strpos($useragent, 'ARM')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.2')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.1')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.0')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.3')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.2')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.1')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.01')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.0')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.1')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.0')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 3.5')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT 3.1')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Windows NT')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'cygwin')) {
-            return $deviceLoader->load('windows desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'CPU OS')) {
-            if (false !== mb_strpos($useragent, 'iPad')) {
-                return $deviceLoader->load('ipad', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPod')) {
-                return $deviceLoader->load('ipod touch', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
-                return $deviceLoader->load('iphone', $useragent);
-            }
-        } elseif (false !== mb_strpos($useragent, 'CPU iPhone OS')) {
-            if (false !== mb_strpos($useragent, 'iPad')) {
-                return $deviceLoader->load('ipad', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPod')) {
-                return $deviceLoader->load('ipod touch', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
-                return $deviceLoader->load('iphone', $useragent);
-            }
-        } elseif (false !== mb_strpos($useragent, 'CPU like Mac OS X')) {
-            if (false !== mb_strpos($useragent, 'iPad')) {
-                return $deviceLoader->load('ipad', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPod')) {
-                return $deviceLoader->load('ipod touch', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
-                return $deviceLoader->load('iphone', $useragent);
-            }
-        } elseif (false !== mb_strpos($useragent, 'iOS')) {
-            if (false !== mb_strpos($useragent, 'iPad')) {
-                return $deviceLoader->load('ipad', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPod')) {
-                return $deviceLoader->load('ipod touch', $useragent);
-            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
-                return $deviceLoader->load('iphone', $useragent);
-            }
-        } elseif (false !== mb_strpos($useragent, 'Mac OS X')) {
-            return $deviceLoader->load('macintosh', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'kubuntu')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'ubuntu')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'fedora')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'suse')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'mandriva')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'gentoo')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_stripos($useragent, 'slackware')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'CrOS')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        } elseif (false !== mb_strpos($useragent, 'Linux')) {
-            return $deviceLoader->load('linux desktop', $useragent);
-        }
+        $s            = new Stringy($useragent);
 
         if (preg_match('/redmi 3s/i', $useragent)) {
             return $deviceLoader->load('redmi 3s', $useragent);
@@ -227,8 +137,6 @@ class Device
             return $deviceLoader->load('one mini', $useragent);
         } elseif (preg_match('/(one[ _]sv|onesv)/i', $useragent)) {
             return $deviceLoader->load('one sv', $useragent);
-        } elseif (preg_match('/(one[ _]s|ones)/i', $useragent) && !preg_match('/iOS/', $useragent)) {
-            return $deviceLoader->load('pj401', $useragent);
         } elseif (preg_match('/(one[ _]x\+|onexplus)/i', $useragent)) {
             return $deviceLoader->load('pm63100', $useragent);
         } elseif (preg_match('/one[ _]xl/i', $useragent)) {
@@ -2793,7 +2701,99 @@ class Device
         ) {
             return $deviceLoader->load('m7', $useragent);
         } elseif (preg_match('/CFNetwork/', $useragent)) {
-            return (new \BrowserDetector\Factory\Device\DarwinFactory($cache, $deviceLoader))->detect($useragent);
+            return (new \BrowserDetector\Factory\Device\DarwinFactory($cache, $deviceLoader))->detect($useragent, $s);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 10.0')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.4')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.3') && false !== mb_strpos($useragent, 'ARM')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.3')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.2') && false !== mb_strpos($useragent, 'ARM')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.2')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.1')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 6.0')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.3')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.2')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.1')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.01')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 5.0')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.1')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 4.0')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 3.5')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT 3.1')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Windows NT')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'cygwin')) {
+            return $deviceLoader->load('windows desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'CPU OS')) {
+            if (false !== mb_strpos($useragent, 'iPad')) {
+                return $deviceLoader->load('ipad', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPod')) {
+                return $deviceLoader->load('ipod touch', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
+                return $deviceLoader->load('iphone', $useragent);
+            }
+        } elseif (false !== mb_strpos($useragent, 'CPU iPhone OS')) {
+            if (false !== mb_strpos($useragent, 'iPad')) {
+                return $deviceLoader->load('ipad', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPod')) {
+                return $deviceLoader->load('ipod touch', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
+                return $deviceLoader->load('iphone', $useragent);
+            }
+        } elseif (false !== mb_strpos($useragent, 'CPU like Mac OS X')) {
+            if (false !== mb_strpos($useragent, 'iPad')) {
+                return $deviceLoader->load('ipad', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPod')) {
+                return $deviceLoader->load('ipod touch', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
+                return $deviceLoader->load('iphone', $useragent);
+            }
+        } elseif (false !== mb_strpos($useragent, 'iOS')) {
+            if (false !== mb_strpos($useragent, 'iPad')) {
+                return $deviceLoader->load('ipad', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPod')) {
+                return $deviceLoader->load('ipod touch', $useragent);
+            } elseif (false !== mb_strpos($useragent, 'iPhone')) {
+                return $deviceLoader->load('iphone', $useragent);
+            }
+        } elseif (false !== mb_stripos($useragent, 'os=mac 10')) {
+            return $deviceLoader->load('macintosh', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Mac OS X')) {
+            return $deviceLoader->load('macintosh', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'kubuntu')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'ubuntu')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'fedora')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'suse')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'mandriva')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'gentoo')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_stripos($useragent, 'slackware')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'CrOS')) {
+            return $deviceLoader->load('linux desktop', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'Linux')) {
+            return $deviceLoader->load('linux desktop', $useragent);
         } else {
             /* @var \UaResult\Result\Result $result */
             try {
@@ -2838,11 +2838,11 @@ class Device
             }
 
             if (!$deviceMaker instanceof Company) {
-                $deviceMaker = new Company('unknown', 'unknown');
+                $deviceMaker = new Company(null, null);
             }
 
             if (!$deviceBrand instanceof Company) {
-                $deviceBrand = new Company('unknown', 'unknown');
+                $deviceBrand = new Company(null, null);
             }
 
             $device = new \UaResult\Device\Device(

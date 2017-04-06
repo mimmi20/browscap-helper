@@ -206,6 +206,12 @@ class Platform
             $platformNameBrowscap           = 'SymbianOS';
             $platformMakerBrowscap          = 'Symbian Foundation';
             $platformDescriptionBrowscap    = 'unknown';
+        } elseif (false !== mb_strpos($useragent, 'S8500')) {
+            $platform = $platformLoader->load('bada', $useragent);
+
+            $platformNameBrowscap           = 'Bada';
+            //$platformMakerBrowscap          = 'Oracle';
+            $platformDescriptionBrowscap    = 'unknown';
         } elseif (false !== mb_strpos($useragent, 'MIDP')) {
             $platform = $platformLoader->load('java', $useragent);
 
@@ -566,6 +572,24 @@ class Platform
             $platformNameBrowscap           = 'iOS';
             $platformMakerBrowscap          = 'Apple Inc';
             $platformDescriptionBrowscap    = 'iPod, iPhone & iPad';
+        } elseif (false !== mb_stripos($useragent, 'os=mac 10')) {
+            $platform = $platformLoader->load('mac os x', $useragent);
+
+            $platformMakerBrowscap          = 'Apple Inc';
+
+            $platformDescriptionBrowscap = 'Mac OS X';
+
+            if (preg_match('/os=mac (\d+[\_\.]\d+)/', $useragent, $matches)) {
+                $platformVersionBrowscap = str_replace('_', '.', $matches[1]);
+            }
+
+            $platformBits = $platform->getBits();
+
+            if (version_compare($platformVersionBrowscap, '10.12', '>=')) {
+                $platformNameBrowscap = 'macOS';
+            } else {
+                $platformNameBrowscap = 'MacOSX';
+            }
         } elseif (false !== mb_strpos($useragent, 'Mac OS X')) {
             $platform = $platformLoader->load('mac os x', $useragent);
 

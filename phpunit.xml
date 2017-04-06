@@ -9,11 +9,13 @@
         beStrictAboutTestsThatDoNotTestAnything="true"
         beStrictAboutTodoAnnotatedTests="true"
         verbose="true"
+        failOnWarning="true"
         bootstrap="vendor/autoload.php"
         >
     <php>
         <ini name="error_reporting" value="-1"/>
         <ini name="memory_limit" value="-1"/>
+        <ini name="date.timezone" value="UTC"/>
     </php>
 
     <testsuites>
