@@ -100,7 +100,7 @@ class Device
         } elseif (preg_match('/(lumia|nokia) 920/i', $useragent)) {
             return $deviceLoader->load('lumia 920', $useragent);
         } elseif (preg_match('/(lumia 650|id336)/i', $useragent)) {
-            return $deviceLoader->load('lumia 920', $useragent);
+            return $deviceLoader->load('lumia 650', $useragent);
         } elseif (preg_match('/lumia 520/i', $useragent)) {
             return $deviceLoader->load('lumia 520', $useragent);
         } elseif (preg_match('/(lumia \d{3,4} xl)/i', $useragent, $matches)) {
