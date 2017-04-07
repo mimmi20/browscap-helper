@@ -608,6 +608,12 @@ class Platform
             } else {
                 $platformNameBrowscap = 'MacOSX';
             }
+        } elseif (preg_match('/(CFNetwork|Darwin)/', $useragent)) {
+            $platform = (new Factory\Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
+
+            $platformNameBrowscap        = 'Darwin';
+            $platformMakerBrowscap       = 'Apple Inc';
+            $platformDescriptionBrowscap = 'Darwin is a Core Component of MacOSX and iOS';
         } elseif (false !== mb_stripos($useragent, 'kubuntu')) {
             $platform = $platformLoader->load('kubuntu', $useragent);
 
@@ -746,12 +752,6 @@ class Platform
             $platformNameBrowscap        = 'webOS';
             $platformMakerBrowscap       = 'HP';
             $platformDescriptionBrowscap = 'webOS';
-        } elseif (preg_match('/CFNetwork/', $useragent)) {
-            $platform = (new Factory\Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
-
-            $platformNameBrowscap        = 'Darwin';
-            $platformMakerBrowscap       = 'Apple Inc';
-            $platformDescriptionBrowscap = 'Darwin is a Core Component of MacOSX and iOS';
         } elseif (preg_match('/HP\-UX/', $useragent)) {
             $platform = $platformLoader->load('hp-ux', $useragent);
 
@@ -763,6 +763,11 @@ class Platform
             try {
                 $result   = $detector->getBrowser($useragent);
                 $platform = $result->getOs();
+
+                if ($platformCodenameDetector === 'unknown') {
+                    $platformCodenameDetector      = null;
+                    $platformMarketingnameDetector = null;
+                }
 
                 if ($platformCodenameDetector === $platform->getName()) {
                     $platformBits = $platform->getBits();

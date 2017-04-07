@@ -93,10 +93,16 @@ class Device
             }
         } elseif (preg_match('/(lumia 1020|nokia; 909|arm; 909)/i', $useragent)) {
             return $deviceLoader->load('lumia 1020', $useragent);
+        } elseif (preg_match('/(lumia|nokia) 928/i', $useragent)) {
+            return $deviceLoader->load('lumia 928', $useragent);
         } elseif (preg_match('/(lumia|nokia) 925/i', $useragent)) {
             return $deviceLoader->load('lumia 925', $useragent);
+        } elseif (preg_match('/(lumia|nokia) 920/i', $useragent)) {
+            return $deviceLoader->load('lumia 920', $useragent);
         } elseif (preg_match('/(lumia 650|id336)/i', $useragent)) {
             return $deviceLoader->load('lumia 650', $useragent);
+        } elseif (preg_match('/lumia 520/i', $useragent)) {
+            return $deviceLoader->load('lumia 520', $useragent);
         } elseif (preg_match('/(lumia \d{3,4} xl)/i', $useragent, $matches)) {
             try {
                 return $deviceLoader->load($matches[1], $useragent);
@@ -137,6 +143,8 @@ class Device
             return $deviceLoader->load('one mini', $useragent);
         } elseif (preg_match('/(one[ _]sv|onesv)/i', $useragent)) {
             return $deviceLoader->load('one sv', $useragent);
+        } elseif (preg_match('/(htc[ _]one[ _]s)/i', $useragent)) {
+            return $deviceLoader->load('pj401', $useragent);
         } elseif (preg_match('/(one[ _]x\+|onexplus)/i', $useragent)) {
             return $deviceLoader->load('pm63100', $useragent);
         } elseif (preg_match('/one[ _]xl/i', $useragent)) {
@@ -2157,6 +2165,8 @@ class Device
             return $deviceLoader->load('xt1080', $useragent);
         } elseif (preg_match('/XT1021/i', $useragent)) {
             return $deviceLoader->load('xt1021', $useragent);
+        } elseif (preg_match('/XT910/i', $useragent)) {
+            return $deviceLoader->load('xt910', $useragent);
         } elseif (preg_match('/MotoG3/i', $useragent)) {
             return $deviceLoader->load('motog3', $useragent);
         } elseif (preg_match('/MB612/i', $useragent)) {
@@ -2239,6 +2249,8 @@ class Device
             return $deviceLoader->load('a766', $useragent);
         } elseif (preg_match('/Lenovo A536/i', $useragent)) {
             return $deviceLoader->load('a536', $useragent);
+        } elseif (preg_match('/A3000\-H/i', $useragent)) {
+            return $deviceLoader->load('a3000-h', $useragent);
         } elseif (preg_match('/SmartTabII10/i', $useragent)) {
             return $deviceLoader->load('smarttab ii 10', $useragent);
         } elseif (preg_match('/Vodafone Smart Tab III 10/i', $useragent)) {
@@ -2446,7 +2458,9 @@ class Device
         } elseif (preg_match('/ZTE Geek/', $useragent)) {
             return $deviceLoader->load('v975', $useragent);
         } elseif (preg_match('/ZTE LEO Q2/', $useragent)) {
-            return $deviceLoader->load('v769m', $useragent);
+            return $deviceLoader->load('v975', $useragent);
+        } elseif (preg_match('/ATLAS W/', $useragent)) {
+            return $deviceLoader->load('atlas w', $useragent);
         } elseif (preg_match('/IEOS_QUAD_10_PRO/', $useragent)) {
             return $deviceLoader->load('ieos quad 10 pro', $useragent);
         } elseif (preg_match('/IEOS_QUAD_W/', $useragent)) {

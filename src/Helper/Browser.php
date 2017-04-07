@@ -545,6 +545,10 @@ class Browser
             //$lite = false;
             //@todo add TheWorld
             $browser = null;
+        } elseif (false !== mb_strpos($useragent, 'Outlook')) {
+            list($browser) = $loader->load('outlook', $useragent);
+        } elseif (false !== mb_strpos($useragent, 'IEMobile')) {
+            list($browser) = $loader->load('iemobile', $useragent);
         } elseif (false !== mb_strpos($useragent, 'MSIE')) {
             list($browser) = $loader->load('internet explorer', $useragent);
         } elseif (false !== mb_strpos($useragent, 'like Gecko') && false !== mb_strpos($useragent, 'rv:11.0')) {
@@ -590,9 +594,15 @@ class Browser
         } elseif (false !== mb_stripos($useragent, 'quicktime')) {
             list($browser) = $loader->load('quicktime', $useragent);
             $lite          = false;
-        } elseif (false !== mb_strpos($useragent, 'ZendHttpClient')
-            || false !== mb_strpos($useragent, 'Zend_Http_Client')
-            || false !== mb_strpos($useragent, 'Zend\\Http\\Client')
+        } elseif (false !== mb_stripos($useragent, 'nokiabrowser')) {
+            list($browser) = $loader->load('nokiabrowser', $useragent);
+            $lite          = false;
+        } elseif (false !== mb_stripos($useragent, 'Pinterest')) {
+            list($browser) = $loader->load('pinterest app', $useragent);
+            $lite          = false;
+        } elseif (false !== mb_strpos($useragent, 'Zend')
+            && false !== mb_strpos($useragent, 'Http')
+            && false !== mb_strpos($useragent, 'Client')
         ) {
             list($browser) = $loader->load('zend_http_client', $useragent);
             $lite          = false;
@@ -601,6 +611,10 @@ class Browser
             try {
                 $result  = $detector->getBrowser($useragent);
                 $browser = $result->getBrowser();
+
+                if ($browserName === 'Default Browser') {
+                    $browserName = null;
+                }
 
                 if ($browserName !== $browser->getName()) {
                     $browser = null;
