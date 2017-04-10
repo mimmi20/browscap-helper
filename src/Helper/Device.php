@@ -2715,7 +2715,7 @@ class Device
         ) {
             return $deviceLoader->load('m7', $useragent);
         } elseif (preg_match('/CFNetwork/', $useragent)) {
-            return (new \BrowserDetector\Factory\Device\DarwinFactory($cache, $deviceLoader))->detect($useragent, $s);
+            return (new \BrowserDetector\Factory\Device\DarwinFactory($deviceLoader))->detect($useragent, $s);
         } elseif (false !== mb_strpos($useragent, 'Windows NT 10.0')) {
             return $deviceLoader->load('windows desktop', $useragent);
         } elseif (false !== mb_strpos($useragent, 'Windows NT 6.4')) {

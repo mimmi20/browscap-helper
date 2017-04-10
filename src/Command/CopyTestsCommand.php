@@ -169,7 +169,7 @@ class CopyTestsCommand extends Command
 
             $data[$key] = [
                 'ua'     => $ua,
-                'result' => $result->toArray(),
+                'result' => $result->toArray(false),
             ];
 
             ++$counter;

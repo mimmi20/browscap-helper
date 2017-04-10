@@ -335,7 +335,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $outputDetector += [
                 $newKey => [
                     'ua'     => $test->ua,
-                    'result' => $this->handleTest($output, $test)->toArray(),
+                    'result' => $this->handleTest($output, $test)->toArray(false),
                 ],
             ];
             ++$groupCounter;

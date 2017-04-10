@@ -609,7 +609,7 @@ class Platform
                 $platformNameBrowscap = 'MacOSX';
             }
         } elseif (preg_match('/(CFNetwork|Darwin)/', $useragent)) {
-            $platform = (new Factory\Platform\DarwinFactory($cache, $platformLoader))->detect($useragent);
+            $platform = (new Factory\Platform\DarwinFactory($platformLoader))->detect($useragent);
 
             $platformNameBrowscap        = 'Darwin';
             $platformMakerBrowscap       = 'Apple Inc';
