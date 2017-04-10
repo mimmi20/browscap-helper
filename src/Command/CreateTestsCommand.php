@@ -312,7 +312,7 @@ class CreateTestsCommand extends Command
 
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'     => $ua,
-            'result' => $result->toArray(),
+            'result' => $result->toArray(false),
         ];
     }
 }
