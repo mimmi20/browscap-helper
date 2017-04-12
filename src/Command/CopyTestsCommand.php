@@ -183,7 +183,7 @@ class CopyTestsCommand extends Command
             $fileCreated = true;
 
             if ($chunkCounter >= 100) {
-                $output->writeln('    writing file ' . $targetFilename);
+                $this->logger->info('    writing file ' . $targetFilename);
 
                 $chunkCounter = 0;
                 $data         = [];

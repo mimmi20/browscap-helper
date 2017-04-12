@@ -151,8 +151,6 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $output->writeln('    parsing ua ' . $useragent);
-
             $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number, $output);
             $checks[$useragent] = $issue;
             ++$counter;
@@ -198,7 +196,7 @@ class CreateTestsCommand extends Command
     {
         $platformCodename = 'unknown';
 
-        $output->writeln('      detecting platform ...');
+        $this->logger->info('      detecting platform ...');
 
         list(
             $platformNameBrowscap,
@@ -212,7 +210,7 @@ class CreateTestsCommand extends Command
             $platformBits,
             $platform) = (new Platform())->detect($this->cache, $ua, $this->detector, $platformCodename);
 
-        $output->writeln('      detecting device ...');
+        $this->logger->info('      detecting device ...');
 
         $deviceCode = 'unknown';
 
@@ -227,7 +225,7 @@ class CreateTestsCommand extends Command
             $applets,
             $activex) = (new Engine())->detect($this->cache, $ua, $this->detector, $engineCode);
 
-        $output->writeln('      detecting browser ...');
+        $this->logger->info('      detecting browser ...');
 
         $browserNameDetector = 'unknown';
 
@@ -243,7 +241,7 @@ class CreateTestsCommand extends Command
         $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
         $formatedCounter = sprintf('%1$05d', (int) $counter);
 
-        $output->writeln('      writing browscap data ...');
+        $this->logger->info('      writing browscap data ...');
 
         $outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
@@ -299,12 +297,12 @@ class CreateTestsCommand extends Command
         'standard' => " . ($standard ? 'true' : 'false') . ",
     ],\n";
 
-        $output->writeln('      detecting test name ...');
+        $this->logger->info('      detecting test name ...');
 
         $formatedIssue   = sprintf('%1$08d', (int) $testNumber);
         $formatedCounter = sprintf('%1$08d', (int) $counter);
 
-        $output->writeln('      detecting request ...');
+        $this->logger->info('      detecting request ...');
 
         $request = (new GenericRequestFactory())->createRequestForUserAgent($ua);
 
@@ -312,7 +310,7 @@ class CreateTestsCommand extends Command
 
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'     => $ua,
-            'result' => $result->toArray(false),
+            'result' => $result->toArray(),
         ];
     }
 }

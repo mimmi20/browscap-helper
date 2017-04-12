@@ -111,7 +111,7 @@ class RewriteTestsCommand extends Command
 
             if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
                 $files[] = $filename;
-                $output->writeln('file ' . $filename . ' is out of strcture');
+                $this->logger->warn('file ' . $filename . ' is out of strcture');
                 continue;
             }
 
@@ -282,14 +282,14 @@ class T' . $group . 'Test extends UserAgentsTest
         $group
     ) {
         $output->writeln('file ' . $file->getBasename());
-        $output->writeln('    checking ...');
+        $this->logger->info('    checking ...');
 
         /** @var $file \SplFileInfo */
         if (!$file->isFile() || $file->getExtension() !== 'json') {
             return 0;
         }
 
-        $output->writeln('    reading ...');
+        $this->logger->info('    reading ...');
 
         $tests = json_decode(file_get_contents($file->getPathname()), false);
 
@@ -300,19 +300,19 @@ class T' . $group . 'Test extends UserAgentsTest
         $oldCounter = count(get_object_vars($tests));
 
         if ($oldCounter < 1) {
-            $output->writeln('    file does not contain any test');
+            $this->logger->info('    file does not contain any test');
             unlink($file->getPathname());
 
             return 0;
         }
 
         if (1 === $oldCounter) {
-            $output->writeln('    contains 1 test');
+            $this->logger->info('    contains 1 test');
         } else {
-            $output->writeln('    contains ' . $oldCounter . ' tests');
+            $this->logger->info('    contains ' . $oldCounter . ' tests');
         }
 
-        $output->writeln('    processing ...');
+        $this->logger->info('    processing ...');
         $outputDetector = [];
 
         foreach ($tests as $key => $test) {
@@ -322,7 +322,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
             if (isset($checks[$test->ua])) {
                 // UA was added more than once
-                $output->writeln('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
+                $this->logger->info('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
                 unset($tests->$key);
                 continue;
             }
@@ -343,17 +343,17 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $newCounter = count($outputDetector);
 
-        $output->writeln('    contains now ' . $newCounter . ' tests');
+        $this->logger->info('    contains now ' . $newCounter . ' tests');
 
         if ($newCounter < 1) {
-            $output->writeln('    all tests are removed from the file');
+            $this->logger->info('    all tests are removed from the file');
             unlink($file->getPathname());
 
             return 0;
         }
 
         if ($newCounter < $oldCounter) {
-            $output->writeln('    ' . ($oldCounter - $newCounter) . ' test(s) is/are removed from the file');
+            $this->logger->info('    ' . ($oldCounter - $newCounter) . ' test(s) is/are removed from the file');
         }
 
         $output->writeln('    removing old file');
@@ -379,11 +379,11 @@ class T' . $group . 'Test extends UserAgentsTest
         OutputInterface $output,
         \stdClass $test
     ) {
-        $output->writeln('        ua: ' . $test->ua);
-
         $result = (new ResultFactory())->fromArray($this->cache, $this->logger, (array) $test->result);
 
-        /** rewrite browsers */
+        /* rewrite browsers */
+
+        $this->logger->info('        rewriting browser');
 
         $browser = $result->getBrowser();
 
@@ -396,7 +396,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /* rewrite platforms */
 
-        $output->writeln('        rewriting platform');
+        $this->logger->info('        rewriting platform');
 
         $platform = $result->getOs();
 
@@ -408,7 +408,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /* @var $platform OsInterface|null */
 
-        $output->writeln('        rewriting device');
+        $this->logger->info('        rewriting device');
 
         /** rewrite devices */
 
@@ -456,7 +456,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $this->logger->warning($e);
         }
 
-        $output->writeln('        generating result');
+        $this->logger->info('        generating result');
 
         $request = (new GenericRequestFactory())->createRequestForUserAgent($test->ua);
 
