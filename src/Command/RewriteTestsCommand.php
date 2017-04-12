@@ -381,7 +381,7 @@ class T' . $group . 'Test extends UserAgentsTest
     ) {
         $result = (new ResultFactory())->fromArray($this->cache, $this->logger, (array) $test->result);
 
-        /** rewrite browsers */
+        /* rewrite browsers */
 
         $this->logger->info('        rewriting browser');
 
