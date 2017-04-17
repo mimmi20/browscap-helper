@@ -19,6 +19,7 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\Detector;
+use BrowserDetector\Version\VersionInterface;
 use League\Flysystem\UnreadableFileException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -151,7 +152,7 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number, $output);
+            $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number);
             $checks[$useragent] = $issue;
             ++$counter;
         }
@@ -185,54 +186,30 @@ class CreateTestsCommand extends Command
     }
 
     /**
-     * @param string          $ua
-     * @param int             $counter
-     * @param string          &$outputBrowscap
-     * @param array           &$outputDetector
-     * @param int             $testNumber
-     * @param OutputInterface $output
+     * @param string $ua
+     * @param int    $counter
+     * @param string &$outputBrowscap
+     * @param array  &$outputDetector
+     * @param int    $testNumber
      */
-    private function parseLine($ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber, OutputInterface $output)
+    private function parseLine($ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber)
     {
-        $platformCodename = 'unknown';
-
         $this->logger->info('      detecting platform ...');
 
-        list(
-            $platformNameBrowscap,
-            $platformMakerBrowscap,
-            $platformDescriptionBrowscap,
-            $platformVersionBrowscap,
-            $win64,
-            $win32,
-            $win16,
-            $standard,
-            $platformBits,
-            $platform) = (new Platform())->detect($this->cache, $ua, $this->detector, $platformCodename);
+        $platform = (new Platform())->detect($this->cache, $ua);
 
         $this->logger->info('      detecting device ...');
 
-        $deviceCode = 'unknown';
-
         /** @var \UaResult\Device\DeviceInterface $device */
-        list($device) = (new Device())->detect($this->cache, $ua, $platform, $this->detector, $deviceCode);
-
-        $engineCode = 'unknown';
+        $device = (new Device())->detect($this->cache, $ua);
 
         /** @var \UaResult\Engine\EngineInterface $engine */
-        list(
-            $engine,
-            $applets,
-            $activex) = (new Engine())->detect($this->cache, $ua, $this->detector, $engineCode);
+        $engine = (new Engine())->detect($this->cache, $ua);
 
         $this->logger->info('      detecting browser ...');
 
-        $browserNameDetector = 'unknown';
-
         /** @var \UaResult\Browser\Browser $browser */
-        list(
-            $browser,
-            $lite) = (new Browser())->detect($this->cache, $ua, $this->detector, $browserNameDetector);
+        $browser = (new Browser())->detect($this->cache, $ua);
 
         $v          = explode('.', $browser->getVersion()->getVersion(), 2);
         $maxVersion = $v[0];
@@ -255,25 +232,25 @@ class CreateTestsCommand extends Command
             'Version' => '" . $browser->getVersion()->getVersion() . "',
             'MajorVer' => '" . $maxVersion . "',
             'MinorVer' => '" . $minVersion . "',
-            'Platform' => '" . $platformNameBrowscap . "',
-            'Platform_Version' => '$platformVersionBrowscap',
-            'Platform_Description' => '$platformDescriptionBrowscap',
-            'Platform_Bits' => '$platformBits',
-            'Platform_Maker' => '$platformMakerBrowscap',
+            'Platform' => '" . $platform->getName() . "',
+            'Platform_Version' => '" . $platform->getVersion()->getVersion(VersionInterface::IGNORE_MICRO) . "',
+            'Platform_Description' => '',
+            'Platform_Bits' => '" . $platform->getBits() . "',
+            'Platform_Maker' => '" . $platform->getManufacturer()->getName() . "',
             'Alpha' => false,
             'Beta' => false,
-            'Win16' => " . ($win16 ? 'true' : 'false') . ",
-            'Win32' => " . ($win32 ? 'true' : 'false') . ",
-            'Win64' => " . ($win64 ? 'true' : 'false') . ",
+            'Win16' => false,
+            'Win32' => false,
+            'Win64' => false,
             'Frames' => true,
             'IFrames' => true,
             'Tables' => true,
             'Cookies' => true,
-            'BackgroundSounds' => " . ($activex ? 'true' : 'false') . ",
+            'BackgroundSounds' => false,
             'JavaScript' => true,
-            'VBScript' => " . ($activex ? 'true' : 'false') . ",
-            'JavaApplets' => " . ($applets ? 'true' : 'false') . ",
-            'ActiveXControls' => " . ($activex ? 'true' : 'false') . ",
+            'VBScript' => false,
+            'JavaApplets' => false,
+            'ActiveXControls' => false,
             'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
             'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
             'isSyndicationReader' => false,
@@ -293,8 +270,8 @@ class CreateTestsCommand extends Command
             'RenderingEngine_Version' => 'unknown',
             'RenderingEngine_Maker' => '" . $engine->getManufacturer()->getName() . "',
         ],
-        'lite' => " . ($lite ? 'true' : 'false') . ",
-        'standard' => " . ($standard ? 'true' : 'false') . ",
+        'lite' => true,
+        'standard' => true,
     ],\n";
 
         $this->logger->info('      detecting test name ...');
@@ -310,7 +287,7 @@ class CreateTestsCommand extends Command
 
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'     => $ua,
-            'result' => $result->toArray(),
+            'result' => $result->toArray(false),
         ];
     }
 }

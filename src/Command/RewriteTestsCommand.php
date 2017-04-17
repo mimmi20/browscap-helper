@@ -13,8 +13,6 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper;
 use BrowserDetector\Detector;
-use BrowserDetector\Loader\DeviceLoader;
-use BrowserDetector\Loader\NotFoundException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -24,7 +22,6 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Os\OsInterface;
 use UaResult\Result\Result;
-use UaResult\Result\ResultFactory;
 use Wurfl\Request\GenericRequestFactory;
 
 /**
@@ -335,7 +332,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $outputDetector += [
                 $newKey => [
                     'ua'     => $test->ua,
-                    'result' => $this->handleTest($output, $test)->toArray(false),
+                    'result' => $this->handleTest($test->ua)->toArray(false),
                 ],
             ];
             ++$groupCounter;
@@ -370,41 +367,24 @@ class T' . $group . 'Test extends UserAgentsTest
     }
 
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \stdClass                                         $test
+     * @param string $useragent
      *
      * @return \UaResult\Result\Result
      */
-    private function handleTest(
-        OutputInterface $output,
-        \stdClass $test
-    ) {
-        $result = (new ResultFactory())->fromArray($this->cache, $this->logger, (array) $test->result);
-
+    private function handleTest($useragent)
+    {
         /* rewrite browsers */
 
         $this->logger->info('        rewriting browser');
 
-        $browser = $result->getBrowser();
-
-        try {
-            /** @var \UaResult\Browser\Browser $browser */
-            list($browser) = (new Helper\Browser())->detect($this->cache, $test->ua, $this->detector, $browser->getName());
-        } catch (NotFoundException $e) {
-            $this->logger->warning($e);
-        }
+        /** @var \UaResult\Browser\Browser $browser */
+        $browser = (new Helper\Browser())->detect($this->cache, $useragent);
 
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
-        $platform = $result->getOs();
-
-        try {
-            list(, , , , , , , , , $platform) = (new Helper\Platform())->detect($this->cache, $test->ua, $this->detector, $platform->getName(), $platform->getMarketingName(), $platform->getManufacturer(), $platform->getVersion());
-        } catch (NotFoundException $e) {
-            $this->logger->warning($e);
-        }
+        $platform = (new Helper\Platform())->detect($this->cache, $useragent);
 
         /* @var $platform OsInterface|null */
 
@@ -412,53 +392,16 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /** rewrite devices */
 
-        $device     = $result->getDevice();
-        $deviceCode = (string) $device->getDeviceName();
-
-        try {
-            list($device) = (new Helper\Device())->detect(
-                $this->cache,
-                $test->ua,
-                $platform,
-                $this->detector,
-                $deviceCode,
-                $device->getBrand()->getBrandName(),
-                $device->getPointingMethod(),
-                $device->getType()->getName(),
-                $device->getManufacturer()->getName(),
-                $device->getMarketingName(),
-                $device->getDualOrientation()
-            );
-            /* @var $deviceType \UaDeviceType\TypeInterface */
-
-            if ($deviceCode === 'unknown'
-                || $deviceCode === null
-                || (false !== mb_stripos($deviceCode, 'general') && (!in_array($deviceCode, ['general Mobile Device', 'general Mobile Phone', 'general Desktop', 'general Apple Device'])))
-            ) {
-                $deviceLoader = new DeviceLoader($this->cache);
-                list($device) = $deviceLoader->load('unknown', $test->ua);
-            }
-
-            /* @var $deviceType \UaDeviceType\TypeInterface */
-            /* @var $device \UaResult\Device\DeviceInterface */
-        } catch (NotFoundException $e) {
-            $this->logger->warning($e);
-        }
+        $device = (new Helper\Device())->detect($this->cache, $useragent);
 
         /** rewrite engines */
 
-        $engine = $result->getEngine();
-
-        try {
-            /** @var \UaResult\Engine\EngineInterface $engine */
-            list($engine) = (new Helper\Engine())->detect($this->cache, $test->ua, $this->detector, $engine->getName());
-        } catch (NotFoundException $e) {
-            $this->logger->warning($e);
-        }
+        /** @var \UaResult\Engine\EngineInterface $engine */
+        $engine = (new Helper\Engine())->detect($this->cache, $useragent);
 
         $this->logger->info('        generating result');
 
-        $request = (new GenericRequestFactory())->createRequestForUserAgent($test->ua);
+        $request = (new GenericRequestFactory())->createRequestForUserAgent($useragent);
 
         return new Result($request, $device, $platform, $browser, $engine);
     }
