@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Factory\EngineFactory;
+use BrowserDetector\Loader\BrowserLoader;
 use BrowserDetector\Loader\EngineLoader;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -32,11 +33,12 @@ class Engine
      */
     public function detect(CacheItemPoolInterface $cache, $useragent)
     {
-        $loader = new EngineLoader($cache);
+        $loader        = new EngineLoader($cache);
+        $browserLoader = new BrowserLoader($cache);
 
         /* @var \UaResult\Engine\Engine $engine */
         try {
-            $engine = (new EngineFactory($loader))->detect($useragent);
+            $engine = (new EngineFactory($loader))->detect($useragent, $browserLoader);
         } catch (\Exception $e) {
             $engine = null;
         }
