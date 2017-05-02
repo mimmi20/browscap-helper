@@ -11,10 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper\Browser;
-use BrowscapHelper\Helper\Device;
-use BrowscapHelper\Helper\Engine;
-use BrowscapHelper\Helper\Platform;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
@@ -194,22 +190,46 @@ class CreateTestsCommand extends Command
      */
     private function parseLine($ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber)
     {
+        $this->logger->info('      detecting');
+
+        $result = (new Detector($this->cache, $this->logger))->getBrowser($ua);
+
         $this->logger->info('      detecting platform ...');
 
-        $platform = (new Platform())->detect($this->cache, $ua);
+        $platform = $result->getOs();
+
+        if (null === $platform || in_array($platform->getName(), [null, 'unknown'])) {
+            $platform = new \UaResult\Os\Os(null, null);
+        }
 
         $this->logger->info('      detecting device ...');
 
         /** @var \UaResult\Device\DeviceInterface $device */
-        $device = (new Device())->detect($this->cache, $ua);
+        $device = $result->getDevice();
+
+        if (null === $device
+            || in_array($device->getDeviceName(), [null, 'unknown'])
+            || (!in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                && false !== mb_stripos($device->getDeviceName(), 'general'))
+        ) {
+            $device = new \UaResult\Device\Device(null, null);
+        }
 
         /** @var \UaResult\Engine\EngineInterface $engine */
-        $engine = (new Engine())->detect($this->cache, $ua);
+        $engine = $result->getEngine();
+
+        if (null === $engine || in_array($engine->getName(), [null, 'unknown'])) {
+            $engine = new \UaResult\Engine\Engine(null);
+        }
 
         $this->logger->info('      detecting browser ...');
 
         /** @var \UaResult\Browser\Browser $browser */
-        $browser = (new Browser())->detect($this->cache, $ua);
+        $browser = $result->getBrowser();
+
+        if (null === $browser || in_array($browser->getName(), [null, 'unknown'])) {
+            $browser = new \UaResult\Browser\Browser(null);
+        }
 
         $v          = explode('.', $browser->getVersion()->getVersion(), 2);
         $maxVersion = $v[0];

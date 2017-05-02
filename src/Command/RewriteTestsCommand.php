@@ -11,7 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper;
 use BrowserDetector\Detector;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -195,11 +194,17 @@ test:
         );
 
         foreach ($circleLines as $group => $count) {
+            if ($count >= 100) {
+                $columns = 111 + 2 * mb_strlen((string) $count);
+            } else {
+                $columns = $count + 11 + 2 * mb_strlen((string) $count);
+            }
+
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage --group ';
-            $circleciContent .= $group . ' --colors=auto --columns 117 tests/UserAgentsTest/T' . $group . 'Test.php';
+            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage --colors=auto';
+            $circleciContent .= ' --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php';
             $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
@@ -373,18 +378,28 @@ class T' . $group . 'Test extends UserAgentsTest
      */
     private function handleTest($useragent)
     {
-        /* rewrite browsers */
+        $this->logger->info('        rewriting');
+
+        $result = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
 
         $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\Browser $browser */
-        $browser = (new Helper\Browser())->detect($this->cache, $useragent);
+        $browser = $result->getBrowser();
+
+        if (null === $browser || in_array($browser->getName(), [null, 'unknown'])) {
+            $browser = new \UaResult\Browser\Browser(null);
+        }
 
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
-        $platform = (new Helper\Platform())->detect($this->cache, $useragent);
+        $platform = $result->getOs();
+
+        if (null === $platform || in_array($platform->getName(), [null, 'unknown'])) {
+            $platform = new \UaResult\Os\Os(null, null);
+        }
 
         /* @var $platform OsInterface|null */
 
@@ -392,12 +407,24 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /** rewrite devices */
 
-        $device = (new Helper\Device())->detect($this->cache, $useragent);
+        $device = $result->getDevice();
+
+        if (null === $device
+            || in_array($device->getDeviceName(), [null, 'unknown'])
+            || (!in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                && false !== mb_stripos($device->getDeviceName(), 'general'))
+        ) {
+            $device = new \UaResult\Device\Device(null, null);
+        }
 
         /** rewrite engines */
 
         /** @var \UaResult\Engine\EngineInterface $engine */
-        $engine = (new Helper\Engine())->detect($this->cache, $useragent);
+        $engine = $result->getEngine();
+
+        if (null === $engine || in_array($engine->getName(), [null, 'unknown'])) {
+            $engine = new \UaResult\Engine\Engine(null);
+        }
 
         $this->logger->info('        generating result');
 
