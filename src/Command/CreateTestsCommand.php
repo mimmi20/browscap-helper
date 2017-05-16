@@ -198,7 +198,7 @@ class CreateTestsCommand extends Command
 
         $platform = $result->getOs();
 
-        if (null === $platform || in_array($platform->getName(), [null, 'unknown'])) {
+        if (null === $platform) {
             $platform = new \UaResult\Os\Os(null, null);
         }
 
@@ -218,7 +218,7 @@ class CreateTestsCommand extends Command
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = $result->getEngine();
 
-        if (null === $engine || in_array($engine->getName(), [null, 'unknown'])) {
+        if (null === $engine) {
             $engine = new \UaResult\Engine\Engine(null);
         }
 
