@@ -191,7 +191,7 @@ class CopyTestsCommand extends Command
                 ++$fileCounter;
             }
 
-            if ($fileCounter >= 200) {
+            if ($fileCounter >= 100) {
                 $fileCounter     = 0;
                 $number          = $targetDirectoryHelper->getNextTest($output);
                 $targetDirectory = $targetDirectoryHelper->getPath($output);
