@@ -19,7 +19,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaResult\Os\OsInterface;
+use UaResult\Browser\Browser;
+use UaResult\Device\Device;
+use UaResult\Engine\Engine;
+use UaResult\Os\Os;
 use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
 
@@ -194,17 +197,10 @@ test:
         );
 
         foreach ($circleLines as $group => $count) {
-            if ($count >= 100) {
-                $columns = 111 + 2 * mb_strlen((string) $count);
-            } else {
-                $columns = $count + 11 + 2 * mb_strlen((string) $count);
-            }
-
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage --colors=auto';
-            $circleciContent .= ' --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php';
+            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage tests/UserAgentsTest/T' . $group . 'Test.php';
             $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
@@ -382,13 +378,15 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $result = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
 
+        /* rewrite browsers */
+
         $this->logger->info('        rewriting browser');
 
-        /** @var \UaResult\Browser\Browser $browser */
+        /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = $result->getBrowser();
 
-        if (null === $browser || in_array($browser->getName(), [null, 'unknown'])) {
-            $browser = new \UaResult\Browser\Browser(null);
+        if (null === $browser) {
+            $browser = new Browser(null);
         }
 
         /* rewrite platforms */
@@ -398,14 +396,14 @@ class T' . $group . 'Test extends UserAgentsTest
         $platform = $result->getOs();
 
         if (null === $platform) {
-            $platform = new \UaResult\Os\Os(null, null);
+            $platform = new Os(null, null);
         }
 
-        /* @var $platform OsInterface|null */
+        /* @var $platform \UaResult\Os\OsInterface|null */
 
         $this->logger->info('        rewriting device');
 
-        /** rewrite devices */
+        /* rewrite devices */
 
         $device = $result->getDevice();
 
@@ -414,21 +412,21 @@ class T' . $group . 'Test extends UserAgentsTest
             || (!in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
                 && false !== mb_stripos($device->getDeviceName(), 'general'))
         ) {
-            $device = new \UaResult\Device\Device(null, null);
+            $device = new Device(null, null);
         }
 
-        /** rewrite engines */
+        /* rewrite engines */
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = $result->getEngine();
 
         if (null === $engine) {
-            $engine = new \UaResult\Engine\Engine(null);
+            $engine = new Engine(null);
         }
 
         $this->logger->info('        generating result');
 
-        $request = (new GenericRequestFactory())->createRequestForUserAgent($useragent);
+        $request = (new GenericRequestFactory())->createRequestFromString($useragent);
 
         return new Result($request, $device, $platform, $browser, $engine);
     }

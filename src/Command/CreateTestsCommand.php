@@ -25,6 +25,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaResult\Browser\Browser;
+use UaResult\Device\Device;
+use UaResult\Engine\Engine;
+use UaResult\Os\Os;
 use UaResult\Result\Result;
 use Wurfl\Request\GenericRequestFactory;
 
@@ -196,10 +200,11 @@ class CreateTestsCommand extends Command
 
         $this->logger->info('      detecting platform ...');
 
+        /** @var \UaResult\Os\OsInterface $platform */
         $platform = $result->getOs();
 
         if (null === $platform) {
-            $platform = new \UaResult\Os\Os(null, null);
+            $platform = new Os(null, null);
         }
 
         $this->logger->info('      detecting device ...');
@@ -212,23 +217,23 @@ class CreateTestsCommand extends Command
             || (!in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
                 && false !== mb_stripos($device->getDeviceName(), 'general'))
         ) {
-            $device = new \UaResult\Device\Device(null, null);
+            $device = new Device(null, null);
         }
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = $result->getEngine();
 
         if (null === $engine) {
-            $engine = new \UaResult\Engine\Engine(null);
+            $engine = new Engine(null);
         }
 
         $this->logger->info('      detecting browser ...');
 
-        /** @var \UaResult\Browser\Browser $browser */
+        /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = $result->getBrowser();
 
-        if (null === $browser || in_array($browser->getName(), [null, 'unknown'])) {
-            $browser = new \UaResult\Browser\Browser(null);
+        if (null === $browser) {
+            $browser = new Browser(null);
         }
 
         $v          = explode('.', $browser->getVersion()->getVersion(), 2);
@@ -301,7 +306,7 @@ class CreateTestsCommand extends Command
 
         $this->logger->info('      detecting request ...');
 
-        $request = (new GenericRequestFactory())->createRequestForUserAgent($ua);
+        $request = (new GenericRequestFactory())->createRequestFromString($ua);
 
         $result = new Result($request, $device, $platform, $browser, $engine);
 
