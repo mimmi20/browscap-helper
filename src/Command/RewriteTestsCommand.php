@@ -200,7 +200,7 @@ test:
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit --no-coverage tests/UserAgentsTest/T' . $group . 'Test.php';
+            $circleciContent .= '    - php -n vendor/bin/phpunit --colors=auto --no-coverage tests/UserAgentsTest/T' . $group . 'Test.php';
             $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
