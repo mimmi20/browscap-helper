@@ -52,8 +52,8 @@ class TargetDirectory
             throw new UnreadableFileException('directory "' . $targetDirectory . '" is not readable');
         }
 
-        $filesArray      = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
-        $number          = 0;
+        $filesArray = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
+        $number     = 0;
 
         foreach ($filesArray as $filename) {
             if (in_array($filename, ['.', '..'])) {

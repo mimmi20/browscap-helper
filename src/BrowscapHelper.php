@@ -12,13 +12,11 @@ declare(strict_types = 1);
 namespace BrowscapHelper;
 
 use BrowserDetector\Detector;
-use Cache\Adapter\Filesystem\FilesystemCachePool;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application;
 
 /**
@@ -51,10 +49,7 @@ class BrowscapHelper extends Application
 
         ErrorHandler::register($logger);
 
-        $adapter  = new Local('cache/');
-        $cache    = new FilesystemCachePool(new Filesystem($adapter));
-        $cache->setLogger($logger);
-
+        $cache    = new FilesystemAdapter('', 0, __DIR__ . '/../cache/');
         $detector = new Detector($cache, $logger);
 
         $commands = [
