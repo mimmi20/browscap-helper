@@ -236,10 +236,6 @@ class CreateTestsCommand extends Command
             $browser = new Browser(null);
         }
 
-        $v          = explode('.', $browser->getVersion()->getVersion(), 2);
-        $maxVersion = $v[0];
-        $minVersion = (isset($v[1]) ? $v[1] : '0');
-
         $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
         $formatedCounter = sprintf('%1$05d', (int) $counter);
 
@@ -255,8 +251,6 @@ class CreateTestsCommand extends Command
             'Browser_Maker' => '" . $browser->getManufacturer()->getName() . "',
             'Browser_Modus' => '" . $browser->getModus() . "',
             'Version' => '" . $browser->getVersion()->getVersion() . "',
-            'MajorVer' => '" . $maxVersion . "',
-            'MinorVer' => '" . $minVersion . "',
             'Platform' => '" . $platform->getName() . "',
             'Platform_Version' => '" . $platform->getVersion()->getVersion(VersionInterface::IGNORE_MICRO) . "',
             'Platform_Description' => '',
@@ -264,18 +258,6 @@ class CreateTestsCommand extends Command
             'Platform_Maker' => '" . $platform->getManufacturer()->getName() . "',
             'Alpha' => false,
             'Beta' => false,
-            'Win16' => false,
-            'Win32' => false,
-            'Win64' => false,
-            'Frames' => true,
-            'IFrames' => true,
-            'Tables' => true,
-            'Cookies' => true,
-            'BackgroundSounds' => false,
-            'JavaScript' => true,
-            'VBScript' => false,
-            'JavaApplets' => false,
-            'ActiveXControls' => false,
             'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
             'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
             'isSyndicationReader' => false,
@@ -283,8 +265,6 @@ class CreateTestsCommand extends Command
             'isFake' => false,
             'isAnonymized' => false,
             'isModified' => false,
-            'CssVersion' => '0',
-            'AolVersion' => '0',
             'Device_Name' => '" . $device->getMarketingName() . "',
             'Device_Maker' => '" . $device->getManufacturer()->getName() . "',
             'Device_Type' => '" . $device->getType()->getName() . "',
@@ -295,6 +275,7 @@ class CreateTestsCommand extends Command
             'RenderingEngine_Version' => 'unknown',
             'RenderingEngine_Maker' => '" . $engine->getManufacturer()->getName() . "',
         ],
+        'full' => true,
         'lite' => true,
         'standard' => true,
     ],\n";
