@@ -426,10 +426,10 @@ class T' . $group . 'Test extends UserAgentsTest
             $regexFactory = new RegexFactory($this->cache, $this->logger);
             $regexFactory->detect($normalizedUa);
             list($device) = $regexFactory->getDevice();
-            $replaced = false;
+            $replaced     = false;
 
             if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device = new Device(null, null);
+                $device   = new Device(null, null);
                 $replaced = true;
             }
 
@@ -450,11 +450,11 @@ class T' . $group . 'Test extends UserAgentsTest
         } catch (NotFoundException $e) {
             $this->logger->debug($e);
 
-            $device = $result->getDevice();
+            $device   = $result->getDevice();
             $replaced = false;
 
             if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device = new Device(null, null);
+                $device   = new Device(null, null);
                 $replaced = true;
             }
 
