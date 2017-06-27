@@ -9,8 +9,9 @@
  */
 
 declare(strict_types = 1);
-namespace BrowserDetector\Loader;
+namespace BrowscapHelper\Loader;
 
+use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;

@@ -11,7 +11,11 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Factory\Regex\NoMatchException;
+use BrowscapHelper\Factory\RegexFactory;
 use BrowserDetector\Detector;
+use BrowserDetector\Factory\NormalizerFactory;
+use BrowserDetector\Loader\NotFoundException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -103,10 +107,14 @@ class RewriteTestsCommand extends Command
         $testCounter = [];
         $groups      = [];
 
+        $output->writeln('count and check directories ...');
+
         foreach ($filesArray as $filename) {
             if (in_array($filename, ['.', '..'])) {
                 continue;
             }
+
+            $output->writeln('  checking directory: ' . $filename);
 
             if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
                 $files[] = $filename;
@@ -134,7 +142,11 @@ class RewriteTestsCommand extends Command
         $g            = null;
         $groupCounter = 0;
 
+        $output->writeln('handling files ...');
+
         foreach ($files as $fullFilename) {
+            $output->writeln('  handling file: ' . $fullFilename);
+
             $file  = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $fullFilename);
             $group = $groups[$fullFilename];
 
@@ -151,6 +163,8 @@ class RewriteTestsCommand extends Command
 
             $testCounter[$group][$fullFilename] += $newCounter;
         }
+
+        $output->writeln('preparing circle.yml ...');
 
         $circleFile      = 'vendor/mimmi20/browser-detector-tests/circle.yml';
         $circleciContent = 'machine:
@@ -261,6 +275,8 @@ class T' . $group . 'Test extends UserAgentsTest
         file_put_contents($circleFile, $circleciContent);
 
         $output->writeln('done');
+
+        return 0;
     }
 
     /**
@@ -279,7 +295,6 @@ class T' . $group . 'Test extends UserAgentsTest
         &$groupCounter,
         $group
     ) {
-        $output->writeln('file ' . $file->getBasename());
         $this->logger->info('    checking ...');
 
         /** @var $file \SplFileInfo */
@@ -320,12 +335,12 @@ class T' . $group . 'Test extends UserAgentsTest
 
             if (isset($checks[$test->ua])) {
                 // UA was added more than once
-                $this->logger->info('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
+                $this->logger->error('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
                 unset($tests->$key);
                 continue;
             }
 
-            $output->writeln('    processing Test ' . $key . ' ...');
+            $this->logger->info('    processing Test ' . $key . ' ...');
 
             $checks[$test->ua] = $key;
             $newKey            = 'test-' . sprintf('%1$08d', $group) . '-' . sprintf('%1$08d', $groupCounter);
@@ -354,10 +369,10 @@ class T' . $group . 'Test extends UserAgentsTest
             $this->logger->info('    ' . ($oldCounter - $newCounter) . ' test(s) is/are removed from the file');
         }
 
-        $output->writeln('    removing old file');
+        $this->logger->info('    removing old file');
         unlink($file->getPathname());
 
-        $output->writeln('    rewriting file');
+        $this->logger->info('    rewriting file');
 
         file_put_contents(
             $file->getPathname(),
@@ -403,16 +418,68 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $this->logger->info('        rewriting device');
 
+        $normalizedUa = (new NormalizerFactory())->build()->normalize($useragent);
+
         /* rewrite devices */
 
-        $device = $result->getDevice();
+        try {
+            $regexFactory = new RegexFactory($this->cache, $this->logger);
+            $regexFactory->detect($normalizedUa);
+            list($device) = $regexFactory->getDevice();
+            $replaced = false;
 
-        if (null === $device
-            || in_array($device->getDeviceName(), [null, 'unknown'])
-            || (!in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
-                && false !== mb_stripos($device->getDeviceName(), 'general'))
-        ) {
-            $device = new Device(null, null);
+            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                $device = new Device(null, null);
+                $replaced = true;
+            }
+
+            if (!$replaced
+                && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                && false !== mb_stripos($device->getDeviceName(), 'general')
+            ) {
+                $device = new Device('not found via regexes', null);
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->logger->error($e);
+
+            $device = $result->getDevice();
+
+            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                $device = new Device(null, null);
+            }
+        } catch (NotFoundException $e) {
+            $this->logger->debug($e);
+
+            $device = $result->getDevice();
+            $replaced = false;
+
+            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                $device = new Device(null, null);
+                $replaced = true;
+            }
+
+            if (!$replaced
+                && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                && false !== mb_stripos($device->getDeviceName(), 'general')
+            ) {
+                $device = new Device('not found', null);
+            }
+        } catch (NoMatchException $e) {
+            $this->logger->debug($e);
+
+            $device = $result->getDevice();
+
+            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                $device = new Device(null, null);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error($e);
+
+            $device = $result->getDevice();
+
+            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                $device = new Device(null, null);
+            }
         }
 
         /* rewrite engines */

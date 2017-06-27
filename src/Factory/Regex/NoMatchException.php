@@ -9,7 +9,7 @@
  */
 
 declare(strict_types = 1);
-namespace BrowserDetector\Factory\Regex;
+namespace BrowscapHelper\Factory\Regex;
 
 /**
  * an exception thrown if data were not found

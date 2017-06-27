@@ -9,7 +9,7 @@ os:
   - linux
 
 env:
-  - COMPOSER_FLAGS="--prefer-lowest"
+#  - COMPOSER_FLAGS="--prefer-lowest"
   - COMPOSER_FLAGS=""
 
 matrix:
@@ -32,7 +32,7 @@ before_install:
   - travis_retry composer self-update
 
 install:
-  - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $COMPOSER_FLAGS
+  - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $COMPOSER_FLAGS -vv
 
 script:
   - composer validate

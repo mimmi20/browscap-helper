@@ -9,14 +9,15 @@
  */
 
 declare(strict_types = 1);
-namespace BrowserDetector\Factory;
+namespace BrowscapHelper\Factory;
 
+use BrowscapHelper\Loader\RegexLoader;
+use BrowserDetector\Factory;
 use BrowserDetector\Loader\BrowserLoader;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\EngineLoader;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Loader\PlatformLoader;
-use BrowserDetector\Loader\RegexLoader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Stringy\Stringy;
@@ -30,7 +31,7 @@ use Stringy\Stringy;
  * @copyright 2012-2017 Thomas Mueller
  * @license   http://www.opensource.org/licenses/MIT MIT License
  */
-class RegexFactory implements FactoryInterface
+class RegexFactory implements Factory\FactoryInterface
 {
     /**
      * @var \Psr\Cache\CacheItemPoolInterface|null
@@ -55,11 +56,6 @@ class RegexFactory implements FactoryInterface
     private $logger = null;
 
     /**
-     * @var \BrowserDetector\Loader\RegexLoader
-     */
-    private $loader = null;
-
-    /**
      * @var bool
      */
     private $runDetection = false;
@@ -72,7 +68,6 @@ class RegexFactory implements FactoryInterface
     {
         $this->cache  = $cache;
         $this->logger = $logger;
-        $this->loader = new RegexLoader($cache, $logger);
     }
 
     /**
@@ -80,13 +75,14 @@ class RegexFactory implements FactoryInterface
      *
      * @param string $useragent
      *
+     * @return void
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
-     * @throws \BrowserDetector\Factory\Regex\NoMatchException
+     * @throws \BrowscapHelper\Factory\Regex\NoMatchException
      */
     public function detect($useragent)
     {
-        $regexes = $this->loader->getRegexes();
+        $regexes = (new RegexLoader($this->cache, $this->logger))->getRegexes();
 
         $this->match     = null;
         $this->useragent = $useragent;
@@ -98,8 +94,8 @@ class RegexFactory implements FactoryInterface
         foreach ($regexes as $regex) {
             $matches = [];
 
+            //$this->logger->error($regex);
             if (preg_match($regex, $useragent, $matches)) {
-                $this->logger->debug('a regex matched');
                 $this->match = $matches;
 
                 $this->runDetection = true;
@@ -124,7 +120,7 @@ class RegexFactory implements FactoryInterface
         }
 
         if (!is_array($this->match) && $this->runDetection) {
-            throw new NotFoundException('device not found via regexes');
+            throw new \InvalidArgumentException('device not found via regexes');
         }
 
         if (!is_array($this->match)) {
@@ -142,6 +138,8 @@ class RegexFactory implements FactoryInterface
             return $deviceLoader->load('windows desktop', $this->useragent);
         } elseif ('macintosh' === $deviceCode) {
             return $deviceLoader->load('macintosh', $this->useragent);
+        } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
+            return $deviceLoader->load('linux desktop', $this->useragent);
         } elseif ('touch' === $deviceCode
             && array_key_exists('osname', $this->match)
             && 'bb10' === mb_strtolower($this->match['osname'])
@@ -156,9 +154,14 @@ class RegexFactory implements FactoryInterface
         }
 
         if ($deviceLoader->has($manufacturercode . ' ' . $deviceCode)) {
-            $this->logger->debug('device detected via manufacturercode and devicecode');
+            /** @var \UaResult\Device\DeviceInterface $device */
+            list($device, $platform) = $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
 
-            return $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
+            if (!in_array($device->getDeviceName(), ['unknown', null])) {
+                $this->logger->debug('device detected via manufacturercode and devicecode');
+
+                return [$device, $platform];
+            }
         }
 
         if ($deviceLoader->has($deviceCode)) {
@@ -172,32 +175,59 @@ class RegexFactory implements FactoryInterface
             }
         }
 
-        if ('' !== $manufacturercode) {
-            $className = '\\BrowserDetector\\Factory\\Mobile\\' . ucfirst($manufacturercode);
+        $s = new Stringy($this->useragent);
+
+        if ($manufacturercode) {
+            $className = '\\BrowserDetector\\Factory\\Device\\Mobile\\' . ucfirst($manufacturercode) . 'Factory';
 
             if (class_exists($className)) {
                 $this->logger->debug('device detected via manufacturer');
                 /** @var \BrowserDetector\Factory\FactoryInterface $factory */
-                $factory = new $className($this->cache);
+                $factory = new $className($deviceLoader);
 
-                return $factory->detect($this->useragent);
+                try {
+                    return $factory->detect($this->useragent, $s);
+                } catch (NotFoundException $e) {
+                    $this->logger->warning($e);
+                    throw $e;
+                }
+            } else {
+                $this->logger->warning('factory "' . $className . '" not found');
             }
 
             $this->logger->info('device manufacturer class was not found');
         }
 
         if (array_key_exists('devicetype', $this->match)) {
-            $className = '\\BrowserDetector\\Factory\\' . ucfirst(mb_strtolower($this->match['devicetype']));
+            if ('wpdesktop' === mb_strtolower($this->match['devicetype']) || 'xblwp7' === mb_strtolower($this->match['devicetype'])) {
+                $factory = new Factory\Device\MobileFactory($deviceLoader);
 
-            if (class_exists($className)) {
-                $this->logger->debug('device detected via device type (mobile or tv)');
-                /** @var \BrowserDetector\Factory\FactoryInterface $factory */
-                $factory = new $className($this->cache);
+                try {
+                    return $factory->detect($this->useragent, $s);
+                } catch (NotFoundException $e) {
+                    $this->logger->warning($e);
+                    throw $e;
+                }
+            } else {
+                $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst(mb_strtolower($this->match['devicetype'])) . 'Factory';
 
-                return $factory->detect($this->useragent);
+                if (class_exists($className)) {
+                    $this->logger->debug('device detected via device type (mobile or tv)');
+                    /** @var \BrowserDetector\Factory\FactoryInterface $factory */
+                    $factory = new $className($deviceLoader);
+
+                    try {
+                        return $factory->detect($this->useragent, $s);
+                    } catch (NotFoundException $e) {
+                        $this->logger->warning($e);
+                        throw $e;
+                    }
+                } else {
+                    $this->logger->warning('factory "' . $className . '" not found');
+                }
+
+                $this->logger->info('device type class was not found');
             }
-
-            $this->logger->info('device type class was not found');
         }
 
         throw new NotFoundException('device not found via regexes');
@@ -237,10 +267,12 @@ class RegexFactory implements FactoryInterface
 
         $platformCode = mb_strtolower($this->match['osname']);
 
-        if ('darwin' === $platformCode) {
-            $darwinFactory = new Platform\DarwinFactory($this->cache, $platformLoader);
+        $s = new Stringy($this->useragent);
 
-            return $darwinFactory->detect($this->useragent);
+        if ('darwin' === $platformCode) {
+            $darwinFactory = new Factory\Platform\DarwinFactory($platformLoader);
+
+            return $darwinFactory->detect($this->useragent, $s);
         }
 
         $s = new Stringy($this->useragent);
@@ -255,9 +287,9 @@ class RegexFactory implements FactoryInterface
             // Android Desktop Mode with UCBrowser
             $platformCode = 'android';
         } elseif ('linux' === $platformCode) {
-            $linuxFactory = new Platform\LinuxFactory($this->cache, $platformLoader);
+            $linuxFactory = new Factory\Platform\LinuxFactory($platformLoader);
 
-            return $linuxFactory->detect($this->useragent);
+            return $linuxFactory->detect($this->useragent, $s);
         } elseif ('bb10' === $platformCode || 'blackberry' === $platformCode) {
             // Rim OS
             $platformCode = 'rim os';
@@ -284,7 +316,7 @@ class RegexFactory implements FactoryInterface
     }
 
     /**
-     * @return \UaResult\Browser\BrowserInterface
+     * @return array
      */
     public function getBrowser()
     {
@@ -363,7 +395,7 @@ class RegexFactory implements FactoryInterface
             list($browser) = $browserLoader->load($browserCode, $this->useragent);
 
             if (!in_array($browser->getName(), ['unknown', null])) {
-                return $browser;
+                return [$browser];
             }
 
             $this->logger->info('browser with code "' . $browserCode . '" not found via regexes');
