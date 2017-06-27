@@ -18,11 +18,9 @@
         <ini name="date.timezone" value="UTC"/>
     </php>
 
-    <testsuites>
-        <testsuite name="Browscap-Helper Test Suite">
-            <directory>tests/</directory>
-        </testsuite>
-    </testsuites>
+    <testsuite name="Browscap-Helper Test Suite">
+        <directory>tests/</directory>
+    </testsuite>
 
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">

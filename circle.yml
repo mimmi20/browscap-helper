@@ -6,9 +6,9 @@ machine:
 
 dependencies:
   override:
-    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-interaction --no-progress
+    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
 
 test:
   override:
     - mkdir -p $CIRCLE_TEST_REPORTS/phpunit
-    - phpunit --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml tests
+    - vendor/bin/phpunit --colors=auto --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml
