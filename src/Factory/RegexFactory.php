@@ -133,10 +133,26 @@ class RegexFactory implements Factory\FactoryInterface
         $deviceCode   = mb_strtolower($this->match['devicecode']);
         $deviceLoader = new DeviceLoader($this->cache);
 
+        $s = new Stringy($this->useragent);
+
         if ('windows' === $deviceCode) {
             return $deviceLoader->load('windows desktop', $this->useragent);
         } elseif ('macintosh' === $deviceCode) {
             return $deviceLoader->load('macintosh', $this->useragent);
+        } elseif ('cfnetwork' === $deviceCode) {
+            try {
+                return (new Factory\Device\DarwinFactory($deviceLoader))->detect($this->useragent, $s);
+            } catch (NotFoundException $e) {
+                $this->logger->warning($e);
+                throw $e;
+            }
+        } elseif ('dalvik' === $deviceCode || 'android' === $deviceCode) {
+            try {
+                return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
+            } catch (NotFoundException $e) {
+                $this->logger->warning($e);
+                throw $e;
+            }
         } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
             return $deviceLoader->load('linux desktop', $this->useragent);
         } elseif ('touch' === $deviceCode
@@ -173,8 +189,6 @@ class RegexFactory implements Factory\FactoryInterface
                 return [$device, $platform];
             }
         }
-
-        $s = new Stringy($this->useragent);
 
         if ($manufacturercode) {
             $className = '\\BrowserDetector\\Factory\\Device\\Mobile\\' . ucfirst($manufacturercode) . 'Factory';

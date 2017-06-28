@@ -422,6 +422,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /* rewrite devices */
 
+        /**/
         try {
             $regexFactory = new RegexFactory($this->cache, $this->logger);
             $regexFactory->detect($normalizedUa);
@@ -481,6 +482,22 @@ class T' . $group . 'Test extends UserAgentsTest
                 $device = new Device(null, null);
             }
         }
+        /*
+        $device   = $result->getDevice();
+        $replaced = false;
+
+        if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+            $device   = new Device(null, null);
+            $replaced = true;
+        }
+
+        if (!$replaced
+            && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+            && false !== mb_stripos($device->getDeviceName(), 'general')
+        ) {
+            $device = new Device('not found', null);
+        }
+        /**/
 
         /* rewrite engines */
 
