@@ -133,7 +133,7 @@ class CreateTestsCommand extends Command
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
-            return;
+            return 1;
         }
 
         $output->writeln('next test: ' . $number);
@@ -183,6 +183,8 @@ class CreateTestsCommand extends Command
 
         $output->writeln('');
         $output->writeln($counter . ' tests exported');
+
+        return 0;
     }
 
     /**

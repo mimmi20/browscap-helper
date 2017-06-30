@@ -175,7 +175,7 @@ class RewriteTestsCommand extends Command
 
 dependencies:
   override:
-    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-interaction --no-progress
+    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
 
 test:
   override:';
@@ -422,67 +422,6 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /* rewrite devices */
 
-        /**/
-        try {
-            $regexFactory = new RegexFactory($this->cache, $this->logger);
-            $regexFactory->detect($normalizedUa);
-            list($device) = $regexFactory->getDevice();
-            $replaced     = false;
-
-            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device   = new Device(null, null);
-                $replaced = true;
-            }
-
-            if (!$replaced
-                && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
-                && false !== mb_stripos($device->getDeviceName(), 'general')
-            ) {
-                $device = new Device('not found via regexes', null);
-            }
-        } catch (\InvalidArgumentException $e) {
-            $this->logger->error($e);
-
-            $device = $result->getDevice();
-
-            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device = new Device(null, null);
-            }
-        } catch (NotFoundException $e) {
-            $this->logger->debug($e);
-
-            $device   = $result->getDevice();
-            $replaced = false;
-
-            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device   = new Device(null, null);
-                $replaced = true;
-            }
-
-            if (!$replaced
-                && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
-                && false !== mb_stripos($device->getDeviceName(), 'general')
-            ) {
-                $device = new Device('not found', null);
-            }
-        } catch (NoMatchException $e) {
-            $this->logger->debug($e);
-
-            $device = $result->getDevice();
-
-            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device = new Device(null, null);
-            }
-        } catch (\Exception $e) {
-            $this->logger->error($e);
-
-            $device = $result->getDevice();
-
-            if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                $device = new Device(null, null);
-            }
-        }
-        /*
         $device   = $result->getDevice();
         $replaced = false;
 
@@ -495,9 +434,68 @@ class T' . $group . 'Test extends UserAgentsTest
             && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
-            $device = new Device('not found', null);
+            //$device = new Device('not found', null);
+
+            try {
+                $regexFactory = new RegexFactory($this->cache, $this->logger);
+                $regexFactory->detect($normalizedUa);
+                list($device) = $regexFactory->getDevice();
+                $replaced     = false;
+
+                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                    $device   = new Device(null, null);
+                    $replaced = true;
+                }
+
+                if (!$replaced
+                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                    && false !== mb_stripos($device->getDeviceName(), 'general')
+                ) {
+                    $device = new Device('not found via regexes', null);
+                }
+            } catch (\InvalidArgumentException $e) {
+                $this->logger->error($e);
+
+                $device = $result->getDevice();
+
+                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                    $device = new Device(null, null);
+                }
+            } catch (NotFoundException $e) {
+                $this->logger->debug($e);
+
+                $device   = $result->getDevice();
+                $replaced = false;
+
+                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                    $device   = new Device(null, null);
+                    $replaced = true;
+                }
+
+                if (!$replaced
+                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                    && false !== mb_stripos($device->getDeviceName(), 'general')
+                ) {
+                    $device = new Device('not found', null);
+                }
+            } catch (NoMatchException $e) {
+                $this->logger->debug($e);
+
+                $device = $result->getDevice();
+
+                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                    $device = new Device(null, null);
+                }
+            } catch (\Exception $e) {
+                $this->logger->error($e);
+
+                $device = $result->getDevice();
+
+                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                    $device = new Device(null, null);
+                }
+            }
         }
-        /**/
 
         /* rewrite engines */
 
