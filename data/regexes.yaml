@@ -55,7 +55,8 @@ regexes:
     - '/(?P<devicecode>Macintosh); ?(PPC|Intel) (?P<osname>Mac OS X) ?(?P<osversion>[\d._]+)?/i'
     ####################################################################################################################
     # Darwin
-    - '/(?P<devicecode>CFNetwork)\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))?( \((?P<devicecode>[^\)]+)\))?/i'
+    - '/CFNetwork\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))?( \((?P<devicecode>[^\)]+)\))?/i'
+    - '/(?P<devicecode>CFNetwork)\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))/i'
     ####################################################################################################################
     # Chrome OS
     # Chrome
