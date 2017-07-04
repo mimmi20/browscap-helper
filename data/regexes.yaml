@@ -14,9 +14,14 @@ regexes:
     ####################################################################################################################
     # Android OS
     - '/Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\/([^\)]+)?/i'
+    - '/Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\.\+_#]+)\//i'
+    - '/Linux; ?(?P<devicecode>Android)[ -]?(?P<osversion>[\d.]+);? ?Build\/([^\)]+)?/i'
+    - '/(?P<devicecode>Android)[ -]?(?P<osversion>[\d.]+);? ?Linux;?/i'
     # Desktop Mode
     - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\/([^\)]+)?/i'
+    - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\.\+_#]+)\//i'
     - '/^(?P<browsername>Dalvik)\/(?P<browserversion>[\d.+ab]+) ?\(Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+)/i'
+    - '/^(?P<devicecode>Dalvik)\/(?P<browserversion>[\d.+ab]+) ?\(Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+)/i'
     # Opera Mini
     - '/^Opera\/[\d.]+ ?\(((?P<osname>Android)[ -]?(?P<osversion>[\d.]+)?; )? ?(?P<browsername>Opera Mini)\/(?P<browserversion>[\d.+ab]+)([^\)]+)?\) (?P<enginename>Presto)\/(?P<engineversion>[\d.+ab]+) Version\/([\d.]+)/i'
     # UCBrowser
@@ -50,11 +55,12 @@ regexes:
     - '/(?P<devicecode>Macintosh); ?(PPC|Intel) (?P<osname>Mac OS X) ?(?P<osversion>[\d._]+)?/i'
     ####################################################################################################################
     # Darwin
-    - '/^(?P<enginename>CFNetwork)\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))?( \((?P<devicecode>[^\)]+)\))?/i'
+    - '/CFNetwork\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))?( \((?P<devicecode>[^\)]+)\))?/i'
+    - '/(?P<devicecode>CFNetwork)\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))/i'
     ####################################################################################################################
     # Chrome OS
     # Chrome
-    - '/X11;? (?P<devicecode>CrOS) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?([^\)]+)?\) ?(?P<enginename>AppleWebKit)\/?(?P<engineversion>[\d.+ab]+) ?\(KHTML, like Gecko\) *(?P<browsername>Chrome)\/(?P<browserversion>[\d.+ab]+) ?(Safari)\/([\d.]+)/i'
+    - '/(?P<devicecode>CrOS) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?([^\)]+)?\) ?(?P<enginename>AppleWebKit)\/?(?P<engineversion>[\d.+ab]+) ?\(KHTML, like Gecko\)/i'
     ####################################################################################################################
     # Linux
     # Midori
@@ -69,10 +75,10 @@ regexes:
     ####################################################################################################################
     # FreeBSD
     # Kazehakase
-    - '/X11;? (?P<osname>FreeBSD) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?;? rv:(?P<engineversion>[\d.+ab]+)\) ?(?P<enginename>Gecko)(\/[\d.]+)? (Firefox)\/([\d.]+) (?P<browsername>Kazehakase)\/(?P<browserversion>[\d.+ab]+)/i'
-    - '/X11;? (?P<osname>FreeBSD) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?;? rv:(?P<engineversion>[\d.+ab]+)\) ?(?P<enginename>Gecko)(\/[\d.]+)? (?P<browsername>Kazehakase)\/(?P<browserversion>[\d.+ab]+)/i'
+    - '/(?P<osname>FreeBSD) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?;? rv:(?P<engineversion>[\d.+ab]+)\) ?(?P<enginename>Gecko)(\/[\d.]+)? (Firefox)\/([\d.]+) (?P<browsername>Kazehakase)\/(?P<browserversion>[\d.+ab]+)/i'
+    - '/(?P<osname>FreeBSD) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?;? rv:(?P<engineversion>[\d.+ab]+)\) ?(?P<enginename>Gecko)(\/[\d.]+)? (?P<browsername>Kazehakase)\/(?P<browserversion>[\d.+ab]+)/i'
     # Firefox
-    - '/X11;? (?P<osname>FreeBSD) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?;? rv:(?P<engineversion>[\d.+ab]+)\) ?(?P<enginename>Gecko)(\/[\d.]+)? (?P<browsername>Firefox)\/(?P<browserversion>[\d.+ab]+)/i'
+    - '/(?P<osname>FreeBSD) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?;? rv:(?P<engineversion>[\d.+ab]+)\) ?(?P<enginename>Gecko)(\/[\d.]+)? (?P<browsername>Firefox)\/(?P<browserversion>[\d.+ab]+)/i'
     ####################################################################################################################
     # Blackberry
     - '/(?P<osname>BB10); (?P<devicecode>Kbd|Touch)\) ?(?P<enginename>AppleWebKit)\/?(?P<engineversion>[\d.+ab]+) ?\(KHTML, like Gecko\)/i'
