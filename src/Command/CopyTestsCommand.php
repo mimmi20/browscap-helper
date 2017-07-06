@@ -100,7 +100,7 @@ class CopyTestsCommand extends Command
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
-            return;
+            return 1;
         }
 
         $output->writeln('next test: ' . $number);
@@ -112,7 +112,7 @@ class CopyTestsCommand extends Command
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
-            return;
+            return 1;
         }
 
         $output->writeln('target directory: ' . $targetDirectory);
@@ -158,14 +158,14 @@ class CopyTestsCommand extends Command
                 continue;
             }
 
-            $targetFilename = 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $fileCounter) . '.json';
+            $targetFilename = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', (int) $fileCounter) . '.json';
 
             if (!$fileCreated && file_exists($targetDirectory . $targetFilename)) {
                 $this->logger->emergency('    target file for chunk ' . $fileCounter . ' already exists');
                 exit;
             }
 
-            $key = 'test-' . sprintf('%1$08d', $number) . '-' . sprintf('%1$08d', $chunkCounter);
+            $key = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$05d', $chunkCounter);
 
             $data[$key] = [
                 'ua'     => $ua,
@@ -191,7 +191,7 @@ class CopyTestsCommand extends Command
                 ++$fileCounter;
             }
 
-            if ($fileCounter >= 100) {
+            if ($fileCounter >= 10) {
                 $fileCounter     = 0;
                 $number          = $targetDirectoryHelper->getNextTest($output);
                 $targetDirectory = $targetDirectoryHelper->getPath($output);
@@ -208,5 +208,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('');
         $output->writeln('Es wurden ' . $counter . ' Tests exportiert');
+
+        return 0;
     }
 }

@@ -122,5 +122,7 @@ class ConvertLogsCommand extends Command
         $output->writeln('finished reading files.');
         $output->writeln('');
         $output->writeln($counter . ' new  agents added');
+
+        return 0;
     }
 }
