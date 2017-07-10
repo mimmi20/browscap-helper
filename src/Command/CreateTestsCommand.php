@@ -166,6 +166,7 @@ class CreateTestsCommand extends Command
         $issue            = 'test-' . sprintf('%1$08d', $number);
         $fileCounter      = 0;
         $chunkCounter     = 0;
+        $totalCounter     = 0;
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -179,6 +180,7 @@ class CreateTestsCommand extends Command
 
             ++$counter;
             ++$chunkCounter;
+            ++$totalCounter;
 
             file_put_contents(
                 $targetDirectory . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', (int) $fileCounter) . '.json',
@@ -216,7 +218,7 @@ class CreateTestsCommand extends Command
         file_put_contents('results/issue-' . sprintf('%1$05d', $number) . '.php', $outputBrowscap);
 
         $output->writeln('');
-        $output->writeln($counter . ' tests exported');
+        $output->writeln($totalCounter . ' tests exported');
 
         return 0;
     }
