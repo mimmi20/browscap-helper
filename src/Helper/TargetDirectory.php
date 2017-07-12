@@ -34,7 +34,7 @@ class TargetDirectory
     {
         $number = $this->getNextTest($output);
 
-        return 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$05d', $number) . '/';
+        return 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$07d', $number) . '/';
     }
 
     /**

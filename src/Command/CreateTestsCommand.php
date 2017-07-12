@@ -127,8 +127,11 @@ class CreateTestsCommand extends Command
             $checks[$useragent] = $useragent;
         }
 
+        $targetDirectoryHelper = new TargetDirectory();
+
+        $output->writeln('detect next test number ...');
         try {
-            $number = (new TargetDirectory())->getNextTest($output);
+            $number = $targetDirectoryHelper->getNextTest($output);
         } catch (UnreadableFileException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
@@ -137,6 +140,23 @@ class CreateTestsCommand extends Command
         }
 
         $output->writeln('next test: ' . $number);
+        $output->writeln('detect directory to write new tests ...');
+
+        try {
+            $targetDirectory = $targetDirectoryHelper->getPath($output);
+        } catch (UnreadableFileException $e) {
+            $this->logger->critical($e);
+            $output->writeln($e->getMessage());
+
+            return 1;
+        }
+
+        $output->writeln('target directory: ' . $targetDirectory);
+
+        if (!file_exists($targetDirectory)) {
+            mkdir($targetDirectory);
+        }
+
         $output->writeln('reading new files ...');
 
         $sourcesDirectory = $input->getOption('resources');
@@ -144,6 +164,9 @@ class CreateTestsCommand extends Command
         $outputDetector   = [];
         $counter          = 0;
         $issue            = 'test-' . sprintf('%1$08d', $number);
+        $fileCounter      = 0;
+        $chunkCounter     = 0;
+        $totalCounter     = 0;
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -154,35 +177,48 @@ class CreateTestsCommand extends Command
 
             $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number);
             $checks[$useragent] = $issue;
+
             ++$counter;
+            ++$chunkCounter;
+            ++$totalCounter;
+
+            file_put_contents(
+                $targetDirectory . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', (int) $fileCounter) . '.json',
+                json_encode(
+                    $outputDetector,
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
+                ) . PHP_EOL
+            );
+
+            if ($chunkCounter >= 100) {
+                $chunkCounter   = 0;
+                $outputDetector = [];
+                ++$fileCounter;
+            }
+
+            if ($fileCounter >= 10) {
+                $chunkCounter    = 0;
+                $outputDetector  = [];
+                $fileCounter     = 0;
+                $counter         = 0;
+                $number          = $targetDirectoryHelper->getNextTest($output);
+                $targetDirectory = $targetDirectoryHelper->getPath($output);
+
+                $output->writeln('next test: ' . $number);
+                $output->writeln('target directory: ' . $targetDirectory);
+
+                if (!file_exists($targetDirectory)) {
+                    mkdir($targetDirectory);
+                }
+            }
         }
 
         $outputBrowscap .= "];\n";
 
         file_put_contents('results/issue-' . sprintf('%1$05d', $number) . '.php', $outputBrowscap);
 
-        $chunks          = array_chunk($outputDetector, 100, true);
-        $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$05d', $number) . '/';
-        if (!file_exists($targetDirectory)) {
-            mkdir($targetDirectory);
-        }
-
-        foreach ($chunks as $chunkId => $chunk) {
-            if (!count($chunk)) {
-                continue;
-            }
-
-            file_put_contents(
-                $targetDirectory . 'test-' . sprintf('%1$05d', $number) . '-' . sprintf('%1$05d', (int) $chunkId) . '.json',
-                json_encode(
-                    $chunk,
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
-                ) . PHP_EOL
-            );
-        }
-
         $output->writeln('');
-        $output->writeln($counter . ' tests exported');
+        $output->writeln($totalCounter . ' tests exported');
 
         return 0;
     }
@@ -284,8 +320,8 @@ class CreateTestsCommand extends Command
 
         $this->logger->info('      detecting test name ...');
 
-        $formatedIssue   = sprintf('%1$08d', (int) $testNumber);
-        $formatedCounter = sprintf('%1$08d', (int) $counter);
+        $formatedIssue   = sprintf('%1$07d', (int) $testNumber);
+        $formatedCounter = sprintf('%1$05d', (int) $counter);
 
         $this->logger->info('      detecting request ...');
 

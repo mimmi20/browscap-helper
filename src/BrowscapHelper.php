@@ -37,8 +37,8 @@ class BrowscapHelper extends Application
     {
         parent::__construct('Browscap Helper Project', 'dev-master');
 
-        $sourcesDirectory = realpath(__DIR__ . '/../sources/') . '/';
-        $targetDirectory  = realpath(__DIR__ . '/../results/') . '/';
+        $sourcesDirectory = realpath(__DIR__ . '/../sources/');
+        $targetDirectory  = realpath(__DIR__ . '/../results/');
 
         $formatter = new LineFormatter(null, null, true, true);
         $stream    = new StreamHandler('log/error.log', Logger::INFO);

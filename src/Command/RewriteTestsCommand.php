@@ -231,16 +231,14 @@ declare(strict_types = 1);
 namespace BrowserDetectorTest\UserAgentsTest;
 
 use BrowserDetectorTest\UserAgentsTest;
-use UaResult\Result\Result;
 
 /**
- * Class UserAgentsTest
+ * Class T' . $group . 'Test
  *
- * @category   CompareTest
+ * has ' . $count . ' tests
+ * this file was created/edited automatically, please do not edit it
  *
  * @author     Thomas Mueller <mimmi20@live.de>
- * @group      useragenttest
- * @group      integration
  * @group      ' . $group . '
  */
 class T' . $group . 'Test extends UserAgentsTest
@@ -249,22 +247,6 @@ class T' . $group . 'Test extends UserAgentsTest
      * @var string
      */
     protected $sourceDirectory = \'tests/issues/' . $group . '/\';
-
-    /**
-     * @dataProvider userAgentDataProvider
-     *
-     * @param string                  $userAgent
-     * @param \UaResult\Result\Result $expectedResult
-     *
-     * @throws \\Exception
-     * @group  integration
-     * @group  useragenttest
-     * @group  ' . $group . '
-     */
-    public function testUserAgents($userAgent, Result $expectedResult)
-    {
-        parent::testUserAgents($userAgent, $expectedResult);
-    }
 }
 ';
             $testFile = 'vendor/mimmi20/browser-detector-tests/tests/UserAgentsTest/T' . $group . 'Test.php';
@@ -343,7 +325,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $this->logger->info('    processing Test ' . $key . ' ...');
 
             $checks[$test->ua] = $key;
-            $newKey            = 'test-' . sprintf('%1$08d', $group) . '-' . sprintf('%1$08d', $groupCounter);
+            $newKey            = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
 
             $outputDetector += [
                 $newKey => [
