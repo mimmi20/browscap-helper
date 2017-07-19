@@ -174,11 +174,15 @@ class RewriteTestsCommand extends Command
     Europe/Berlin
 
 dependencies:
+  pre:
+    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
   override:
     - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
 
 test:
-  override:';
+  override:
+    - composer validate
+';
 
         $circleLines = [];
 
@@ -211,10 +215,13 @@ test:
         );
 
         foreach ($circleLines as $group => $count) {
+            $columns = 111 + 2 * mb_strlen((string) $count);
+            $tests   = str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #' . str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+            $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n vendor/bin/phpunit --colors=auto --no-coverage tests/UserAgentsTest/T' . $group . 'Test.php';
+            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --no-globals-backup --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
@@ -235,7 +242,7 @@ use BrowserDetectorTest\UserAgentsTest;
 /**
  * Class T' . $group . 'Test
  *
- * has ' . $count . ' tests
+ * has ' . $tests . '
  * this file was created/edited automatically, please do not edit it
  *
  * @author     Thomas Mueller <mimmi20@live.de>

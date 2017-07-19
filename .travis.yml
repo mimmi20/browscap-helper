@@ -6,37 +6,30 @@ php:
   - 7.1
   - nightly
 
-os:
-  - linux
+os: linux
 
-env:
-#  - COMPOSER_FLAGS="--prefer-lowest"
-  - COMPOSER_FLAGS=""
-
-matrix:
-  include:
-    - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
-  allow_failures:
-    - php: nightly
+env: COMPOSER_FLAGS=""
 
 cache:
   directories:
     - $HOME/.composer/cache
 
 before_install:
-  - if [[ $TRAVIS_PHP_VERSION != nightly && $COVERAGE != yes ]]; then phpenv config-rm xdebug.ini; fi
+  - if [[ $TRAVIS_PHP_VERSION != nightly ]]; then phpenv config-rm xdebug.ini; fi
   - echo 'opcache.enable=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'opcache.enable_cli=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - travis_retry composer self-update
 
 install: travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction $COMPOSER_FLAGS -vv
 
-script:
-  - composer validate
+script: composer validate
 
 jobs:
+  allow_failures:
+    - php: nightly
   include:
+    - php: nightly
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - stage: check coding style
       php: 7.1
       script: php -n -d memory_limit=768M vendor/bin/phpcs
