@@ -13,18 +13,17 @@ regexes:
     - '/(?P<devicetype>WPDesktop|XBLWP7);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?;? ?(?P<devicecode>[^;\)]+)?/i'
     ####################################################################################################################
     # Android OS
-    - '/Linux; ?(?P<osname>Android)[ -\/]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\/([^\)]+)?/i'
+    - '/Linux; ?(?P<osname>Android)[ -\/]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\//i'
     - '/Linux; ?(?P<osname>Android)[ -\/]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\.\+_#]+)\//i'
-    - '/Linux; ?(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+);? ?Build\/([^\)]+)?/i'
+    - '/Linux; ?(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+)?;? ?Build\//i'
     - '/(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+);? ?Linux;?/i'
     # Desktop Mode
-    - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\/([^\)]+)?/i'
+    - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\//i'
     - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\.\+_#]+)\//i'
     - '/^(?P<browsername>Dalvik)\/(?P<browserversion>[\d.+ab]+) ?\(Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+)/i'
-    - '/^(?P<devicecode>Dalvik)\/(?P<browserversion>[\d.+ab]+) ?\(Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+)/i'
-    # Opera Mini
-    - '/^Opera\/[\d.]+ ?\(((?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+)?; )? ?(?P<browsername>Opera Mini)/i'
-    - '/^Opera\/[\d.]+ ?\(((?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+)?; )? ?(?P<browsername>Opera Mobi)/i'
+    - '/^Dalvik\/[\d.+ab]+ ?\(Linux; ?(?P<devicecode>Android)/i'
+    # Opera
+    - '/^Opera\/[\d.]+ ?\((?P<devicecode>Android)/i'
     # UCBrowser
     - '/^UCWEB\/[\d.]+ ?\((?P<osname>Linux); Opera Mini\/([^;]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\/([^\)]+)?\) (?P<enginename>U2)\/(?P<engineversion>[\d.+ab]+) (?P<browsername>UCBrowser)\/(?P<browserversion>[\d.+ab]+) Mobile/i'
     - '/^JUC ?\(Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+)?;?;?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+)([^\)]+)?\) ?(?P<browsername>UCWEB)(?P<browserversion>[\d.+ab]+)/i'
