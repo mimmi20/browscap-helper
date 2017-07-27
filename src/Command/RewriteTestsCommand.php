@@ -221,7 +221,7 @@ test:
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --no-globals-backup --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
