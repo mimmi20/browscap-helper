@@ -16,7 +16,6 @@ use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\Detector;
 use BrowserDetector\Version\VersionInterface;
-use League\Flysystem\UnreadableFileException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -131,8 +130,8 @@ class CreateTestsCommand extends Command
 
         $output->writeln('detect next test number ...');
         try {
-            $number = $targetDirectoryHelper->getNextTest($output);
-        } catch (UnreadableFileException $e) {
+            $number = $targetDirectoryHelper->getNextTest();
+        } catch (\UnexpectedValueException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -143,8 +142,8 @@ class CreateTestsCommand extends Command
         $output->writeln('detect directory to write new tests ...');
 
         try {
-            $targetDirectory = $targetDirectoryHelper->getPath($output);
-        } catch (UnreadableFileException $e) {
+            $targetDirectory = $targetDirectoryHelper->getPath();
+        } catch (\UnexpectedValueException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -201,8 +200,8 @@ class CreateTestsCommand extends Command
                 $outputDetector  = [];
                 $fileCounter     = 0;
                 $counter         = 0;
-                $number          = $targetDirectoryHelper->getNextTest($output);
-                $targetDirectory = $targetDirectoryHelper->getPath($output);
+                $number          = $targetDirectoryHelper->getNextTest();
+                $targetDirectory = $targetDirectoryHelper->getPath();
 
                 $output->writeln('next test: ' . $number);
                 $output->writeln('target directory: ' . $targetDirectory);
@@ -232,47 +231,12 @@ class CreateTestsCommand extends Command
      */
     private function parseLine($ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber)
     {
-        $this->logger->info('      detecting');
+        $this->logger->info('      create result');
 
-        $result = (new Detector($this->cache, $this->logger))->getBrowser($ua);
-
-        $this->logger->info('      detecting platform ...');
-
-        /** @var \UaResult\Os\OsInterface $platform */
-        $platform = $result->getOs();
-
-        if (null === $platform) {
-            $platform = new Os(null, null);
-        }
-
-        $this->logger->info('      detecting device ...');
-
-        /** @var \UaResult\Device\DeviceInterface $device */
-        $device = $result->getDevice();
-
-        if (null === $device
-            || in_array($device->getDeviceName(), [null, 'unknown'])
-            || (!in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
-                && false !== mb_stripos($device->getDeviceName(), 'general'))
-        ) {
-            $device = new Device(null, null);
-        }
-
-        /** @var \UaResult\Engine\EngineInterface $engine */
-        $engine = $result->getEngine();
-
-        if (null === $engine) {
-            $engine = new Engine(null);
-        }
-
-        $this->logger->info('      detecting browser ...');
-
-        /** @var \UaResult\Browser\BrowserInterface $browser */
-        $browser = $result->getBrowser();
-
-        if (null === $browser) {
-            $browser = new Browser(null);
-        }
+        $platform = new Os(null, null);
+        $device   = new Device(null, null);
+        $engine   = new Engine(null);
+        $browser  = new Browser(null);
 
         $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
         $formatedCounter = sprintf('%1$05d', (int) $counter);
@@ -327,11 +291,9 @@ class CreateTestsCommand extends Command
 
         $request = (new GenericRequestFactory())->createRequestFromString($ua);
 
-        $result = new Result($request, $device, $platform, $browser, $engine);
-
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'     => $ua,
-            'result' => $result->toArray(false),
+            'result' => (new Result($request, $device, $platform, $browser, $engine))->toArray(false),
         ];
     }
 }

@@ -155,7 +155,7 @@ class RewriteTestsCommand extends Command
                 $g            = $group;
             }
 
-            $newCounter = $this->handleFile($output, $file, $checks, $groupCounter, $group);
+            $newCounter = $this->handleFile($file, $checks, $groupCounter, $group);
 
             if (!$newCounter) {
                 continue;
@@ -216,7 +216,7 @@ test:
 
         foreach ($circleLines as $group => $count) {
             $columns = 111 + 2 * mb_strlen((string) $count);
-            $tests   = str_pad((string) $count, 6, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
 
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
@@ -242,7 +242,7 @@ use BrowserDetectorTest\UserAgentsTest;
 /**
  * Class T' . $group . 'Test
  *
- * has ' . $tests . '
+ * has ' . trim($tests) . '
  * this file was created/edited automatically, please do not edit it
  *
  * @author     Thomas Mueller <mimmi20@live.de>
@@ -269,7 +269,6 @@ class T' . $group . 'Test extends UserAgentsTest
     }
 
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \SplFileInfo                                      $file
      * @param array                                             $checks
      * @param int                                               $groupCounter
@@ -278,7 +277,6 @@ class T' . $group . 'Test extends UserAgentsTest
      * @return int
      */
     private function handleFile(
-        OutputInterface $output,
         \SplFileInfo $file,
         array &$checks,
         &$groupCounter,
@@ -411,6 +409,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         /* rewrite devices */
 
+        /** @var \UaResult\Device\DeviceInterface|null $device */
         $device   = $result->getDevice();
         $replaced = false;
 

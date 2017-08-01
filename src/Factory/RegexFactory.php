@@ -75,6 +75,7 @@ class RegexFactory implements Factory\FactoryInterface
      *
      * @param string $useragent
      *
+     * @return void
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
@@ -93,7 +94,6 @@ class RegexFactory implements Factory\FactoryInterface
         foreach ($regexes as $regex) {
             $matches = [];
 
-            //$this->logger->error($regex);
             if (preg_match($regex, $useragent, $matches)) {
                 $this->match = $matches;
 
@@ -191,6 +191,10 @@ class RegexFactory implements Factory\FactoryInterface
         }
 
         if ($manufacturercode) {
+            if ('sonyericsson' === mb_strtolower($manufacturercode)) {
+                $manufacturercode = 'Sony';
+            }
+
             $className = '\\BrowserDetector\\Factory\\Device\\Mobile\\' . ucfirst($manufacturercode) . 'Factory';
 
             if (class_exists($className)) {
@@ -205,7 +209,7 @@ class RegexFactory implements Factory\FactoryInterface
                     throw $e;
                 }
             } else {
-                $this->logger->warning('factory "' . $className . '" not found');
+                $this->logger->error('factory "' . $className . '" not found');
             }
 
             $this->logger->info('device manufacturer class was not found');
@@ -221,7 +225,7 @@ class RegexFactory implements Factory\FactoryInterface
                     $this->logger->warning($e);
                     throw $e;
                 }
-            } else {
+            } elseif (!empty($this->match['devicetype'])) {
                 $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst(mb_strtolower($this->match['devicetype'])) . 'Factory';
 
                 if (class_exists($className)) {
@@ -236,7 +240,7 @@ class RegexFactory implements Factory\FactoryInterface
                         throw $e;
                     }
                 } else {
-                    $this->logger->warning('factory "' . $className . '" not found');
+                    $this->logger->error('factory "' . $className . '" not found');
                 }
 
                 $this->logger->info('device type class was not found');
@@ -287,8 +291,6 @@ class RegexFactory implements Factory\FactoryInterface
 
             return $darwinFactory->detect($this->useragent, $s);
         }
-
-        $s = new Stringy($this->useragent);
 
         if ('linux' === $platformCode && array_key_exists('devicecode', $this->match)) {
             // Android Desktop Mode
