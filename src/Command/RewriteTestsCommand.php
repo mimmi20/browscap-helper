@@ -269,10 +269,10 @@ class T' . $group . 'Test extends UserAgentsTest
     }
 
     /**
-     * @param \SplFileInfo                                      $file
-     * @param array                                             $checks
-     * @param int                                               $groupCounter
-     * @param int                                               $group
+     * @param \SplFileInfo $file
+     * @param array        $checks
+     * @param int          $groupCounter
+     * @param int          $group
      *
      * @return int
      */

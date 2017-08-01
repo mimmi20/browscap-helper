@@ -75,7 +75,6 @@ class RegexFactory implements Factory\FactoryInterface
      *
      * @param string $useragent
      *
-     * @return void
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
