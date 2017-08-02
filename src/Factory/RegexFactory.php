@@ -132,6 +132,12 @@ class RegexFactory implements Factory\FactoryInterface
         $deviceCode   = mb_strtolower($this->match['devicecode']);
         $deviceLoader = new DeviceLoader($this->cache);
 
+        if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
+            $platformCode = null;
+        } else {
+            $platformCode = mb_strtolower($this->match['osname']);
+        }
+
         $s = new Stringy($this->useragent);
 
         if ('windows' === $deviceCode) {
@@ -142,15 +148,19 @@ class RegexFactory implements Factory\FactoryInterface
             try {
                 return (new Factory\Device\DarwinFactory($deviceLoader))->detect($this->useragent, $s);
             } catch (NotFoundException $e) {
-                $this->logger->warning($e);
                 throw $e;
             }
-        } elseif ('dalvik' === $deviceCode || 'android' === $deviceCode) {
+        } elseif (in_array($deviceCode, ['dalvik', 'android'])) {
             try {
                 return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
             } catch (NotFoundException $e) {
-                $this->logger->warning($e);
-                throw $e;
+                return $deviceLoader->load('general mobile device', $this->useragent);
+            }
+        } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
+            try {
+                return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
+            } catch (NotFoundException $e) {
+                return $deviceLoader->load('general mobile device', $this->useragent);
             }
         } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
             return $deviceLoader->load('linux desktop', $this->useragent);
