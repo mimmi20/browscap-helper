@@ -162,6 +162,8 @@ class RegexFactory implements Factory\FactoryInterface
             } catch (NotFoundException $e) {
                 return $deviceLoader->load('general mobile device', $this->useragent);
             }
+        } elseif ('philipstv' === $deviceCode) {
+            return $deviceLoader->load('general philips tv', $this->useragent);
         } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
             return $deviceLoader->load('linux desktop', $this->useragent);
         } elseif ('touch' === $deviceCode

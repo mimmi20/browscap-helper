@@ -60,11 +60,10 @@ regexes:
     - '/(?P<devicecode>CFNetwork)\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))/i'
     ####################################################################################################################
     # Chrome OS
-    # Chrome
-    - '/(?P<devicecode>CrOS) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?([^\)]+)?\) ?(?P<enginename>AppleWebKit)\/?(?P<engineversion>[\d.+ab]+) ?\(KHTML, like Gecko\)/i'
+    - '/(?P<devicecode>CrOS) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?([^\)]+)?\)/i'
     ####################################################################################################################
     # Linux
-    # Midori
+    - '/(?P<devicecode>philipstv)/i'
     - '/(?P<devicecode>Linux) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?/i'
     ####################################################################################################################
     # Tizen
