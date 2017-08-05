@@ -171,7 +171,7 @@ class RegexFactory implements Factory\FactoryInterface
             && 'bb10' === mb_strtolower($this->match['osname'])
         ) {
             return $deviceLoader->load('z10', $this->useragent);
-        } elseif ('4g lte' === $deviceCode) {
+        } elseif (in_array($deviceCode, ['4g lte', '3g'])) {
             return $deviceLoader->load('general mobile device', $this->useragent);
         }
 
