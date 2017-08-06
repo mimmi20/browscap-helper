@@ -75,6 +75,7 @@ class RegexFactory implements Factory\FactoryInterface
      *
      * @param string $useragent
      *
+     * @return void
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
@@ -171,7 +172,7 @@ class RegexFactory implements Factory\FactoryInterface
             && 'bb10' === mb_strtolower($this->match['osname'])
         ) {
             return $deviceLoader->load('z10', $this->useragent);
-        } elseif (in_array($deviceCode, ['4g lte', '3g'])) {
+        } elseif (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118'])) {
             return $deviceLoader->load('general mobile device', $this->useragent);
         }
 
