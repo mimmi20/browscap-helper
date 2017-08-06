@@ -165,6 +165,8 @@ class RegexFactory implements Factory\FactoryInterface
             }
         } elseif ('philipstv' === $deviceCode) {
             return $deviceLoader->load('general philips tv', $this->useragent);
+        } elseif (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
+            return $deviceLoader->load('general mobile device', $this->useragent);
         } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
             return $deviceLoader->load('linux desktop', $this->useragent);
         } elseif ('touch' === $deviceCode
@@ -172,8 +174,6 @@ class RegexFactory implements Factory\FactoryInterface
             && 'bb10' === mb_strtolower($this->match['osname'])
         ) {
             return $deviceLoader->load('z10', $this->useragent);
-        } elseif (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118'])) {
-            return $deviceLoader->load('general mobile device', $this->useragent);
         }
 
         if (array_key_exists('manufacturercode', $this->match)) {
