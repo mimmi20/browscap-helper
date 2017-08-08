@@ -32,10 +32,10 @@ jobs:
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - stage: check coding style
       php: 7.1
-      script: php -n -d memory_limit=768M vendor/bin/phpcs
+      script: vendor/bin/phpcs
     - stage: check coding style
       php: 7.1
-      script: php -n -d memory_limit=768M vendor/bin/php-cs-fixer fix --dry-run -vv
+      script: vendor/bin/php-cs-fixer fix --dry-run -vv
 
 notifications:
   email: false
