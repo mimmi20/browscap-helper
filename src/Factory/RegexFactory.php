@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Factory;
 
+use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Loader\RegexLoader;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\BrowserLoader;
@@ -156,18 +157,18 @@ class RegexFactory implements Factory\FactoryInterface
             try {
                 return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
             } catch (NotFoundException $e) {
-                return $deviceLoader->load('general mobile device', $this->useragent);
+                throw new GeneralDeviceException('use general mobile device', 0, $e);
             }
         } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
             try {
                 return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
             } catch (NotFoundException $e) {
-                return $deviceLoader->load('general mobile device', $this->useragent);
+                throw new GeneralDeviceException('use general mobile device', 0, $e);
             }
         } elseif ('philipstv' === $deviceCode) {
             return $deviceLoader->load('general philips tv', $this->useragent);
         } elseif (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
-            return $deviceLoader->load('general mobile device', $this->useragent);
+            throw new GeneralDeviceException('use general mobile device');
         } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
             return $deviceLoader->load('linux desktop', $this->useragent);
         } elseif ('touch' === $deviceCode

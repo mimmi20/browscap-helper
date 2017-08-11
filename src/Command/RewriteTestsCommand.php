@@ -11,10 +11,12 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
+use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -385,7 +387,7 @@ class T' . $group . 'Test extends UserAgentsTest
         $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
-        $browser = $result->getBrowser();
+        $browser = clone $result->getBrowser();
 
         if (null === $browser) {
             $browser = new Browser(null);
@@ -395,7 +397,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
         $this->logger->info('        rewriting platform');
 
-        $platform = $result->getOs();
+        $platform = clone $result->getOs();
 
         if (null === $platform) {
             $platform = new Os(null, null);
@@ -410,7 +412,7 @@ class T' . $group . 'Test extends UserAgentsTest
         /* rewrite devices */
 
         /** @var \UaResult\Device\DeviceInterface|null $device */
-        $device   = $result->getDevice();
+        $device   = clone $result->getDevice();
         $replaced = false;
 
         if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
@@ -436,7 +438,7 @@ class T' . $group . 'Test extends UserAgentsTest
                 }
 
                 if (!$replaced
-                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'])
                     && false !== mb_stripos($device->getDeviceName(), 'general')
                 ) {
                     $device = new Device('not found via regexes', null);
@@ -444,7 +446,7 @@ class T' . $group . 'Test extends UserAgentsTest
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error($e);
 
-                $device = $result->getDevice();
+                $device = clone $result->getDevice();
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
@@ -452,7 +454,7 @@ class T' . $group . 'Test extends UserAgentsTest
             } catch (NotFoundException $e) {
                 $this->logger->debug($e);
 
-                $device   = $result->getDevice();
+                $device   = clone $result->getDevice();
                 $replaced = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
@@ -466,10 +468,20 @@ class T' . $group . 'Test extends UserAgentsTest
                 ) {
                     $device = new Device('not found', null);
                 }
+            } catch (GeneralDeviceException $e) {
+                $deviceLoader = new DeviceLoader($this->cache);
+
+                try {
+                    $device = $deviceLoader->load('general mobile device', $normalizedUa);
+                } catch (\Exception $e) {
+                    $this->logger->crit($e);
+
+                    $device = new Device(null, null);
+                }
             } catch (NoMatchException $e) {
                 $this->logger->debug($e);
 
-                $device = $result->getDevice();
+                $device = clone $result->getDevice();
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
@@ -477,7 +489,7 @@ class T' . $group . 'Test extends UserAgentsTest
             } catch (\Exception $e) {
                 $this->logger->error($e);
 
-                $device = $result->getDevice();
+                $device = clone $result->getDevice();
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
@@ -488,7 +500,7 @@ class T' . $group . 'Test extends UserAgentsTest
         /* rewrite engines */
 
         /** @var \UaResult\Engine\EngineInterface $engine */
-        $engine = $result->getEngine();
+        $engine = clone $result->getEngine();
 
         if (null === $engine) {
             $engine = new Engine(null);
