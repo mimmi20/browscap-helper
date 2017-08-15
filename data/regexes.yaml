@@ -16,7 +16,8 @@ regexes:
     - '/Linux; ?(?P<osname>Android)[ -\/]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\//i'
     - '/Linux; ?(?P<osname>Android)[ -\/]?(?P<osversion>[\d.]+);? ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\.\+_#]+)\//i'
     - '/Linux; ?(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+)?;? ?Build\//i'
-    - '/(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+);? ?Linux;?/i'
+    - '/(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+)?;? ?Linux;?/i'
+    - '/Linux; ?(?P<devicecode>Android)[ -\/]?(?P<osversion>[\d.]+)?;? ?Build/i'
     # Desktop Mode
     - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\//i'
     - '/(?P<osname>Linux); ?(?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\.\+_#]+)\//i'
@@ -31,11 +32,12 @@ regexes:
     - '/^UCWEB\/[\d.]+ ?\((Linux|MIDP\-2\.0); (?P<osname>Adr) ?(?P<osversion>[\d.]+)?; (?P<manufacturercode>HTC|Nokia|Microsoft|Samsung|ZTE|LG|BLU|Dell|Huawei|Archos|Allview|xbox|Lenovo|micromax|gfive|coolpad|odys|phicomm|oysters|kiano|keneksi|pantech|modecom|starway|philips|texet|kazam|cosmote|digma|arnova|asus|hp|thl|sony(ericsson)?|phicomm)?([ _\-])?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+)([^\)]+)?\) (?P<enginename>U2)\/(?P<engineversion>[\d.+ab]+) (?P<browsername>UCBrowser)\/(?P<browserversion>[\d.+ab]+) U2\/[\d.+]+ (?P<devicetype>Mobile)/i'
     # MQQBrowser (Safari based)
     - '/^(?P<browsername>MQQBrowser)\/(?P<browserversion>[\d.+ab]+)\/Mozilla\/[\d.]+ ?\(Linux; ?(?P<osname>Android)[ -]?(?P<osversion>[\d.]+);? ?(?P<devicecode>[a-zA-Z0-9\-\(\)\/\.\+_# ]+) Build\/([^\)]+)?\) ?(?P<enginename>AppleWebKit)\/?(?P<engineversion>[\d.+ab]+) ?\(KHTML, like Gecko\) *Version\/([\d.]+) (?P<devicetype>Mobile|TV)? ?(.*)(Safari)\/([\d.]+)/i'
+    - '/(?P<osname>Linux).*(?P<browsername>Puffin)\/(?P<browserversion>[\d.+ab]+)(?P<devicecode>A(P|T))/i'
     ####################################################################################################################
     # iOS
     # Chrome
     - '/(?P<devicecode>iPhone|iPad|iPod( Touch)?); (?P<osname>CPU iPhone OS|CPU OS) ?(?P<osversion>[\d._]+) like Mac OS X([^\)]+)?\) (?P<enginename>AppleWebKit)\/(?P<engineversion>[\d.+ab]+) \(KHTML, like Gecko\)/i'
-    - '/(?P<osname>Linux) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?\) (?P<enginename>AppleWebKit)\/(?P<engineversion>[\d.+ab]+) \(KHTML, like Gecko\) *(?P<devicetype>Mobile|TV)?(\/[^ ]+)? ?(Safari)\/([\d.]+) (?P<browsername>Puffin)\/(?P<browserversion>[\d.+ab]+)(?P<devicecode>I(P|T))/i'
+    - '/(?P<osname>Linux).*(?P<browsername>Puffin)\/(?P<browserversion>[\d.+ab]+)(?P<devicecode>I(P|T))/i'
     ####################################################################################################################
     # Windows
     - '/(?P<devicecode>Windows)?;? ?(?P<osname>Windows NT( [\d.]+)?(; ARM)?)(; (WOW64|Win64; x64))?([^\)]+)?/i'
@@ -59,12 +61,12 @@ regexes:
     - '/(?P<devicecode>CFNetwork)\/(?P<engineversion>[\d.+ab]+) (?P<osname>Darwin)\/(?P<osversion>[\d._]+)( \((?P<osbits>x86_64|i386|i686 on x86_64)\))/i'
     ####################################################################################################################
     # Chrome OS
-    # Chrome
-    - '/(?P<devicecode>CrOS) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?([^\)]+)?\) ?(?P<enginename>AppleWebKit)\/?(?P<engineversion>[\d.+ab]+) ?\(KHTML, like Gecko\)/i'
+    - '/(?P<devicecode>CrOS) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?([^\)]+)?\)/i'
     ####################################################################################################################
     # Linux
-    # Midori
-    - '/(?P<devicecode>Linux) ?(i386|i686|i686 on x86_64|x86_64|sparc64)?/i'
+    - '/(?P<devicecode>philipstv)/i'
+    - '/(?P<devicecode>linux arm)/i'
+    - '/(?P<devicecode>linux)/i'
     ####################################################################################################################
     # Tizen
     # Samsung Browser (Safari based)

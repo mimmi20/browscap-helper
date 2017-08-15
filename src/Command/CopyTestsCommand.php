@@ -19,7 +19,6 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use League\Flysystem\UnreadableFileException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -95,8 +94,8 @@ class CopyTestsCommand extends Command
 
         $output->writeln('detect next test number ...');
         try {
-            $number = $targetDirectoryHelper->getNextTest($output);
-        } catch (UnreadableFileException $e) {
+            $number = $targetDirectoryHelper->getNextTest();
+        } catch (\UnexpectedValueException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -107,8 +106,8 @@ class CopyTestsCommand extends Command
         $output->writeln('detect directory to write new tests ...');
 
         try {
-            $targetDirectory = $targetDirectoryHelper->getPath($output);
-        } catch (UnreadableFileException $e) {
+            $targetDirectory = $targetDirectoryHelper->getPath();
+        } catch (\UnexpectedValueException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
 
@@ -193,8 +192,8 @@ class CopyTestsCommand extends Command
 
             if ($fileCounter >= 10) {
                 $fileCounter     = 0;
-                $number          = $targetDirectoryHelper->getNextTest($output);
-                $targetDirectory = $targetDirectoryHelper->getPath($output);
+                $number          = $targetDirectoryHelper->getNextTest();
+                $targetDirectory = $targetDirectoryHelper->getPath();
                 $fileCreated     = false;
 
                 $output->writeln('next test: ' . $number);

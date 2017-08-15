@@ -11,9 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
-use League\Flysystem\UnreadableFileException;
-use Symfony\Component\Console\Output\OutputInterface;
-
 /**
  * Class TargetDirectory
  *
@@ -24,32 +21,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TargetDirectory
 {
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @throws \League\Flysystem\UnreadableFileException
+     * @throws \UnexpectedValueException
      *
      * @return string
      */
-    public function getPath(OutputInterface $output)
+    public function getPath()
     {
-        $number = $this->getNextTest($output);
+        $number = $this->getNextTest();
 
         return 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$07d', $number) . '/';
     }
 
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @throws \League\Flysystem\UnreadableFileException
+     * @throws \UnexpectedValueException
      *
      * @return int
      */
-    public function getNextTest(OutputInterface $output)
+    public function getNextTest()
     {
         $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
         if (!is_readable($targetDirectory)) {
-            throw new UnreadableFileException('directory "' . $targetDirectory . '" is not readable');
+            throw new \UnexpectedValueException('directory "' . $targetDirectory . '" is not readable');
         }
 
         $filesArray = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
