@@ -424,8 +424,6 @@ class T' . $group . 'Test extends UserAgentsTest
             && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
-            //$device = new Device('not found', null);
-
             try {
                 $regexFactory = new RegexFactory($this->cache, $this->logger);
                 $regexFactory->detect($normalizedUa);
@@ -472,7 +470,7 @@ class T' . $group . 'Test extends UserAgentsTest
                 $deviceLoader = new DeviceLoader($this->cache);
 
                 try {
-                    $device = $deviceLoader->load('general mobile device', $normalizedUa);
+                    list($device) = $deviceLoader->load('general mobile device', $normalizedUa);
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 
