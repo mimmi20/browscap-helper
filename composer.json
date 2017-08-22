@@ -3,22 +3,22 @@
   "description": "some small helper functions for working with Browscap",
   "require": {
     "php": "^7.1",
-    "monolog/monolog": "^1.20",
-    "symfony/cache": "^3.3",
     "symfony/console": "^3.3",
+    "symfony/cache": "^3.3",
+    "monolog/monolog": "^1.20",
 
-    "mimmi20/ua-data-mapper": "~2.0.3",
+    "mimmi20/ua-data-mapper": "~2.0.4",
+
+    "browscap/browscap-php": "^3.1",
 
     "mimmi20/browscap-helper-source-collection": "~2.0.1",
 
-    "mimmi20/browscap-helper-source-textfile": "~2.0.4",
-
-    "mimmi20/browscap-helper-source-logfile": "~2.0.5",
-
     "browscap/browscap": "dev-master",
-    "mimmi20/browscap-helper-source-browscap": "~2.0.5",
+    "mimmi20/browscap-helper-source-browscap": "~2.0.6",
 
-    "mimmi20/browscap-helper-source-detector": "~2.0.3",
+    "mimmi20/browscap-helper-source-detector": "~2.0.4",
+
+    "mimmi20/browscap-helper-source-textfile": "~2.0.4",
 
     "piwik/device-detector": "dev-master",
     "mimmi20/browscap-helper-source-piwik": "~2.0.5",
@@ -34,7 +34,7 @@
     "woothee/woothee-testset": "dev-master",
     "mimmi20/browscap-helper-source-woothee": " ~2.0.4",
 
-    "browscap/browscap-php": "^3.1"
+    "mimmi20/browscap-helper-source-logfile": "~2.0.5"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.0",

@@ -154,17 +154,9 @@ class RegexFactory implements Factory\FactoryInterface
                 throw $e;
             }
         } elseif (in_array($deviceCode, ['dalvik', 'android'])) {
-            try {
-                return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
-            } catch (NotFoundException $e) {
-                throw new GeneralDeviceException('use general mobile device', 0, $e);
-            }
+            throw new GeneralDeviceException('use general mobile device');
         } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
-            try {
-                return (new Factory\Device\MobileFactory($deviceLoader))->detect($this->useragent, $s);
-            } catch (NotFoundException $e) {
-                throw new GeneralDeviceException('use general mobile device', 0, $e);
-            }
+            throw new GeneralDeviceException('use general mobile device');
         } elseif ('philipstv' === $deviceCode) {
             return $deviceLoader->load('general philips tv', $this->useragent);
         } elseif (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
@@ -238,8 +230,7 @@ class RegexFactory implements Factory\FactoryInterface
                 try {
                     return $factory->detect($this->useragent, $s);
                 } catch (NotFoundException $e) {
-                    $this->logger->warning($e);
-                    throw $e;
+                    throw new GeneralDeviceException('use general mobile device', 0, $e);
                 }
             } elseif (!empty($this->match['devicetype'])) {
                 $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst(mb_strtolower($this->match['devicetype'])) . 'Factory';
