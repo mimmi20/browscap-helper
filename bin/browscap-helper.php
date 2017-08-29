@@ -6,10 +6,10 @@
  */
 chdir(dirname(__DIR__));
 
-$autoloadPaths = array(
+$autoloadPaths = [
     'vendor/autoload.php',
     '../../autoload.php',
-);
+];
 
 foreach ($autoloadPaths as $path) {
     if (file_exists($path)) {

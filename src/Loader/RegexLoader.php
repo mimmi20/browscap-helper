@@ -55,7 +55,7 @@ class RegexLoader
      *
      * @return array|null
      */
-    public function getRegexes()
+    public function getRegexes(): ?array
     {
         $cacheInitializedId = hash('sha512', 'regex-cache is initialized');
         $cacheInitialized   = $this->cache->getItem($cacheInitializedId);
@@ -78,7 +78,7 @@ class RegexLoader
      *
      * @throws \BrowserDetector\Loader\NotFoundException
      */
-    private function initCache(CacheItemInterface $cacheInitialized)
+    private function initCache(CacheItemInterface $cacheInitialized): void
     {
         static $regexes = null;
 

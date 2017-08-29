@@ -16,6 +16,7 @@ use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Noodlehaus\Config;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application;
 
@@ -52,11 +53,15 @@ class BrowscapHelper extends Application
         $cache    = new FilesystemAdapter('', 0, __DIR__ . '/../cache/');
         $detector = new Detector($cache, $logger);
 
+        $config = new Config(['data/configs/config.json']);
+
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\CopyTestsCommand($logger, $cache),
             new Command\CreateTestsCommand($logger, $cache, $detector, $sourcesDirectory),
             new Command\RewriteTestsCommand($logger, $cache, $detector),
+            new Command\CompareCommand($logger, $cache, $config),
+            new Command\ParseCommand($logger, $cache, $config),
         ];
 
         foreach ($commands as $command) {

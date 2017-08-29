@@ -82,7 +82,7 @@ class RegexFactory implements Factory\FactoryInterface
      *
      * @return void
      */
-    public function detect($useragent)
+    public function detect($useragent): void
     {
         $regexes = (new RegexLoader($this->cache, $this->logger))->getRegexes();
 
@@ -114,7 +114,7 @@ class RegexFactory implements Factory\FactoryInterface
      *
      * @return array
      */
-    public function getDevice()
+    public function getDevice(): array
     {
         if (null === $this->useragent) {
             throw new \InvalidArgumentException('no useragent was set');
@@ -260,7 +260,7 @@ class RegexFactory implements Factory\FactoryInterface
     /**
      * @return \UaResult\Os\OsInterface
      */
-    public function getPlatform()
+    public function getPlatform(): OsInterface
     {
         if (null === $this->useragent) {
             throw new \InvalidArgumentException('no useragent was set');
@@ -340,7 +340,7 @@ class RegexFactory implements Factory\FactoryInterface
     /**
      * @return array
      */
-    public function getBrowser()
+    public function getBrowser(): array
     {
         if (null === $this->useragent) {
             throw new \InvalidArgumentException('no useragent was set');
@@ -429,7 +429,7 @@ class RegexFactory implements Factory\FactoryInterface
     /**
      * @return \UaResult\Engine\EngineInterface
      */
-    public function getEngine()
+    public function getEngine(): EngineInterface
     {
         if (null === $this->useragent) {
             throw new \InvalidArgumentException('no useragent was set');

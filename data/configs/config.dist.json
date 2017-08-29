@@ -1,0 +1,128 @@
+{
+  "modules": {
+    "browser-detector": {
+      "name": "BrowserDetector",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": true,
+      "cache-dir": "data/cache/browser/",
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/browser-detector/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
+    },
+    "browscap3": {
+      "name": "Browscap-PHP (3.x)",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": true,
+      "cache-dir": "data/cache/browscap3/",
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/browscap3/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "Browscap"
+    },
+    "crossjoin": {
+      "name": "Crossjoin-Browscap",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": true,
+      "cache-dir": "data/cache/crossjoin/",
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/crossjoin/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "Browscap"
+    },
+    "native-get-browser": {
+      "name": "native get_browser function",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": true,
+      "cache-dir": "data/cache/native/",
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/native/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "Browscap"
+    },
+    "piwik": {
+      "name": "Piwik",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": false,
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/piwik/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "PiwikDetector"
+    },
+    "ua-parser": {
+      "name": "UAParser",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": false,
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/ua-parser/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "UaParser"
+    },
+    "which-browser": {
+      "name": "WhichBrowser",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": false,
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/which-browser/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "WhichBrowser"
+    },
+    "woothee": {
+      "name": "Woothee",
+      "enabled": false,
+      "class": "Http",
+      "requires-cache": false,
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/woothee/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "Local",
+      "mapper": "Woothee"
+    }
+  }
+}

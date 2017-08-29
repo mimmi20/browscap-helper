@@ -25,7 +25,7 @@ class TargetDirectory
      *
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         $number = $this->getNextTest();
 
@@ -37,7 +37,7 @@ class TargetDirectory
      *
      * @return int
      */
-    public function getNextTest()
+    public function getNextTest(): int
     {
         $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 

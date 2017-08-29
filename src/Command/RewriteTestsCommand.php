@@ -30,6 +30,7 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
+use UaResult\Result\ResultInterface;
 use Wurfl\Request\GenericRequestFactory;
 
 /**
@@ -281,9 +282,9 @@ class T' . $group . 'Test extends UserAgentsTest
     private function handleFile(
         \SplFileInfo $file,
         array &$checks,
-        &$groupCounter,
-        $group
-    ) {
+        int &$groupCounter,
+        int $group
+    ): int {
         $this->logger->info('    checking ...');
 
         /** @var $file \SplFileInfo */
@@ -374,9 +375,9 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @param string $useragent
      *
-     * @return \UaResult\Result\Result
+     * @return \UaResult\Result\ResultInterface
      */
-    private function handleTest($useragent)
+    private function handleTest(string $useragent): ResultInterface
     {
         $this->logger->info('        rewriting');
 
@@ -421,7 +422,8 @@ class T' . $group . 'Test extends UserAgentsTest
         }
 
         if (!$replaced
-            && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+            && $device->getType()->isMobile()
+            && !in_array($device->getDeviceName(), ['general Apple Device'])
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             try {

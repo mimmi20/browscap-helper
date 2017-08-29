@@ -229,7 +229,7 @@ class CreateTestsCommand extends Command
      * @param array  &$outputDetector
      * @param int    $testNumber
      */
-    private function parseLine($ua, $counter, &$outputBrowscap, array &$outputDetector, $testNumber)
+    private function parseLine(string $ua, int $counter, string &$outputBrowscap, array &$outputDetector, int $testNumber): void
     {
         $this->logger->info('      create result');
 
