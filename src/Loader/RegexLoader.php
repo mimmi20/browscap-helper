@@ -29,16 +29,16 @@ use Symfony\Component\Yaml\Yaml;
 class RegexLoader
 {
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * an logger instance
      *
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache

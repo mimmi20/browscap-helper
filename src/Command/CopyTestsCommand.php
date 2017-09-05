@@ -157,7 +157,7 @@ class CopyTestsCommand extends Command
                 continue;
             }
 
-            $targetFilename = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', (int) $fileCounter) . '.json';
+            $targetFilename = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $fileCounter) . '.json';
 
             if (!$fileCreated && file_exists($targetDirectory . $targetFilename)) {
                 $this->logger->emergency('    target file for chunk ' . $fileCounter . ' already exists');
@@ -168,7 +168,7 @@ class CopyTestsCommand extends Command
 
             $data[$key] = [
                 'ua'     => $ua,
-                'result' => $result->toArray(false),
+                'result' => $result->toArray(),
             ];
 
             ++$counter;

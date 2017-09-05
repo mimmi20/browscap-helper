@@ -42,7 +42,7 @@ class CollectionSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter   = 0;
         $allAgents = [];
@@ -75,7 +75,7 @@ class CollectionSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         $allTests = [];
 

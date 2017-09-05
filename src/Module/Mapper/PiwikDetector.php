@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Module\Mapper;
 
 use BrowscapHelper\DataMapper\InputMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Browser\Browser;
@@ -20,7 +21,7 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
+use UaResult\Result\ResultInterface;
 
 /**
  * BrowscapHelper.ini parsing class with caching and update capabilities
@@ -34,14 +35,14 @@ use Wurfl\Request\GenericRequestFactory;
 class PiwikDetector implements MapperInterface
 {
     /**
-     * @var \BrowscapHelper\DataMapper\InputMapper|null
+     * @var \BrowscapHelper\DataMapper\InputMapper
      */
-    private $mapper = null;
+    private $mapper;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \BrowscapHelper\DataMapper\InputMapper $mapper
@@ -71,14 +72,17 @@ class PiwikDetector implements MapperInterface
 
             if (!empty($parserResult->bot->producer->name)) {
                 $browserMakerKey = $this->mapper->mapBrowserMaker($parserResult->bot->producer->name, $browserName);
-                try {
-                    $browserManufacturer = (new CompanyLoader($this->cache))->load($browserMakerKey);
-                } catch (NotFoundException $e) {
-                    //$this->logger->info($e);
+
+                if (null !== $browserMakerKey) {
+                    try {
+                        $browserManufacturer = (new CompanyLoader($this->cache))->load($browserMakerKey);
+                    } catch (NotFoundException $e) {
+                        //$this->logger->info($e);
+                    }
                 }
             }
 
-            $browserType = $this->mapper->mapBrowserType($this->cache, 'robot');
+            $browserType = $this->mapper->mapBrowserType('robot');
         } else {
             $browserName    = $this->mapper->mapBrowserName($parserResult->client->name);
             $browserVersion = $this->mapper->mapBrowserVersion(
@@ -87,7 +91,7 @@ class PiwikDetector implements MapperInterface
             );
 
             if (!empty($parserResult->client->type)) {
-                $browserType = $this->mapper->mapBrowserType($this->cache, $parserResult->client->type);
+                $browserType = $this->mapper->mapBrowserType($parserResult->client->type);
             } else {
                 $browserType = null;
             }
@@ -100,22 +104,30 @@ class PiwikDetector implements MapperInterface
             $browserType
         );
 
-        $deviceName = $this->mapper->mapDeviceName($parserResult->device->model);
+        $deviceName    = $this->mapper->mapDeviceName($parserResult->device->model);
+        $marketingName = null;
+
+        if (null !== $deviceName) {
+            $marketingName = $this->mapper->mapDeviceMarketingName($deviceName);
+        }
 
         $deviceBrand    = null;
         $deviceBrandKey = $this->mapper->mapDeviceBrandName($parserResult->device->brand, $deviceName);
-        try {
-            $deviceBrand = (new CompanyLoader($this->cache))->load($deviceBrandKey);
-        } catch (NotFoundException $e) {
-            //$this->logger->info($e);
+
+        if (null !== $deviceBrandKey) {
+            try {
+                $deviceBrand = (new CompanyLoader($this->cache))->load($deviceBrandKey);
+            } catch (NotFoundException $e) {
+                //$this->logger->info($e);
+            }
         }
 
         $device = new Device(
             $deviceName,
-            $this->mapper->mapDeviceMarketingName($deviceName),
+            $marketingName,
             null,
             $deviceBrand,
-            $this->mapper->mapDeviceType($this->cache, $parserResult->device->type)
+            $this->mapper->mapDeviceType($parserResult->device->type)
         );
 
         $os = new Os(null, null);
@@ -139,6 +151,6 @@ class PiwikDetector implements MapperInterface
 
         $requestFactory = new GenericRequestFactory();
 
-        return new Result($requestFactory->createRequestForUserAgent($agent), $device, $os, $browser, $engine);
+        return new Result($requestFactory->createRequestFromString(trim($agent))->getHeaders(), $device, $os, $browser, $engine);
     }
 }

@@ -20,6 +20,7 @@ use BrowscapHelper\DataMapper\DeviceTypeMapper;
 use BrowscapHelper\DataMapper\EngineNameMapper;
 use BrowscapHelper\DataMapper\PlatformNameMapper;
 use BrowscapHelper\DataMapper\PlatformVersionMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -30,7 +31,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -42,12 +42,12 @@ class PiwikSource implements SourceInterface
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Psr\Log\LoggerInterface          $logger
@@ -64,7 +64,7 @@ class PiwikSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -82,11 +82,11 @@ class PiwikSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
             $row     = json_decode($row, false);
-            $request = (new GenericRequestFactory())->createRequestForUserAgent($row->user_agent);
+            $request = (new GenericRequestFactory())->createRequestFromString($row->user_agent);
 
             $browserManufacturer = null;
             $browserVersion      = null;
@@ -106,7 +106,7 @@ class PiwikSource implements SourceInterface
                 }
 
                 try {
-                    $browserType = (new BrowserTypeMapper())->mapBrowserType($this->cache, 'robot');
+                    $browserType = (new BrowserTypeMapper())->mapBrowserType('robot');
                 } catch (NotFoundException $e) {
                     $this->logger->critical($e);
                     $browserType = null;
@@ -120,7 +120,7 @@ class PiwikSource implements SourceInterface
 
                 if (!empty($row->client->type)) {
                     try {
-                        $browserType = (new BrowserTypeMapper())->mapBrowserType($this->cache, (string) $row->client->type);
+                        $browserType = (new BrowserTypeMapper())->mapBrowserType((string) $row->client->type);
                     } catch (NotFoundException $e) {
                         $this->logger->critical($e);
                         $browserType = null;
@@ -149,7 +149,7 @@ class PiwikSource implements SourceInterface
                 }
 
                 try {
-                    $deviceType = (new DeviceTypeMapper())->mapDeviceType($this->cache, (string) $row->device->type);
+                    $deviceType = (new DeviceTypeMapper())->mapDeviceType((string) $row->device->type);
                 } catch (NotFoundException $e) {
                     $this->logger->critical($e);
                     $deviceType = null;
@@ -157,7 +157,7 @@ class PiwikSource implements SourceInterface
             } else {
                 $deviceName  = 'unknown';
                 $deviceBrand = null;
-                $deviceType  = (new DeviceTypeMapper())->mapDeviceType($this->cache, 'unknown');
+                $deviceType  = (new DeviceTypeMapper())->mapDeviceType('unknown');
             }
 
             $device = new Device(
@@ -187,14 +187,14 @@ class PiwikSource implements SourceInterface
                 $engine = new Engine(null);
             }
 
-            yield trim($row->user_agent) => new Result($request, $device, $os, $browser, $engine);
+            yield trim($row->user_agent) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
     /**
      * @return string[]
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $path = 'vendor/piwik/device-detector/Tests/fixtures';
 

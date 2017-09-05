@@ -11,7 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\DataMapper;
 
-use Psr\Cache\CacheItemPoolInterface;
+use UaDeviceType\TypeInterface;
 use UaDeviceType\TypeLoader;
 
 /**
@@ -28,17 +28,12 @@ class DeviceTypeMapper
     /**
      * maps the name of a device
      *
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param string                            $deviceType
+     * @param string $deviceType
      *
      * @return \UaDeviceType\TypeInterface
      */
-    public function mapDeviceType(CacheItemPoolInterface $cache, $deviceType)
+    public function mapDeviceType(string $deviceType): TypeInterface
     {
-        if (null === $deviceType) {
-            return (new TypeLoader($cache))->load('unknown');
-        }
-
         switch (mb_strtolower($deviceType)) {
             case 'smart-tv':
             case 'tv device':
@@ -73,6 +68,6 @@ class DeviceTypeMapper
                 break;
         }
 
-        return (new TypeLoader($cache))->load($typeKey);
+        return (new TypeLoader())->load($typeKey);
     }
 }

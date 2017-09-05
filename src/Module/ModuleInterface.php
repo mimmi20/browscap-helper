@@ -81,4 +81,9 @@ interface ModuleInterface
      * @return \UaResult\Result\ResultInterface|null
      */
     public function getDetectionResult(): ?ResultInterface;
+
+    /**
+     * @return string
+     */
+    public function getName(): string;
 }

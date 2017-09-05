@@ -43,7 +43,7 @@ class Local implements CheckInterface
         CacheItemPoolInterface $cache,
         LoggerInterface $logger,
         string $agent
-    ): stdClass {
+    ): \stdClass {
         /*
          * no json returned?
          */

@@ -25,14 +25,14 @@ class DeviceMarketingnameMapper
     /**
      * maps the marketing name of a device
      *
-     * @param string $marketingName
+     * @param string|null $marketingName
      *
      * @return string|null
      */
-    public function mapDeviceMarketingName($marketingName)
+    public function mapDeviceMarketingName(?string $marketingName = null): ?string
     {
         if (null === $marketingName) {
-            return;
+            return null;
         }
 
         switch (mb_strtolower($marketingName)) {
@@ -159,10 +159,10 @@ class DeviceMarketingnameMapper
      *
      * @return string|null
      */
-    public function mapDeviceName($deviceName)
+    public function mapDeviceName(?string $deviceName = null): ?string
     {
         if (null === $deviceName) {
-            return;
+            return null;
         }
 
         $marketingName = null;

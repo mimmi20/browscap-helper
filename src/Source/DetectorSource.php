@@ -24,14 +24,14 @@ use UaResult\Result\ResultFactory;
 class DetectorSource implements SourceInterface
 {
     /**
-     * @var null
+     * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Psr\Log\LoggerInterface          $logger
@@ -48,7 +48,7 @@ class DetectorSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -65,7 +65,7 @@ class DetectorSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         $resultFactory = new ResultFactory();
 
@@ -77,7 +77,7 @@ class DetectorSource implements SourceInterface
     /**
      * @return \StdClass[]
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $path = 'vendor/mimmi20/browser-detector-tests/tests/issues';
 

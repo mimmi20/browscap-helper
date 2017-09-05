@@ -18,8 +18,8 @@ namespace BrowscapHelper\Helper;
  */
 class Check
 {
-    const MINIMUM = 'minimum';
-    const MEDIUM  = 'medium';
+    public const MINIMUM = 'minimum';
+    public const MEDIUM  = 'medium';
 
     /**
      * Executes the current command.
@@ -29,11 +29,11 @@ class Check
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @param int $checklevel
+     * @param string $checklevel
      *
      * @return array
      */
-    public function getChecks(int $checklevel): array
+    public function getChecks(string $checklevel): array
     {
         $checks = [
             'Browser' => [

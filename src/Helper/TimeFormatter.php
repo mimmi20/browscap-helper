@@ -30,13 +30,13 @@ class TimeFormatter
     public static function formatTime(string $time): string
     {
         $wochen      = (int) ((int) $time / 604800);
-        $restwoche   = (int) ((int) $time % 604800);
+        $restwoche   = ($time % 604800);
         $tage        = (int) ($restwoche / 86400);
-        $resttage    = (int) ($restwoche % 86400);
+        $resttage    = ($restwoche % 86400);
         $stunden     = (int) ($resttage / 3600);
-        $reststunden = (int) ($resttage % 3600);
+        $reststunden = ($resttage % 3600);
         $minuten     = (int) ($reststunden / 60);
-        $sekunden    = (int) ($reststunden % 60);
+        $sekunden    = ($reststunden % 60);
 
         return mb_substr('00' . $wochen, -2) . ' Wochen '
             . mb_substr('00' . $tage, -2) . ' Tage '

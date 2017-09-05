@@ -29,12 +29,8 @@ class PlatformNameMapper
      *
      * @return string|null
      */
-    public function mapOsName($osName)
+    public function mapOsName(string $osName): ?string
     {
-        if (null === $osName) {
-            return;
-        }
-
         switch (mb_strtolower($osName)) {
             case '':
             case 'unknown':

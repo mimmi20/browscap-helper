@@ -16,6 +16,7 @@ use BrowscapHelper\DataMapper\BrowserTypeMapper;
 use BrowscapHelper\DataMapper\BrowserVersionMapper;
 use BrowscapHelper\DataMapper\PlatformNameMapper;
 use BrowscapHelper\DataMapper\PlatformVersionMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\Version;
 use Psr\Cache\CacheItemPoolInterface;
@@ -27,7 +28,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -39,12 +39,12 @@ class WootheeSource implements SourceInterface
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Psr\Log\LoggerInterface          $logger
@@ -61,7 +61,7 @@ class WootheeSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -72,7 +72,7 @@ class WootheeSource implements SourceInterface
 
             $row = json_decode($row, false);
 
-            yield $row->target;
+            yield trim($row->target);
             ++$counter;
         }
     }
@@ -80,16 +80,16 @@ class WootheeSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
             $row     = json_decode($row, false);
-            $request = (new GenericRequestFactory())->createRequestForUserAgent($row->target);
+            $request = (new GenericRequestFactory())->createRequestFromString($row->target);
 
             $browserName = (new BrowserNameMapper())->mapBrowserName($row->name);
 
             try {
-                $browserType = (new BrowserTypeMapper())->mapBrowserType($this->cache, $row->category);
+                $browserType = (new BrowserTypeMapper())->mapBrowserType($row->category);
             } catch (NotFoundException $e) {
                 $this->logger->critical($e);
                 $browserType = null;
@@ -130,14 +130,14 @@ class WootheeSource implements SourceInterface
             $device = new Device(null, null);
             $engine = new Engine(null);
 
-            yield $row->target => new Result($request, $device, $os, $browser, $engine);
+            yield trim($row->target) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
     /**
      * @return string[]
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $path = 'vendor/woothee/woothee-testset/testsets';
 

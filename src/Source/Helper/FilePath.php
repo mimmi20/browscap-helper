@@ -30,7 +30,7 @@ class FilePath
         $realpath = realpath($file->getPathname());
 
         if (false === $realpath) {
-            return;
+            return null;
         }
 
         switch ($file->getExtension()) {

@@ -18,7 +18,6 @@ rm -rf ../data/cache/
 mkdir ../data/cache/
 mkdir ../data/cache/browscap3/
 mkdir ../data/cache/browser/
-mkdir ../data/cache/crossjoin/
 mkdir ../data/cache/native/
 mkdir ../data/cache/piwik/
 mkdir ../data/cache/uaparser/
@@ -33,6 +32,3 @@ php build-browscap.ini.php
 
 echo "Updating browscap-php (3.x) data..."
 php update-browscap-php.php
-
-echo "Updating crossjoin-browscap data..."
-php update-crossjoin-browscap.php

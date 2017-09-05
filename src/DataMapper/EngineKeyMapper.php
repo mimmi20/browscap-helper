@@ -27,14 +27,10 @@ class EngineKeyMapper
      *
      * @param string $engineName
      *
-     * @return string|null
+     * @return string
      */
-    public function mapEngineKey($engineName)
+    public function mapEngineKey(string $engineName): string
     {
-        if (null === $engineName) {
-            return 'unknown';
-        }
-
         switch (mb_strtolower($engineName)) {
             case '':
             case 'unknown':

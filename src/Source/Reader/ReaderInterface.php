@@ -11,6 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source\Reader;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Class DiffCommand
  *
@@ -23,10 +25,12 @@ interface ReaderInterface
     /**
      * @param string $file
      */
-    public function setLocalFile($file): void;
+    public function setLocalFile(string $file): void;
 
     /**
-     * @return array
+     * @param \Psr\Log\LoggerInterface $logger
+     *
+     * @return iterable
      */
-    public function getAgents(): iterator;
+    public function getAgents(LoggerInterface $logger): iterable;
 }

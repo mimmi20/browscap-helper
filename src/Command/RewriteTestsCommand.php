@@ -16,6 +16,7 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
 use Monolog\Handler\PsrHandler;
@@ -27,11 +28,8 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class RewriteTestsCommand
@@ -158,7 +156,7 @@ class RewriteTestsCommand extends Command
                 $g            = $group;
             }
 
-            $newCounter = $this->handleFile($file, $checks, $groupCounter, $group);
+            $newCounter = $this->handleFile($file, $checks, $groupCounter, (int) $group);
 
             if (!$newCounter) {
                 continue;
@@ -338,7 +336,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $outputDetector += [
                 $newKey => [
                     'ua'     => $test->ua,
-                    'result' => $this->handleTest($test->ua)->toArray(false),
+                    'result' => $this->handleTest($test->ua)->toArray(),
                 ],
             ];
             ++$groupCounter;
@@ -390,19 +388,11 @@ class T' . $group . 'Test extends UserAgentsTest
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $result->getBrowser();
 
-        if (null === $browser) {
-            $browser = new Browser(null);
-        }
-
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
         $platform = clone $result->getOs();
-
-        if (null === $platform) {
-            $platform = new Os(null, null);
-        }
 
         /* @var $platform \UaResult\Os\OsInterface|null */
 
@@ -448,7 +438,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
                 $device = clone $result->getDevice();
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
                 }
             } catch (NotFoundException $e) {
@@ -457,7 +447,7 @@ class T' . $group . 'Test extends UserAgentsTest
                 $device   = clone $result->getDevice();
                 $replaced = false;
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device   = new Device(null, null);
                     $replaced = true;
                 }
@@ -483,7 +473,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
                 $device = clone $result->getDevice();
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
                 }
             } catch (\Exception $e) {
@@ -491,7 +481,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
                 $device = clone $result->getDevice();
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
                 }
             }
@@ -502,14 +492,10 @@ class T' . $group . 'Test extends UserAgentsTest
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $result->getEngine();
 
-        if (null === $engine) {
-            $engine = new Engine(null);
-        }
-
         $this->logger->info('        generating result');
 
         $request = (new GenericRequestFactory())->createRequestFromString($useragent);
 
-        return new Result($request, $device, $platform, $browser, $engine);
+        return new Result($request->getHeaders(), $device, $platform, $browser, $engine);
     }
 }

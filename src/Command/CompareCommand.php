@@ -32,8 +32,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CompareCommand extends Command
 {
-    const COL_LENGTH       = 50;
-    const FIRST_COL_LENGTH = 20;
+    private const COL_LENGTH       = 50;
+    private const FIRST_COL_LENGTH = 20;
 
     /**
      * @var \Monolog\Logger
@@ -107,10 +107,10 @@ class CompareCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
-        $output->writeln('preparing App ...');
-
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
+
+        $output->writeln('preparing App ...');
 
         /*******************************************************************************
          * Loop

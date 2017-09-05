@@ -29,12 +29,8 @@ class EngineNameMapper
      *
      * @return string|null
      */
-    public function mapEngineName($engineName)
+    public function mapEngineName(string $engineName): ?string
     {
-        if (null === $engineName) {
-            return;
-        }
-
         switch (mb_strtolower($engineName)) {
             case '':
             case 'unknown':

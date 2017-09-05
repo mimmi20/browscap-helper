@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
+use BrowserDetector\Helper\GenericRequestFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -19,7 +20,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -31,7 +31,7 @@ class UapCoreSource implements SourceInterface
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
@@ -46,7 +46,7 @@ class UapCoreSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -63,23 +63,23 @@ class UapCoreSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $request  = (new GenericRequestFactory())->createRequestForUserAgent($row['user_agent_string']);
+            $request  = (new GenericRequestFactory())->createRequestFromString($row['user_agent_string']);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($row['user_agent_string']) => new Result($request, $device, $platform, $browser, $engine);
+            yield trim($row['user_agent_string']) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
      * @return array[]
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $path = 'vendor/thadafinser/uap-core/tests';
 

@@ -15,6 +15,7 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
 use BrowserDetector\Detector;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -29,7 +30,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class CreateTestsCommand
@@ -182,7 +182,7 @@ class CreateTestsCommand extends Command
             ++$totalCounter;
 
             file_put_contents(
-                $targetDirectory . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', (int) $fileCounter) . '.json',
+                $targetDirectory . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $fileCounter) . '.json',
                 json_encode(
                     $outputDetector,
                     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
@@ -238,8 +238,8 @@ class CreateTestsCommand extends Command
         $engine   = new Engine(null);
         $browser  = new Browser(null);
 
-        $formatedIssue   = sprintf('%1$05d', (int) $testNumber);
-        $formatedCounter = sprintf('%1$05d', (int) $counter);
+        $formatedIssue   = sprintf('%1$05d', $testNumber);
+        $formatedCounter = sprintf('%1$05d', $counter);
 
         $this->logger->info('      writing browscap data ...');
 
@@ -284,8 +284,8 @@ class CreateTestsCommand extends Command
 
         $this->logger->info('      detecting test name ...');
 
-        $formatedIssue   = sprintf('%1$07d', (int) $testNumber);
-        $formatedCounter = sprintf('%1$05d', (int) $counter);
+        $formatedIssue   = sprintf('%1$07d', $testNumber);
+        $formatedCounter = sprintf('%1$05d', $counter);
 
         $this->logger->info('      detecting request ...');
 
@@ -293,7 +293,7 @@ class CreateTestsCommand extends Command
 
         $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
             'ua'     => $ua,
-            'result' => (new Result($request, $device, $platform, $browser, $engine))->toArray(false),
+            'result' => (new Result($request->getHeaders(), $device, $platform, $browser, $engine))->toArray(),
         ];
     }
 }

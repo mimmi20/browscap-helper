@@ -13,6 +13,7 @@ namespace BrowscapHelper\Module\Mapper;
 
 use BrowscapHelper\DataMapper\InputMapper;
 use Psr\Cache\CacheItemPoolInterface;
+use UaResult\Result\ResultInterface;
 
 /**
  * BrowscapHelper.ini parsing class with caching and update capabilities
@@ -26,14 +27,14 @@ use Psr\Cache\CacheItemPoolInterface;
 class BrowserDetectorModule implements MapperInterface
 {
     /**
-     * @var \BrowscapHelper\DataMapper\InputMapper|null
+     * @var \BrowscapHelper\DataMapper\InputMapper
      */
-    private $mapper = null;
+    private $mapper;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \BrowscapHelper\DataMapper\InputMapper $mapper
@@ -51,7 +52,7 @@ class BrowserDetectorModule implements MapperInterface
      * @param \UaResult\Result\ResultInterface $parserResult
      * @param string                           $agent
      *
-     * @return \UaResult\Result\Result the object containing the browsers details
+     * @return \UaResult\Result\ResultInterface the object containing the browsers details
      */
     public function map($parserResult, string $agent): ResultInterface
     {

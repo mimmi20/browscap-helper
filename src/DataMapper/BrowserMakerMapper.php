@@ -30,17 +30,17 @@ class BrowserMakerMapper
      *
      * @return string|null
      */
-    public function mapBrowserMaker($browserMaker, $browserName = null)
+    public function mapBrowserMaker(string $browserMaker, ?string $browserName = null): ?string
     {
         if (null === $browserName) {
-            return;
+            return null;
         }
 
         switch (mb_strtolower($browserName)) {
             case 'unknown':
             case 'other':
             case '':
-                $browserMaker = null;
+                return null;
                 break;
             default:
                 $browserMaker = (new MakerMapper())->mapMaker($browserMaker);

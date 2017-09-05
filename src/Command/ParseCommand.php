@@ -42,9 +42,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ParseCommand extends Command
 {
-    const SOURCE_SQL  = 'sql';
-    const SOURCE_DIR  = 'dir';
-    const SOURCE_TEST = 'tests';
+    private const SOURCE_SQL  = 'sql';
+    private const SOURCE_DIR  = 'dir';
+    private const SOURCE_TEST = 'tests';
 
     /**
      * @var array
@@ -134,8 +134,6 @@ class ParseCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
-        $output->writeln('preparing App ...');
-
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
@@ -193,18 +191,6 @@ class ParseCommand extends Command
         }
 
         /*******************************************************************************
-         * init Modules
-         */
-
-        $output->writeln('initializing modules ...');
-
-        foreach ($collection->getModules() as $module) {
-            $output->writeln('    initializing module ' . $module->getName() . ' ...');
-
-            $module->init();
-        }
-
-        /*******************************************************************************
          * initialize Source
          */
 
@@ -258,10 +244,9 @@ class ParseCommand extends Command
 
             foreach ($collection as $module) {
                 /* @var \BrowscapHelper\Module\ModuleInterface $module */
-                $module
-                    ->startTimer()
-                    ->detect($agent)
-                    ->endTimer();
+                $module->startTimer();
+                $module->detect($agent);
+                $module->endTimer();
 
                 $detectionResult = $module->getDetectionResult();
                 $actualTime      = $module->getTime();

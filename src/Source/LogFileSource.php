@@ -13,6 +13,7 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Helper\FilePath;
 use BrowscapHelper\Source\Reader\LogFileReader;
+use BrowserDetector\Helper\GenericRequestFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use UaResult\Browser\Browser;
@@ -20,7 +21,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -30,20 +30,20 @@ use Wurfl\Request\GenericRequestFactory;
 class LogFileSource implements SourceInterface
 {
     /**
-     * @var string|null
+     * @var string
      */
-    private $sourcesDirectory = null;
+    private $sourcesDirectory;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
      * @param string                   $sourcesDirectory
      */
-    public function __construct(LoggerInterface $logger, $sourcesDirectory)
+    public function __construct(LoggerInterface $logger, string $sourcesDirectory)
     {
         $this->logger           = $logger;
         $this->sourcesDirectory = $sourcesDirectory;
@@ -54,7 +54,7 @@ class LogFileSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter   = 0;
         $allAgents = [];
@@ -72,7 +72,7 @@ class LogFileSource implements SourceInterface
                 continue;
             }
 
-            yield $agent;
+            yield trim($agent);
             $allAgents[$agent] = 1;
             ++$counter;
         }
@@ -81,7 +81,7 @@ class LogFileSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         $allTests = [];
 
@@ -94,13 +94,13 @@ class LogFileSource implements SourceInterface
                 continue;
             }
 
-            $request  = (new GenericRequestFactory())->createRequestForUserAgent($agent);
+            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield $agent => new Result($request, $device, $platform, $browser, $engine);
+            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
             $allTests[$agent] = 1;
         }
     }
@@ -108,7 +108,7 @@ class LogFileSource implements SourceInterface
     /**
      * @return array
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $finder = new Finder();
         $finder->files();
@@ -148,7 +148,7 @@ class LogFileSource implements SourceInterface
     /**
      * @return string[]
      */
-    private function getAgents(): iterator
+    private function getAgents(): iterable
     {
         $reader = new LogFileReader();
 

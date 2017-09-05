@@ -30,10 +30,10 @@ class PlatformMakerMapper
      *
      * @return string|null
      */
-    public function mapOsMaker($osMaker, $osName = null)
+    public function mapOsMaker(string $osMaker, ?string $osName = null): ?string
     {
         if (null === $osName) {
-            return;
+            return null;
         }
 
         switch (mb_strtolower($osName)) {

@@ -20,6 +20,7 @@ use BrowscapHelper\DataMapper\EngineNameMapper;
 use BrowscapHelper\DataMapper\EngineVersionMapper;
 use BrowscapHelper\DataMapper\PlatformNameMapper;
 use BrowscapHelper\DataMapper\PlatformVersionMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -30,7 +31,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -42,12 +42,12 @@ class WhichBrowserSource implements SourceInterface
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Psr\Log\LoggerInterface          $logger
@@ -64,7 +64,7 @@ class WhichBrowserSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -75,7 +75,7 @@ class WhichBrowserSource implements SourceInterface
 
             $row = json_decode($row, false);
 
-            yield $row->{'User-Agent'};
+            yield trim($row->{'User-Agent'});
             ++$counter;
         }
     }
@@ -83,12 +83,12 @@ class WhichBrowserSource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
             $row     = json_decode($row, false);
             $agent   = $row->{'User-Agent'};
-            $request = (new GenericRequestFactory())->createRequestForUserAgent($agent);
+            $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             if (isset($row->browser->name)) {
                 $browserName = (new BrowserNameMapper())->mapBrowserName($row->browser->name);
@@ -104,7 +104,7 @@ class WhichBrowserSource implements SourceInterface
 
             if (!empty($row->browser->type)) {
                 try {
-                    $browserType = (new BrowserTypeMapper())->mapBrowserType($this->cache, $row->browser->type);
+                    $browserType = (new BrowserTypeMapper())->mapBrowserType($row->browser->type);
                 } catch (NotFoundException $e) {
                     $this->logger->critical($e);
                     $browserType = null;
@@ -122,7 +122,7 @@ class WhichBrowserSource implements SourceInterface
 
             if (isset($row->device->type)) {
                 try {
-                    $deviceType = (new DeviceTypeMapper())->mapDeviceType($this->cache, $row->device->type);
+                    $deviceType = (new DeviceTypeMapper())->mapDeviceType($row->device->type);
                 } catch (NotFoundException $e) {
                     $this->logger->critical($e);
                     $deviceType = null;
@@ -179,14 +179,14 @@ class WhichBrowserSource implements SourceInterface
                 $engineVersion
             );
 
-            yield $agent => new Result($request, $device, $os, $browser, $engine);
+            yield trim($agent) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
     /**
      * @return array[]
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $path = 'vendor/whichbrowser/parser/tests/data';
 
@@ -252,18 +252,20 @@ class WhichBrowserSource implements SourceInterface
      */
     private function getAgentFromRow(array $row): string
     {
-        if (isset($row['headers']['User-Agent'])) {
-            return $row['headers']['User-Agent'];
-        }
+        if (isset($row['headers'])) {
+            if (isset($row['headers']['User-Agent'])) {
+                return $row['headers']['User-Agent'];
+            }
 
-        if (class_exists('\http\Header')) {
-            // pecl_http versions 2.x/3.x
-            $headers = \http\Header::parse($row['headers']);
-        } elseif (function_exists('\http_parse_headers')) {
-            // pecl_http version 1.x
-            $headers = \http_parse_headers($row['headers']);
-        } else {
-            return '';
+            if (class_exists('\http\Header')) {
+                // pecl_http versions 2.x/3.x
+                $headers = \http\Header::parse($row['headers']);
+            } elseif (function_exists('\http_parse_headers')) {
+                // pecl_http version 1.x
+                $headers = \http_parse_headers($row['headers']);
+            } else {
+                return '';
+            }
         }
 
         if (isset($headers['User-Agent'])) {

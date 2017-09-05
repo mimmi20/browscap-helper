@@ -12,13 +12,14 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Module\Mapper;
 
 use BrowscapHelper\DataMapper\InputMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
+use UaResult\Result\ResultInterface;
 
 /**
  * BrowscapHelper.ini parsing class with caching and update capabilities
@@ -32,14 +33,14 @@ use Wurfl\Request\GenericRequestFactory;
 class WhichBrowser implements MapperInterface
 {
     /**
-     * @var \BrowscapHelper\DataMapper\InputMapper|null
+     * @var \BrowscapHelper\DataMapper\InputMapper
      */
-    private $mapper = null;
+    private $mapper;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \BrowscapHelper\DataMapper\InputMapper $mapper
@@ -70,7 +71,7 @@ class WhichBrowser implements MapperInterface
         }
 
         if (!empty($parserResult->browser->type)) {
-            $browserType = $this->mapper->mapBrowserType($this->cache, $parserResult->browser->type);
+            $browserType = $this->mapper->mapBrowserType($parserResult->browser->type);
         } else {
             $browserType = null;
         }
@@ -87,7 +88,7 @@ class WhichBrowser implements MapperInterface
             $this->mapper->mapDeviceMarketingName($parserResult->device->model),
             null,
             null,
-            $this->mapper->mapDeviceType($this->cache, $parserResult->device->type)
+            $this->mapper->mapDeviceType($parserResult->device->type)
         );
 
         $platform = $this->mapper->mapOsName($parserResult->os->name);
@@ -114,6 +115,6 @@ class WhichBrowser implements MapperInterface
 
         $requestFactory = new GenericRequestFactory();
 
-        return new Result($requestFactory->createRequestForUserAgent($agent), $device, $os, $browser, $engine);
+        return new Result($requestFactory->createRequestFromString(trim($agent))->getHeaders(), $device, $os, $browser, $engine);
     }
 }

@@ -13,6 +13,7 @@ namespace BrowscapHelper\DataMapper;
 
 use BrowserDetector\Version\Version;
 use BrowserDetector\Version\VersionFactory;
+use BrowserDetector\Version\VersionInterface;
 
 /**
  * class with caching and update capabilities
@@ -31,30 +32,26 @@ class BrowserVersionMapper
      * @param string      $browserVersion
      * @param string|null $browserName
      *
-     * @return \BrowserDetector\Version\Version
+     * @return \BrowserDetector\Version\VersionInterface
      */
-    public function mapBrowserVersion($browserVersion, $browserName = null)
+    public function mapBrowserVersion(string $browserVersion, ?string $browserName = null): VersionInterface
     {
-        if (null === $browserVersion) {
-            return new Version(0);
-        }
-
         switch (mb_strtolower($browserVersion)) {
             case '':
             case 'unknown':
             case 'other':
-                return new Version(0);
+                return new Version('0');
                 break;
             default:
                 if (null === $browserName) {
-                    return new Version(0);
+                    return new Version('0');
                 }
 
                 switch (mb_strtolower($browserName)) {
                     case '':
                     case 'unknown':
                     case 'other':
-                        return new Version(0);
+                        return new Version('0');
                         break;
                     default:
                         // nothing to do here

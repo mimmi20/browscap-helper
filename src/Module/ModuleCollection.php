@@ -61,16 +61,6 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * initializes the module
-     */
-    public function init(): void
-    {
-        foreach ($this->modules as $module) {
-            $module->init();
-        }
-    }
-
-    /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
      *

@@ -11,13 +11,13 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
+use BrowserDetector\Helper\GenericRequestFactory;
 use Psr\Log\LoggerInterface;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -29,12 +29,12 @@ class PdoSource implements SourceInterface
     /**
      * @var \PDO
      */
-    private $pdo = null;
+    private $pdo;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
@@ -51,26 +51,26 @@ class PdoSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         foreach ($this->getAgents($limit) as $agent) {
-            yield $agent;
+            yield trim($agent);
         }
     }
 
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->getAgents() as $agent) {
-            $request  = (new GenericRequestFactory())->createRequestForUserAgent($agent);
+            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield $agent => new Result($request, $device, $platform, $browser, $engine);
+            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
@@ -79,12 +79,12 @@ class PdoSource implements SourceInterface
      *
      * @return string[]
      */
-    private function getAgents($limit = 0)
+    private function getAgents(int $limit = 0): iterable
     {
         $sql = 'SELECT DISTINCT SQL_BIG_RESULT HIGH_PRIORITY `agent` FROM `agents` ORDER BY `lastTimeFound` DESC, `count` DESC, `idAgents` DESC';
 
         if ($limit) {
-            $sql .= ' LIMIT ' . (int) $limit;
+            $sql .= ' LIMIT ' . $limit;
         }
 
         $driverOptions = [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY];

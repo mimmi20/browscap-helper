@@ -30,10 +30,10 @@ class DeviceMakerMapper
      *
      * @return string|null
      */
-    public function mapDeviceMaker($deviceMaker, $deviceName = null)
+    public function mapDeviceMaker(string $deviceMaker, ?string $deviceName = null): ?string
     {
         if (null === $deviceName) {
-            return;
+            return null;
         }
 
         switch (mb_strtolower($deviceName)) {

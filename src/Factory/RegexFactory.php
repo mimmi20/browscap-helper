@@ -22,6 +22,8 @@ use BrowserDetector\Loader\PlatformLoader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Stringy\Stringy;
+use UaResult\Engine\EngineInterface;
+use UaResult\Os\OsInterface;
 
 /**
  * detection class using regexes
@@ -32,12 +34,12 @@ use Stringy\Stringy;
  * @copyright 2012-2017 Thomas Mueller
  * @license   http://www.opensource.org/licenses/MIT MIT License
  */
-class RegexFactory implements Factory\FactoryInterface
+class RegexFactory
 {
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var array|null
@@ -54,7 +56,7 @@ class RegexFactory implements Factory\FactoryInterface
      *
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var bool

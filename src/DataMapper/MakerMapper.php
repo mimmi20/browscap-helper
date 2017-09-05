@@ -29,12 +29,8 @@ class MakerMapper
      *
      * @return string|null
      */
-    public function mapMaker($maker)
+    public function mapMaker(string $maker): ?string
     {
-        if (null === $maker) {
-            return;
-        }
-
         switch (mb_strtolower(trim($maker))) {
             case '':
             case 'unknown':

@@ -15,6 +15,7 @@ use BrowscapHelper\DataMapper\BrowserTypeMapper;
 use BrowscapHelper\DataMapper\BrowserVersionMapper;
 use BrowscapHelper\DataMapper\DeviceTypeMapper;
 use BrowscapHelper\DataMapper\EngineVersionMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -25,7 +26,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -35,14 +35,14 @@ use Wurfl\Request\GenericRequestFactory;
 class BrowscapSource implements SourceInterface
 {
     /**
-     * @var null
+     * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Psr\Log\LoggerInterface          $logger
@@ -59,7 +59,7 @@ class BrowscapSource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -74,9 +74,9 @@ class BrowscapSource implements SourceInterface
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return \UaResult\Result\ResultInterface[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
             $agent   = trim($row['ua']);
@@ -84,7 +84,7 @@ class BrowscapSource implements SourceInterface
 
             if (array_key_exists('Browser_Type', $row['properties'])) {
                 try {
-                    $browserType = (new BrowserTypeMapper())->mapBrowserType($this->cache, $row['properties']['Browser_Type']);
+                    $browserType = (new BrowserTypeMapper())->mapBrowserType($row['properties']['Browser_Type']);
                 } catch (NotFoundException $e) {
                     $this->logger->critical($e);
                     $browserType = null;
@@ -107,7 +107,7 @@ class BrowscapSource implements SourceInterface
             }
 
             if (array_key_exists('Browser_Bits', $row['properties'])) {
-                $bits = $row['properties']['Browser_Bits'];
+                $bits = (int) $row['properties']['Browser_Bits'];
             } else {
                 $this->logger->warning('The browser bits are missing for UA "' . $agent . '"');
                 $bits = null;
@@ -155,7 +155,7 @@ class BrowscapSource implements SourceInterface
 
             if (array_key_exists('Device_Type', $row['properties'])) {
                 try {
-                    $deviceType = (new DeviceTypeMapper())->mapDeviceType($this->cache, $row['properties']['Device_Type']);
+                    $deviceType = (new DeviceTypeMapper())->mapDeviceType($row['properties']['Device_Type']);
                 } catch (NotFoundException $e) {
                     $this->logger->critical($e);
                     $deviceType = null;
@@ -253,14 +253,14 @@ class BrowscapSource implements SourceInterface
                 $engine = null;
             }
 
-            yield $agent => new Result($request, $device, $platform, $browser, $engine);
+            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
      * @return array[]
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $path = 'vendor/browscap/browscap/tests/fixtures/issues';
 

@@ -31,18 +31,8 @@ class BrowserNameMapper
      *
      * @return string|null
      */
-    public function mapBrowserName($browserInput)
+    public function mapBrowserName(string $browserInput): ?string
     {
-        if (null === $browserInput) {
-            return;
-        }
-
-        if (!is_string($browserInput)) {
-            throw new \UnexpectedValueException(
-                'a string is required as input in this function'
-            );
-        }
-
         $browserName = $browserInput;
 
         switch (mb_strtolower($browserInput)) {

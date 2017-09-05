@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Module\Mapper;
 
 use BrowscapHelper\DataMapper\InputMapper;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Version\Version;
 use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Browser\Browser;
@@ -19,7 +20,7 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
+use UaResult\Result\ResultInterface;
 
 /**
  * BrowscapHelper.ini parsing class with caching and update capabilities
@@ -33,14 +34,14 @@ use Wurfl\Request\GenericRequestFactory;
 class UaParser implements MapperInterface
 {
     /**
-     * @var \BrowscapHelper\DataMapper\InputMapper|null
+     * @var \BrowscapHelper\DataMapper\InputMapper
      */
-    private $mapper = null;
+    private $mapper;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \BrowscapHelper\DataMapper\InputMapper $mapper
@@ -65,14 +66,14 @@ class UaParser implements MapperInterface
         $browser = new Browser(
             $this->mapper->mapBrowserName($parserResult->ua->family),
             null,
-            new Version((int) $parserResult->ua->major, (int) $parserResult->ua->minor, (string) $parserResult->ua->patch)
+            new Version((string) $parserResult->ua->major, (string) $parserResult->ua->minor, (string) $parserResult->ua->patch)
         );
 
         $os = new Os(
             $this->mapper->mapOsName($parserResult->os->family),
             null,
             null,
-            new Version((int) $parserResult->os->major, (int) $parserResult->os->minor, (string) $parserResult->os->patch)
+            new Version((string) $parserResult->os->major, (string) $parserResult->os->minor, (string) $parserResult->os->patch)
         );
 
         $device = new Device(null, null);
@@ -80,6 +81,6 @@ class UaParser implements MapperInterface
 
         $requestFactory = new GenericRequestFactory();
 
-        return new Result($requestFactory->createRequestForUserAgent($agent), $device, $os, $browser, $engine);
+        return new Result($requestFactory->createRequestFromString(trim($agent))->getHeaders(), $device, $os, $browser, $engine);
     }
 }

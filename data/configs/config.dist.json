@@ -32,22 +32,6 @@
       "check": "Local",
       "mapper": "Browscap"
     },
-    "crossjoin": {
-      "name": "Crossjoin-Browscap",
-      "enabled": false,
-      "class": "Http",
-      "requires-cache": true,
-      "cache-dir": "data/cache/crossjoin/",
-      "request": {
-        "method": "GET",
-        "ua-key": "useragent",
-        "uri": "http://localhost:8000/web/crossjoin/detect.php",
-        "params": {},
-        "headers": {}
-      },
-      "check": "Local",
-      "mapper": "Browscap"
-    },
     "native-get-browser": {
       "name": "native get_browser function",
       "enabled": false,

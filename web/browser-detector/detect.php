@@ -63,18 +63,18 @@ $start = microtime(true);
 $parser = new Detector($cache, $logger);
 
 try {
-    /** @var \UaResult\Result\Result $detectionResult */
-    $detectionResult = $parser->getBrowser($_GET['useragent'], true);
+    /** @var array $detectionResult */
+    $detectionResult = $parser->getBrowser($_GET['useragent'])->toArray();
 } catch (\Exception $e) {
     $logger->critical($e);
-    $detectionResult = null;
+    $detectionResult = [];
 }
 
 $duration = microtime(true) - $start;
 
 echo htmlentities(serialize(
     [
-        'result'   => $detectionResult->toArray(),
+        'result'   => $detectionResult,
         'duration' => $duration,
         'memory'   => memory_get_usage(true),
     ]

@@ -11,6 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Module\Mapper;
 
+use UaResult\Result\ResultInterface;
+
 /**
  * Browscap.ini parsing class with caching and update capabilities
  *

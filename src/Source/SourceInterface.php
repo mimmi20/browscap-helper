@@ -23,10 +23,10 @@ interface SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator;
+    public function getUserAgents(int $limit = 0): iterable;
 
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator;
+    public function getTests(): iterable;
 }

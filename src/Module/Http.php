@@ -20,6 +20,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request as GuzzleHttpRequest;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use UaResult\Result\ResultInterface;
 
 /**
  * BrowscapHelper.ini parsing class with caching and update capabilities
@@ -58,24 +59,24 @@ class Http implements ModuleInterface
     private $agent = '';
 
     /**
-     * @var null|\Ubench
+     * @var \Ubench
      */
-    private $bench = null;
+    private $bench;
 
     /**
-     * @var null|array
+     * @var array
      */
     private $config = null;
 
     /**
-     * @var null|\BrowscapHelper\Module\Check\CheckInterface
+     * @var \BrowscapHelper\Module\Check\CheckInterface
      */
-    private $check = null;
+    private $check;
 
     /**
-     * @var null|\BrowscapHelper\Module\Mapper\MapperInterface
+     * @var \BrowscapHelper\Module\Mapper\MapperInterface
      */
-    private $mapper = null;
+    private $mapper;
 
     /**
      * @var \GuzzleHttp\Psr7\Request
@@ -151,8 +152,6 @@ class Http implements ModuleInterface
         } catch (RequestException $e) {
             $this->logger->error($e);
         }
-
-        return $this;
     }
 
     /**
@@ -170,8 +169,8 @@ class Http implements ModuleInterface
     {
         $this->bench->end();
 
-        $this->duration = $this->bench->getTime(true);
-        $this->memory   = $this->bench->getMemoryPeak(true);
+        $this->duration = (float) $this->bench->getTime(true);
+        $this->memory   = (int) $this->bench->getMemoryPeak(true);
     }
 
     /**
@@ -200,11 +199,11 @@ class Http implements ModuleInterface
     public function getDetectionResult(): ?ResultInterface
     {
         if (null === $this->detectionResult) {
-            return;
+            return null;
         }
 
         try {
-            $return = $this->getCheck()->getResponse(
+            $return = $this->check->getResponse(
                 $this->detectionResult,
                 $this->request,
                 $this->cache,
@@ -214,7 +213,7 @@ class Http implements ModuleInterface
         } catch (RequestException $e) {
             $this->logger->error($e);
 
-            return;
+            return null;
         }
 
         if (isset($return->duration)) {
@@ -231,12 +230,22 @@ class Http implements ModuleInterface
 
         try {
             if (isset($return->result)) {
-                return $this->getMapper()->map($return->result, $this->agent);
+                return $this->mapper->map($return->result, $this->agent);
             }
 
-            return $this->getMapper()->map($return, $this->agent);
+            return $this->mapper->map($return, $this->agent);
         } catch (\UnexpectedValueException $e) {
             $this->logger->error($e);
         }
+
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 }

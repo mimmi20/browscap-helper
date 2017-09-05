@@ -37,7 +37,7 @@ class LogFileReader implements ReaderInterface
     /**
      * @param string $file
      */
-    public function setLocalFile($file): void
+    public function setLocalFile(string $file): void
     {
         $this->loader->setLocalFile($file);
     }
@@ -47,7 +47,7 @@ class LogFileReader implements ReaderInterface
      *
      * @return \Generator
      */
-    public function getAgents(LoggerInterface $logger = null): iterator
+    public function getAgents(LoggerInterface $logger): iterable
     {
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $this->loader->load();

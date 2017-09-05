@@ -11,7 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\DataMapper;
 
-use Psr\Cache\CacheItemPoolInterface;
+use UaBrowserType\TypeInterface;
 use UaBrowserType\TypeLoader;
 
 /**
@@ -28,17 +28,12 @@ class BrowserTypeMapper
     /**
      * maps the browser type
      *
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param string                            $browserType
+     * @param string $browserType
      *
      * @return \UaBrowserType\TypeInterface
      */
-    public function mapBrowserType(CacheItemPoolInterface $cache, $browserType)
+    public function mapBrowserType(string $browserType): TypeInterface
     {
-        if (null === $browserType) {
-            return (new TypeLoader($cache))->load('unknown');
-        }
-
         switch (mb_strtolower($browserType)) {
             case 'browser':
             case 'mobile browser':
@@ -90,6 +85,6 @@ class BrowserTypeMapper
                 break;
         }
 
-        return (new TypeLoader($cache))->load($typeKey);
+        return (new TypeLoader())->load($typeKey);
     }
 }

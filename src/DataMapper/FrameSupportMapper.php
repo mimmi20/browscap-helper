@@ -29,20 +29,16 @@ class FrameSupportMapper
      *
      * @return string
      */
-    public function mapFrameSupport($support)
+    public function mapFrameSupport($support): string
     {
-        switch ($support) {
-            case true:
-                $support = 'full';
-                break;
-            case false:
-                $support = 'none';
-                break;
-            default:
-                // nothing to do here
-                break;
+        if (true === $support) {
+            return 'full';
         }
 
-        return $support;
+        if (false === $support) {
+            return 'none';
+        }
+
+        return (string) $support;
     }
 }

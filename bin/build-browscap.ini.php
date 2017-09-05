@@ -54,7 +54,7 @@ $buildGenerator
     ->setCollectionCreator(new CollectionCreator())
     ->setWriterCollection($writerCollection);
 
-$version = (int) file_get_contents('vendor/browscap/browscap/BUILD_NUMBER');
+$version = (string) file_get_contents('vendor/browscap/browscap/BUILD_NUMBER');
 
 $buildGenerator->run($version, false);
 

@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
+use BrowserDetector\Helper\GenericRequestFactory;
 use FileLoader\Loader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
@@ -19,7 +20,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
 
 /**
  * Class DirectorySource
@@ -31,23 +31,23 @@ class DirectorySource implements SourceInterface
     /**
      * @var string
      */
-    private $dir = null;
+    private $dir;
 
     /**
      * @var \FileLoader\Loader
      */
-    private $loader = null;
+    private $loader;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
      * @param string                   $dir
      */
-    public function __construct(LoggerInterface $logger, $dir)
+    public function __construct(LoggerInterface $logger, string $dir)
     {
         $this->logger = $logger;
         $this->dir    = $dir;
@@ -59,7 +59,7 @@ class DirectorySource implements SourceInterface
      *
      * @return string[]
      */
-    public function getUserAgents(int $limit = 0): iterator
+    public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
 
@@ -68,7 +68,7 @@ class DirectorySource implements SourceInterface
                 return;
             }
 
-            yield $line;
+            yield trim($line);
             ++$counter;
         }
     }
@@ -76,23 +76,23 @@ class DirectorySource implements SourceInterface
     /**
      * @return \UaResult\Result\Result[]
      */
-    public function getTests(): iterator
+    public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $line) {
-            $request  = (new GenericRequestFactory())->createRequestForUserAgent($line);
+            $request  = (new GenericRequestFactory())->createRequestFromString($line);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield $line => new Result($request, $device, $platform, $browser, $engine);
+            yield trim($line) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
      * @return \Generator
      */
-    private function loadFromPath(): iterator
+    private function loadFromPath(): iterable
     {
         $allLines = [];
         $finder   = new Finder();

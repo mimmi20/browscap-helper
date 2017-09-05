@@ -66,16 +66,16 @@ class MessageFormatter
     }
 
     /**
-     * @param \BrowscapHelper\Helper\string|string $propertyName
-     * @param \Psr\Cache\CacheItemPoolInterface    $cache
-     * @param \Psr\Log\LoggerInterface             $logger
+     * @param string                            $propertyName
+     * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param \Psr\Log\LoggerInterface          $logger
      *
      * @return string[]
      */
     public function formatMessage(string $propertyName, CacheItemPoolInterface $cache, LoggerInterface $logger): array
     {
         $modules = array_keys($this->collection);
-        /** @var \UaResult\Result\Result $firstElement */
+        /** @var \UaResult\Result\Result|null $firstElement */
         $firstElement = $this->collection[$modules[0]]['result'];
 
         if (null === $firstElement) {
@@ -87,7 +87,7 @@ class MessageFormatter
         $detectionResults = [];
 
         foreach ($modules as $module => $name) {
-            /** @var \UaResult\Result\Result $element */
+            /** @var \UaResult\Result\Result|null $element */
             $element = $this->collection[$name]['result'];
             if (null === $element) {
                 $strTarget = '(NULL)';
@@ -216,9 +216,6 @@ class MessageFormatter
             case 'pointing_method':
                 $value = $element->getDevice()->getPointingMethod();
                 break;
-            case 'has_qwerty_keyboard':
-                $value = $element->getDevice()->getHasQwertyKeyboard();
-                break;
             case 'resolution_width':
                 $value = $element->getDevice()->getResolutionWidth();
                 break;
@@ -227,9 +224,6 @@ class MessageFormatter
                 break;
             case 'dual_orientation':
                 $value = $element->getDevice()->getDualOrientation();
-                break;
-            case 'colors':
-                $value = $element->getDevice()->getColors();
                 break;
             default:
                 $value = '(n/a)';

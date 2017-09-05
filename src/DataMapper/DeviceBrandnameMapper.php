@@ -29,12 +29,8 @@ class DeviceBrandnameMapper
      *
      * @return string|null
      */
-    public function mapDeviceBrandName($brandName)
+    public function mapDeviceBrandName(string $brandName): ?string
     {
-        if (null === $brandName) {
-            return;
-        }
-
         switch (mb_strtolower($brandName)) {
             case '':
             case 'unknown':
@@ -124,10 +120,10 @@ class DeviceBrandnameMapper
      *
      * @return string|null
      */
-    public function mapDeviceName($deviceName)
+    public function mapDeviceName(?string $deviceName = null): ?string
     {
         if (null === $deviceName) {
-            return;
+            return null;
         }
 
         $brandName = null;
