@@ -63,7 +63,7 @@ jobs:
       install:
         - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction --no-suggest --no-dev $COMPOSER_FLAGS -vv
         - travis_retry composer require --update-with-dependencies --prefer-dist phpstan/phpstan:0.8.4
-      script: vendor/bin/phpstan analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress src web bin
+      script: vendor/bin/phpstan analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress src web bin tests
 
 notifications:
   email: false

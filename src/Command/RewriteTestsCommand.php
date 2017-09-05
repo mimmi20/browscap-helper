@@ -101,7 +101,7 @@ class RewriteTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
+        $sourceDirectory = 'tests/issues/';
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
@@ -167,7 +167,7 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('preparing circle.yml ...');
 
-        $circleFile      = 'vendor/mimmi20/browser-detector-tests/circle.yml';
+        $circleFile      = 'circle.yml';
         $circleciContent = 'machine:
   php:
     version: 7.1.0
@@ -227,7 +227,7 @@ test:
 
             $testContent = '<?php
 /**
- * This file is part of the browser-detector-tests package.
+ * This file is part of the browscap-helper package.
  *
  * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
@@ -236,9 +236,9 @@ test:
  */
 
 declare(strict_types = 1);
-namespace BrowserDetectorTest\UserAgentsTest;
+namespace BrowscapHelperTest\UserAgentsTest;
 
-use BrowserDetectorTest\UserAgentsTest;
+use BrowscapHelperTest\UserAgentsTestTrait;
 
 /**
  * Class T' . $group . 'Test
@@ -249,15 +249,17 @@ use BrowserDetectorTest\UserAgentsTest;
  * @author     Thomas Mueller <mimmi20@live.de>
  * @group      ' . $group . '
  */
-class T' . $group . 'Test extends UserAgentsTest
+class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 {
+    use UserAgentsTestTrait;
+
     /**
      * @var string
      */
-    protected $sourceDirectory = \'tests/issues/' . $group . '/\';
+    private $sourceDirectory = \'tests/issues/' . $group . '/\';
 }
 ';
-            $testFile = 'vendor/mimmi20/browser-detector-tests/tests/UserAgentsTest/T' . $group . 'Test.php';
+            $testFile = 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
         }
 

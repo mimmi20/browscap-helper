@@ -16,6 +16,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/web')
     ->in(__DIR__ . '/bin')
+    ->in(__DIR__ . '/tests')
 ;
 
 return PhpCsFixer\Config::create()

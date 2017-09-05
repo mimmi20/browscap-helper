@@ -79,7 +79,7 @@ class DetectorSource implements SourceInterface
      */
     private function loadFromPath(): iterable
     {
-        $path = 'vendor/mimmi20/browser-detector-tests/tests/issues';
+        $path = 'tests/issues';
 
         if (!file_exists($path)) {
             return;
