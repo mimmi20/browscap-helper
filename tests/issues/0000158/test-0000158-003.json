@@ -1,0 +1,3902 @@
+{
+    "test-0000158-300": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 6.0b; Windows NT 5.0; .NET CLR 1.1.4322)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 6.0b; Windows NT 5.0; .NET CLR 1.1.4322)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "6.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.0",
+                "marketingName": "Windows 2000",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-301": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; SM-T325 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; SM-T325 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "SM-T325",
+                "marketingName": "Galaxy Tab Pro 8.4 LTE",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 2560,
+                "resolutionHeight": 1600,
+                "dualOrientation": true,
+                "type": "fone-pad"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-302": {
+        "ua": "Mozilla/5.0 (X11;) AppleWebKit/534.34 (KHTML, like Gecko) kded/4.11.5 Safari/534.34",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (X11;) AppleWebKit/534.34 (KHTML, like Gecko) kded/4.11.5 Safari/534.34"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "kded",
+                "modus": null,
+                "version": "4.11.5",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Linux",
+                "marketingName": "Linux",
+                "version": "0.0.0",
+                "manufacturer": "LinuxFoundation",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.34.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-303": {
+        "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.21 (KHTML, like Gecko) konqueror/4.11.5 Safari/537.21",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.21 (KHTML, like Gecko) konqueror/4.11.5 Safari/537.21"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Konqueror",
+                "modus": null,
+                "version": "4.11.5",
+                "manufacturer": "Kde",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Linux",
+                "marketingName": "Linux",
+                "version": "0.0.0",
+                "manufacturer": "LinuxFoundation",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.21.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-304": {
+        "ua": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; Valve Steam GameOverlay/1416350232; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.86 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; Valve Steam GameOverlay/1416350232; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.86 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "35.0.1916.86",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-305": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; tb-gmx/2.6.0; EIE10;DEDEMSE; rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; tb-gmx/2.6.0; EIE10;DEDEMSE; rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-306": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; tb-webde/2.6.0; (webde/1.4.0.0))",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; tb-webde/2.6.0; (webde/1.4.0.0))"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-307": {
+        "ua": "Mozilla/5.0 (Windows NT 6.0; rv:34.0) Gecko/20100101 Firefox/34.0 anonymized by Abelssoft 1124527414",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.0; rv:34.0) Gecko/20100101 Firefox/34.0 anonymized by Abelssoft 1124527414"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "34.0.0",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.0",
+                "marketingName": "Windows Vista",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "34.0.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-308": {
+        "ua": "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.04 (lucid) Firefox/3.6.13",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.04 (lucid) Firefox/3.6.13"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "3.6.13",
+                "manufacturer": "MozillaFoundation",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Ubuntu",
+                "marketingName": "Ubuntu",
+                "version": "10.04.0",
+                "manufacturer": "Canonical",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "1.9.2.13",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-309": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Win64; x64; Trident/5.0; .NET CLR 2.0.50727; SLCC1; Media Center PC 5.0; .NET CLR 3.5.21022; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E; .NET CLR 3.0.30729; Creative AutoUpdate v1.40.01)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Win64; x64; Trident/5.0; .NET CLR 2.0.50727; SLCC1; Media Center PC 5.0; .NET CLR 3.5.21022; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E; .NET CLR 3.0.30729; Creative AutoUpdate v1.40.01)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "9.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.0",
+                "marketingName": "Windows Vista",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "5.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-310": {
+        "ua": "Mozilla/5.0 (Windows NT 5.1; rv:34.0) Gecko/20100101 Firefox/34.0 DT-Browser/DTB7.34.0.19_05",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 5.1; rv:34.0) Gecko/20100101 Firefox/34.0 DT-Browser/DTB7.34.0.19_05"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "DT Browser",
+                "modus": null,
+                "version": "7.34.0.19.05",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "34.0.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-311": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; rv:31.0) Gecko/20100101 Firefox/31.0 anonymized by Abelssoft 2021633465",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; rv:31.0) Gecko/20100101 Firefox/31.0 anonymized by Abelssoft 2021633465"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "31.0.0",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "31.0.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-312": {
+        "ua": "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; MDDCJS; rv:11.0; GTB7.5) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; MDDCJS; rv:11.0; GTB7.5) like Gecko"
+            },
+            "device": {
+                "deviceName": "PC",
+                "marketingName": "PC",
+                "manufacturer": "Dell",
+                "brand": "Dell",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.3",
+                "marketingName": "Windows 8.1",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-313": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; GT-N7100 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; GT-N7100 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "GT-N7100",
+                "marketingName": "Galaxy Note II",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 720,
+                "resolutionHeight": 1280,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-314": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; NP06; tb-webde/1.7.0; rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; NP06; tb-webde/1.7.0; rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "PC",
+                "marketingName": "PC",
+                "manufacturer": "Asus",
+                "brand": "Asus",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-315": {
+        "ua": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0; tb-webde/2.4.1; MASEJS)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0; tb-webde/2.4.1; MASEJS)"
+            },
+            "device": {
+                "deviceName": "PC",
+                "marketingName": "PC",
+                "manufacturer": "Sony",
+                "brand": "Sony",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "10.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.2",
+                "marketingName": "Windows 8",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "6.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-316": {
+        "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B411 [FBAN/FBIOS;FBAV/20.1.0.15.10;FBBV/5758778;FBDV/iPhone5,4;FBMD/iPhone;FBSN/iPhone OS;FBSV/8.1;FBSS/2; FBCR/E-Plus;FBID/phone;FBLC/de_DE;FBOP/5]",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B411 [FBAN/FBIOS;FBAV/20.1.0.15.10;FBBV/5758778;FBDV/iPhone5,4;FBMD/iPhone;FBSN/iPhone OS;FBSV/8.1;FBSS/2; FBCR/E-Plus;FBID/phone;FBLC/de_DE;FBOP/5]"
+            },
+            "device": {
+                "deviceName": "iPhone 5C",
+                "marketingName": "iPhone 5C",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 640,
+                "resolutionHeight": 1136,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Facebook App",
+                "modus": null,
+                "version": "20.1.0.15.10",
+                "manufacturer": "Facebook",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "8.1.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "600.1.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-317": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; Lark FreeMe X2 7 ver.3 Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; Lark FreeMe X2 7 ver.3 Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "X2",
+                "marketingName": "X2",
+                "manufacturer": "SonyEricsson",
+                "brand": "SonyEricsson",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-318": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; ASUS_T00G Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; ASUS_T00G Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-319": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; GTB7.5; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; GTB7.5; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-320": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1,gzip(gfe)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1,gzip(gfe)"
+            },
+            "device": {
+                "deviceName": "Macintosh",
+                "marketingName": "Macintosh",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "6.0.5",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.5",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "536.30.1",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-321": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; GTB6; (R1 1.5); .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; GTB6; (R1 1.5); .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-322": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; de-de; SAMSUNG GT-I9301I/I9301IXXUANH1 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; de-de; SAMSUNG GT-I9301I/I9301IXXUANH1 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "GT-I9301I",
+                "marketingName": "Galaxy S3 Neo Plus",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 720,
+                "resolutionHeight": 1280,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "1.5.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-323": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; RAINBOW 4G Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; RAINBOW 4G Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Rainbow",
+                "marketingName": "Rainbow",
+                "manufacturer": "Wiko",
+                "brand": "Wiko",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 720,
+                "resolutionHeight": 1280,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-324": {
+        "ua": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 YaBrowser/14.7.1916.15705 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 YaBrowser/14.7.1916.15705 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Yandex Browser",
+                "modus": null,
+                "version": "14.7.1916.15705",
+                "manufacturer": "Yandex",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.3",
+                "marketingName": "Windows 8.1",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-325": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/6.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; MAFS; ibrytetoolbar_browseforchange; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; tb-webde/2.4.0)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/6.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; MAFS; ibrytetoolbar_browseforchange; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; tb-webde/2.4.0)"
+            },
+            "device": {
+                "deviceName": "PC",
+                "marketingName": "PC",
+                "manufacturer": "Fujitsu",
+                "brand": "Fujitsu",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "10.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "6.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-326": {
+        "ua": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0; tb-webde/2.4.0)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0; tb-webde/2.4.0)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "10.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "6.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-327": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; InfoPath.2; OfficeLiveConnector.1.5; OfficeLivePatch.1.3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; InfoPath.2; OfficeLiveConnector.1.5; OfficeLivePatch.1.3)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-328": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.4; XT1032 Build/KXB21.14-L1.40) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.4; XT1032 Build/KXB21.14-L1.40) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "XT1032",
+                "marketingName": "Moto G",
+                "manufacturer": "Motorola",
+                "brand": "Motorola",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 720,
+                "resolutionHeight": 1280,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-329": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET4.0C; .NET4.0E; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; Media Center PC 6.0; Microsoft Outlook 14.0.7113; ms-office; MSOffice 14)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET4.0C; .NET4.0E; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; Media Center PC 6.0; Microsoft Outlook 14.0.7113; ms-office; MSOffice 14)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Outlook",
+                "modus": null,
+                "version": "2010.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "email-client"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-330": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; C2105 Build/15.3.A.1.17) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.117 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; C2105 Build/15.3.A.1.17) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.117 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "C2105",
+                "marketingName": "Xperia L",
+                "manufacturer": "Sony",
+                "brand": "Sony",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 854,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "37.0.2062.117",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-331": {
+        "ua": "Googlebot/2.X (+http://www.googlebot.com/bot.html)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Googlebot/2.X (+http://www.googlebot.com/bot.html)"
+            },
+            "device": {
+                "deviceName": null,
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Google Bot",
+                "modus": null,
+                "version": "2.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "bot"
+            },
+            "os": {
+                "name": null,
+                "marketingName": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32
+            },
+            "engine": {
+                "name": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown"
+            }
+        }
+    },
+    "test-0000158-332": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET4.0C; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0E)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET4.0C; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0E)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-333": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; HM NOTE 1W Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; HM NOTE 1W Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "HM NOTE 1W",
+                "marketingName": "Redmi Note",
+                "manufacturer": "XiaomiTech",
+                "brand": "XiaomiTech",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 540,
+                "resolutionHeight": 960,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-334": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; GTB7.5; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; InfoPath.1; .NET4.0C; .NET4.0E)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; GTB7.5; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; InfoPath.1; .NET4.0C; .NET4.0E)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-335": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; TOB 6.11; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; TOB 6.11; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "T-Online Browser",
+                "modus": null,
+                "version": "6.11.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-336": {
+        "ua": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2268.0 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2268.0 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "41.0.2268.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Linux",
+                "marketingName": "Linux",
+                "version": "0.0.0",
+                "manufacturer": "LinuxFoundation",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-337": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 1.1.4322; .NET4.0C; .NET4.0E; InfoPath.3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 1.1.4322; .NET4.0C; .NET4.0E; InfoPath.3)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-338": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; i-NavFourF; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; i-NavFourF; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "7.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-339": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.3; de-de; Archos 45b Platinum Build/JLS36C) AppleWebKit/537.16 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.16",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.3; de-de; Archos 45b Platinum Build/JLS36C) AppleWebKit/537.16 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.16"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.3.0",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.16.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-340": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; C2005 Build/15.2.A.2.5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; C2005 Build/15.2.A.2.5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "C2005",
+                "marketingName": "Xperia M Dual",
+                "manufacturer": "Sony",
+                "brand": "Sony",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 854,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-341": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.3; en-gb; SAMSUNG SM-G7102 Build/JLS36C) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.3; en-gb; SAMSUNG SM-G7102 Build/JLS36C) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "SM-G7102",
+                "marketingName": "Galaxy Grand 2 Duos",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 720,
+                "resolutionHeight": 1280,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "1.5.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.3.0",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-342": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 1.1.4322; InfoPath.2; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 1.1.4322; InfoPath.2; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-343": {
+        "ua": "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "36.0.1985.143",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.2",
+                "marketingName": "Windows 8",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-344": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; SM-N9005 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/24.0.0.30.15;]",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; SM-N9005 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/24.0.0.30.15;]"
+            },
+            "device": {
+                "deviceName": "SM-N9005",
+                "marketingName": "Galaxy Note 3 LTE",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Facebook App",
+                "modus": null,
+                "version": "24.0.0.30.15",
+                "manufacturer": "Facebook",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-345": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; BRI/2; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; MSNIE8A)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; BRI/2; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; MSNIE8A)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-346": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; it-it; VT10416-1 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; it-it; VT10416-1 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30"
+            },
+            "device": {
+                "deviceName": "VT10416-1",
+                "marketingName": "Peoples Tablet",
+                "manufacturer": "TrekStor",
+                "brand": "TrekStor",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1366,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-347": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.1; Tablet PC 2.0)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.1; Tablet PC 2.0)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-348": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; GT95 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; GT95 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-349": {
+        "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_4 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) GSA/5.1.42378 Mobile/11B554a Safari/9537.53",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_4 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) GSA/5.1.42378 Mobile/11B554a Safari/9537.53"
+            },
+            "device": {
+                "deviceName": "iPhone",
+                "marketingName": "iPhone",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Google App",
+                "modus": null,
+                "version": "5.1.42378",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "7.0.4",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.51.1",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-350": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; GTB6.3; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; GTB6.3; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.2",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-351": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; AOL 9.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729; Tablet PC 2.0; MAARJS)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; AOL 9.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729; Tablet PC 2.0; MAARJS)"
+            },
+            "device": {
+                "deviceName": "PC",
+                "marketingName": "PC",
+                "manufacturer": "Acer",
+                "brand": "Acer",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.2",
+                "marketingName": "Windows 8",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-352": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; Cynus F4 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 [FB_IAB/FB4A;FBAV/24.0.0.30.15;]",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; Cynus F4 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 [FB_IAB/FB4A;FBAV/24.0.0.30.15;]"
+            },
+            "device": {
+                "deviceName": "MT-7521S",
+                "marketingName": "Cynus F4",
+                "manufacturer": "Mobistel",
+                "brand": "Mobistel",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 854,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Facebook App",
+                "modus": null,
+                "version": "24.0.0.30.15",
+                "manufacturer": "Facebook",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-353": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.4; Nexus 7 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.59 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.4; Nexus 7 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.59 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Nexus 7",
+                "marketingName": "Nexus 7",
+                "manufacturer": "Asus",
+                "brand": "Google",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1280,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-354": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.5; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; MS-RTC LM 8)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.5; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; MS-RTC LM 8)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-355": {
+        "ua": "Mozilla/5.0 (Windows NT 6.3; ARM; Trident/7.0; Touch; WebView/2.0; rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; ARM; Trident/7.0; Touch; WebView/2.0; rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows RT Tablet",
+                "marketingName": "Windows RT Tablet",
+                "manufacturer": "Microsoft",
+                "brand": "Microsoft",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1280,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows RT 6.3",
+                "marketingName": "Windows RT 8.1",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-356": {
+        "ua": "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.1) Gecko/20071205 Iceweasel/2.0.0.1 (Debian-2.0.0.1+dfsg-2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.1) Gecko/20071205 Iceweasel/2.0.0.1 (Debian-2.0.0.1+dfsg-2)"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Iceweasel",
+                "modus": null,
+                "version": "2.0.0.1",
+                "manufacturer": "SoftwareInThePublicInterest",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Debian",
+                "marketingName": "Debian",
+                "version": "0.0.0",
+                "manufacturer": "SoftwareInThePublicInterest",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "1.8.1.1",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-357": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0 DT-Browser/DTB7.029.0040",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0 DT-Browser/DTB7.029.0040"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "DT Browser",
+                "modus": null,
+                "version": "7.029.0040",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "29.0.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-358": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; InfoPath.1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; InfoPath.1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-359": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; tb-webde/2.6.0; yie11; rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; tb-webde/2.6.0; yie11; rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-360": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-V400 Build/KOT49I.A1399997689) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-V400 Build/KOT49I.A1399997689) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "V400",
+                "marketingName": "G Pad 7.0",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1280,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-361": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; tb-webde/2.6.0; MSNIE9A; rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; tb-webde/2.6.0; MSNIE9A; rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-362": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.4.2; de-de; HTC_One_max/2.62.111.2 Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.4.2; de-de; HTC_One_max/2.62.111.2 Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "One Max",
+                "marketingName": "One Max",
+                "manufacturer": "Htc",
+                "brand": "Htc",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 540,
+                "resolutionHeight": 960,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-363": {
+        "ua": "python-requests/2.5.1 CPython/2.7.9 Windows/2012Server",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "python-requests/2.5.1 CPython/2.7.9 Windows/2012Server"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "python-requests",
+                "modus": null,
+                "version": "2.5.1",
+                "manufacturer": "PythonSoftwareFoundation",
+                "bits": 32,
+                "type": "bot"
+            },
+            "os": {
+                "name": "Windows",
+                "marketingName": "Windows",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown"
+            }
+        }
+    },
+    "test-0000158-364": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.2; .NET4.0C; .NET4.0E; OfficeLiveConnector.1.5; OfficeLivePatch.1.3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.2; .NET4.0C; .NET4.0E; OfficeLiveConnector.1.5; OfficeLivePatch.1.3)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-365": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; InfoPath.1; OfficeLiveConnector.1.5; OfficeLivePatch.1.3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; InfoPath.1; OfficeLiveConnector.1.5; OfficeLivePatch.1.3)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-366": {
+        "ua": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0) ICAPoHTTPS",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0) ICAPoHTTPS"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "10.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "6.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-367": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; it-it; SAMSUNG GT-I9515/I9515XXU1ANI2 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; it-it; SAMSUNG GT-I9515/I9515XXU1ANI2 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "GT-I9515",
+                "marketingName": "Galaxy S4 Value Edition",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "1.5.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-368": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; SurfTab ST70204-3-a Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; SurfTab ST70204-3-a Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-369": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; .NET4.0C)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; .NET4.0C)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-370": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; Media Center PC 6.0; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729; MSOffice 12)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; Media Center PC 6.0; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729; MSOffice 12)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Office",
+                "modus": null,
+                "version": "2007.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "Windows NT 6.2",
+                "marketingName": "Windows 8",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-371": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; InfoPath.3; .NET4.0E; Tablet PC 2.0)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; InfoPath.3; .NET4.0E; Tablet PC 2.0)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-372": {
+        "ua": "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; tb-webde/2.6.0; (web.de/1.3.0.0); rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; tb-webde/2.6.0; (web.de/1.3.0.0); rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.3",
+                "marketingName": "Windows 8.1",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-373": {
+        "ua": "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; tb-webde/2.6.0; (web.de/1.3.0.0; GTB7.5); rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; tb-webde/2.6.0; (web.de/1.3.0.0; GTB7.5); rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.3",
+                "marketingName": "Windows 8.1",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-374": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.4.2; de-de; LG-D855 Build/KVT49L.A1401987978) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.4.2; de-de; LG-D855 Build/KVT49L.A1401987978) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "D855",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-375": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; Z130 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.102 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; Z130 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.102 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Z130",
+                "marketingName": "Liquid Z3",
+                "manufacturer": "Acer",
+                "brand": "Acer",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "38.0.2125.102",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-376": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.0.4; MEDION E4001 Build/IMM76I) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.0.4; MEDION E4001 Build/IMM76I) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-377": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; GT-I9195 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 ACHEETAHI/2100501026",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; GT-I9195 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 ACHEETAHI/2100501026"
+            },
+            "device": {
+                "deviceName": "GT-I9195",
+                "marketingName": "Galaxy S4 Mini",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 540,
+                "resolutionHeight": 960,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "CM Browser",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "CheetahMobile",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-378": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; yie6-de; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; yie6-de; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "6.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.0",
+                "marketingName": "Windows 2000",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-379": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; Anonymisiert durch AlMiSoft Browser-Anonymisierer 65190274; Trident/7.0; tb-webde/2.6.0; (webde/1.4.0.0); rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; Anonymisiert durch AlMiSoft Browser-Anonymisierer 65190274; Trident/7.0; tb-webde/2.6.0; (webde/1.4.0.0); rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-380": {
+        "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D257 [FBAN/FBIOS;FBAV/16.0.0.13.22;FBBV/4697910;FBDV/iPhone6,2;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.1.2;FBSS/2; FBCR/Carrier;FBID/phone;FBLC/de_DE;FBOP/5]",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D257 [FBAN/FBIOS;FBAV/16.0.0.13.22;FBBV/4697910;FBDV/iPhone6,2;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.1.2;FBSS/2; FBCR/Carrier;FBID/phone;FBLC/de_DE;FBOP/5]"
+            },
+            "device": {
+                "deviceName": "iPhone 5S",
+                "marketingName": "iPhone 5S",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 640,
+                "resolutionHeight": 1136,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Facebook App",
+                "modus": null,
+                "version": "16.0.0.13.22",
+                "manufacturer": "Facebook",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "7.1.2",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.51.2",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-381": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; S5 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; S5 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-382": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.3; Nexus 7 Build/JWR66Y) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.3; Nexus 7 Build/JWR66Y) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Nexus 7",
+                "marketingName": "Nexus 7",
+                "manufacturer": "Asus",
+                "brand": "Google",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1280,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.3.0",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-383": {
+        "ua": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.8 (.NET CLR 1.1.4322)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.8 (.NET CLR 1.1.4322)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "3.0.8",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.1",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "1.9.0.8",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-384": {
+        "ua": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9) Gecko/2008061712 Firefox/3.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9) Gecko/2008061712 Firefox/3.0"
+            },
+            "device": {
+                "deviceName": "Macintosh",
+                "marketingName": "Macintosh",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "3.0.0",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "1.9.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-385": {
+        "ua": "Mozilla/5.0 (Windows NT 6.0; U; ja; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.0; U; ja; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "3.5.6",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.0",
+                "marketingName": "Windows Vista",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "1.9.1.6",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-386": {
+        "ua": "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.7) Gecko/2009032606 Red Hat/3.0.7-1.el5 Firefox/3.0.7",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.7) Gecko/2009032606 Red Hat/3.0.7-1.el5 Firefox/3.0.7"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "3.0.7",
+                "manufacturer": "MozillaFoundation",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Redhat Linux",
+                "marketingName": "Redhat Linux",
+                "version": "0.0.0",
+                "manufacturer": "Redhat",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "1.9.0.7",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-387": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.4; C6603 Build/10.5.1.A.0.283) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.117 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.4; C6603 Build/10.5.1.A.0.283) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.117 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "C6603",
+                "marketingName": "Xperia Z",
+                "manufacturer": "Sony",
+                "brand": "Sony",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "37.0.2062.117",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-388": {
+        "ua": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E; InfoPath.3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E; InfoPath.3)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "8.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 5.2",
+                "marketingName": "Windows XP",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "4.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-389": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; MR1002H1CW1 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; MR1002H1CW1 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000158-390": {
+        "ua": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "36.0.1985.143",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.2",
+                "marketingName": "Windows 8",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-391": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:24.0; WUID=3a420edfb5dc4e417f2a79d38f52d967; WTB=6787) Gecko/20100101 Firefox/24.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:24.0; WUID=3a420edfb5dc4e417f2a79d38f52d967; WTB=6787) Gecko/20100101 Firefox/24.0"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "24.0.0",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "24.0.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-392": {
+        "ua": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0; Touch; tb-gmx/2.6.0; (gmx/1.4.0.0))",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0; Touch; tb-gmx/2.6.0; (gmx/1.4.0.0))"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "10.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.2",
+                "marketingName": "Windows 8",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "6.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-393": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.4; GT-P5100 Build/KTU84Q) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.4; GT-P5100 Build/KTU84Q) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "GT-P5100",
+                "marketingName": "Galaxy Tab 2 10.1",
+                "manufacturer": "Samsung",
+                "brand": "Samsung",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1280,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-394": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0 IAV/FF32",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0 IAV/FF32"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Firefox",
+                "modus": null,
+                "version": "32.0.0",
+                "manufacturer": "MozillaFoundation",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Gecko",
+                "version": "32.0.0",
+                "manufacturer": "MozillaFoundation"
+            }
+        }
+    },
+    "test-0000158-395": {
+        "ua": "WordPress/4.0; http://blog.geld.de",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "WordPress/4.0; http://blog.geld.de"
+            },
+            "device": {
+                "deviceName": null,
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "WordPress",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "WordPress",
+                "bits": 32,
+                "type": "bot"
+            },
+            "os": {
+                "name": null,
+                "marketingName": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32
+            },
+            "engine": {
+                "name": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown"
+            }
+        }
+    },
+    "test-0000158-396": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.4; Nexus 7 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.102 Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.4; Nexus 7 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.102 Safari/537.36"
+            },
+            "device": {
+                "deviceName": "Nexus 7",
+                "marketingName": "Nexus 7",
+                "manufacturer": "Asus",
+                "brand": "Google",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1280,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "38.0.2125.102",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-397": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.4; XT1039 Build/KXB21.14-L1.56) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.4; XT1039 Build/KXB21.14-L1.56) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.93 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "XT1039",
+                "marketingName": "Moto G LTE",
+                "manufacturer": "Motorola",
+                "brand": "Motorola",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 720,
+                "resolutionHeight": 1280,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "39.0.2171.93",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000158-398": {
+        "ua": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; Media Center PC 5.0; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; SLCC1; BRI/2; .NET4.0C)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; Media Center PC 5.0; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; SLCC1; BRI/2; .NET4.0C)"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "10.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "6.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    },
+    "test-0000158-399": {
+        "ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; tb-webde/2.1.0; (web.de/1.3.0.0); rv:11.0) like Gecko",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; tb-webde/2.1.0; (web.de/1.3.0.0); rv:11.0) like Gecko"
+            },
+            "device": {
+                "deviceName": "Windows Desktop",
+                "marketingName": "Windows Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Internet Explorer",
+                "modus": null,
+                "version": "11.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Windows NT 6.1",
+                "marketingName": "Windows 7",
+                "version": "0.0.0",
+                "manufacturer": "Microsoft",
+                "bits": 64
+            },
+            "engine": {
+                "name": "Trident",
+                "version": "7.0.0",
+                "manufacturer": "Microsoft"
+            }
+        }
+    }
+}

@@ -1,0 +1,3902 @@
+{
+    "test-0000376-400": {
+        "ua": "LG-CU915/V1.0h Obigo/Q05A Profile/MIDP-2.0 Configuration/CLDC-1.1 UNTRUSTED/1.0 UCWEB/2.0 (Java; U; MIDP-2.0; es-LA; LG-CU915) U2/1.0.0 UCBrowser/9.3.0.326 U2/1.0.0 Mobile",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "LG-CU915/V1.0h Obigo/Q05A Profile/MIDP-2.0 Configuration/CLDC-1.1 UNTRUSTED/1.0 UCWEB/2.0 (Java; U; MIDP-2.0; es-LA; LG-CU915) U2/1.0.0 UCBrowser/9.3.0.326 U2/1.0.0 Mobile"
+            },
+            "device": {
+                "deviceName": "general LG Device",
+                "marketingName": "general LG Device",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "UC Browser",
+                "modus": null,
+                "version": "9.3.0.326",
+                "manufacturer": "UcWeb",
+                "bits": 32,
+                "type": "transcoder"
+            },
+            "os": {
+                "name": "Java",
+                "marketingName": "Java",
+                "version": "0.0.0",
+                "manufacturer": "Oracle",
+                "bits": 32
+            },
+            "engine": {
+                "name": "U2",
+                "version": "1.0.0",
+                "manufacturer": "UcWeb"
+            }
+        }
+    },
+    "test-0000376-401": {
+        "ua": "LG-CU920/V1.0p Obigo/Q05A Profile/MIDP-2.0 Configuration/CLDC-1.1 Wapfrog Hangman 2.0;LG-CU920/V1.0p Obigo/Q05A Profile/MIDP-2.0 Configu",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "LG-CU920/V1.0p Obigo/Q05A Profile/MIDP-2.0 Configuration/CLDC-1.1 Wapfrog Hangman 2.0;LG-CU920/V1.0p Obigo/Q05A Profile/MIDP-2.0 Configu"
+            },
+            "device": {
+                "deviceName": "general LG Device",
+                "marketingName": "general LG Device",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Obigo Q",
+                "modus": null,
+                "version": "05.0.0-alpha",
+                "manufacturer": "Obigo",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Java",
+                "marketingName": "Java",
+                "version": "0.0.0",
+                "manufacturer": "Oracle",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Teleca",
+                "version": "0.0.0",
+                "manufacturer": "Obigo"
+            }
+        }
+    },
+    "test-0000376-402": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.2.2; En-ca; LG-CX670 Build/FRG83G) AppleWebKit/533.1 (KHTML, Like Gecko) Version/4.0 Mobile Safari/533.1",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.2.2; En-ca; LG-CX670 Build/FRG83G) AppleWebKit/533.1 (KHTML, Like Gecko) Version/4.0 Mobile Safari/533.1"
+            },
+            "device": {
+                "deviceName": "Linux Desktop",
+                "marketingName": "Linux Desktop",
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-403": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D150 Build/KOT49I.A1396318826) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D150 Build/KOT49I.A1396318826) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-404": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D160 Build/KOT49I.A1389931170) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D160 Build/KOT49I.A1389931170) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D160",
+                "marketingName": "D160",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-405": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D170 Build/KOT49I.A1395137737) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D170 Build/KOT49I.A1395137737) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-406": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D213 Build/KOT49I.A1398650005) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D213 Build/KOT49I.A1398650005) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D213",
+                "marketingName": "L50 NFC",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-407": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D280 Build/KOT49I.A1397152590) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D280 Build/KOT49I.A1397152590) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D280",
+                "marketingName": "D280",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-408": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D285 Build/KOT49I.A1394439556) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D285 Build/KOT49I.A1394439556) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D285",
+                "marketingName": "L65 Dual SIM",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "31.0.1650.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-409": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D315 Build/KOT49I.A1391848015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D315 Build/KOT49I.A1391848015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-410": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D320 Build/KOT49I.A1390495439) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D320 Build/KOT49I.A1390495439) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D320",
+                "marketingName": "L70",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-411": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D325 Build/KOT49I.A1394634372) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D325 Build/KOT49I.A1394634372) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D325",
+                "marketingName": "L70 Dual",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-412": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D405 Build/KOT49I) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D405 Build/KOT49I) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D405",
+                "marketingName": "Optimus L90",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 540,
+                "resolutionHeight": 960,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-413": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D410 Build/KOT49I.A1392133459) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D410 Build/KOT49I.A1392133459) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D410",
+                "marketingName": "Optimus L90 Dual",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "34.0.1847.114",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-414": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-D500 Build/JZO54K) AppleWebKit/537.31 (KHTML, Like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-D500 Build/JZO54K) AppleWebKit/537.31 (KHTML, Like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "26.0.1410.58",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-415": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-D505 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-D505 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "32.0.1700.99",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-416": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; fr-fr; LG-D505-Bouygues Telecom Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; fr-fr; LG-D505-Bouygues Telecom Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-417": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-D505-Orange/D50509h-ORG-XX Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-D505-Orange/D50509h-ORG-XX Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-418": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-D520 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-D520 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-419": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D618 Build/KOT49I.A1396931578) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D618 Build/KOT49I.A1396931578) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D618",
+                "marketingName": "G2 mini Dual Sim",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-420": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D620 Build/KOT49I.A1389586651) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D620 Build/KOT49I.A1389586651) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D620",
+                "marketingName": "D620",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-421": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; es-; LG-D680 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; es-; LG-D680 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-422": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-D682TR Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-D682TR Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "D682TR",
+                "marketingName": "G Pro Lite",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-423": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-D683 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.166 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-D683 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.166 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "33.0.1750.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-424": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; en-us; LG-D684 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; en-us; LG-D684 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-425": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; pt-br; LG-D685 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; pt-br; LG-D685 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-426": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.0.4; LG-D700 Build/IMM76L) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.0.4; LG-D700 Build/IMM76L) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-427": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D800 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D800 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "31.0.1650.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-428": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D801 Build/JDQ39B) AppleWebKit/537.36 (KHTML, Like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D801 Build/JDQ39B) AppleWebKit/537.36 (KHTML, Like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "27.0.1453.90",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.36.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-429": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D802 Build/JDQ39B  StockMOD v1.06) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D802 Build/JDQ39B  StockMOD v1.06) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D802",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "31.0.1650.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-430": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; LG-D802-Orange Build/D80210b Build/JDQ39B) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.2 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; de-de; LG-D802-Orange Build/D80210b Build/JDQ39B) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.2 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "D802",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.2.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-431": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D802T Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D802T Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D802",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "32.0.1700.99",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-432": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D802TR Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.94 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D802TR Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.94 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D802TR",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "28.0.1500.94",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-433": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D803 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D803 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "32.0.1700.99",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-434": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D805 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.12218 YaBrowser/13.12.1599.12218 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D805 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.12218 YaBrowser/13.12.1599.12218 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D805",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Yandex Browser",
+                "modus": null,
+                "version": "13.12.1599.12218",
+                "manufacturer": "Yandex",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-435": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D806 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D806 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "34.0.1847.114",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-436": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D838 Build/KOT49I.D83810a) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.4.2; LG-D838 Build/KOT49I.D83810a) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D838",
+                "marketingName": "G PRO 2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "30.0.1599.103",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-437": {
+        "ua": "LG-D855/Mozilla/5.0 (Linux; U; Android 4.4.2; de-de; LG-D855 Build/KVT49L.A1398501991) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.1599.103 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "LG-D855/Mozilla/5.0 (Linux; U; Android 4.4.2; de-de; LG-D855 Build/KVT49L.A1398501991) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.1599.103 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D855",
+                "marketingName": "G2",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android WebView",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.4.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-438": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.2.2; en-gb; LG-D950/D95010c Build/JDQ39B) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.2 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.2.2; en-gb; LG-D950/D95010c Build/JDQ39B) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.2 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.2.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-439": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D958 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D958 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "D958",
+                "marketingName": "G Flex",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1080,
+                "resolutionHeight": 1920,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "32.0.1700.99",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-440": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D959 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.2.2; LG-D959 Build/JDQ39B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "32.0.1700.99",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.2.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-441": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.4; de-de; LG-E390 Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.4; de-de; LG-E390 Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-442": {
+        "ua": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E400 Build/GRK39F) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31 OPR/14.0.1074.57768",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E400 Build/GRK39F) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31 OPR/14.0.1074.57768"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Opera Mobile",
+                "modus": null,
+                "version": "14.0.1074.57768",
+                "manufacturer": "Opera",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-443": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.6; de-de; LG-E400-Orange/V10g Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.6; de-de; LG-E400-Orange/V10g Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-444": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.6; en-ca; LG-E400b Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.6; en-ca; LG-E400b Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-445": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.6; en-ca; LG-E400b-parrot Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.6; en-ca; LG-E400b-parrot Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-446": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.6; LG-E400de_DE Build/GRK39F) AppleWebKit/ (KHTML, like Gecko) Version/ Mobile Safari/ Wetter.de/1.7",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.6; LG-E400de_DE Build/GRK39F) AppleWebKit/ (KHTML, like Gecko) Version/ Mobile Safari/ Wetter.de/1.7"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "0.0.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-447": {
+        "ua": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E400f Build/GRK39F) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.123 Mobile Safari/537.22 OPR/14.0.1025.52315",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E400f Build/GRK39F) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.123 Mobile Safari/537.22 OPR/14.0.1025.52315"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Opera Mobile",
+                "modus": null,
+                "version": "14.0.1025.52315",
+                "manufacturer": "Opera",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.22.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-448": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.6; de-de; LG-E400g Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.6; de-de; LG-E400g Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-449": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.6; de-de; LG-E400R Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.6; de-de; LG-E400R Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.2"
+            },
+            "device": {
+                "deviceName": "E400",
+                "marketingName": "Optimus L3",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-450": {
+        "ua": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E405 Build/GRK39F) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.123 Mobile Safari/537.22 OPR/14.0.1025.53005",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E405 Build/GRK39F) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.123 Mobile Safari/537.22 OPR/14.0.1025.53005"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Opera Mobile",
+                "modus": null,
+                "version": "14.0.1025.53005",
+                "manufacturer": "Opera",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.22.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-451": {
+        "ua": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E405f Build/GRK39F) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.123 Mobile Safari/537.22 OPR/14.0.1025.53005",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 2.3.6; LG-E405f Build/GRK39F) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.123 Mobile Safari/537.22 OPR/14.0.1025.53005"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Opera Mobile",
+                "modus": null,
+                "version": "14.0.1025.53005",
+                "manufacturer": "Opera",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.6",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.22.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-452": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E410 Build/JZO54K) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E410 Build/JZO54K) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "26.0.1410.58",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-453": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; en-ca; LG-E410B Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; en-ca; LG-E410B Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-454": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E410f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.94 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E410f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.94 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "28.0.1500.94",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-455": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E410g Build/JZO54K) AppleWebKit/537.31 (KHTML, Like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E410g Build/JZO54K) AppleWebKit/537.31 (KHTML, Like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "26.0.1410.58",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-456": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E411g Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E411g Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "31.0.1650.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-457": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E415f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E415f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "31.0.1650.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-458": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E420 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.166 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E420 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.166 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "33.0.1750.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-459": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E425 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E425 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E425",
+                "marketingName": "Optimus L3 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-460": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E425f Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E425f Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E425",
+                "marketingName": "Optimus L3 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-461": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E425g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E425g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E425",
+                "marketingName": "Optimus L3 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-462": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; es-cl; LG-E425j Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; es-cl; LG-E425j Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "E425",
+                "marketingName": "Optimus L3 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-463": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E430 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E430 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S"
+            },
+            "device": {
+                "deviceName": "E430",
+                "marketingName": "Optimus L3 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-464": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; bg-bg; LG-E430-Orange Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; bg-bg; LG-E430-Orange Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "E430",
+                "marketingName": "Optimus L3 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 240,
+                "resolutionHeight": 320,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-465": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E431g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E431g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-466": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E435 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E435 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-467": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E435f Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E435f Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-468": {
+        "ua": "Android 4.1.2;AppleWebKit/534.30;Build/JZO54K;LG-E435f_gugu Build/JZO54K",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Android 4.1.2;AppleWebKit/534.30;Build/JZO54K;LG-E435f_gugu Build/JZO54K"
+            },
+            "device": {
+                "deviceName": "general LG Device",
+                "marketingName": "general LG Device",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-469": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E435g Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E435g Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-470": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E440 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E440 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S"
+            },
+            "device": {
+                "deviceName": "E440",
+                "marketingName": "Optimus L4 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-471": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E440f Build/JZO54K) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E440f Build/JZO54K) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31"
+            },
+            "device": {
+                "deviceName": "E440",
+                "marketingName": "Optimus L4 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "26.0.1410.58",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-472": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E440g Build/JZO54K) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E440g Build/JZO54K) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31"
+            },
+            "device": {
+                "deviceName": "E440",
+                "marketingName": "Optimus L4 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "26.0.1410.58",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-473": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E445 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E445 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-474": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-475": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450B Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450B Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-476": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450f Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450f Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-477": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-478": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450j Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E450j Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-479": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E451g Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E451g Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-480": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E455 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E455 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile S"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-481": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E455f Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E455f Build/JZO54K) AppleWebKit/535.19 (KHTML, Like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-482": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E455g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E455g Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-483": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-E460-Orange/E46010e-ORG-XX Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-E460-Orange/E46010e-ORG-XX Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "E460",
+                "marketingName": "Optimus L5 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-484": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E460f Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E460f Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E460",
+                "marketingName": "Optimus L5 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 480,
+                "resolutionHeight": 800,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-485": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E465f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.136 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E465f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.136 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "33.0.1750.136",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-486": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-E465g Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.1.2; de-de; LG-E465g Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-487": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E467f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.136 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E467f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.136 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "E467F",
+                "marketingName": "Optimus L4 II",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "33.0.1750.136",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-488": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E470f Build/JZO54K) AppleWebKit/537.31 (KHTML, Like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E470f Build/JZO54K) AppleWebKit/537.31 (KHTML, Like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "26.0.1410.58",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "537.31.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-489": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E475f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.1.2; LG-E475f Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36"
+            },
+            "device": {
+                "deviceName": "not found via regexes",
+                "marketingName": null,
+                "manufacturer": "Unknown",
+                "brand": "Unknown",
+                "pointingMethod": null,
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": null,
+                "type": "unknown"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "31.0.1650.59",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.1.2",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "Blink",
+                "version": "537.36.0",
+                "manufacturer": "Google"
+            }
+        }
+    },
+    "test-0000376-490": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.2; en-us; LG-E510 Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.2; en-us; LG-E510 Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+            },
+            "device": {
+                "deviceName": "E510",
+                "marketingName": "Optimus Hub",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.2.0",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-491": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.4; Pt-br ; LG-E510f Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1/UCBrowser/8.3.0.143/145/352",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.4; Pt-br ; LG-E510f Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1/UCBrowser/8.3.0.143/145/352"
+            },
+            "device": {
+                "deviceName": "E510",
+                "marketingName": "Optimus Hub",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "UC Browser",
+                "modus": null,
+                "version": "8.3.0.143",
+                "manufacturer": "UcWeb",
+                "bits": 32,
+                "type": "transcoder"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-492": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 2.3.4; de-de; LG-E510g Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.0/1.2",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 2.3.4; de-de; LG-E510g Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MMS/LG-Android-MMS-V1.0/1.2"
+            },
+            "device": {
+                "deviceName": "E510",
+                "marketingName": "Optimus Hub",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "2.3.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "533.1.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-493": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.0.3; bg-bg; LG-E610-Orange Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.0.3; bg-bg; LG-E610-Orange Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "E610",
+                "marketingName": "Optimus L5",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.3",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-494": {
+        "ua": "Mozilla/5.0 (Linux; U; Android 4.0.3; en-ca; LG-E610G Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; U; Android 4.0.3; en-ca; LG-E610G Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            "device": {
+                "deviceName": "E610",
+                "marketingName": "Optimus L5",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Android Webkit",
+                "modus": null,
+                "version": "4.0.0",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.3",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "534.30.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-495": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E610v Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E610v Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E610",
+                "marketingName": "Optimus L5",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.3",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-496": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E612 Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E612 Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile"
+            },
+            "device": {
+                "deviceName": "E612",
+                "marketingName": "Optimus L5 Dual",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.133",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.3",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-497": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E612f Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E612f Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E612",
+                "marketingName": "Optimus L5 Dual",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.3",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-498": {
+        "ua": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E612g Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Linux; Android 4.0.3; LG-E612g Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
+            },
+            "device": {
+                "deviceName": "E612",
+                "marketingName": "Optimus L5 Dual",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "Chrome",
+                "modus": null,
+                "version": "18.0.1025.166",
+                "manufacturer": "Google",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.3",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "535.19.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000376-499": {
+        "ua": "Mozilla/5.0 (Android; U; Android 4.0.4; zh-cn; LG-E615; 320*480) AppleWebKit/528.5 (KHTML, like Gecko) UCBrowser/8.0.0.202/139/352 Mobile",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mozilla/5.0 (Android; U; Android 4.0.4; zh-cn; LG-E615; 320*480) AppleWebKit/528.5 (KHTML, like Gecko) UCBrowser/8.0.0.202/139/352 Mobile"
+            },
+            "device": {
+                "deviceName": "E615",
+                "marketingName": "Optimus L5 Dual",
+                "manufacturer": "Lg",
+                "brand": "Lg",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "mobile-phone"
+            },
+            "browser": {
+                "name": "UC Browser",
+                "modus": null,
+                "version": "8.0.0.202",
+                "manufacturer": "UcWeb",
+                "bits": 32,
+                "type": "transcoder"
+            },
+            "os": {
+                "name": "Android",
+                "marketingName": "Android",
+                "version": "4.0.4",
+                "manufacturer": "Google",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "528.5.0",
+                "manufacturer": "Apple"
+            }
+        }
+    }
+}

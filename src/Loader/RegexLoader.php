@@ -29,16 +29,16 @@ use Symfony\Component\Yaml\Yaml;
 class RegexLoader
 {
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface|null
+     * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * an logger instance
      *
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Psr\Cache\CacheItemPoolInterface $cache
@@ -55,7 +55,7 @@ class RegexLoader
      *
      * @return array|null
      */
-    public function getRegexes()
+    public function getRegexes(): ?array
     {
         $cacheInitializedId = hash('sha512', 'regex-cache is initialized');
         $cacheInitialized   = $this->cache->getItem($cacheInitializedId);
@@ -78,7 +78,7 @@ class RegexLoader
      *
      * @throws \BrowserDetector\Loader\NotFoundException
      */
-    private function initCache(CacheItemInterface $cacheInitialized)
+    private function initCache(CacheItemInterface $cacheInitialized): void
     {
         static $regexes = null;
 

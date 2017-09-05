@@ -1,0 +1,3902 @@
+{
+    "test-0000339-300": {
+        "ua": "browser/26468 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26468 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-301": {
+        "ua": "browseripad/26468 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26468 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-302": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-303": {
+        "ua": "Safari5533.22.3 CFNetwork/438.16 Darwin/9.8.0 (i386) (MacBook5%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari5533.22.3 CFNetwork/438.16 Darwin/9.8.0 (i386) (MacBook5%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.5.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "438.16.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-304": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacPro4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacPro4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacPro",
+                "marketingName": "MacPro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-305": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac10%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac10%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-306": {
+        "ua": "browseripad/26468 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26468 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-307": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C5)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C5)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-308": {
+        "ua": "RealPlayer%20Download-Manager949 CFNetwork/438.14 Darwin/9.8.0 (i386) (MacBook4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "RealPlayer%20Download-Manager949 CFNetwork/438.14 Darwin/9.8.0 (i386) (MacBook4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.5.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "438.14.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-309": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro8%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro8%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-310": {
+        "ua": "Spector%20Pro/2699 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacPro4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Spector%20Pro/2699 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacPro4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacPro",
+                "marketingName": "MacPro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 64,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-311": {
+        "ua": "Mercury3/5.0.3 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mercury3/5.0.3 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Mercury",
+                "modus": null,
+                "version": "5.0.3",
+                "manufacturer": "IlegendSoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-312": {
+        "ua": "Reeder/2.5.2 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Reeder/2.5.2 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Reeder",
+                "modus": null,
+                "version": "2.5.2",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-313": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac7%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac7%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-314": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac8%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac8%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-315": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (Macmini3%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (Macmini3%2C1)"
+            },
+            "device": {
+                "deviceName": "Mac Mini",
+                "marketingName": "Mac Mini",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-316": {
+        "ua": "browseripad/26651 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26651 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-317": {
+        "ua": "InstapaperPro/4.0 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "InstapaperPro/4.0 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-318": {
+        "ua": "Webnote/2.0.0b44 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacBook4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Webnote/2.0.0b44 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacBook4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-319": {
+        "ua": "browser/26651 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26651 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-320": {
+        "ua": "Pulse%20News/2.5 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Pulse%20News/2.5 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-321": {
+        "ua": "Zain_iPhone/1.0 CFNetwork/485.13.8 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Zain_iPhone/1.0 CFNetwork/485.13.8 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPhone",
+                "marketingName": "iPhone",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 320,
+                "resolutionHeight": 480,
+                "dualOrientation": true,
+                "type": "smartphone"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.8",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-322": {
+        "ua": "Y!%20Search/2.0.3 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Y!%20Search/2.0.3 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-323": {
+        "ua": "AtomicLite/5.6.0 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "AtomicLite/5.6.0 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Atomic Browser Lite",
+                "modus": null,
+                "version": "5.6.0",
+                "manufacturer": "RichardTrautvetter",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-324": {
+        "ua": "Mercury3/5.0.1 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mercury3/5.0.1 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Mercury",
+                "modus": null,
+                "version": "5.0.1",
+                "manufacturer": "IlegendSoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-325": {
+        "ua": "Account%20Viewer/1.1 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Account%20Viewer/1.1 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-326": {
+        "ua": "Download%20Free/1.8 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Download%20Free/1.8 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-327": {
+        "ua": "browser/26651 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26651 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-328": {
+        "ua": "browseripad/26651 CFNetwork/467.12 Darwin/10.3.1",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26651 CFNetwork/467.12 Darwin/10.3.1"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "467.12.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-329": {
+        "ua": "Mercury3/5.0.1 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mercury3/5.0.1 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Mercury",
+                "modus": null,
+                "version": "5.0.1",
+                "manufacturer": "IlegendSoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-330": {
+        "ua": "Terra/1.3.5 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Terra/1.3.5 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-331": {
+        "ua": "browseripad/26651 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26651 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-332": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro7%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro7%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-333": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac9%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac9%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-334": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro8%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro8%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-335": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBook4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBook4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-336": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-337": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookAir3%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookAir3%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook Air",
+                "marketingName": "MacBook Air",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-338": {
+        "ua": "Download/1.8 CFNetwork/485.12.7 Darwin/10.4.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Download/1.8 CFNetwork/485.12.7 Darwin/10.4.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.2.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.12.7",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-339": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac10%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac10%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-340": {
+        "ua": "Download/1.8 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Download/1.8 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-341": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac5%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac5%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-342": {
+        "ua": "browser/26468 CFNetwork/485.2 Darwin/10.3.1",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26468 CFNetwork/485.2 Darwin/10.3.1"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.2.0",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-343": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacPro3%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacPro3%2C1)"
+            },
+            "device": {
+                "deviceName": "MacPro",
+                "marketingName": "MacPro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-344": {
+        "ua": "Dual%20Browser/1.4.1 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Dual%20Browser/1.4.1 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-345": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro6%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro6%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-346": {
+        "ua": "Download%20Free/1.8 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Download%20Free/1.8 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-347": {
+        "ua": "Safari/6534.50 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookAir3%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.50 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookAir3%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Air",
+                "marketingName": "MacBook Air",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-348": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro8%2C3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro8%2C3)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-349": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C4)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C4)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-350": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-351": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro2%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro2%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-352": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacPro4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacPro4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacPro",
+                "marketingName": "MacPro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-353": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac11%2C3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac11%2C3)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-354": {
+        "ua": "browser/26777 CFNetwork/485.13.8 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26777 CFNetwork/485.13.8 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.8",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-355": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (iMac5%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (iMac5%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-356": {
+        "ua": "Maven/1.7.2 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Maven/1.7.2 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-357": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBook6%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBook6%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-358": {
+        "ua": "browseripad/26777 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26777 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-359": {
+        "ua": "Terra/1.3.6 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Terra/1.3.6 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-360": {
+        "ua": "browser/26777 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26777 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-361": {
+        "ua": "360%20Browser/4.0.4 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "360%20Browser/4.0.4 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-362": {
+        "ua": "RealPlayer%20Downloader/1379 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac10%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "RealPlayer%20Downloader/1379 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac10%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-363": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBook1%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBook1%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-364": {
+        "ua": "Maven/1.7.2 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Maven/1.7.2 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-365": {
+        "ua": "Y!%20Search/2.0.3 CFNetwork/485.12.7 Darwin/10.4.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Y!%20Search/2.0.3 CFNetwork/485.12.7 Darwin/10.4.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.2.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.12.7",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-366": {
+        "ua": "iSearch/1.2 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "iSearch/1.2 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-367": {
+        "ua": "Flipboard/1.5.3 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Flipboard/1.5.3 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Flipboard App",
+                "modus": null,
+                "version": "1.5.3",
+                "manufacturer": "Flipboard",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-368": {
+        "ua": "Reeder/1010.39.00 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookAir4%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Reeder/1010.39.00 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookAir4%2C2)"
+            },
+            "device": {
+                "deviceName": "MacBook Air",
+                "marketingName": "MacBook Air",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Reeder",
+                "modus": null,
+                "version": "1010.39.00",
+                "manufacturer": "Unknown",
+                "bits": 64,
+                "type": "application"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-369": {
+        "ua": "ImageSearcherProS/2.1 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "ImageSearcherProS/2.1 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-370": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacBook2%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacBook2%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-371": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacBook4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (i386) (MacBook4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-372": {
+        "ua": "Delibar/209 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBook5%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Delibar/209 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBook5%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 64,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-373": {
+        "ua": "Reeder/1.5.3 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Reeder/1.5.3 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Reeder",
+                "modus": null,
+                "version": "1.5.3",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "application"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-374": {
+        "ua": "Download%20Free/1.8 CFNetwork/485.12.7 Darwin/10.4.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Download%20Free/1.8 CFNetwork/485.12.7 Darwin/10.4.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.2.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.12.7",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-375": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac12%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac12%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-376": {
+        "ua": "Maven/1.7 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Maven/1.7 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-377": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac11%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac11%2C2)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-378": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac11%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac11%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-379": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro4%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro4%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-380": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac11%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac11%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-381": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro6%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro6%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-382": {
+        "ua": "Puffin/3337 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Puffin/3337 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Puffin",
+                "modus": null,
+                "version": "3337.0.0",
+                "manufacturer": "CloudMosa",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-383": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBook5%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBook5%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook",
+                "marketingName": "MacBook",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-384": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac12%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac12%2C2)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-385": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac11%2C2)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (iMac11%2C2)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-386": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (x86_64) (MacBookPro5%2C5)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (x86_64) (MacBookPro5%2C5)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-387": {
+        "ua": "browser/26651 CFNetwork/485.12.7 Darwin/10.4.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26651 CFNetwork/485.12.7 Darwin/10.4.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.2.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.12.7",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-388": {
+        "ua": "Little%20Bookmark%20Box/395 CFNetwork/454.12.4 Darwin/10.8.0 (x86_64) (MacPro5%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Little%20Bookmark%20Box/395 CFNetwork/454.12.4 Darwin/10.8.0 (x86_64) (MacPro5%2C1)"
+            },
+            "device": {
+                "deviceName": "MacPro",
+                "marketingName": "MacPro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 64,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-389": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro5%2C3)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-390": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (x86_64) (iMac11%2C3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (x86_64) (iMac11%2C3)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-391": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (0000) DDDDDDDDDDDDDD",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (0000) DDDDDDDDDDDDDD"
+            },
+            "device": {
+                "deviceName": "Macintosh",
+                "marketingName": "Macintosh",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-392": {
+        "ua": "Mercury3/5.0.3 CFNetwork/485.13.8 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Mercury3/5.0.3 CFNetwork/485.13.8 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": "Mercury",
+                "modus": null,
+                "version": "5.0.3",
+                "manufacturer": "IlegendSoft",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.8",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-393": {
+        "ua": "browser/26777 CFNetwork/485.13.9 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browser/26777 CFNetwork/485.13.9 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "4.3.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "485.13.9",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-394": {
+        "ua": "browseripad/26777 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "browseripad/26777 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "iPad",
+                "marketingName": "iPad",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": 1024,
+                "resolutionHeight": 768,
+                "dualOrientation": true,
+                "type": "tablet"
+            },
+            "browser": {
+                "name": "Mobile Safari UIWebView",
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "0.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-395": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro5%2C3)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookPro5%2C3)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-396": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac7%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (iMac7%2C1)"
+            },
+            "device": {
+                "deviceName": "iMac",
+                "marketingName": "iMac",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-397": {
+        "ua": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro7%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/7534.51.22 CFNetwork/520.2.5 Darwin/11.2.0 (x86_64) (MacBookPro7%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Pro",
+                "marketingName": "MacBook Pro",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.1.0",
+                "manufacturer": "Apple",
+                "bits": 64,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.7.0",
+                "manufacturer": "Apple",
+                "bits": 64
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "520.2.5",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-398": {
+        "ua": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookAir3%2C1)",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Safari/6534.51.22 CFNetwork/454.12.4 Darwin/10.8.0 (i386) (MacBookAir3%2C1)"
+            },
+            "device": {
+                "deviceName": "MacBook Air",
+                "marketingName": "MacBook Air",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "mouse",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": false,
+                "type": "desktop"
+            },
+            "browser": {
+                "name": "Safari",
+                "modus": null,
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32,
+                "type": "browser"
+            },
+            "os": {
+                "name": "Mac OS X",
+                "marketingName": "Mac OS X",
+                "version": "10.6.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "454.12.4",
+                "manufacturer": "Apple"
+            }
+        }
+    },
+    "test-0000339-399": {
+        "ua": "Love%20Messenger/8.10.1 CFNetwork/548.0.3 Darwin/11.0.0",
+        "result": {
+            "request": {
+                "HTTP_USER_AGENT": "Love%20Messenger/8.10.1 CFNetwork/548.0.3 Darwin/11.0.0"
+            },
+            "device": {
+                "deviceName": "general Apple Device",
+                "marketingName": "general Apple Device",
+                "manufacturer": "Apple",
+                "brand": "Apple",
+                "pointingMethod": "touchscreen",
+                "resolutionWidth": null,
+                "resolutionHeight": null,
+                "dualOrientation": true,
+                "type": "mobile-device"
+            },
+            "browser": {
+                "name": null,
+                "modus": null,
+                "version": "0.0.0",
+                "manufacturer": "Unknown",
+                "bits": 32,
+                "type": "unknown"
+            },
+            "os": {
+                "name": "iOS",
+                "marketingName": "iOS",
+                "version": "5.0.0",
+                "manufacturer": "Apple",
+                "bits": 32
+            },
+            "engine": {
+                "name": "WebKit",
+                "version": "548.0.3",
+                "manufacturer": "Apple"
+            }
+        }
+    }
+}

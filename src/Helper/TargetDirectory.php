@@ -25,11 +25,11 @@ class TargetDirectory
      *
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         $number = $this->getNextTest();
 
-        return 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$07d', $number) . '/';
+        return 'tests/issues/' . sprintf('%1$07d', $number) . '/';
     }
 
     /**
@@ -37,9 +37,9 @@ class TargetDirectory
      *
      * @return int
      */
-    public function getNextTest()
+    public function getNextTest(): int
     {
-        $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
+        $targetDirectory = 'tests/issues/';
 
         if (!is_readable($targetDirectory)) {
             throw new \UnexpectedValueException('directory "' . $targetDirectory . '" is not readable');

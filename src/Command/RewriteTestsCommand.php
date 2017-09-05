@@ -16,6 +16,7 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
+use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
 use Monolog\Handler\PsrHandler;
@@ -27,10 +28,8 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Wurfl\Request\GenericRequestFactory;
+use UaResult\Result\ResultInterface;
 
 /**
  * Class RewriteTestsCommand
@@ -102,7 +101,7 @@ class RewriteTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $sourceDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
+        $sourceDirectory = 'tests/issues/';
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
@@ -157,7 +156,7 @@ class RewriteTestsCommand extends Command
                 $g            = $group;
             }
 
-            $newCounter = $this->handleFile($file, $checks, $groupCounter, $group);
+            $newCounter = $this->handleFile($file, $checks, $groupCounter, (int) $group);
 
             if (!$newCounter) {
                 continue;
@@ -168,7 +167,7 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('preparing circle.yml ...');
 
-        $circleFile      = 'vendor/mimmi20/browser-detector-tests/circle.yml';
+        $circleFile      = 'circle.yml';
         $circleciContent = 'machine:
   php:
     version: 7.1.0
@@ -228,7 +227,7 @@ test:
 
             $testContent = '<?php
 /**
- * This file is part of the browser-detector-tests package.
+ * This file is part of the browscap-helper package.
  *
  * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
@@ -237,9 +236,9 @@ test:
  */
 
 declare(strict_types = 1);
-namespace BrowserDetectorTest\UserAgentsTest;
+namespace BrowscapHelperTest\UserAgentsTest;
 
-use BrowserDetectorTest\UserAgentsTest;
+use BrowscapHelperTest\UserAgentsTestTrait;
 
 /**
  * Class T' . $group . 'Test
@@ -250,15 +249,17 @@ use BrowserDetectorTest\UserAgentsTest;
  * @author     Thomas Mueller <mimmi20@live.de>
  * @group      ' . $group . '
  */
-class T' . $group . 'Test extends UserAgentsTest
+class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 {
+    use UserAgentsTestTrait;
+
     /**
      * @var string
      */
-    protected $sourceDirectory = \'tests/issues/' . $group . '/\';
+    private $sourceDirectory = \'tests/issues/' . $group . '/\';
 }
 ';
-            $testFile = 'vendor/mimmi20/browser-detector-tests/tests/UserAgentsTest/T' . $group . 'Test.php';
+            $testFile = 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
         }
 
@@ -281,9 +282,9 @@ class T' . $group . 'Test extends UserAgentsTest
     private function handleFile(
         \SplFileInfo $file,
         array &$checks,
-        &$groupCounter,
-        $group
-    ) {
+        int &$groupCounter,
+        int $group
+    ): int {
         $this->logger->info('    checking ...');
 
         /** @var $file \SplFileInfo */
@@ -337,7 +338,7 @@ class T' . $group . 'Test extends UserAgentsTest
             $outputDetector += [
                 $newKey => [
                     'ua'     => $test->ua,
-                    'result' => $this->handleTest($test->ua)->toArray(false),
+                    'result' => $this->handleTest($test->ua)->toArray(),
                 ],
             ];
             ++$groupCounter;
@@ -374,9 +375,9 @@ class T' . $group . 'Test extends UserAgentsTest
     /**
      * @param string $useragent
      *
-     * @return \UaResult\Result\Result
+     * @return \UaResult\Result\ResultInterface
      */
-    private function handleTest($useragent)
+    private function handleTest(string $useragent): ResultInterface
     {
         $this->logger->info('        rewriting');
 
@@ -389,19 +390,11 @@ class T' . $group . 'Test extends UserAgentsTest
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $result->getBrowser();
 
-        if (null === $browser) {
-            $browser = new Browser(null);
-        }
-
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
         $platform = clone $result->getOs();
-
-        if (null === $platform) {
-            $platform = new Os(null, null);
-        }
 
         /* @var $platform \UaResult\Os\OsInterface|null */
 
@@ -421,7 +414,8 @@ class T' . $group . 'Test extends UserAgentsTest
         }
 
         if (!$replaced
-            && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
+            && $device->getType()->isMobile()
+            && !in_array($device->getDeviceName(), ['general Apple Device'])
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             try {
@@ -446,7 +440,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
                 $device = clone $result->getDevice();
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
                 }
             } catch (NotFoundException $e) {
@@ -455,7 +449,7 @@ class T' . $group . 'Test extends UserAgentsTest
                 $device   = clone $result->getDevice();
                 $replaced = false;
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device   = new Device(null, null);
                     $replaced = true;
                 }
@@ -481,7 +475,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
                 $device = clone $result->getDevice();
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
                 }
             } catch (\Exception $e) {
@@ -489,7 +483,7 @@ class T' . $group . 'Test extends UserAgentsTest
 
                 $device = clone $result->getDevice();
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device = new Device(null, null);
                 }
             }
@@ -500,14 +494,10 @@ class T' . $group . 'Test extends UserAgentsTest
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $result->getEngine();
 
-        if (null === $engine) {
-            $engine = new Engine(null);
-        }
-
         $this->logger->info('        generating result');
 
         $request = (new GenericRequestFactory())->createRequestFromString($useragent);
 
-        return new Result($request, $device, $platform, $browser, $engine);
+        return new Result($request->getHeaders(), $device, $platform, $browser, $engine);
     }
 }

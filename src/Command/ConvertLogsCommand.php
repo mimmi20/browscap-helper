@@ -114,7 +114,7 @@ class ConvertLogsCommand extends Command
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
         foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $agent) {
-            file_put_contents($targetBulkFile, $agent . "\n", FILE_APPEND | LOCK_EX);
+            file_put_contents($targetBulkFile, trim($agent) . "\n", FILE_APPEND | LOCK_EX);
             ++$counter;
         }
 
