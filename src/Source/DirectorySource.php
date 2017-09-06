@@ -68,7 +68,13 @@ class DirectorySource implements SourceInterface
                 return;
             }
 
-            yield trim($line);
+            $agent = trim($line);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -79,13 +85,19 @@ class DirectorySource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $line) {
-            $request  = (new GenericRequestFactory())->createRequestFromString($line);
+            $agent = trim($line);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($line) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
@@ -105,6 +117,7 @@ class DirectorySource implements SourceInterface
 
         foreach ($finder as $file) {
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 

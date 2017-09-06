@@ -122,14 +122,15 @@ class CopyTestsCommand extends Command
 
         $output->writeln('read existing tests ...');
         $existingTests = [];
-        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $ua) {
-            $ua = trim($ua);
+        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
 
-            if (isset($existingTests[$ua])) {
+            if (isset($existingTests[$useragent])) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
                 continue;
             }
 
-            $existingTests[$ua] = 1;
+            $existingTests[$useragent] = 1;
         }
 
         $output->writeln('init sources ...');
@@ -150,12 +151,15 @@ class CopyTestsCommand extends Command
         $data         = [];
         $fileCreated  = false;
 
-        foreach ($source->getTests() as $ua => $result) {
-            $ua = trim($ua);
+        foreach ($source->getTests() as $useragent => $result) {
+            $useragent = trim($useragent);
 
-            if (isset($existingTests[$ua])) {
+            if (isset($existingTests[$useragent])) {
+                $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
                 continue;
             }
+
+            $existingTests[$useragent] = 1;
 
             $targetFilename = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $fileCounter) . '.json';
 
@@ -167,7 +171,7 @@ class CopyTestsCommand extends Command
             $key = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$05d', $chunkCounter);
 
             $data[$key] = [
-                'ua'     => $ua,
+                'ua'     => $useragent,
                 'result' => $result->toArray(),
             ];
 

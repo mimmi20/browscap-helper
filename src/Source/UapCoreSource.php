@@ -55,7 +55,13 @@ class UapCoreSource implements SourceInterface
                 return;
             }
 
-            yield trim($row['user_agent_string']);
+            $agent = trim($row['user_agent_string']);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -66,13 +72,19 @@ class UapCoreSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $request  = (new GenericRequestFactory())->createRequestFromString($row['user_agent_string']);
+            $agent = trim($row['user_agent_string']);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($row['user_agent_string']) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
@@ -102,10 +114,12 @@ class UapCoreSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 
             if ('yaml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
                 continue;
             }
 

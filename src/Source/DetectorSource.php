@@ -57,7 +57,13 @@ class DetectorSource implements SourceInterface
                 return;
             }
 
-            yield trim($test->ua);
+            $agent = trim($test->ua);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -70,7 +76,13 @@ class DetectorSource implements SourceInterface
         $resultFactory = new ResultFactory();
 
         foreach ($this->loadFromPath() as $test) {
-            yield trim($test->ua) => $resultFactory->fromArray($this->cache, $this->logger, (array) $test->result);
+            $agent = trim($test->ua);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent => $resultFactory->fromArray($this->cache, $this->logger, (array) $test->result);
         }
     }
 
@@ -100,10 +112,12 @@ class DetectorSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 
             if ('json' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
                 continue;
             }
 

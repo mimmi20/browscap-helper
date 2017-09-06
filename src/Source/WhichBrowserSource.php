@@ -74,8 +74,13 @@ class WhichBrowserSource implements SourceInterface
             }
 
             $row = json_decode($row, false);
+            $agent = trim($row->{'User-Agent'});
 
-            yield trim($row->{'User-Agent'});
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -86,8 +91,13 @@ class WhichBrowserSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row     = json_decode($row, false);
-            $agent   = $row->{'User-Agent'};
+            $row   = json_decode($row, false);
+            $agent = trim($row->{'User-Agent'});
+
+            if (empty($agent)) {
+                continue;
+            }
+
             $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             if (isset($row->browser->name)) {
@@ -179,7 +189,7 @@ class WhichBrowserSource implements SourceInterface
                 $engineVersion
             );
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
@@ -209,10 +219,12 @@ class WhichBrowserSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 
             if ('yaml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
                 continue;
             }
 

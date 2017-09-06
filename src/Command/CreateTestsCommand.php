@@ -120,10 +120,11 @@ class CreateTestsCommand extends Command
 
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             if (isset($checks[$useragent])) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
                 continue;
             }
 
-            $checks[$useragent] = $useragent;
+            $checks[$useragent] = 1;
         }
 
         $targetDirectoryHelper = new TargetDirectory();
@@ -171,6 +172,7 @@ class CreateTestsCommand extends Command
             $useragent = trim($useragent);
 
             if (isset($checks[$useragent])) {
+                $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
                 continue;
             }
 
@@ -231,7 +233,7 @@ class CreateTestsCommand extends Command
      */
     private function parseLine(string $ua, int $counter, string &$outputBrowscap, array &$outputDetector, int $testNumber): void
     {
-        $this->logger->info('      create result');
+        //$this->logger->info('      create result');
 
         $platform = new Os(null, null);
         $device   = new Device(null, null);
@@ -241,7 +243,7 @@ class CreateTestsCommand extends Command
         $formatedIssue   = sprintf('%1$05d', $testNumber);
         $formatedCounter = sprintf('%1$05d', $counter);
 
-        $this->logger->info('      writing browscap data ...');
+        //$this->logger->info('      writing browscap data ...');
 
         $outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
@@ -282,12 +284,12 @@ class CreateTestsCommand extends Command
         'standard' => true,
     ],\n";
 
-        $this->logger->info('      detecting test name ...');
+        //$this->logger->info('      detecting test name ...');
 
         $formatedIssue   = sprintf('%1$07d', $testNumber);
         $formatedCounter = sprintf('%1$05d', $counter);
 
-        $this->logger->info('      detecting request ...');
+        //$this->logger->info('      detecting request ...');
 
         $request = (new GenericRequestFactory())->createRequestFromString($ua);
 

@@ -68,7 +68,13 @@ class BrowscapSource implements SourceInterface
                 return;
             }
 
-            yield trim($row['ua']);
+            $agent = trim($row['ua']);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -79,7 +85,12 @@ class BrowscapSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $agent   = trim($row['ua']);
+            $agent = trim($row['ua']);
+
+            if (empty($agent)) {
+                continue;
+            }
+
             $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             if (array_key_exists('Browser_Type', $row['properties'])) {
@@ -253,7 +264,7 @@ class BrowscapSource implements SourceInterface
                 $engine = null;
             }
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
@@ -283,10 +294,12 @@ class BrowscapSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 
             if ('php' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
                 continue;
             }
 

@@ -71,8 +71,13 @@ class WootheeSource implements SourceInterface
             }
 
             $row = json_decode($row, false);
+            $agent = trim($row->target);
 
-            yield trim($row->target);
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -83,8 +88,14 @@ class WootheeSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row     = json_decode($row, false);
-            $request = (new GenericRequestFactory())->createRequestFromString($row->target);
+            $row   = json_decode($row, false);
+            $agent = trim($row->target);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             $browserName = (new BrowserNameMapper())->mapBrowserName($row->name);
 
@@ -96,7 +107,7 @@ class WootheeSource implements SourceInterface
             }
 
             if (isset($row->version)) {
-                $browserVersion = $row->version;
+                $browserVersion = (new BrowserVersionMapper())->mapBrowserVersion($row->version, $browserName);
             } else {
                 $browserVersion = null;
             }
@@ -104,21 +115,20 @@ class WootheeSource implements SourceInterface
             $browser = new Browser(
                 $browserName,
                 null,
-                (new BrowserVersionMapper())->mapBrowserVersion($browserVersion, $browserName),
+                $browserVersion,
                 $browserType
             );
 
             if (!empty($row->os) && !in_array($row->os, ['iPad', 'iPhone'])) {
+                $osName = (new PlatformNameMapper())->mapOsName($row->os);
+
                 if (isset($row->os_version)) {
-                    $osVersion = $row->os_version;
+                    $osVersion = (new PlatformVersionMapper())->mapOsVersion($row->os_version, $osName);
+
+                    if (!($osVersion instanceof Version)) {
+                        $osVersion = null;
+                    }
                 } else {
-                    $osVersion = null;
-                }
-
-                $osName    = (new PlatformNameMapper())->mapOsName($row->os);
-                $osVersion = (new PlatformVersionMapper())->mapOsVersion($osVersion, $osName);
-
-                if (!($osVersion instanceof Version)) {
                     $osVersion = null;
                 }
 
@@ -130,7 +140,7 @@ class WootheeSource implements SourceInterface
             $device = new Device(null, null);
             $engine = new Engine(null);
 
-            yield trim($row->target) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
@@ -160,10 +170,12 @@ class WootheeSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 
             if ('yaml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
                 continue;
             }
 

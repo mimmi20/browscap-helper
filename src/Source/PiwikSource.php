@@ -74,7 +74,13 @@ class PiwikSource implements SourceInterface
             }
 
             $row = json_decode($row, false);
-            yield trim($row->user_agent);
+            $agent = trim($row->user_agent);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
@@ -85,8 +91,14 @@ class PiwikSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row     = json_decode($row, false);
-            $request = (new GenericRequestFactory())->createRequestFromString($row->user_agent);
+            $row   = json_decode($row, false);
+            $agent = trim($row->user_agent);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             $browserManufacturer = null;
             $browserVersion      = null;
@@ -187,7 +199,7 @@ class PiwikSource implements SourceInterface
                 $engine = new Engine(null);
             }
 
-            yield trim($row->user_agent) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
@@ -217,10 +229,12 @@ class PiwikSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
                 continue;
             }
 
             if ('yml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
                 continue;
             }
 

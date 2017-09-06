@@ -54,7 +54,7 @@ class PdoSource implements SourceInterface
     public function getUserAgents(int $limit = 0): iterable
     {
         foreach ($this->getAgents($limit) as $agent) {
-            yield trim($agent);
+            yield $agent;
         }
     }
 
@@ -70,7 +70,7 @@ class PdoSource implements SourceInterface
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
