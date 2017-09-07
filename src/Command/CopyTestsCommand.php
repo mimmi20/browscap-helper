@@ -19,6 +19,8 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowscapHelper\Writer\BrowscapTestWriter;
+use BrowscapHelper\Writer\DetectorTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -146,10 +148,9 @@ class CopyTestsCommand extends Command
         );
 
         $output->writeln('import tests ...');
-        $chunkCounter = 0;
-        $fileCounter  = 0;
-        $data         = [];
-        $fileCreated  = false;
+
+        $detectorTestWriter = new DetectorTestWriter($this->logger, $targetDirectory);
+        $browscapTestWriter = new BrowscapTestWriter($this->logger, 'results/');
 
         foreach ($source->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
@@ -161,44 +162,11 @@ class CopyTestsCommand extends Command
 
             $existingTests[$useragent] = 1;
 
-            $targetFilename = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $fileCounter) . '.json';
+            $browscapTestWriter->write($result, $number);
 
-            if (!$fileCreated && file_exists($targetDirectory . $targetFilename)) {
-                $this->logger->emergency('    target file for chunk ' . $fileCounter . ' already exists');
-                exit;
-            }
-
-            $key = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$05d', $chunkCounter);
-
-            $data[$key] = [
-                'ua'     => $useragent,
-                'result' => $result->toArray(),
-            ];
-
-            ++$counter;
-            ++$chunkCounter;
-
-            file_put_contents(
-                $targetDirectory . $targetFilename,
-                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT)
-            );
-
-            $fileCreated = true;
-
-            if ($chunkCounter >= 100) {
-                $this->logger->info('    writing file ' . $targetFilename);
-
-                $chunkCounter = 0;
-                $data         = [];
-                $fileCreated  = false;
-                ++$fileCounter;
-            }
-
-            if ($fileCounter >= 10) {
-                $fileCounter     = 0;
+            if ($detectorTestWriter->write($result, $number, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();
                 $targetDirectory = $targetDirectoryHelper->getPath();
-                $fileCreated     = false;
 
                 $output->writeln('next test: ' . $number);
                 $output->writeln('target directory: ' . $targetDirectory);

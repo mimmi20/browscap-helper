@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\LogFileSource;
+use BrowscapHelper\Writer\TxtWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -113,8 +114,10 @@ class ConvertLogsCommand extends Command
         $output->writeln("reading from directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
+        $txtWriter = new TxtWriter($this->logger, $targetBulkFile);
+
         foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $agent) {
-            file_put_contents($targetBulkFile, trim($agent) . "\n", FILE_APPEND | LOCK_EX);
+            $txtWriter->write($agent);
             ++$counter;
         }
 
