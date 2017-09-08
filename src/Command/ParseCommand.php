@@ -204,7 +204,6 @@ class ParseCommand extends Command
                 new WhichBrowserSource($this->logger, $this->cache),
                 new WootheeSource($this->logger, $this->cache),
                 new DetectorSource($this->logger, $this->cache),
-                new DirectorySource($this->logger, 'data/useragents'),
             ]
         );
 
@@ -218,25 +217,23 @@ class ParseCommand extends Command
         $counter       = 1;
         $existingTests = [];
 
-        foreach ($source->getUserAgents($limit) as $agent) {
-            $agent = trim($agent);
-
-            if (isset($existingTests[$agent])) {
+        foreach ($source->getUserAgents($limit) as $useragent) {
+            if (isset($existingTests[$useragent])) {
                 continue;
             }
 
             if (0 < $limit) {
-                $output->writeln('        parsing ua #' . sprintf('%1$08d', $counter) . ': ' . $agent . ' ...');
+                $output->writeln('        parsing ua #' . sprintf('%1$08d', $counter) . ': ' . $useragent . ' ...');
             }
 
             $bench = [
-                'agent' => $agent,
+                'agent' => $useragent,
             ];
 
             /***************************************************************************
              * handle modules
              */
-            $cacheId = hash('sha512', bin2hex($agent));
+            $cacheId = hash('sha512', bin2hex($useragent));
 
             if (!file_exists('data/results/' . $cacheId)) {
                 mkdir('data/results/' . $cacheId, 0775, true);
@@ -245,7 +242,7 @@ class ParseCommand extends Command
             foreach ($collection as $module) {
                 /* @var \BrowscapHelper\Module\ModuleInterface $module */
                 $module->startTimer();
-                $module->detect($agent);
+                $module->detect($useragent);
                 $module->endTimer();
 
                 $detectionResult = $module->getDetectionResult();
@@ -262,7 +259,7 @@ class ParseCommand extends Command
                     'data/results/' . $cacheId . '/' . $module->getName() . '.json',
                     json_encode(
                         [
-                            'ua'     => $agent,
+                            'ua'     => $useragent,
                             'result' => (null === $detectionResult ? null : $detectionResult->toArray()),
                             'time'   => $actualTime,
                             'memory' => $actualMemory,
@@ -279,7 +276,7 @@ class ParseCommand extends Command
 
             ++$counter;
 
-            $existingTests[$agent] = 1;
+            $existingTests[$useragent] = 1;
         }
     }
 }

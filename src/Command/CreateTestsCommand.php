@@ -166,20 +166,13 @@ class CreateTestsCommand extends Command
         $detectorTestWriter = new DetectorTestWriter($this->logger, $targetDirectory);
         $browscapTestWriter = new BrowscapTestWriter($this->logger, 'results/');
 
-        foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
+        foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             if (isset($checks[$useragent])) {
                 $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
                 continue;
             }
 
             $checks[$useragent] = $number;
-
-            $platform = new Os(null, null);
-            $device   = new Device(null, null);
-            $engine   = new Engine(null);
-            $browser  = new Browser(null);
-            $request = (new GenericRequestFactory())->createRequestFromString($useragent);
-            $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
             $browscapTestWriter->write($result, $number);
 
