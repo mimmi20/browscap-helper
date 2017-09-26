@@ -120,11 +120,13 @@ class LogFileSource implements SourceInterface
 
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
-            if (!!$file->isReadable()) {
-                $this->logger->warn('file not readable');
+            if ((bool) $file->isReadable()) {
+                $this->logger->emergency('file not readable');
+
                 continue;
             }
 

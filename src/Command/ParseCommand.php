@@ -16,7 +16,6 @@ use BrowscapHelper\Module\ModuleCollection;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\DetectorSource;
-use BrowscapHelper\Source\DirectorySource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
@@ -54,17 +53,17 @@ class ParseCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var \Noodlehaus\Config;
      */
-    private $config = null;
+    private $config;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -83,7 +82,7 @@ class ParseCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         foreach ($this->config['modules'] as $key => $moduleConfig) {
             if (!$moduleConfig['enabled'] || !$moduleConfig['name'] || !$moduleConfig['class']) {
@@ -126,7 +125,7 @@ class ParseCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */

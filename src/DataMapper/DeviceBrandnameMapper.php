@@ -37,74 +37,97 @@ class DeviceBrandnameMapper
             case 'other':
             case 'various':
                 $brandName = null;
+
                 break;
             case 'htc corporation':
             case 'ht':
                 $brandName = 'HTC';
+
                 break;
             case 'au':
                 $brandName = 'Asus';
+
                 break;
             case 'sa':
                 $brandName = 'Samsung';
+
                 break;
             case 'so':
                 $brandName = 'Sony';
+
                 break;
             case 'rm':
                 $brandName = 'BlackBerry';
+
                 break;
             case 'nk':
                 $brandName = 'Nokia';
+
                 break;
             case 'ac':
                 $brandName = 'Acer';
+
                 break;
             case 'go':
                 $brandName = 'Google';
+
                 break;
             case 'le':
             case 'md':
                 $brandName = 'Lenovo';
+
                 break;
             case 'mr':
                 $brandName = 'Motorola';
+
                 break;
             case 'kn':
                 $brandName = 'Amazon';
+
                 break;
             case 'hu':
                 $brandName = 'Huawei';
+
                 break;
             case 'ni':
                 $brandName = 'Nintendo';
+
                 break;
             case 'ap':
                 $brandName = 'Apple';
+
                 break;
             case 'al':
                 $brandName = 'Alcatel';
+
                 break;
             case 'mb':
                 $brandName = 'Mobistel';
+
                 break;
             case 'wi':
                 $brandName = 'Wiko';
+
                 break;
             case 'xi':
                 $brandName = 'Xiaomi';
+
                 break;
             case 'ar':
                 $brandName = 'Archos';
+
                 break;
             case 'kz':
                 $brandName = 'KAZAM';
+
                 break;
             case 'ms':
                 $brandName = 'Microsoft';
+
                 break;
             case 'mi':
                 $brandName = 'Micromax';
+
                 break;
             default:
                 break;
@@ -171,21 +194,25 @@ class DeviceBrandnameMapper
             case 'windows mobile (opera)':
             case 'nokia unrecognized ovi browser':
                 $brandName = null;
+
                 break;
             // Medion
             case 'p9514':
             case 'lifetab p9514':
             case 'lifetab s9512':
                 $brandName = 'Medion';
+
                 break;
             // HTC
             case 'htc desire sv':
                 $brandName = 'HTC';
+
                 break;
             // Apple
             case 'ipad':
             case 'iphone':
                 $brandName = 'Apple';
+
                 break;
             default:
                 // nothing to do here

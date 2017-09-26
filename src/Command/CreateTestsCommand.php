@@ -17,8 +17,6 @@ use BrowscapHelper\Source\DirectorySource;
 use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
-use BrowserDetector\Helper\GenericRequestFactory;
-use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -27,11 +25,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class CreateTestsCommand
@@ -50,17 +43,17 @@ class CreateTestsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var \BrowserDetector\Detector
      */
-    private $detector = null;
+    private $detector;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -81,7 +74,7 @@ class CreateTestsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('create-tests')
@@ -108,7 +101,7 @@ class CreateTestsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -123,6 +116,7 @@ class CreateTestsCommand extends Command
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             if (isset($checks[$useragent])) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
@@ -132,6 +126,7 @@ class CreateTestsCommand extends Command
         $targetDirectoryHelper = new TargetDirectory();
 
         $output->writeln('detect next test number ...');
+
         try {
             $number = $targetDirectoryHelper->getNextTest();
         } catch (\UnexpectedValueException $e) {
@@ -161,22 +156,23 @@ class CreateTestsCommand extends Command
 
         $output->writeln('reading new files ...');
 
-        $sourcesDirectory = $input->getOption('resources');
-        $totalCounter     = 0;
+        $sourcesDirectory   = $input->getOption('resources');
+        $totalCounter       = 0;
         $detectorTestWriter = new DetectorTestWriter($this->logger, $targetDirectory);
         $browscapTestWriter = new BrowscapTestWriter($this->logger, 'results/');
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             if (isset($checks[$useragent])) {
                 $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
             $checks[$useragent] = $number;
 
-            $browscapTestWriter->write($result, $number);
+            $browscapTestWriter->write($result, $number, $useragent);
 
-            if ($detectorTestWriter->write($result, $number, $totalCounter)) {
+            if ($detectorTestWriter->write($result, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();
                 $targetDirectory = $targetDirectoryHelper->getPath();
 

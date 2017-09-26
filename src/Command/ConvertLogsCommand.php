@@ -43,7 +43,7 @@ class ConvertLogsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Monolog\Logger $logger
@@ -62,7 +62,7 @@ class ConvertLogsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('convert-logs')
@@ -96,7 +96,7 @@ class ConvertLogsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */

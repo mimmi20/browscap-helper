@@ -44,6 +44,7 @@ class BrowserMakerMapper
                 break;
             default:
                 $browserMaker = (new MakerMapper())->mapMaker($browserMaker);
+
                 break;
         }
 

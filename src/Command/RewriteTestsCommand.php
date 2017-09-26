@@ -43,17 +43,17 @@ class RewriteTestsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var \BrowserDetector\Detector
      */
-    private $detector = null;
+    private $detector;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -72,7 +72,7 @@ class RewriteTestsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('rewrite-tests')
@@ -92,7 +92,7 @@ class RewriteTestsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -101,7 +101,9 @@ class RewriteTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $sourceDirectory = 'tests/issues/';
+        $basePath = 'vendor/mimmi20/browser-detector-tests/';
+
+        $sourceDirectory = $basePath . 'tests/issues/';
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
@@ -120,6 +122,7 @@ class RewriteTestsCommand extends Command
             if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
                 $files[] = $filename;
                 $this->logger->warn('file ' . $filename . ' is out of strcture');
+
                 continue;
             }
 
@@ -167,7 +170,7 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('preparing circle.yml ...');
 
-        $circleFile      = 'circle.yml';
+        $circleFile      = $basePath . 'circle.yml';
         $circleciContent = 'machine:
   php:
     version: 7.1.0
@@ -217,7 +220,7 @@ test:
 
         foreach ($circleLines as $group => $count) {
             $columns = 111 + 2 * mb_strlen((string) $count);
-            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
@@ -236,9 +239,9 @@ test:
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelperTest\UserAgentsTest;
+namespace BrowserDetectorTest\UserAgentsTest;
 
-use BrowscapHelperTest\UserAgentsTestTrait;
+use BrowserDetectorTest\UserAgentsTestTrait;
 
 /**
  * Class T' . $group . 'Test
@@ -259,7 +262,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
     private $sourceDirectory = \'tests/issues/' . $group . '/\';
 }
 ';
-            $testFile = 'tests/UserAgentsTest/T' . $group . 'Test.php';
+            $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
         }
 
@@ -288,7 +291,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
         $this->logger->info('    checking ...');
 
         /** @var $file \SplFileInfo */
-        if (!$file->isFile() || $file->getExtension() !== 'json') {
+        if (!$file->isFile() || 'json' !== $file->getExtension()) {
             return 0;
         }
 
@@ -302,7 +305,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 
         $oldCounter = count(get_object_vars($tests));
 
-        if ($oldCounter < 1) {
+        if (1 > $oldCounter) {
             $this->logger->info('    file does not contain any test');
             unlink($file->getPathname());
 
@@ -327,6 +330,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
                 // UA was added more than once
                 $this->logger->error('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
                 unset($tests->$key);
+
                 continue;
             }
 
@@ -348,7 +352,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 
         $this->logger->info('    contains now ' . $newCounter . ' tests');
 
-        if ($newCounter < 1) {
+        if (1 > $newCounter) {
             $this->logger->info('    all tests are removed from the file');
             unlink($file->getPathname());
 
@@ -421,7 +425,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
             try {
                 $regexFactory = new RegexFactory($this->cache, $this->logger);
                 $regexFactory->detect($normalizedUa);
-                list($device) = $regexFactory->getDevice();
+                [$device]     = $regexFactory->getDevice();
                 $replaced     = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
@@ -464,7 +468,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
                 $deviceLoader = new DeviceLoader($this->cache);
 
                 try {
-                    list($device) = $deviceLoader->load('general mobile device', $normalizedUa);
+                    [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 

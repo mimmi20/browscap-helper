@@ -38,33 +38,43 @@ class DeviceTypeMapper
             case 'smart-tv':
             case 'tv device':
                 $typeKey = 'tv';
+
                 break;
             case 'desktop':
                 $typeKey = 'desktop';
+
                 break;
             case 'fonepad':
                 $typeKey = 'fone-pad';
+
                 break;
             case 'tablet':
                 $typeKey = 'tablet';
+
                 break;
             case 'mobile device':
                 $typeKey = 'mobile-device';
+
                 break;
             case 'mobile phone':
                 $typeKey = 'mobile-phone';
+
                 break;
             case 'smartphone':
                 $typeKey = 'smartphone';
+
                 break;
             case 'feature phone':
                 $typeKey = 'feature-phone';
+
                 break;
             case 'digital camera':
                 $typeKey = 'digital-camera';
+
                 break;
             default:
                 $typeKey = 'unknown';
+
                 break;
         }
 

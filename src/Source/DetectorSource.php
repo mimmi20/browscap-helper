@@ -91,7 +91,7 @@ class DetectorSource implements SourceInterface
      */
     private function loadFromPath(): iterable
     {
-        $path = 'tests/issues';
+        $path = 'vendor/mimmi20/browser-detector-tests/tests/issues';
 
         if (!file_exists($path)) {
             return;
@@ -113,11 +113,13 @@ class DetectorSource implements SourceInterface
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('json' !== $file->getExtension()) {
                 $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 

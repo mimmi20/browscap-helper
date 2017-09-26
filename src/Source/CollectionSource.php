@@ -21,16 +21,16 @@ class CollectionSource implements SourceInterface
     /**
      * @var \BrowscapHelper\Source\SourceInterface[]
      */
-    private $collection = null;
+    private $collection;
 
     /**
-     * @param array $collection
+     * @param \BrowscapHelper\Source\SourceInterface[] $collection
      */
     public function __construct(array $collection)
     {
         foreach ($collection as $source) {
             if (!$source instanceof SourceInterface) {
-                continue;
+                throw new SourceException('unsupported type of source found');
             }
 
             $this->collection[] = $source;

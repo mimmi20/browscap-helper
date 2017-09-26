@@ -41,12 +41,12 @@ class CopyTestsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -63,7 +63,7 @@ class CopyTestsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('copy-tests')
@@ -83,7 +83,7 @@ class CopyTestsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -95,6 +95,7 @@ class CopyTestsCommand extends Command
         $targetDirectoryHelper = new TargetDirectory();
 
         $output->writeln('detect next test number ...');
+
         try {
             $number = $targetDirectoryHelper->getNextTest();
         } catch (\UnexpectedValueException $e) {
@@ -129,6 +130,7 @@ class CopyTestsCommand extends Command
 
             if (isset($existingTests[$useragent])) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
@@ -157,14 +159,15 @@ class CopyTestsCommand extends Command
 
             if (isset($existingTests[$useragent])) {
                 $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
             $existingTests[$useragent] = 1;
 
-            $browscapTestWriter->write($result, $number);
+            $browscapTestWriter->write($result, $number, $useragent);
 
-            if ($detectorTestWriter->write($result, $number, $totalCounter)) {
+            if ($detectorTestWriter->write($result, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();
                 $targetDirectory = $targetDirectoryHelper->getPath();
 

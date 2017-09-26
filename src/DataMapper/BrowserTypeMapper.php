@@ -38,50 +38,62 @@ class BrowserTypeMapper
             case 'browser':
             case 'mobile browser':
                 $typeKey = 'browser';
+
                 break;
             case 'bot':
             case 'robot':
             case 'bot/crawler':
             case 'library':
                 $typeKey = 'bot';
+
                 break;
             case 'emailclient':
             case 'email client':
                 $typeKey = 'email-client';
+
                 break;
             case 'pim':
                 $typeKey = 'pim';
+
                 break;
             case 'feedreader':
             case 'feed reader':
                 $typeKey = 'feed-reader';
+
                 break;
             case 'multimediaplayer':
             case 'mediaplayer':
             case 'multimedia player':
                 $typeKey = 'multimedia-player';
+
                 break;
             case 'offlinebrowser':
             case 'offline browser':
                 $typeKey = 'offline-browser';
+
                 break;
             case 'useragentanonymizer':
             case 'useragent anonymizer':
                 $typeKey = 'useragent-anonymizer';
+
                 break;
             case 'wapbrowser':
             case 'wap browser':
                 $typeKey = 'wap-browser';
+
                 break;
             case 'application':
             case 'mobile app':
                 $typeKey = 'application';
+
                 break;
             case 'tool':
                 $typeKey = 'tool';
+
                 break;
             default:
                 $typeKey = 'unknown';
+
                 break;
         }
 

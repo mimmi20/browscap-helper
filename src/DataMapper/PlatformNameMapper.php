@@ -36,6 +36,7 @@ class PlatformNameMapper
             case 'unknown':
             case 'other':
                 $osName = null;
+
                 break;
             case 'winxp':
             case 'win7':
@@ -63,6 +64,7 @@ class PlatformNameMapper
             case 'windows server':
             case 'windows unknown ver':
                 $osName = 'Windows';
+
                 break;
             case 'winphone7':
             case 'winphone7.5':
@@ -71,46 +73,58 @@ class PlatformNameMapper
             case 'windows phone':
             case 'windows phone 7':
                 $osName = 'Windows Phone OS';
+
                 break;
             case 'winrt8':
             case 'winrt8.1':
                 $osName = 'Windows RT';
+
                 break;
             case 'winmobile':
                 $osName = 'Windows Mobile OS';
+
                 break;
             case 'wince':
                 $osName = 'Windows CE';
+
                 break;
             case 'blackberry os':
                 $osName = 'RIM OS';
+
                 break;
             case 'mac':
             case 'macosx':
             case 'os x':
             case 'mac osx':
                 $osName = 'Mac OS X';
+
                 break;
             case 'jvm':
             case 'java':
                 $osName = 'Java';
+
                 break;
             case 'bada os':
                 $osName = 'Bada';
+
                 break;
             case 'symbianos':
             case 'nokia series 40':
             case 'symbian os series 40':
                 $osName = 'Symbian OS';
+
                 break;
             case 'gnu/linux':
                 $osName = 'Linux';
+
                 break;
             case 'chrome os':
                 $osName = 'ChromeOS';
+
                 break;
             case 'mint':
                 $osName = 'Linux Mint';
+
                 break;
             default:
                 // nothing to do here

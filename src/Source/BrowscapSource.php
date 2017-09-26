@@ -295,11 +295,13 @@ class BrowscapSource implements SourceInterface
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('php' !== $file->getExtension()) {
                 $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 

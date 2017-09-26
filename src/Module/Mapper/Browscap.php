@@ -174,6 +174,7 @@ class Browscap implements MapperInterface
             $engineName = $this->mapper->mapEngineName($parserResult->renderingengine_name);
 
             $engineManufacturer = null;
+
             try {
                 $engineManufacturer = (new CompanyLoader($this->cache))->load($parserResult->renderingengine_maker);
             } catch (NotFoundException $e) {

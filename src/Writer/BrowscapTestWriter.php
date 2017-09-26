@@ -11,15 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Writer;
 
-use BrowserDetector\Helper\GenericRequestFactory;
-use FileLoader\Loader;
+use BrowserDetector\Version\VersionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Finder\Finder;
 use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
 class BrowscapTestWriter
@@ -39,7 +33,8 @@ class BrowscapTestWriter
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
-     * @param string $file
+     * @param string                   $file
+     * @param string                   $dir
      */
     public function __construct(LoggerInterface $logger, string $dir)
     {
@@ -48,12 +43,13 @@ class BrowscapTestWriter
     }
 
     /**
-     * @param \UaResult\Result\ResultInterface        $result
-     * @param int    $number
+     * @param \UaResult\Result\ResultInterface $result
+     * @param int                              $number
+     * @param string                           $useragent
      *
      * @return bool
      */
-    public function write(ResultInterface $result, int $number): bool
+    public function write(ResultInterface $result, int $number, string $useragent): bool
     {
         $platform = clone $result->getOs();
         $device   = clone $result->getDevice();
@@ -102,7 +98,7 @@ class BrowscapTestWriter
         'full' => true,
     ],\n";
 
-        file_put_contents($this->dir . 'issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $outputBrowscap . "];\n");
+        file_put_contents($this->dir . 'issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
 
         ++$this->counter;
 

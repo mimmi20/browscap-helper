@@ -73,7 +73,7 @@ class PiwikSource implements SourceInterface
                 return;
             }
 
-            $row = json_decode($row, false);
+            $row   = json_decode($row, false);
             $agent = trim($row->user_agent);
 
             if (empty($agent)) {
@@ -230,11 +230,13 @@ class PiwikSource implements SourceInterface
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('yml' !== $file->getExtension()) {
                 $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 

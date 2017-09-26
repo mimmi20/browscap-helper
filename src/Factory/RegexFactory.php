@@ -44,12 +44,12 @@ class RegexFactory
     /**
      * @var array|null
      */
-    private $match = null;
+    private $match;
 
     /**
      * @var string|null
      */
-    private $useragent = null;
+    private $useragent;
 
     /**
      * an logger instance
@@ -108,6 +108,7 @@ class RegexFactory
         }
 
         $this->runDetection = true;
+
         throw new Regex\NoMatchException('no regex did match');
     }
 
@@ -147,9 +148,11 @@ class RegexFactory
 
         if ('windows' === $deviceCode) {
             return $deviceLoader->load('windows desktop', $this->useragent);
-        } elseif ('macintosh' === $deviceCode) {
+        }
+        if ('macintosh' === $deviceCode) {
             return $deviceLoader->load('macintosh', $this->useragent);
-        } elseif ('cfnetwork' === $deviceCode) {
+        }
+        if ('cfnetwork' === $deviceCode) {
             try {
                 return (new Factory\Device\DarwinFactory($deviceLoader))->detect($this->useragent, $s);
             } catch (NotFoundException $e) {
@@ -180,7 +183,7 @@ class RegexFactory
 
         if ($deviceLoader->has($manufacturercode . ' ' . $deviceCode)) {
             /** @var \UaResult\Device\DeviceInterface $device */
-            list($device, $platform) = $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
+            [$device, $platform] = $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
 
             if (!in_array($device->getDeviceName(), ['unknown', null])) {
                 $this->logger->debug('device detected via manufacturercode and devicecode');
@@ -191,7 +194,7 @@ class RegexFactory
 
         if ($deviceLoader->has($deviceCode)) {
             /** @var \UaResult\Device\DeviceInterface $device */
-            list($device, $platform) = $deviceLoader->load($deviceCode, $this->useragent);
+            [$device, $platform] = $deviceLoader->load($deviceCode, $this->useragent);
 
             if (!in_array($device->getDeviceName(), ['unknown', null])) {
                 $this->logger->debug('device detected via devicecode');
@@ -216,6 +219,7 @@ class RegexFactory
                     return $factory->detect($this->useragent, $s);
                 } catch (NotFoundException $e) {
                     $this->logger->warning($e);
+
                     throw $e;
                 }
             } else {
@@ -246,6 +250,7 @@ class RegexFactory
                         return $factory->detect($this->useragent, $s);
                     } catch (NotFoundException $e) {
                         $this->logger->warning($e);
+
                         throw $e;
                     }
                 } else {
@@ -366,19 +371,24 @@ class RegexFactory
         switch ($browserCode) {
             case 'opr':
                 $browserCode = 'opera';
+
                 break;
             case 'msie':
                 $browserCode = 'internet explorer';
+
                 break;
             case 'ucweb':
             case 'ubrowser':
                 $browserCode = 'ucbrowser';
+
                 break;
             case 'crmo':
                 $browserCode = 'chrome';
+
                 break;
             case 'granparadiso':
                 $browserCode = 'firefox';
+
                 break;
             default:
                 // do nothing here
@@ -416,7 +426,7 @@ class RegexFactory
 
         if ($browserLoader->has($browserCode)) {
             /** @var \UaResult\Browser\BrowserInterface $browser */
-            list($browser) = $browserLoader->load($browserCode, $this->useragent);
+            [$browser] = $browserLoader->load($browserCode, $this->useragent);
 
             if (!in_array($browser->getName(), ['unknown', null])) {
                 return [$browser];
@@ -463,7 +473,7 @@ class RegexFactory
                 $chromeversion = 0;
             }
 
-            if ($chromeversion >= 28) {
+            if (28 <= $chromeversion) {
                 $engineCode = 'blink';
             } else {
                 $engineCode = 'webkit';

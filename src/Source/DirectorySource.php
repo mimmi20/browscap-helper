@@ -118,6 +118,7 @@ class DirectorySource implements SourceInterface
         foreach ($finder as $file) {
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 

@@ -27,7 +27,7 @@ class LogFileReader implements ReaderInterface
     /**
      * @var \FileLoader\Loader
      */
-    private $loader = null;
+    private $loader;
 
     public function __construct()
     {
@@ -71,6 +71,7 @@ class LogFileReader implements ReaderInterface
 
             if (!preg_match($regex, $line, $lineMatches)) {
                 $logger->warning('no useragent found in line "' . $line . '"');
+
                 continue;
             }
 

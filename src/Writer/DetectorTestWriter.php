@@ -11,14 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Writer;
 
-use BrowserDetector\Helper\GenericRequestFactory;
-use FileLoader\Loader;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Finder\Finder;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
@@ -41,7 +34,8 @@ class DetectorTestWriter
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
-     * @param string $file
+     * @param string                   $file
+     * @param string                   $dir
      */
     public function __construct(LoggerInterface $logger, string $dir)
     {
@@ -50,13 +44,14 @@ class DetectorTestWriter
     }
 
     /**
-     * @param \UaResult\Result\ResultInterface        $result
-     * @param int $number
-     * @param int $totalCounter
+     * @param \UaResult\Result\ResultInterface $result
+     * @param int                              $number
+     * @param string                           $useragent
+     * @param int                              &$totalCounter
      *
      * @return bool
      */
-    public function write(ResultInterface $result, int $number, int &$totalCounter): bool
+    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): bool
     {
         $formatedIssue   = sprintf('%1$07d', $number);
         $formatedCounter = sprintf('%1$05d', $this->counter);
@@ -77,13 +72,13 @@ class DetectorTestWriter
         ++$this->chunkCounter;
         ++$totalCounter;
 
-        if ($this->chunkCounter >= 100) {
+        if (100 <= $this->chunkCounter) {
             $this->chunkCounter   = 0;
             $this->outputDetector = [];
             ++$this->fileCounter;
         }
 
-        if ($this->fileCounter >= 10) {
+        if (10 <= $this->fileCounter) {
             $this->chunkCounter    = 0;
             $this->outputDetector  = [];
             $this->fileCounter     = 0;

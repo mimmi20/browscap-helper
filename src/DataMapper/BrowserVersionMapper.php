@@ -61,6 +61,7 @@ class BrowserVersionMapper
                         // nothing to do here
                         break;
                 }
+
                 break;
         }
 

@@ -32,7 +32,7 @@ class BrowscapHelper extends Application
     /**
      * @var string
      */
-    const DEFAULT_RESOURCES_FOLDER = '../sources';
+    public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
     public function __construct()
     {

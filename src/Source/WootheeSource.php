@@ -70,7 +70,7 @@ class WootheeSource implements SourceInterface
                 return;
             }
 
-            $row = json_decode($row, false);
+            $row   = json_decode($row, false);
             $agent = trim($row->target);
 
             if (empty($agent)) {
@@ -171,11 +171,13 @@ class WootheeSource implements SourceInterface
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('yaml' !== $file->getExtension()) {
                 $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 

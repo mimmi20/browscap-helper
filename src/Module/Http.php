@@ -36,12 +36,12 @@ class Http implements ModuleInterface
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var string
@@ -51,7 +51,7 @@ class Http implements ModuleInterface
     /**
      * @var \GuzzleHttp\Psr7\Response|null
      */
-    private $detectionResult = null;
+    private $detectionResult;
 
     /**
      * @var string
@@ -66,7 +66,7 @@ class Http implements ModuleInterface
     /**
      * @var array
      */
-    private $config = null;
+    private $config;
 
     /**
      * @var \BrowscapHelper\Module\Check\CheckInterface
@@ -81,7 +81,7 @@ class Http implements ModuleInterface
     /**
      * @var \GuzzleHttp\Psr7\Request
      */
-    private $request = null;
+    private $request;
 
     /**
      * @var float
