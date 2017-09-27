@@ -128,7 +128,7 @@ class DetectorSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = json_decode(file_get_contents($filepath));
 
-            if (!is_iterable($data)) {
+            if (!is_array($data) && !($data instanceof \stdClass)) {
                 continue;
             }
 

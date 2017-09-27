@@ -103,7 +103,7 @@ class RewriteTestsCommand extends Command
 
         $basePath = 'vendor/mimmi20/browser-detector-tests/';
 
-        $sourceDirectory = $basePath . 'tests/issues/';
+        $sourceDirectory = $basePath . 'vendor/mimmi20/browser-detector-tests/tests/issues/';
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];

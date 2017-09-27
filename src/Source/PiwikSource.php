@@ -245,7 +245,7 @@ class PiwikSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = \Spyc::YAMLLoad($filepath);
 
-            if (!is_iterable($data)) {
+            if (!is_array($data) && !($data instanceof \stdClass)) {
                 continue;
             }
 

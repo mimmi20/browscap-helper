@@ -144,7 +144,7 @@ class DirectorySource implements SourceInterface
 
                 $line = trim($line);
 
-                if (isset($allLines[$line])) {
+                if (array_key_exists($line, $allLines)) {
                     continue;
                 }
 

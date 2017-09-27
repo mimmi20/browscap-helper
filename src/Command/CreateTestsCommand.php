@@ -114,7 +114,9 @@ class CreateTestsCommand extends Command
         $checks = [];
 
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
-            if (isset($checks[$useragent])) {
+            $useragent = trim($useragent);
+            
+            if (array_key_exists($useragent, $checks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
@@ -162,8 +164,10 @@ class CreateTestsCommand extends Command
         $browscapTestWriter = new BrowscapTestWriter($this->logger, 'results/');
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
-            if (isset($checks[$useragent])) {
-                $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
+            $useragent = trim($useragent);
+            
+            if (array_key_exists($useragent, $checks)) {
+                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
