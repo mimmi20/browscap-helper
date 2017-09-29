@@ -115,8 +115,17 @@ class ConvertLogsCommand extends Command
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
         $txtWriter = new TxtWriter($this->logger, $targetBulkFile);
+        $allAgents = [];
 
         foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $agent) {
+            if (array_key_exists($agent, $allAgents)) {
+                $this->logger->info('    UA "' . $agent . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $allAgents[$agent] = 1;
+
             $txtWriter->write($agent);
             ++$counter;
         }

@@ -34,24 +34,22 @@ class DetectorTestWriter
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
-     * @param string                   $file
-     * @param string                   $dir
      */
-    public function __construct(LoggerInterface $logger, string $dir)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->dir    = $dir;
     }
 
     /**
      * @param \UaResult\Result\ResultInterface $result
+     * @param string                           $dir
      * @param int                              $number
      * @param string                           $useragent
      * @param int                              &$totalCounter
      *
      * @return bool
      */
-    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): bool
+    public function write(ResultInterface $result, string $dir, int $number, string $useragent, int &$totalCounter): bool
     {
         $formatedIssue   = sprintf('%1$07d', $number);
         $formatedCounter = sprintf('%1$05d', $this->counter);
@@ -62,7 +60,7 @@ class DetectorTestWriter
         ];
 
         file_put_contents(
-            $this->dir . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $this->fileCounter) . '.json',
+            $dir . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $this->fileCounter) . '.json',
             json_encode(
                 $this->outputDetector,
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT

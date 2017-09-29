@@ -138,7 +138,7 @@ class CopyTestsCommand extends Command
         }
 
         $output->writeln('init sources ...');
-        $counter = 0;
+        $totalCounter = 0;
         $source  = new CollectionSource(
             [
                 new BrowscapSource($this->logger, $this->cache),
@@ -158,7 +158,7 @@ class CopyTestsCommand extends Command
             $useragent = trim($useragent);
 
             if (isset($existingTests[$useragent])) {
-                $this->logger->error('    UA "' . $useragent . '" added more than once --> skipped');
+                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
@@ -181,7 +181,7 @@ class CopyTestsCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln('Es wurden ' . $counter . ' Tests exportiert');
+        $output->writeln('Es wurden ' . $totalCounter . ' Tests exportiert');
 
         return 0;
     }

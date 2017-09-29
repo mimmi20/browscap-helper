@@ -124,7 +124,7 @@ class LogFileSource implements SourceInterface
                 continue;
             }
 
-            if ((bool) $file->isReadable()) {
+            if (!$file->isReadable()) {
                 $this->logger->emergency('file not readable');
 
                 continue;
