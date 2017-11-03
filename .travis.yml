@@ -4,6 +4,7 @@ dist: trusty
 
 php:
   - 7.1
+  - 7.2
 
 os: linux
 
@@ -16,7 +17,7 @@ cache:
     - $HOME/.composer/cache
 
 before_install:
-  - phpenv config-rm xdebug.ini
+  - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo 'opcache.enable=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'opcache.enable_cli=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - travis_retry composer self-update
@@ -28,42 +29,22 @@ script: composer validate
 jobs:
   fast_finish: true
   allow_failures:
-    - php: 7.2
     - php: nightly
   include:
-    - php: 7.2
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
-      before_install:
-        - echo 'opcache.enable=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-        - echo 'opcache.enable_cli=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-        - travis_retry composer self-update
     - php: nightly
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
-      before_install:
-        - echo 'opcache.enable=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-        - echo 'opcache.enable_cli=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-        - travis_retry composer self-update
     - stage: check coding style
       php: 7.1
       env: COMPOSER_FLAGS=""
-      install:
-        - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction --no-suggest --no-dev $COMPOSER_FLAGS -vv
-        - travis_retry composer require --update-with-dependencies --prefer-dist squizlabs/php_codesniffer:^3.0
-      script: vendor/bin/phpcs
+      script: wget https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.1.1/phpcs.phar && php phpcs.phar --colors
     - stage: check coding style
       php: 7.1
       env: COMPOSER_FLAGS=""
-      install:
-        - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction --no-suggest --no-dev $COMPOSER_FLAGS -vv
-        - travis_retry composer require --update-with-dependencies --prefer-dist friendsofphp/php-cs-fixer:^2.5
-      script: vendor/bin/php-cs-fixer fix --dry-run -vv
+      script: wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.7.1/php-cs-fixer.phar && php php-cs-fixer.phar fix --dry-run -vv
     - stage: static code analysis
       php: 7.1
       env: COMPOSER_FLAGS=""
-      install:
-        - travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction --no-suggest --no-dev $COMPOSER_FLAGS -vv
-        - travis_retry composer require --update-with-dependencies --prefer-dist phpstan/phpstan:0.8.4
-      script: vendor/bin/phpstan analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress src web bin
+      script: wget https://github.com/phpstan/phpstan/releases/download/0.8.5/phpstan.phar && php phpstan.phar analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress src web bin
 
 notifications:
   email: false

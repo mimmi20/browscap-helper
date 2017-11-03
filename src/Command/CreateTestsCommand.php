@@ -161,7 +161,6 @@ class CreateTestsCommand extends Command
         $sourcesDirectory   = $input->getOption('resources');
         $totalCounter       = 0;
         $detectorTestWriter = new DetectorTestWriter($this->logger);
-        $browscapTestWriter = new BrowscapTestWriter($this->logger, 'results/');
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
@@ -173,8 +172,6 @@ class CreateTestsCommand extends Command
             }
 
             $checks[$useragent] = $number;
-
-            $browscapTestWriter->write($result, $number, $useragent);
 
             if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();

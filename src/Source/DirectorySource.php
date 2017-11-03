@@ -132,11 +132,27 @@ class DirectorySource implements SourceInterface
             /** @var \FileLoader\Psr7\Stream $stream */
             $stream = $response->getBody();
 
-            $stream->read(1);
-            $stream->rewind();
+            try {
+                $stream->read(1);
+            } catch (\Throwable $e) {
+                $this->logger->emergency(new \RuntimeException('reading file ' . $file->getPathname() . ' caused an error on line 0', 0, $e));
+            }
+
+            try {
+                $stream->rewind();
+            } catch (\Throwable $e) {
+                $this->logger->emergency(new \RuntimeException('rewinding file ' . $file->getPathname() . ' caused an error on line 0', 0, $e));
+            }
+
+            $i = 1;
 
             while (!$stream->eof()) {
-                $line = $stream->read(8192);
+                try {
+                    $line = $stream->read(65535);
+                } catch (\Throwable $e) {
+                    $this->logger->emergency(new \RuntimeException('reading file ' . $file->getPathname() . ' caused an error on line ' . $i, 0, $e));
+                }
+                ++$i;
 
                 if (empty($line)) {
                     continue;

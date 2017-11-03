@@ -103,7 +103,13 @@ class RewriteTestsCommand extends Command
 
         $basePath = 'vendor/mimmi20/browser-detector-tests/';
 
-        $sourceDirectory = $basePath . 'vendor/mimmi20/browser-detector-tests/tests/issues/';
+        $sourceDirectory = $basePath . 'tests/issues/';
+
+        if (! file_exists($sourceDirectory)) {
+            $this->logger->crit('source directory not found');
+
+            return 1;
+        }
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
@@ -173,7 +179,7 @@ class RewriteTestsCommand extends Command
         $circleFile      = $basePath . 'circle.yml';
         $circleciContent = 'machine:
   php:
-    version: 7.1.0
+    version: 7.1.9
   timezone:
     Europe/Berlin
 
@@ -188,7 +194,7 @@ test:
     - composer validate
 ';
 
-        $circleLines = [];
+        $circleTests = [];
 
         foreach ($testCounter as $group => $filesinGroup) {
             $count = 0;
@@ -197,13 +203,13 @@ test:
                 $count += $testCounter[$group][$fileinGroup];
             }
 
-            $circleLines[$group] = $count;
+            $circleTests[$group] = $count;
         }
 
         $countArray = [];
         $groupArray = [];
 
-        foreach ($circleLines as $group => $count) {
+        foreach ($circleTests as $group => $count) {
             $countArray[$group] = $count;
             $groupArray[$group] = $group;
         }
@@ -215,18 +221,30 @@ test:
             $groupArray,
             SORT_NUMERIC,
             SORT_ASC,
-            $circleLines
+            $circleTests
         );
 
-        foreach ($circleLines as $group => $count) {
+        $circleLines = [];
+        $circleCount = [];
+        $i           = 0;
+        $c           = 0;
+
+        foreach ($circleTests as $group => $count) {
+            if (($c + $count) > 1000) {
+                ++$i;
+                $c = 0;
+                $circleLines[$i] = '';
+                $circleCount[$i] = 0;
+            }
+
+            $c += $count;
+            $circleLines[$i] .= ',' . $group;
+            $circleCount[$i] += $count;
+        }
+
+        foreach ($circleTests as $group => $count) {
             $columns = 111 + 2 * mb_strlen((string) $count);
             $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
-
-            $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #' . $tests;
-            $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
-            $circleciContent .= PHP_EOL;
 
             $testContent = '<?php
 /**
@@ -242,6 +260,7 @@ declare(strict_types = 1);
 namespace BrowserDetectorTest\UserAgentsTest;
 
 use BrowserDetectorTest\UserAgentsTestTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class T' . $group . 'Test
@@ -252,7 +271,7 @@ use BrowserDetectorTest\UserAgentsTestTrait;
  * @author     Thomas Mueller <mimmi20@live.de>
  * @group      ' . $group . '
  */
-class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
+class T' . $group . 'Test extends TestCase
 {
     use UserAgentsTestTrait;
 
@@ -264,6 +283,20 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 ';
             $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
+        }
+
+        foreach (array_keys($circleCount) as $i) {
+            $count  = $circleCount[$i];
+            $groups = trim($circleLines[$i], ',');
+
+            $columns = 111 + 2 * mb_strlen((string) $count);
+            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
+
+            $circleciContent .= PHP_EOL;
+            $circleciContent .= '    #' . $tests;
+            $circleciContent .= PHP_EOL;
+            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . ' --group ' . $groups . ' -- ' . $tests;
+            $circleciContent .= PHP_EOL;
         }
 
         $output->writeln('writing ' . $circleFile . ' ...');
@@ -301,6 +334,13 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 
         if (is_array($tests)) {
             $tests = (object) $tests;
+        }
+
+        if (null === $tests) {
+            $this->logger->info('    file does not contain any test');
+            unlink($file->getPathname());
+
+            return 0;
         }
 
         $oldCounter = count(get_object_vars($tests));
