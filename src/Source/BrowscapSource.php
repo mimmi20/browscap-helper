@@ -57,7 +57,7 @@ class BrowscapSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -68,25 +68,36 @@ class BrowscapSource implements SourceInterface
                 return;
             }
 
-            yield trim($row['ua']);
+            $agent = trim($row['ua']);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\ResultInterface[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $agent   = trim($row['ua']);
+            $agent = trim($row['ua']);
+
+            if (empty($agent)) {
+                continue;
+            }
+
             $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             if (array_key_exists('Browser_Type', $row['properties'])) {
                 try {
                     $browserType = (new BrowserTypeMapper())->mapBrowserType($row['properties']['Browser_Type']);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('browser type not found: ' . $row['properties']['Browser_Type']);
                     $browserType = null;
                 }
             } else {
@@ -96,9 +107,9 @@ class BrowscapSource implements SourceInterface
 
             if (array_key_exists('Browser_Maker', $row['properties'])) {
                 try {
-                    $browserMaker = (new CompanyLoader($this->cache))->loadByName($row['properties']['Browser_Maker']);
+                    $browserMaker = CompanyLoader::getInstance($this->cache)->load($row['properties']['Browser_Maker']);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('company not found: ' . $row['properties']['Browser_Maker']);
                     $browserMaker = null;
                 }
             } else {
@@ -131,9 +142,9 @@ class BrowscapSource implements SourceInterface
 
             if (array_key_exists('Device_Maker', $row['properties'])) {
                 try {
-                    $deviceMaker = (new CompanyLoader($this->cache))->loadByName($row['properties']['Device_Maker']);
+                    $deviceMaker = CompanyLoader::getInstance($this->cache)->load($row['properties']['Device_Maker']);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('company not found: ' . $row['properties']['Device_Maker']);
                     $deviceMaker = null;
                 }
             } else {
@@ -143,9 +154,9 @@ class BrowscapSource implements SourceInterface
 
             if (array_key_exists('Device_Brand_Name', $row['properties'])) {
                 try {
-                    $deviceBrand = (new CompanyLoader($this->cache))->loadByBrandName($row['properties']['Device_Brand_Name']);
+                    $deviceBrand = CompanyLoader::getInstance($this->cache)->load($row['properties']['Device_Brand_Name']);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('company not found: ' . $row['properties']['Device_Brand_Name']);
                     $deviceBrand = null;
                 }
             } else {
@@ -157,7 +168,7 @@ class BrowscapSource implements SourceInterface
                 try {
                     $deviceType = (new DeviceTypeMapper())->mapDeviceType($row['properties']['Device_Type']);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('device type not found: ' . $row['properties']['Device_Type']);
                     $deviceType = null;
                 }
             } else {
@@ -198,9 +209,9 @@ class BrowscapSource implements SourceInterface
             if (array_key_exists('Platform', $row['properties'])) {
                 if (array_key_exists('Platform_Maker', $row['properties'])) {
                     try {
-                        $platformMaker = (new CompanyLoader($this->cache))->loadByName($row['properties']['Platform_Maker']);
+                        $platformMaker = CompanyLoader::getInstance($this->cache)->load($row['properties']['Platform_Maker']);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical($e);
+                        $this->logger->critical('company not found: ' . $row['properties']['Platform_Maker']);
                         $platformMaker = null;
                     }
                 } else {
@@ -221,9 +232,9 @@ class BrowscapSource implements SourceInterface
             if (array_key_exists('RenderingEngine_Name', $row['properties'])) {
                 if (array_key_exists('Platform_Maker', $row['properties'])) {
                     try {
-                        $engineMaker = (new CompanyLoader($this->cache))->loadByName($row['properties']['RenderingEngine_Maker']);
+                        $engineMaker = CompanyLoader::getInstance($this->cache)->load($row['properties']['RenderingEngine_Maker']);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical($e);
+                        $this->logger->critical('company not found: ' . $row['properties']['RenderingEngine_Maker']);
                         $engineMaker = null;
                     }
                 } else {
@@ -232,12 +243,7 @@ class BrowscapSource implements SourceInterface
                 }
 
                 if (array_key_exists('RenderingEngine_Version', $row['properties'])) {
-                    try {
-                        $engineVersion = (new EngineVersionMapper())->mapEngineVersion($row['properties']['RenderingEngine_Version']);
-                    } catch (NotFoundException $e) {
-                        $this->logger->critical($e);
-                        $engineVersion = null;
-                    }
+                    $engineVersion = (new EngineVersionMapper())->mapEngineVersion($row['properties']['RenderingEngine_Version']);
                 } else {
                     $this->logger->warning('The engine version is missing for UA "' . $agent . '"');
                     $engineVersion = null;
@@ -253,12 +259,12 @@ class BrowscapSource implements SourceInterface
                 $engine = null;
             }
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
-     * @return array[]
+     * @return array[]|iterable
      */
     private function loadFromPath(): iterable
     {
@@ -283,10 +289,14 @@ class BrowscapSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('php' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 
@@ -295,7 +305,7 @@ class BrowscapSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = include $filepath;
 
-            if (!is_iterable($data)) {
+            if (!is_array($data) && !($data instanceof \stdClass)) {
                 continue;
             }
 

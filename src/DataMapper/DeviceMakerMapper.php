@@ -82,16 +82,19 @@ class DeviceMakerMapper
             case 'firefox for android tablet':
             case 'firefox for android':
                 $deviceMaker = null;
+
                 break;
             // Motorola
             case 'motomz616':
             case 'motoxt610':
             case 'motxt912b':
                 $deviceMaker = 'Motorola';
+
                 break;
             // LG
             case 'lg/c550/v1.0':
                 $deviceMaker = 'LG';
+
                 break;
             // Samsung
             case 'gt s8500':
@@ -111,56 +114,68 @@ class DeviceMakerMapper
             case 'sgh i900':
             case 'sph-930':
                 $deviceMaker = 'Samsung';
+
                 break;
             // Acer
             case 'acer e310':
             case 'acer e320':
                 $deviceMaker = 'Acer';
+
                 break;
             // HTC
             case 'sensationxe beats z715e':
             case 's510b':
             case 'htc desire sv':
                 $deviceMaker = 'HTC';
+
                 break;
             // Asus
             case 'asus-padfone':
                 $deviceMaker = 'Asus';
+
                 break;
             // Creative
             case 'creative ziio7':
                 $deviceMaker = 'Creative';
+
                 break;
             // HP
             case 'touchpad':
                 $deviceMaker = 'HP';
+
                 break;
             // Huawei
             case 'u8800':
                 $deviceMaker = 'Huawei';
+
                 break;
             // Amazon
             case 'd01400':
                 $deviceMaker = 'Amazon';
+
                 break;
             // Nokia
             case 'nokia asha 201':
             case 'nokia unrecognized ovi browser':
                 $deviceMaker = 'Nokia';
+
                 break;
             // Medion
             case 'p9514':
             case 'lifetab p9514':
             case 'lifetab s9512':
                 $deviceMaker = 'Medion';
+
                 break;
             // Apple
             case 'ipad':
             case 'iphone':
                 $deviceMaker = 'Apple Inc';
+
                 break;
             default:
                 $deviceMaker = (new MakerMapper())->mapMaker($deviceMaker);
+
                 break;
         }
 

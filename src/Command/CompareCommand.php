@@ -38,17 +38,17 @@ class CompareCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var \Noodlehaus\Config;
      */
-    private $config = null;
+    private $config;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -67,7 +67,7 @@ class CompareCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $allChecks = [
             Check::MINIMUM,
@@ -99,7 +99,7 @@ class CompareCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -230,7 +230,7 @@ class CompareCommand extends Command
                 ++$okfound;
             }
 
-            if (($i % 100) === 0) {
+            if (0 === ($i % 100)) {
                 echo "\n";
             }
 

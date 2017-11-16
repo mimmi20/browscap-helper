@@ -62,7 +62,7 @@ class WhichBrowserSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -73,21 +73,31 @@ class WhichBrowserSource implements SourceInterface
                 return;
             }
 
-            $row = json_decode($row, false);
+            $row   = json_decode($row, false);
+            $agent = trim($row->{'User-Agent'});
 
-            yield trim($row->{'User-Agent'});
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row     = json_decode($row, false);
-            $agent   = $row->{'User-Agent'};
+            $row   = json_decode($row, false);
+            $agent = trim($row->{'User-Agent'});
+
+            if (empty($agent)) {
+                continue;
+            }
+
             $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             if (isset($row->browser->name)) {
@@ -106,7 +116,7 @@ class WhichBrowserSource implements SourceInterface
                 try {
                     $browserType = (new BrowserTypeMapper())->mapBrowserType($row->browser->type);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('browser type not found: ' . $row->browser->type);
                     $browserType = null;
                 }
             } else {
@@ -124,7 +134,7 @@ class WhichBrowserSource implements SourceInterface
                 try {
                     $deviceType = (new DeviceTypeMapper())->mapDeviceType($row->device->type);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('device type not found: ' . $row->device->type);
                     $deviceType = null;
                 }
             } else {
@@ -179,12 +189,12 @@ class WhichBrowserSource implements SourceInterface
                 $engineVersion
             );
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
     /**
-     * @return array[]
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {
@@ -209,10 +219,14 @@ class WhichBrowserSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('yaml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 
@@ -221,7 +235,7 @@ class WhichBrowserSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = Yaml::parse(file_get_contents($filepath));
 
-            if (!is_iterable($data)) {
+            if (!is_array($data) && !($data instanceof \stdClass)) {
                 continue;
             }
 

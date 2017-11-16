@@ -25,7 +25,7 @@ class FrameSupportMapper
     /**
      * maps the value for the frame/iframe support
      *
-     * @param string|bool $support
+     * @param bool|string $support
      *
      * @return string
      */

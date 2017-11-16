@@ -19,6 +19,7 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowscapHelper\Writer\DetectorTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -39,12 +40,12 @@ class CopyTestsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -61,7 +62,7 @@ class CopyTestsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('copy-tests')
@@ -81,7 +82,7 @@ class CopyTestsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -93,6 +94,7 @@ class CopyTestsCommand extends Command
         $targetDirectoryHelper = new TargetDirectory();
 
         $output->writeln('detect next test number ...');
+
         try {
             $number = $targetDirectoryHelper->getNextTest();
         } catch (\UnexpectedValueException $e) {
@@ -122,19 +124,21 @@ class CopyTestsCommand extends Command
 
         $output->writeln('read existing tests ...');
         $existingTests = [];
-        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $ua) {
-            $ua = trim($ua);
+        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
 
-            if (isset($existingTests[$ua])) {
+            if (isset($existingTests[$useragent])) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
-            $existingTests[$ua] = 1;
+            $existingTests[$useragent] = 1;
         }
 
         $output->writeln('init sources ...');
-        $counter = 0;
-        $source  = new CollectionSource(
+        $totalCounter = 0;
+        $source       = new CollectionSource(
             [
                 new BrowscapSource($this->logger, $this->cache),
                 new PiwikSource($this->logger, $this->cache),
@@ -145,56 +149,23 @@ class CopyTestsCommand extends Command
         );
 
         $output->writeln('import tests ...');
-        $chunkCounter = 0;
-        $fileCounter  = 0;
-        $data         = [];
-        $fileCreated  = false;
 
-        foreach ($source->getTests() as $ua => $result) {
-            $ua = trim($ua);
+        $detectorTestWriter = new DetectorTestWriter($this->logger);
 
-            if (isset($existingTests[$ua])) {
+        foreach ($source->getTests() as $useragent => $result) {
+            $useragent = trim($useragent);
+
+            if (isset($existingTests[$useragent])) {
+                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
-            $targetFilename = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $fileCounter) . '.json';
+            $existingTests[$useragent] = 1;
 
-            if (!$fileCreated && file_exists($targetDirectory . $targetFilename)) {
-                $this->logger->emergency('    target file for chunk ' . $fileCounter . ' already exists');
-                exit;
-            }
-
-            $key = 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$05d', $chunkCounter);
-
-            $data[$key] = [
-                'ua'     => $ua,
-                'result' => $result->toArray(),
-            ];
-
-            ++$counter;
-            ++$chunkCounter;
-
-            file_put_contents(
-                $targetDirectory . $targetFilename,
-                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT)
-            );
-
-            $fileCreated = true;
-
-            if ($chunkCounter >= 100) {
-                $this->logger->info('    writing file ' . $targetFilename);
-
-                $chunkCounter = 0;
-                $data         = [];
-                $fileCreated  = false;
-                ++$fileCounter;
-            }
-
-            if ($fileCounter >= 10) {
-                $fileCounter     = 0;
+            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();
                 $targetDirectory = $targetDirectoryHelper->getPath();
-                $fileCreated     = false;
 
                 $output->writeln('next test: ' . $number);
                 $output->writeln('target directory: ' . $targetDirectory);
@@ -206,7 +177,7 @@ class CopyTestsCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln('Es wurden ' . $counter . ' Tests exportiert');
+        $output->writeln('Es wurden ' . $totalCounter . ' Tests exportiert');
 
         return 0;
     }

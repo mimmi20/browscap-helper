@@ -18,10 +18,12 @@ use BrowscapHelper\DataMapper\DeviceMarketingnameMapper;
 use BrowscapHelper\DataMapper\DeviceNameMapper;
 use BrowscapHelper\DataMapper\DeviceTypeMapper;
 use BrowscapHelper\DataMapper\EngineNameMapper;
+use BrowscapHelper\DataMapper\MakerMapper;
 use BrowscapHelper\DataMapper\PlatformNameMapper;
 use BrowscapHelper\DataMapper\PlatformVersionMapper;
 use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
+use DeviceDetector\Parser\Device\Mobile;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
@@ -62,7 +64,7 @@ class PiwikSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -73,20 +75,32 @@ class PiwikSource implements SourceInterface
                 return;
             }
 
-            $row = json_decode($row, false);
-            yield trim($row->user_agent);
+            $row   = json_decode($row, false);
+            $agent = trim($row->user_agent);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row     = json_decode($row, false);
-            $request = (new GenericRequestFactory())->createRequestFromString($row->user_agent);
+            $row   = json_decode($row, false);
+            $agent = trim($row->user_agent);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             $browserManufacturer = null;
             $browserVersion      = null;
@@ -98,9 +112,9 @@ class PiwikSource implements SourceInterface
 
                 if (!empty($row->bot->producer->name)) {
                     try {
-                        $browserManufacturer = (new CompanyLoader($this->cache))->loadByName((string) $row->bot->producer->name);
+                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load((string) $row->bot->producer->name);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical($e);
+                        $this->logger->critical('company not found: ' . (string) $row->bot->producer->name);
                         $browserManufacturer = null;
                     }
                 }
@@ -108,7 +122,7 @@ class PiwikSource implements SourceInterface
                 try {
                     $browserType = (new BrowserTypeMapper())->mapBrowserType('robot');
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('browser type not found: robot');
                     $browserType = null;
                 }
             } elseif (isset($row->client->name)) {
@@ -122,7 +136,7 @@ class PiwikSource implements SourceInterface
                     try {
                         $browserType = (new BrowserTypeMapper())->mapBrowserType((string) $row->client->type);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical($e);
+                        $this->logger->critical('browser type not found: ' . (string) $row->client->type);
                         $browserType = null;
                     }
                 } else {
@@ -138,24 +152,29 @@ class PiwikSource implements SourceInterface
             );
 
             if (isset($row->device->model)) {
-                $deviceName  = (new DeviceNameMapper())->mapDeviceName((string) $row->device->model);
-                $deviceBrand = null;
+                $deviceName       = (new DeviceNameMapper())->mapDeviceName((string) $row->device->model);
+                $deviceBrand      = null;
+                $brandFullnameKey = (new MakerMapper())->mapMaker(Mobile::getFullName((string) $row->device->brand));
 
-                try {
-                    $deviceBrand = (new CompanyLoader($this->cache))->loadByBrandName((string) $row->device->brand);
-                } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                if (isset($row->device->model) && $brandFullnameKey) {
+                    try {
+                        $deviceBrand = CompanyLoader::getInstance($this->cache)->load($brandFullnameKey);
+                    } catch (NotFoundException $e) {
+                        $this->logger->critical('company not found: ' . (string) $row->device->brand);
+                        $deviceBrand = null;
+                    }
+                } else {
                     $deviceBrand = null;
                 }
 
                 try {
                     $deviceType = (new DeviceTypeMapper())->mapDeviceType((string) $row->device->type);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('device type not found: ' . (string) $row->device->type);
                     $deviceType = null;
                 }
             } else {
-                $deviceName  = 'unknown';
+                $deviceName  = null;
                 $deviceBrand = null;
                 $deviceType  = (new DeviceTypeMapper())->mapDeviceType('unknown');
             }
@@ -171,12 +190,9 @@ class PiwikSource implements SourceInterface
             $os = new Os(null, null);
 
             if (!empty($row->os->name)) {
-                $osName = (new PlatformNameMapper())->mapOsName((string) $row->os->name);
-
-                if (!in_array($osName, ['PlayStation'])) {
-                    $osVersion = (new PlatformVersionMapper())->mapOsVersion((string) $row->os->version, (string) $row->os->name);
-                    $os        = new Os($osName, null, null, $osVersion);
-                }
+                $osName    = (new PlatformNameMapper())->mapOsName((string) $row->os->name);
+                $osVersion = (new PlatformVersionMapper())->mapOsVersion((string) $row->os->version, (string) $row->os->name);
+                $os        = new Os($osName, null, null, $osVersion);
             }
 
             if (!empty($row->client->engine)) {
@@ -187,12 +203,12 @@ class PiwikSource implements SourceInterface
                 $engine = new Engine(null);
             }
 
-            yield trim($row->user_agent) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
     /**
-     * @return string[]
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {
@@ -217,10 +233,14 @@ class PiwikSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('yml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 
@@ -229,7 +249,7 @@ class PiwikSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = \Spyc::YAMLLoad($filepath);
 
-            if (!is_iterable($data)) {
+            if (!is_array($data) && !($data instanceof \stdClass)) {
                 continue;
             }
 

@@ -57,7 +57,7 @@ class DirectorySource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -68,29 +68,41 @@ class DirectorySource implements SourceInterface
                 return;
             }
 
-            yield trim($line);
+            $agent = trim($line);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $line) {
-            $request  = (new GenericRequestFactory())->createRequestFromString($line);
+            $agent = trim($line);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
             $browser  = new Browser(null);
             $device   = new Device(null, null);
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($line) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
-     * @return \Generator
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {
@@ -105,6 +117,8 @@ class DirectorySource implements SourceInterface
 
         foreach ($finder as $file) {
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
@@ -118,11 +132,27 @@ class DirectorySource implements SourceInterface
             /** @var \FileLoader\Psr7\Stream $stream */
             $stream = $response->getBody();
 
-            $stream->read(1);
-            $stream->rewind();
+            try {
+                $stream->read(1);
+            } catch (\Throwable $e) {
+                $this->logger->emergency(new \RuntimeException('reading file ' . $file->getPathname() . ' caused an error on line 0', 0, $e));
+            }
+
+            try {
+                $stream->rewind();
+            } catch (\Throwable $e) {
+                $this->logger->emergency(new \RuntimeException('rewinding file ' . $file->getPathname() . ' caused an error on line 0', 0, $e));
+            }
+
+            $i = 1;
 
             while (!$stream->eof()) {
-                $line = $stream->read(8192);
+                try {
+                    $line = $stream->read(65535);
+                } catch (\Throwable $e) {
+                    $this->logger->emergency(new \RuntimeException('reading file ' . $file->getPathname() . ' caused an error on line ' . $i, 0, $e));
+                }
+                ++$i;
 
                 if (empty($line)) {
                     continue;
@@ -130,7 +160,7 @@ class DirectorySource implements SourceInterface
 
                 $line = trim($line);
 
-                if (isset($allLines[$line])) {
+                if (array_key_exists($line, $allLines)) {
                     continue;
                 }
 

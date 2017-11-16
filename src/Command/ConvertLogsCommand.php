@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\LogFileSource;
+use BrowscapHelper\Writer\TxtWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -42,7 +43,7 @@ class ConvertLogsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @param \Monolog\Logger $logger
@@ -61,7 +62,7 @@ class ConvertLogsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('convert-logs')
@@ -95,7 +96,7 @@ class ConvertLogsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -113,8 +114,19 @@ class ConvertLogsCommand extends Command
         $output->writeln("reading from directory '" . $sourcesDirectory . "'");
         $output->writeln("writing to file '" . $targetBulkFile . "'");
 
+        $txtWriter = new TxtWriter($this->logger, $targetBulkFile);
+        $allAgents = [];
+
         foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $agent) {
-            file_put_contents($targetBulkFile, trim($agent) . "\n", FILE_APPEND | LOCK_EX);
+            if (array_key_exists($agent, $allAgents)) {
+                $this->logger->info('    UA "' . $agent . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $allAgents[$agent] = 1;
+
+            $txtWriter->write($agent);
             ++$counter;
         }
 

@@ -32,6 +32,7 @@ $autoloadPaths = [
 foreach ($autoloadPaths as $path) {
     if (file_exists($path)) {
         require_once $path;
+
         break;
     }
 }
@@ -87,8 +88,8 @@ $processed = [
         'brand' => $deviceDetector->getBrand(),
         'model' => $deviceDetector->getModel(),
     ],
-    'os_family'      => $osFamily !== false ? $osFamily : 'Unknown',
-    'browser_family' => $browserFamily !== false ? $browserFamily : 'Unknown',
+    'os_family'      => false !== $osFamily ? $osFamily : 'Unknown',
+    'browser_family' => false !== $browserFamily ? $browserFamily : 'Unknown',
 ];
 $duration = microtime(true) - $start;
 

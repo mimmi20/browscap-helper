@@ -41,108 +41,142 @@ class DeviceMarketingnameMapper
             case 'other':
             case 'various':
                 $marketingName = null;
+
                 break;
             case 'lg optimus chat':
                 $marketingName = 'Optimus Chat';
+
                 break;
             case 't mobile move balance':
                 $marketingName = 'T-Mobile Move Balance';
+
                 break;
             case 'xperia arc so-01c for docomo':
                 $marketingName = 'Xperia Arc SO-01C for DoCoMo';
+
                 break;
             case 'galaxy sii':
                 $marketingName = 'Galaxy S II';
+
                 break;
             case 'galaxy sii plus':
                 $marketingName = 'Galaxy S II Plus';
+
                 break;
             case 'galaxy siii':
             case 'galaxy s3':
                 $marketingName = 'Galaxy S III';
+
                 break;
             case 'galaxy s3 lte international':
                 $marketingName = 'Galaxy S III LTE International';
+
                 break;
             case 'lifetab':
                 $marketingName = 'LifeTab';
+
                 break;
             case 'galaxy sii epic 4g touch':
                 $marketingName = 'Galaxy S II Epic 4G Touch';
+
                 break;
             case 'prestigio multipad':
                 $marketingName = 'Multipad';
+
                 break;
             case 'samsung galaxy tab 7.0 plus':
                 $marketingName = 'Galaxy Tab 7.0 Plus';
+
                 break;
             case 'one touch m\'pop':
                 $marketingName = 'One Touch MPop';
+
                 break;
             case 'people\'s tablet':
                 $marketingName = 'Peoples Tablet';
+
                 break;
             case 'lumia 530 dual sim':
                 $marketingName = 'Lumia 530';
+
                 break;
             case 'droid razr i':
                 $marketingName = 'RAZR i';
+
                 break;
             case 'nokia asha 300':
             case '300':
                 $marketingName = 'Asha 300';
+
                 break;
             case 'galaxy tabpro 10.1" wifi':
                 $marketingName = 'Galaxy Tab Pro 10.1 WiFi';
+
                 break;
             case 'galaxy tab 3 10.1" wifi':
                 $marketingName = 'Galaxy Tab 3 10.1 3G WiFi';
+
                 break;
             case 'galaxy tab 4 10.1" wifi':
                 $marketingName = 'Galaxy Tab 4 10.1 WiFi';
+
                 break;
             case 'galaxy tab 4 10.1" lte':
                 $marketingName = 'Galaxy Tab 4 10.1 LTE';
+
                 break;
             case 'galaxy tab 2 10.1" wifi':
                 $marketingName = 'Galaxy Tab 2 10.1 WiFi';
+
                 break;
             case 'galaxy s5':
                 $marketingName = 'Galaxy S5';
+
                 break;
             case 'gt-i9515':
                 $marketingName = 'Galaxy S4';
+
                 break;
             case 'galaxy tab 3 10.1"':
             case 'galaxy tab 3 (10.1)':
                 $marketingName = 'Galaxy Tab 3 10.1 3G';
+
                 break;
             case 'kindle fire hdx 7" wifi':
                 $marketingName = 'Kindle Fire HDX 7 WiFi';
+
                 break;
             case 'ideatab b8080-f':
                 $marketingName = 'Yoga Tab 10 HD+';
+
                 break;
             case 'galaxy note 4':
                 $marketingName = 'Galaxy Note 4';
+
                 break;
             case 'b8000-f':
                 $marketingName = 'Yoga B8000-F';
+
                 break;
             case 'iconia a3':
                 $marketingName = 'Iconia Tab A3';
+
                 break;
             case 'galaxy trend lite':
                 $marketingName = 'Galaxy Trend Lite';
+
                 break;
             case 'one touch 6030x':
                 $marketingName = 'One Touch Idol';
+
                 break;
             case 'one mini2':
                 $marketingName = 'One Mini 2';
+
                 break;
             case 's iii mini':
                 $marketingName = 'Galaxy S III Mini';
+
                 break;
             default:
                 // nothing to do here
@@ -214,36 +248,45 @@ class DeviceMarketingnameMapper
             case 'firefox for android tablet':
             case 'firefox for android':
                 $marketingName = null;
+
                 break;
             // Acer
             case 'acer e320':
                 $marketingName = 'Liquid Express';
+
                 break;
             // HP
             case 'touchpad':
                 $marketingName = 'Touchpad';
+
                 break;
             // Medion
             case 'p9514':
             case 'lifetab p9514':
                 $marketingName = 'LifeTab P9514';
+
                 break;
             case 'lifetab s9512':
                 $marketingName = 'LifeTab S9512';
+
                 break;
             // HTC
             case 'htc desire sv':
                 $marketingName = 'Desire SV';
+
                 break;
             // Apple
             case 'ipad':
                 $marketingName = 'iPad';
+
                 break;
             case 'iphone':
                 $marketingName = 'iPhone';
+
                 break;
             case 'e610':
                 $marketingName = 'Optimus L5';
+
                 break;
             default:
                 // nothing to do here

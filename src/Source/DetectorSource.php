@@ -46,7 +46,7 @@ class DetectorSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -57,29 +57,41 @@ class DetectorSource implements SourceInterface
                 return;
             }
 
-            yield trim($test->ua);
+            $agent = trim($test->ua);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
         $resultFactory = new ResultFactory();
 
         foreach ($this->loadFromPath() as $test) {
-            yield trim($test->ua) => $resultFactory->fromArray($this->cache, $this->logger, (array) $test->result);
+            $agent = trim($test->ua);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent => $resultFactory->fromArray($this->cache, $this->logger, (array) $test->result);
         }
     }
 
     /**
-     * @return \StdClass[]
+     * @return iterable|\StdClass[]
      */
     private function loadFromPath(): iterable
     {
-        $path = 'tests/issues';
+        $path = 'vendor/mimmi20/browser-detector-tests/tests/issues';
 
         if (!file_exists($path)) {
             return;
@@ -100,10 +112,14 @@ class DetectorSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('json' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 
@@ -112,7 +128,7 @@ class DetectorSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = json_decode(file_get_contents($filepath));
 
-            if (!is_iterable($data)) {
+            if (!is_array($data) && !($data instanceof \stdClass)) {
                 continue;
             }
 

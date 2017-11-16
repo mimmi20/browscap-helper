@@ -41,9 +41,11 @@ class PlatformMakerMapper
             case 'unknown':
             case 'other':
                 $osMaker = null;
+
                 break;
             default:
                 $osMaker = (new MakerMapper())->mapMaker($osMaker);
+
                 break;
         }
 

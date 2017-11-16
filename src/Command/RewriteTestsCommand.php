@@ -29,6 +29,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
 use UaResult\Result\Result;
+use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
 
 /**
@@ -43,17 +44,17 @@ class RewriteTestsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var \BrowserDetector\Detector
      */
-    private $detector = null;
+    private $detector;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -72,7 +73,7 @@ class RewriteTestsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('rewrite-tests')
@@ -92,7 +93,7 @@ class RewriteTestsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -101,7 +102,15 @@ class RewriteTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $sourceDirectory = 'tests/issues/';
+        $basePath = 'vendor/mimmi20/browser-detector-tests/';
+
+        $sourceDirectory = $basePath . 'tests/issues/';
+
+        if (!file_exists($sourceDirectory)) {
+            $this->logger->crit('source directory not found');
+
+            return 1;
+        }
 
         $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
         $files       = [];
@@ -120,6 +129,7 @@ class RewriteTestsCommand extends Command
             if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
                 $files[] = $filename;
                 $this->logger->warn('file ' . $filename . ' is out of strcture');
+
                 continue;
             }
 
@@ -167,10 +177,10 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('preparing circle.yml ...');
 
-        $circleFile      = 'circle.yml';
+        $circleFile      = $basePath . 'circle.yml';
         $circleciContent = 'machine:
   php:
-    version: 7.1.0
+    version: 7.1.9
   timezone:
     Europe/Berlin
 
@@ -185,7 +195,7 @@ test:
     - composer validate
 ';
 
-        $circleLines = [];
+        $circleTests = [];
 
         foreach ($testCounter as $group => $filesinGroup) {
             $count = 0;
@@ -194,13 +204,13 @@ test:
                 $count += $testCounter[$group][$fileinGroup];
             }
 
-            $circleLines[$group] = $count;
+            $circleTests[$group] = $count;
         }
 
         $countArray = [];
         $groupArray = [];
 
-        foreach ($circleLines as $group => $count) {
+        foreach ($circleTests as $group => $count) {
             $countArray[$group] = $count;
             $groupArray[$group] = $group;
         }
@@ -212,12 +222,12 @@ test:
             $groupArray,
             SORT_NUMERIC,
             SORT_ASC,
-            $circleLines
+            $circleTests
         );
 
-        foreach ($circleLines as $group => $count) {
+        foreach ($circleTests as $group => $count) {
             $columns = 111 + 2 * mb_strlen((string) $count);
-            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . ($count !== 1 ? 's' : '');
+            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
@@ -236,9 +246,10 @@ test:
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelperTest\UserAgentsTest;
+namespace BrowserDetectorTest\UserAgentsTest;
 
-use BrowscapHelperTest\UserAgentsTestTrait;
+use BrowserDetectorTest\UserAgentsTestTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class T' . $group . 'Test
@@ -249,7 +260,7 @@ use BrowscapHelperTest\UserAgentsTestTrait;
  * @author     Thomas Mueller <mimmi20@live.de>
  * @group      ' . $group . '
  */
-class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
+class T' . $group . 'Test extends TestCase
 {
     use UserAgentsTestTrait;
 
@@ -259,7 +270,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
     private $sourceDirectory = \'tests/issues/' . $group . '/\';
 }
 ';
-            $testFile = 'tests/UserAgentsTest/T' . $group . 'Test.php';
+            $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
         }
 
@@ -288,21 +299,24 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
         $this->logger->info('    checking ...');
 
         /** @var $file \SplFileInfo */
-        if (!$file->isFile() || $file->getExtension() !== 'json') {
+        if (!$file->isFile() || 'json' !== $file->getExtension()) {
             return 0;
         }
 
         $this->logger->info('    reading ...');
 
-        $tests = json_decode(file_get_contents($file->getPathname()), false);
+        $tests = json_decode(file_get_contents($file->getPathname()), true);
 
-        if (is_array($tests)) {
-            $tests = (object) $tests;
+        if (null === $tests) {
+            $this->logger->info('    file does not contain any test');
+            unlink($file->getPathname());
+
+            return 0;
         }
 
-        $oldCounter = count(get_object_vars($tests));
+        $oldCounter = count($tests);
 
-        if ($oldCounter < 1) {
+        if (1 > $oldCounter) {
             $this->logger->info('    file does not contain any test');
             unlink($file->getPathname());
 
@@ -319,26 +333,23 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
         $outputDetector = [];
 
         foreach ($tests as $key => $test) {
-            if (is_array($test)) {
-                $test = (object) $test;
-            }
-
-            if (isset($checks[$test->ua])) {
+            if (isset($checks[$test['ua']])) {
                 // UA was added more than once
-                $this->logger->error('    UA "' . $test->ua . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test->ua] . '"');
+                $this->logger->error('    UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test['ua']] . '"');
                 unset($tests->$key);
+
                 continue;
             }
 
             $this->logger->info('    processing Test ' . $key . ' ...');
 
-            $checks[$test->ua] = $key;
-            $newKey            = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
+            $checks[$test['ua']] = $key;
+            $newKey              = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
 
             $outputDetector += [
                 $newKey => [
-                    'ua'     => $test->ua,
-                    'result' => $this->handleTest($test->ua)->toArray(),
+                    'ua'     => $test['ua'],
+                    'result' => $this->handleTest($test['ua'], $test['result'])->toArray(),
                 ],
             ];
             ++$groupCounter;
@@ -348,7 +359,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 
         $this->logger->info('    contains now ' . $newCounter . ' tests');
 
-        if ($newCounter < 1) {
+        if (1 > $newCounter) {
             $this->logger->info('    all tests are removed from the file');
             unlink($file->getPathname());
 
@@ -374,27 +385,31 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $useragent
+     * @param array  $oldResultArray
      *
      * @return \UaResult\Result\ResultInterface
      */
-    private function handleTest(string $useragent): ResultInterface
+    private function handleTest(string $useragent, array $oldResultArray): ResultInterface
     {
         $this->logger->info('        rewriting');
 
-        $result = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
+        $oldResult = (new ResultFactory())->fromArray($this->cache, $this->logger, $oldResultArray);
+        $result    = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
 
         /* rewrite browsers */
 
         $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
-        $browser = clone $result->getBrowser();
+        //$browser = clone $result->getBrowser();
+        $browser = clone $oldResult->getBrowser();
 
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
-        $platform = clone $result->getOs();
+        //$platform = clone $result->getOs();
+        $platform = clone $oldResult->getOs();
 
         /* @var $platform \UaResult\Os\OsInterface|null */
 
@@ -421,7 +436,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
             try {
                 $regexFactory = new RegexFactory($this->cache, $this->logger);
                 $regexFactory->detect($normalizedUa);
-                list($device) = $regexFactory->getDevice();
+                [$device]     = $regexFactory->getDevice();
                 $replaced     = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
@@ -464,7 +479,7 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
                 $deviceLoader = new DeviceLoader($this->cache);
 
                 try {
-                    list($device) = $deviceLoader->load('general mobile device', $normalizedUa);
+                    [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 
@@ -491,8 +506,11 @@ class T' . $group . 'Test extends \PHPUnit\Framework\TestCase
 
         /* rewrite engines */
 
+        $this->logger->info('        rewriting engine');
+
         /** @var \UaResult\Engine\EngineInterface $engine */
-        $engine = clone $result->getEngine();
+        //$engine = clone $result->getEngine();
+        $engine = clone $oldResult->getEngine();
 
         $this->logger->info('        generating result');
 

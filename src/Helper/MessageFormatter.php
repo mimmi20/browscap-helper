@@ -32,7 +32,7 @@ class MessageFormatter
     /**
      * @var \UaResult\Result\Result[]
      */
-    private $collection = null;
+    private $collection;
 
     /**
      * @var int
@@ -42,7 +42,7 @@ class MessageFormatter
     /**
      * @var \UaResult\Result\ResultFactory
      */
-    private $resultFactory = null;
+    private $resultFactory;
 
     public function __construct()
     {
@@ -137,6 +137,7 @@ class MessageFormatter
         switch ($propertyName) {
             case 'mobile_browser':
                 $value = $element->getBrowser()->getName();
+
                 break;
             case 'mobile_browser_version':
                 $value = $element->getBrowser()->getVersion();
@@ -148,21 +149,27 @@ class MessageFormatter
                 if ('' === $value) {
                     $value = null;
                 }
+
                 break;
             case 'mobile_browser_modus':
                 $value = $element->getBrowser()->getModus();
+
                 break;
             case 'mobile_browser_bits':
                 $value = $element->getBrowser()->getBits();
+
                 break;
             case 'browser_type':
                 $value = $element->getBrowser()->getType()->getName();
+
                 break;
             case 'mobile_browser_manufacturer':
                 $value = $element->getBrowser()->getManufacturer()->getName();
+
                 break;
             case 'renderingengine_name':
                 $value = $element->getEngine()->getName();
+
                 break;
             case 'renderingengine_version':
                 $value = $element->getEngine()->getVersion();
@@ -174,12 +181,15 @@ class MessageFormatter
                 if ('' === $value) {
                     $value = null;
                 }
+
                 break;
             case 'renderingengine_manufacturer':
                 $value = $element->getEngine()->getManufacturer()->getName();
+
                 break;
             case 'device_os':
                 $value = $element->getOs()->getName();
+
                 break;
             case 'device_os_version':
                 $value = $element->getOs()->getVersion();
@@ -191,42 +201,55 @@ class MessageFormatter
                 if ('' === $value) {
                     $value = null;
                 }
+
                 break;
             case 'device_os_bits':
                 $value = $element->getOs()->getBits();
+
                 break;
             case 'device_os_manufacturer':
                 $value = $element->getOs()->getManufacturer()->getName();
+
                 break;
             case 'brand_name':
                 $value = $element->getDevice()->getBrand()->getBrandName();
+
                 break;
             case 'marketing_name':
                 $value = $element->getDevice()->getMarketingName();
+
                 break;
             case 'model_name':
                 $value = $element->getDevice()->getDeviceName();
+
                 break;
             case 'manufacturer_name':
                 $value = $element->getDevice()->getManufacturer()->getName();
+
                 break;
             case 'device_type':
                 $value = $element->getDevice()->getType()->getName();
+
                 break;
             case 'pointing_method':
                 $value = $element->getDevice()->getPointingMethod();
+
                 break;
             case 'resolution_width':
                 $value = $element->getDevice()->getResolutionWidth();
+
                 break;
             case 'resolution_height':
                 $value = $element->getDevice()->getResolutionHeight();
+
                 break;
             case 'dual_orientation':
                 $value = $element->getDevice()->getDualOrientation();
+
                 break;
             default:
                 $value = '(n/a)';
+
                 break;
         }
 

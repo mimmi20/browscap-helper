@@ -36,6 +36,7 @@ class EngineNameMapper
             case 'unknown':
             case 'other':
                 $engineName = null;
+
                 break;
             default:
                 // nothing to do here

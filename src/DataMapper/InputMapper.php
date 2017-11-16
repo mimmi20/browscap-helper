@@ -43,12 +43,12 @@ class InputMapper
     /**
      * maps the browser version
      *
-     * @param string      $browserVersion
+     * @param string|null $browserVersion
      * @param string|null $browserName
      *
      * @return \BrowserDetector\Version\VersionInterface
      */
-    public function mapBrowserVersion(string $browserVersion, ?string $browserName = null): VersionInterface
+    public function mapBrowserVersion(?string $browserVersion = null, ?string $browserName = null): VersionInterface
     {
         return (new BrowserVersionMapper())->mapBrowserVersion($browserVersion, $browserName);
     }
@@ -196,7 +196,7 @@ class InputMapper
     /**
      * maps the value for the frame/iframe support
      *
-     * @param string|bool $support
+     * @param bool|string $support
      *
      * @return string
      */

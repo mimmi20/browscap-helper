@@ -14,9 +14,8 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
+use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
-use BrowserDetector\Helper\GenericRequestFactory;
-use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -25,11 +24,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class CreateTestsCommand
@@ -48,17 +42,17 @@ class CreateTestsCommand extends Command
     /**
      * @var \Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
      * @var \Psr\Cache\CacheItemPoolInterface
      */
-    private $cache = null;
+    private $cache;
 
     /**
      * @var \BrowserDetector\Detector
      */
-    private $detector = null;
+    private $detector;
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -79,7 +73,7 @@ class CreateTestsCommand extends Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('create-tests')
@@ -106,7 +100,7 @@ class CreateTestsCommand extends Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
@@ -119,16 +113,21 @@ class CreateTestsCommand extends Command
         $checks = [];
 
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
-            if (isset($checks[$useragent])) {
+            $useragent = trim($useragent);
+
+            if (array_key_exists($useragent, $checks)) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
-            $checks[$useragent] = $useragent;
+            $checks[$useragent] = 1;
         }
 
         $targetDirectoryHelper = new TargetDirectory();
 
         $output->writeln('detect next test number ...');
+
         try {
             $number = $targetDirectoryHelper->getNextTest();
         } catch (\UnexpectedValueException $e) {
@@ -158,48 +157,22 @@ class CreateTestsCommand extends Command
 
         $output->writeln('reading new files ...');
 
-        $sourcesDirectory = $input->getOption('resources');
-        $outputBrowscap   = "<?php\n\nreturn [\n";
-        $outputDetector   = [];
-        $counter          = 0;
-        $issue            = 'test-' . sprintf('%1$08d', $number);
-        $fileCounter      = 0;
-        $chunkCounter     = 0;
-        $totalCounter     = 0;
+        $sourcesDirectory   = $input->getOption('resources');
+        $totalCounter       = 0;
+        $detectorTestWriter = new DetectorTestWriter($this->logger);
 
-        foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
+        foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
 
-            if (isset($checks[$useragent])) {
+            if (array_key_exists($useragent, $checks)) {
+                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
+
                 continue;
             }
 
-            $this->parseLine($useragent, $counter, $outputBrowscap, $outputDetector, $number);
-            $checks[$useragent] = $issue;
+            $checks[$useragent] = $number;
 
-            ++$counter;
-            ++$chunkCounter;
-            ++$totalCounter;
-
-            file_put_contents(
-                $targetDirectory . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $fileCounter) . '.json',
-                json_encode(
-                    $outputDetector,
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
-                ) . PHP_EOL
-            );
-
-            if ($chunkCounter >= 100) {
-                $chunkCounter   = 0;
-                $outputDetector = [];
-                ++$fileCounter;
-            }
-
-            if ($fileCounter >= 10) {
-                $chunkCounter    = 0;
-                $outputDetector  = [];
-                $fileCounter     = 0;
-                $counter         = 0;
+            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();
                 $targetDirectory = $targetDirectoryHelper->getPath();
 
@@ -212,88 +185,9 @@ class CreateTestsCommand extends Command
             }
         }
 
-        $outputBrowscap .= "];\n";
-
-        file_put_contents('results/issue-' . sprintf('%1$05d', $number) . '.php', $outputBrowscap);
-
         $output->writeln('');
         $output->writeln($totalCounter . ' tests exported');
 
         return 0;
-    }
-
-    /**
-     * @param string $ua
-     * @param int    $counter
-     * @param string &$outputBrowscap
-     * @param array  &$outputDetector
-     * @param int    $testNumber
-     */
-    private function parseLine(string $ua, int $counter, string &$outputBrowscap, array &$outputDetector, int $testNumber): void
-    {
-        $this->logger->info('      create result');
-
-        $platform = new Os(null, null);
-        $device   = new Device(null, null);
-        $engine   = new Engine(null);
-        $browser  = new Browser(null);
-
-        $formatedIssue   = sprintf('%1$05d', $testNumber);
-        $formatedCounter = sprintf('%1$05d', $counter);
-
-        $this->logger->info('      writing browscap data ...');
-
-        $outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
-        'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $ua) . "',
-        'properties' => [
-            'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browser->getName()) . "',
-            'Browser_Type' => '" . $browser->getType()->getName() . "',
-            'Browser_Bits' => '" . $browser->getBits() . "',
-            'Browser_Maker' => '" . $browser->getManufacturer()->getName() . "',
-            'Browser_Modus' => '" . $browser->getModus() . "',
-            'Version' => '" . $browser->getVersion()->getVersion() . "',
-            'Platform' => '" . $platform->getName() . "',
-            'Platform_Version' => '" . $platform->getVersion()->getVersion(VersionInterface::IGNORE_MICRO) . "',
-            'Platform_Description' => '',
-            'Platform_Bits' => '" . $platform->getBits() . "',
-            'Platform_Maker' => '" . $platform->getManufacturer()->getName() . "',
-            'Alpha' => false,
-            'Beta' => false,
-            'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
-            'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
-            'isSyndicationReader' => false,
-            'Crawler' => " . ($browser->getType()->isBot() ? 'true' : 'false') . ",
-            'isFake' => false,
-            'isAnonymized' => false,
-            'isModified' => false,
-            'Device_Name' => '" . $device->getMarketingName() . "',
-            'Device_Maker' => '" . $device->getManufacturer()->getName() . "',
-            'Device_Type' => '" . $device->getType()->getName() . "',
-            'Device_Pointing_Method' => '" . $device->getPointingMethod() . "',
-            'Device_Code_Name' => '" . $device->getDeviceName() . "',
-            'Device_Brand_Name' => '" . $device->getBrand()->getBrandName() . "',
-            'RenderingEngine_Name' => '" . $engine->getName() . "',
-            'RenderingEngine_Version' => 'unknown',
-            'RenderingEngine_Maker' => '" . $engine->getManufacturer()->getName() . "',
-        ],
-        'full' => true,
-        'lite' => true,
-        'standard' => true,
-    ],\n";
-
-        $this->logger->info('      detecting test name ...');
-
-        $formatedIssue   = sprintf('%1$07d', $testNumber);
-        $formatedCounter = sprintf('%1$05d', $counter);
-
-        $this->logger->info('      detecting request ...');
-
-        $request = (new GenericRequestFactory())->createRequestFromString($ua);
-
-        $outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = [
-            'ua'     => $ua,
-            'result' => (new Result($request->getHeaders(), $device, $platform, $browser, $engine))->toArray(),
-        ];
     }
 }

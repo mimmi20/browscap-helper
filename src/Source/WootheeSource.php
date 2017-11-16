@@ -59,7 +59,7 @@ class WootheeSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -70,33 +70,44 @@ class WootheeSource implements SourceInterface
                 return;
             }
 
-            $row = json_decode($row, false);
+            $row   = json_decode($row, false);
+            $agent = trim($row->target);
 
-            yield trim($row->target);
+            if (empty($agent)) {
+                continue;
+            }
+
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row     = json_decode($row, false);
-            $request = (new GenericRequestFactory())->createRequestFromString($row->target);
+            $row   = json_decode($row, false);
+            $agent = trim($row->target);
+
+            if (empty($agent)) {
+                continue;
+            }
+
+            $request = (new GenericRequestFactory())->createRequestFromString($agent);
 
             $browserName = (new BrowserNameMapper())->mapBrowserName($row->name);
 
             try {
                 $browserType = (new BrowserTypeMapper())->mapBrowserType($row->category);
             } catch (NotFoundException $e) {
-                $this->logger->critical($e);
+                $this->logger->critical('browser type not found: ' . $row->category);
                 $browserType = null;
             }
 
             if (isset($row->version)) {
-                $browserVersion = $row->version;
+                $browserVersion = (new BrowserVersionMapper())->mapBrowserVersion($row->version, $browserName);
             } else {
                 $browserVersion = null;
             }
@@ -104,21 +115,20 @@ class WootheeSource implements SourceInterface
             $browser = new Browser(
                 $browserName,
                 null,
-                (new BrowserVersionMapper())->mapBrowserVersion($browserVersion, $browserName),
+                $browserVersion,
                 $browserType
             );
 
-            if (!empty($row->os) && !in_array($row->os, ['iPad', 'iPhone'])) {
+            if (!empty($row->os)) {
+                $osName = (new PlatformNameMapper())->mapOsName($row->os);
+
                 if (isset($row->os_version)) {
-                    $osVersion = $row->os_version;
+                    $osVersion = (new PlatformVersionMapper())->mapOsVersion($row->os_version, $osName);
+
+                    if (!($osVersion instanceof Version)) {
+                        $osVersion = null;
+                    }
                 } else {
-                    $osVersion = null;
-                }
-
-                $osName    = (new PlatformNameMapper())->mapOsName($row->os);
-                $osVersion = (new PlatformVersionMapper())->mapOsVersion($osVersion, $osName);
-
-                if (!($osVersion instanceof Version)) {
                     $osVersion = null;
                 }
 
@@ -130,12 +140,12 @@ class WootheeSource implements SourceInterface
             $device = new Device(null, null);
             $engine = new Engine(null);
 
-            yield trim($row->target) => new Result($request->getHeaders(), $device, $os, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $os, $browser, $engine);
         }
     }
 
     /**
-     * @return string[]
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {
@@ -160,10 +170,14 @@ class WootheeSource implements SourceInterface
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
                 continue;
             }
 
             if ('yaml' !== $file->getExtension()) {
+                $this->logger->emergency('wrong file extension [' . $file->getExtension() . '] found with finder');
+
                 continue;
             }
 

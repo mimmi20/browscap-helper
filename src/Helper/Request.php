@@ -42,7 +42,7 @@ class Request
         /* @var $response \GuzzleHttp\Psr7\Response */
         $response = $client->send($request);
 
-        if ($response->getStatusCode() !== 200) {
+        if (200 !== $response->getStatusCode()) {
             throw new RequestException('Could not get valid response from "' . $request->getUri() . '". Status code is: "' . $response->getStatusCode() . '"', $request);
         }
 

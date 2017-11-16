@@ -36,15 +36,19 @@ class FilePath
         switch ($file->getExtension()) {
             case 'gz':
                 $path = 'compress.zlib://' . $realpath;
+
                 break;
             case 'bz2':
                 $path = 'compress.bzip2://' . $realpath;
+
                 break;
             case 'tgz':
                 $path = 'phar://' . $realpath;
+
                 break;
             default:
                 $path = $realpath;
+
                 break;
         }
 

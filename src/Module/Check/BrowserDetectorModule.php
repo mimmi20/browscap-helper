@@ -50,7 +50,7 @@ class BrowserDetectorModule implements CheckInterface
          * no json returned?
          */
         $contentType = $response->getHeader('Content-Type');
-        if (!isset($contentType[0]) || $contentType[0] !== 'x-application/serialize') {
+        if (!isset($contentType[0]) || 'x-application/serialize' !== $contentType[0]) {
             throw new RequestException(
                 'Could not get valid "x-application/serialize" response from "' . $request->getUri()
                 . '". Response is "' . $response->getBody()->getContents() . '"',

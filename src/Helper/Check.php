@@ -135,7 +135,7 @@ class Check
             ],
         ];
 
-        if ($checklevel === self::MEDIUM) {
+        if (self::MEDIUM === $checklevel) {
             $checks += [
                 // product info
                 'can_skip_aligned_link_row' => [

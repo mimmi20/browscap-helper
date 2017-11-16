@@ -49,17 +49,17 @@ class PdoSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
         foreach ($this->getAgents($limit) as $agent) {
-            yield trim($agent);
+            yield $agent;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
@@ -70,14 +70,14 @@ class PdoSource implements SourceInterface
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     private function getAgents(int $limit = 0): iterable
     {

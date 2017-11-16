@@ -52,45 +52,37 @@ class LogFileSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
-        $counter   = 0;
-        $allAgents = [];
+        $counter = 0;
 
         foreach ($this->getAgents() as $agent) {
             if ($limit && $counter >= $limit) {
                 return;
             }
 
+            $agent = trim($agent);
+
             if (empty($agent)) {
                 continue;
             }
 
-            if (array_key_exists($agent, $allAgents)) {
-                continue;
-            }
-
-            yield trim($agent);
-            $allAgents[$agent] = 1;
+            yield $agent;
             ++$counter;
         }
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
-        $allTests = [];
-
         foreach ($this->getAgents() as $agent) {
-            if (empty($agent)) {
-                continue;
-            }
+            $agent = trim($agent);
 
-            if (array_key_exists($agent, $allTests)) {
+            if (empty($agent)) {
                 continue;
             }
 
@@ -100,13 +92,12 @@ class LogFileSource implements SourceInterface
             $platform = new Os(null, null);
             $engine   = new Engine(null);
 
-            yield trim($agent) => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
-            $allTests[$agent] = 1;
+            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
         }
     }
 
     /**
-     * @return array
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {
@@ -127,7 +118,15 @@ class LogFileSource implements SourceInterface
 
             $this->logger->info('    reading file ' . $file->getPathname());
 
-            if (!$file->isFile() || !$file->isReadable()) {
+            if (!$file->isFile()) {
+                $this->logger->emergency('not-files selected with finder');
+
+                continue;
+            }
+
+            if (!$file->isReadable()) {
+                $this->logger->emergency('file not readable');
+
                 continue;
             }
 
@@ -146,7 +145,7 @@ class LogFileSource implements SourceInterface
     }
 
     /**
-     * @return string[]
+     * @return iterable|string[]
      */
     private function getAgents(): iterable
     {
