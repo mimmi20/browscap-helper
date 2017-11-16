@@ -90,7 +90,7 @@ class Browscap implements MapperInterface
 
             if (null !== $browserMakerKey) {
                 try {
-                    $browserManufacturer = (new CompanyLoader($this->cache))->load($browserMakerKey);
+                    $browserManufacturer = CompanyLoader::getInstance($this->cache)->load($browserMakerKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -115,7 +115,7 @@ class Browscap implements MapperInterface
 
             if (null !== $deviceMakerKey) {
                 try {
-                    $deviceManufacturer = (new CompanyLoader($this->cache))->load($deviceMakerKey);
+                    $deviceManufacturer = CompanyLoader::getInstance($this->cache)->load($deviceMakerKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -126,7 +126,7 @@ class Browscap implements MapperInterface
 
             if (null !== $deviceBrandKey) {
                 try {
-                    $deviceBrand = (new CompanyLoader($this->cache))->load($deviceBrandKey);
+                    $deviceBrand = CompanyLoader::getInstance($this->cache)->load($deviceBrandKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -153,7 +153,7 @@ class Browscap implements MapperInterface
 
             if (null !== $osMakerKey) {
                 try {
-                    $osManufacturer = (new CompanyLoader($this->cache))->load($osMakerKey);
+                    $osManufacturer = CompanyLoader::getInstance($this->cache)->load($osMakerKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -176,7 +176,7 @@ class Browscap implements MapperInterface
             $engineManufacturer = null;
 
             try {
-                $engineManufacturer = (new CompanyLoader($this->cache))->load($parserResult->renderingengine_maker);
+                $engineManufacturer = CompanyLoader::getInstance($this->cache)->load($parserResult->renderingengine_maker);
             } catch (NotFoundException $e) {
                 //$this->logger->info($e);
             }

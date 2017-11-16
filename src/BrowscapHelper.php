@@ -42,7 +42,7 @@ class BrowscapHelper extends Application
         $targetDirectory  = realpath(__DIR__ . '/../results/');
 
         $formatter = new LineFormatter(null, null, true, true);
-        $stream    = new StreamHandler('log/error.log', Logger::INFO);
+        $stream    = new StreamHandler('log/error.log', Logger::NOTICE);
         $stream->setFormatter($formatter);
 
         $logger = new Logger('browser-detector-helper');

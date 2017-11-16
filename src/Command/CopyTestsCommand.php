@@ -19,7 +19,6 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -139,7 +138,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
         $totalCounter = 0;
-        $source  = new CollectionSource(
+        $source       = new CollectionSource(
             [
                 new BrowscapSource($this->logger, $this->cache),
                 new PiwikSource($this->logger, $this->cache),
@@ -151,8 +150,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('import tests ...');
 
-        $detectorTestWriter = new DetectorTestWriter($this->logger, $targetDirectory);
-        $browscapTestWriter = new BrowscapTestWriter($this->logger, 'results/');
+        $detectorTestWriter = new DetectorTestWriter($this->logger);
 
         foreach ($source->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
@@ -165,9 +163,7 @@ class CopyTestsCommand extends Command
 
             $existingTests[$useragent] = 1;
 
-            $browscapTestWriter->write($result, $number, $useragent);
-
-            if ($detectorTestWriter->write($result, $number, $useragent, $totalCounter)) {
+            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();
                 $targetDirectory = $targetDirectoryHelper->getPath();
 

@@ -46,7 +46,7 @@ class DetectorSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -69,7 +69,7 @@ class DetectorSource implements SourceInterface
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
@@ -87,7 +87,7 @@ class DetectorSource implements SourceInterface
     }
 
     /**
-     * @return \StdClass[]
+     * @return iterable|\StdClass[]
      */
     private function loadFromPath(): iterable
     {

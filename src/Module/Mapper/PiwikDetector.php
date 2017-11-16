@@ -75,7 +75,7 @@ class PiwikDetector implements MapperInterface
 
                 if (null !== $browserMakerKey) {
                     try {
-                        $browserManufacturer = (new CompanyLoader($this->cache))->load($browserMakerKey);
+                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load($browserMakerKey);
                     } catch (NotFoundException $e) {
                         //$this->logger->info($e);
                     }
@@ -116,7 +116,7 @@ class PiwikDetector implements MapperInterface
 
         if (null !== $deviceBrandKey) {
             try {
-                $deviceBrand = (new CompanyLoader($this->cache))->load($deviceBrandKey);
+                $deviceBrand = CompanyLoader::getInstance($this->cache)->load($deviceBrandKey);
             } catch (NotFoundException $e) {
                 //$this->logger->info($e);
             }

@@ -62,7 +62,7 @@ class WhichBrowserSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -86,7 +86,7 @@ class WhichBrowserSource implements SourceInterface
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
@@ -116,7 +116,7 @@ class WhichBrowserSource implements SourceInterface
                 try {
                     $browserType = (new BrowserTypeMapper())->mapBrowserType($row->browser->type);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('browser type not found: ' . $row->browser->type);
                     $browserType = null;
                 }
             } else {
@@ -134,7 +134,7 @@ class WhichBrowserSource implements SourceInterface
                 try {
                     $deviceType = (new DeviceTypeMapper())->mapDeviceType($row->device->type);
                 } catch (NotFoundException $e) {
-                    $this->logger->critical($e);
+                    $this->logger->critical('device type not found: ' . $row->device->type);
                     $deviceType = null;
                 }
             } else {
@@ -194,7 +194,7 @@ class WhichBrowserSource implements SourceInterface
     }
 
     /**
-     * @return array[]
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {

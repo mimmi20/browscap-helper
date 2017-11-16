@@ -23,8 +23,8 @@ foreach ($autoloadPaths as $path) {
 
 ini_set('memory_limit', '-1');
 
+use Browscap\Data\Factory\DataCollectionFactory;
 use Browscap\Generator\BuildGenerator;
-use Browscap\Helper\CollectionCreator;
 use Browscap\Writer\Factory\FullPhpWriterFactory;
 use BrowscapPHP\Helper\LoggerHelper;
 use Noodlehaus\Config;
@@ -42,18 +42,16 @@ $cacheDir = $config['modules']['browscap3']['cache-dir'];
 $loggerHelper = new LoggerHelper();
 $logger       = $loggerHelper->create(false);
 
-$buildGenerator = new BuildGenerator(
-    'vendor/browscap/browscap/resources/',
-    $buildFolder
-);
-
 $writerCollectionFactory = new FullPhpWriterFactory();
 $writerCollection        = $writerCollectionFactory->createCollection($logger, $buildFolder);
 
-$buildGenerator
-    ->setLogger($logger)
-    ->setCollectionCreator(new CollectionCreator())
-    ->setWriterCollection($writerCollection);
+$buildGenerator = new BuildGenerator(
+    'vendor/browscap/browscap/resources/',
+    $buildFolder,
+    $logger,
+    $writerCollection,
+    new DataCollectionFactory($logger)
+);
 
 $version = (string) file_get_contents('vendor/browscap/browscap/BUILD_NUMBER');
 

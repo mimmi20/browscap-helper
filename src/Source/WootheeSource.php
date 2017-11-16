@@ -59,7 +59,7 @@ class WootheeSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -83,7 +83,7 @@ class WootheeSource implements SourceInterface
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
@@ -102,7 +102,7 @@ class WootheeSource implements SourceInterface
             try {
                 $browserType = (new BrowserTypeMapper())->mapBrowserType($row->category);
             } catch (NotFoundException $e) {
-                $this->logger->critical($e);
+                $this->logger->critical('browser type not found: ' . $row->category);
                 $browserType = null;
             }
 
@@ -119,7 +119,7 @@ class WootheeSource implements SourceInterface
                 $browserType
             );
 
-            if (!empty($row->os) && !in_array($row->os, ['iPad', 'iPhone'])) {
+            if (!empty($row->os)) {
                 $osName = (new PlatformNameMapper())->mapOsName($row->os);
 
                 if (isset($row->os_version)) {
@@ -145,7 +145,7 @@ class WootheeSource implements SourceInterface
     }
 
     /**
-     * @return string[]
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {
