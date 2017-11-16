@@ -344,7 +344,7 @@ class T' . $group . 'Test extends TestCase
             $this->logger->info('    processing Test ' . $key . ' ...');
 
             $checks[$test['ua']] = $key;
-            $newKey            = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
+            $newKey              = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
 
             $outputDetector += [
                 $newKey => [
