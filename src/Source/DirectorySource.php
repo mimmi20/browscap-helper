@@ -57,7 +57,7 @@ class DirectorySource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -80,7 +80,7 @@ class DirectorySource implements SourceInterface
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
@@ -102,7 +102,7 @@ class DirectorySource implements SourceInterface
     }
 
     /**
-     * @return \Generator
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {

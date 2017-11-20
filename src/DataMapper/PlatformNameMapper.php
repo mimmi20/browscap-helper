@@ -126,6 +126,11 @@ class PlatformNameMapper
                 $osName = 'Linux Mint';
 
                 break;
+            case 'ipad':
+            case 'iphone':
+                $osName = 'iOS';
+
+                break;
             default:
                 // nothing to do here
                 break;

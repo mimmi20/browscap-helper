@@ -78,6 +78,6 @@ class DeviceTypeMapper
                 break;
         }
 
-        return (new TypeLoader())->load($typeKey);
+        return TypeLoader::getInstance()->load($typeKey);
     }
 }

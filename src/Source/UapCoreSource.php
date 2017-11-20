@@ -44,7 +44,7 @@ class UapCoreSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -67,7 +67,7 @@ class UapCoreSource implements SourceInterface
     }
 
     /**
-     * @return \UaResult\Result\Result[]
+     * @return iterable|\UaResult\Result\Result[]
      */
     public function getTests(): iterable
     {
@@ -89,7 +89,7 @@ class UapCoreSource implements SourceInterface
     }
 
     /**
-     * @return array[]
+     * @return array[]|iterable
      */
     private function loadFromPath(): iterable
     {

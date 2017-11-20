@@ -19,7 +19,6 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -139,7 +138,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
         $totalCounter = 0;
-        $source  = new CollectionSource(
+        $source       = new CollectionSource(
             [
                 new BrowscapSource($this->logger, $this->cache),
                 new PiwikSource($this->logger, $this->cache),

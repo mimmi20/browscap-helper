@@ -14,7 +14,6 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
-use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
 use Monolog\Handler\PsrHandler;
@@ -115,7 +114,7 @@ class CreateTestsCommand extends Command
 
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
-            
+
             if (array_key_exists($useragent, $checks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
@@ -164,7 +163,7 @@ class CreateTestsCommand extends Command
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
-            
+
             if (array_key_exists($useragent, $checks)) {
                 $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
 
