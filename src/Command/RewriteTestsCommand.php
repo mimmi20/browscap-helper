@@ -175,6 +175,18 @@ class RewriteTestsCommand extends Command
             $testCounter[$group][$fullFilename] += $newCounter;
         }
 
+        $output->writeln('remove old test files ...');
+
+        $testFilesArray  = scandir($basePath . 'tests/UserAgentsTest/', SCANDIR_SORT_ASCENDING);
+
+        foreach ($testFilesArray as $filename) {
+            if (in_array($filename, ['.', '..'])) {
+                continue;
+            }
+
+            unlink($filename);
+        }
+
         $output->writeln('preparing circle.yml ...');
 
         $circleFile      = $basePath . 'circle.yml';
@@ -218,10 +230,10 @@ test:
         array_multisort(
             $countArray,
             SORT_NUMERIC,
-            SORT_ASC,
+            SORT_DESC,
             $groupArray,
             SORT_NUMERIC,
-            SORT_ASC,
+            SORT_DESC,
             $circleTests
         );
 
