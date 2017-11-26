@@ -33,6 +33,8 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 
 /**
  * Class DirectorySource
@@ -69,13 +71,24 @@ class PiwikSource implements SourceInterface
     public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
+        $jsonParser = new JsonParser();
 
         foreach ($this->loadFromPath() as $row) {
             if ($limit && $counter >= $limit) {
                 return;
             }
 
-            $row   = json_decode($row, false);
+            try {
+                $row = $jsonParser->parse(
+                    $row,
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->crit(new \Exception('    parsing file content failed', 0, $e));
+
+                continue;
+            }
+
             $agent = trim($row->user_agent);
 
             if (empty($agent)) {
@@ -92,8 +105,20 @@ class PiwikSource implements SourceInterface
      */
     public function getTests(): iterable
     {
+        $jsonParser = new JsonParser();
+
         foreach ($this->loadFromPath() as $row) {
-            $row   = json_decode($row, false);
+            try {
+                $row = $jsonParser->parse(
+                    $row,
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->crit(new \Exception('    parsing file content failed', 0, $e));
+
+                continue;
+            }
+
             $agent = trim($row->user_agent);
 
             if (empty($agent)) {

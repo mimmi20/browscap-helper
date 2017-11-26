@@ -31,6 +31,8 @@ use UaResult\Device\Device;
 use UaResult\Result\Result;
 use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 
 /**
  * Class RewriteTestsCommand
@@ -124,7 +126,7 @@ class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $output->writeln('  checking directory: ' . $filename);
+            $this->logger->info('  checking directory: ' . $filename);
 
             if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
                 $files[] = $filename;
@@ -180,32 +182,14 @@ class RewriteTestsCommand extends Command
         $testFilesArray  = scandir($basePath . 'tests/UserAgentsTest/', SCANDIR_SORT_ASCENDING);
 
         foreach ($testFilesArray as $filename) {
-            if (in_array($filename, ['.', '..'])) {
+            if (in_array($filename, ['.', '..']) || !file_exists($basePath . 'tests/UserAgentsTest/' . $filename)) {
                 continue;
             }
 
-            unlink($filename);
+            unlink($basePath . 'tests/UserAgentsTest/' . $filename);
         }
 
-        $output->writeln('preparing circle.yml ...');
-
-        $circleFile      = $basePath . 'circle.yml';
-        $circleciContent = 'machine:
-  php:
-    version: 7.1.9
-  timezone:
-    Europe/Berlin
-
-dependencies:
-  pre:
-    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
-  override:
-    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
-
-test:
-  override:
-    - composer validate
-';
+        $output->writeln('count and order tests ...');
 
         $circleTests = [];
 
@@ -237,8 +221,53 @@ test:
             $circleTests
         );
 
-        foreach ($circleTests as $group => $count) {
-            $columns = 111 + 2 * mb_strlen((string) $count);
+        $i           = 0;
+        $c           = 0;
+
+        $circleLines     = [$i => []];
+        $circleCount     = [$i => 0];
+        $circleTestsCopy = $circleTests;
+
+        while (count($circleTestsCopy)) {
+            foreach ($circleTestsCopy as $group => $count) {
+                if (($c + $count) > 1000) {
+                    ++$i;
+                    $c = 0;
+                    $circleLines[$i] = [];
+                    $circleCount[$i] = 0;
+                }
+                $c += $count;
+                $circleLines[$i][] = $group;
+                $circleCount[$i]  += $count;
+
+                unset($circleTestsCopy[$group]);
+            }
+        }
+
+        $output->writeln('preparing circle.yml ...');
+
+        $circleFile      = $basePath . 'circle.yml';
+        $circleciContent = 'machine:
+  php:
+    version: 7.1.9
+  timezone:
+    Europe/Berlin
+
+dependencies:
+  pre:
+    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
+  override:
+    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
+
+test:
+  override:
+    - composer validate
+';
+
+        foreach (array_reverse(array_keys($circleCount)) as $i) {
+            $count  = $circleCount[$i];
+            $group  = sprintf('%1$07d', $i);
+
             $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
             $testContent = '<?php
@@ -273,24 +302,26 @@ class T' . $group . 'Test extends TestCase
     /**
      * @var string
      */
-    private $sourceDirectory = \'tests/issues/' . $group . '/\';
+    private $sourceDirectory = [';
+
+            foreach (array_reverse($circleLines[$i]) as $groupx) {
+                $testContent .= '
+        \'tests/issues/' . $groupx . '/\',';
+            }
+
+            $testContent .= '
+    ];
 }
 ';
             $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents($testFile, $testContent);
-        }
-
-        foreach (array_keys($circleCount) as $i) {
-            $count  = $circleCount[$i];
-            $groups = trim($circleLines[$i], ',');
 
             $columns = 111 + 2 * mb_strlen((string) $count);
-            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . ' --group ' . $groups . ' -- ' . $tests;
+            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
         }
 
@@ -325,7 +356,17 @@ class T' . $group . 'Test extends TestCase
 
         $this->logger->info('    reading ...');
 
-        $tests = json_decode(file_get_contents($file->getPathname()), true);
+        $jsonParser = new JsonParser();
+        try {
+            $tests = $jsonParser->parse(
+                file_get_contents($file->getPathname()),
+                JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
+            );
+        } catch (ParsingException $e) {
+            $this->logger->crit(new \Exception('    parsing file content [' . $file->getPathname() . '] failed', 0, $e));
+
+            return 0;
+        }
 
         if (null === $tests) {
             $this->logger->info('    file does not contain any test');
@@ -414,7 +455,7 @@ class T' . $group . 'Test extends TestCase
         $this->logger->info('        rewriting');
 
         $oldResult = (new ResultFactory())->fromArray($this->cache, $this->logger, $oldResultArray);
-        $result    = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
+        //$result    = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
 
         /* rewrite browsers */
 
@@ -440,11 +481,12 @@ class T' . $group . 'Test extends TestCase
         /* rewrite devices */
 
         /** @var \UaResult\Device\DeviceInterface|null $device */
-        $device   = clone $result->getDevice();
-        $replaced = false;
+        //$device   = clone $result->getDevice();
+        $device   = clone $oldResult->getDevice();
+        $replaced = true;
 
         if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-            $device   = new Device(null, null);
+            $device = clone $oldResult->getDevice();
             $replaced = true;
         }
 
@@ -473,28 +515,11 @@ class T' . $group . 'Test extends TestCase
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error($e);
 
-                $device = clone $result->getDevice();
-
-                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
-                    $device = new Device(null, null);
-                }
+                $device = clone $oldResult->getDevice();
             } catch (NotFoundException $e) {
                 $this->logger->debug($e);
 
-                $device   = clone $result->getDevice();
-                $replaced = false;
-
-                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
-                    $device   = new Device(null, null);
-                    $replaced = true;
-                }
-
-                if (!$replaced
-                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device'])
-                    && false !== mb_stripos($device->getDeviceName(), 'general')
-                ) {
-                    $device = new Device('not found', null);
-                }
+                $device = clone $oldResult->getDevice();
             } catch (GeneralDeviceException $e) {
                 $deviceLoader = new DeviceLoader($this->cache);
 
@@ -503,24 +528,16 @@ class T' . $group . 'Test extends TestCase
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $oldResult->getDevice();
                 }
             } catch (NoMatchException $e) {
                 $this->logger->debug($e);
 
-                $device = clone $result->getDevice();
-
-                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
-                    $device = new Device(null, null);
-                }
+                $device = clone $oldResult->getDevice();
             } catch (\Exception $e) {
                 $this->logger->error($e);
 
-                $device = clone $result->getDevice();
-
-                if (in_array($device->getDeviceName(), [null, 'unknown'])) {
-                    $device = new Device(null, null);
-                }
+                $device = clone $oldResult->getDevice();
             }
         }
 

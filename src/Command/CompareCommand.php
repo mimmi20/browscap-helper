@@ -22,6 +22,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 
 /**
  * Class CompareCommand
@@ -154,16 +156,34 @@ class CompareCommand extends Command
             $agent = null;
 
             $collection = [];
+            $jsonParser = new JsonParser();
 
             foreach ($modules as $module) {
-                if (file_exists($path . '/' . $module . '.json')) {
-                    $collection[$module] = (array) json_decode(file_get_contents($path . '/' . $module . '.json'));
+                if (!file_exists($path . '/' . $module . '.json')) {
+                    $collection[$module] = ['result' => []];
+
+                    continue;
+                }
+
+                $collection[$module] = (array) json_decode(file_get_contents($path . '/' . $module . '.json'));
+
+                try {
+                    $collection[$module] = $jsonParser->parse(
+                        file_get_contents($path . '/' . $module . '.json'),
+                        JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
+                    );
 
                     if (null === $agent) {
                         $agent = $collection[$module]['ua'];
                     }
-                } else {
+                } catch (ParsingException $e) {
+                    $this->logger->crit(new \Exception('    parsing file content [' . $path . '/' . $module . '.json] failed', 0, $e));
+
                     $collection[$module] = ['result' => []];
+
+                    if (null === $agent) {
+                        $agent = '';
+                    }
                 }
             }
 
