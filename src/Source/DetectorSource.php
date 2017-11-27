@@ -15,6 +15,8 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use UaResult\Result\ResultFactory;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 
 /**
  * Class DirectorySource
@@ -109,6 +111,8 @@ class DetectorSource implements SourceInterface
         $finder->ignoreUnreadableDirs();
         $finder->in($path);
 
+        $jsonParser = new JsonParser();
+
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
@@ -126,9 +130,19 @@ class DetectorSource implements SourceInterface
             $filepath = $file->getPathname();
 
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
-            $data = json_decode(file_get_contents($filepath));
 
-            if (!is_array($data) && !($data instanceof \stdClass)) {
+            try {
+                $data = $jsonParser->parse(
+                    file_get_contents($filepath),
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->crit(new \Exception('    parsing file content [' . $filepath . '] failed', 0, $e));
+
+                continue;
+            }
+
+            if (!($data instanceof \stdClass)) {
                 continue;
             }
 
