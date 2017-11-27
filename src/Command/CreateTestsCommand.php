@@ -12,8 +12,10 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\TargetDirectory;
+use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\DirectorySource;
+use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
 use Monolog\Handler\PsrHandler;
@@ -40,6 +42,11 @@ class CreateTestsCommand extends Command
     private $sourcesDirectory = '';
 
     /**
+     * @var string
+     */
+    private $targetDirectory = '';
+
+    /**
      * @var \Monolog\Logger
      */
     private $logger;
@@ -59,10 +66,12 @@ class CreateTestsCommand extends Command
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param \BrowserDetector\Detector         $detector
      * @param string                            $sourcesDirectory
+     * @param string                            $targetDirectory
      */
-    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector, $sourcesDirectory)
+    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector, string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
+        $this->targetDirectory  = $targetDirectory;
         $this->logger           = $logger;
         $this->cache            = $cache;
         $this->detector         = $detector;
@@ -110,18 +119,31 @@ class CreateTestsCommand extends Command
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $output->writeln('reading already existing tests ...');
-        $checks = [];
+        $detectorChecks = [];
+        $browscapChecks = [];
 
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            if (array_key_exists($useragent, $checks)) {
+            if (array_key_exists($useragent, $detectorChecks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $checks[$useragent] = 1;
+            $detectorChecks[$useragent] = 1;
+        }
+
+        foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
+
+            if (array_key_exists($useragent, $browscapChecks)) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $browscapChecks[$useragent] = 1;
         }
 
         $targetDirectoryHelper = new TargetDirectory();
@@ -160,17 +182,24 @@ class CreateTestsCommand extends Command
         $sourcesDirectory   = $input->getOption('resources');
         $totalCounter       = 0;
         $detectorTestWriter = new DetectorTestWriter($this->logger);
+        $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
 
-            if (array_key_exists($useragent, $checks)) {
+            if (!array_key_exists($useragent, $browscapChecks)) {
+                $browscapTestWriter->write($result, $number, $useragent);
+            }
+
+            $browscapChecks[$useragent] = $number;
+
+            if (array_key_exists($useragent, $detectorChecks)) {
                 $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $checks[$useragent] = $number;
+            $detectorChecks[$useragent] = $number;
 
             if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();

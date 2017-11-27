@@ -50,7 +50,7 @@ class ConvertLogsCommand extends Command
      * @param string          $sourcesDirectory
      * @param string          $targetDirectory
      */
-    public function __construct(Logger $logger, $sourcesDirectory, $targetDirectory)
+    public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;

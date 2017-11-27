@@ -19,6 +19,7 @@ use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -48,13 +49,19 @@ class CopyTestsCommand extends Command
     private $cache;
 
     /**
+     * @var string
+     */
+    private $targetDirectory = '';
+
+    /**
      * @param \Monolog\Logger                   $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      */
-    public function __construct(Logger $logger, CacheItemPoolInterface $cache)
+    public function __construct(Logger $logger, CacheItemPoolInterface $cache, string $targetDirectory)
     {
         $this->logger = $logger;
         $this->cache  = $cache;
+        $this->targetDirectory  = $targetDirectory;
 
         parent::__construct();
     }
@@ -123,17 +130,31 @@ class CopyTestsCommand extends Command
         }
 
         $output->writeln('read existing tests ...');
-        $existingTests = [];
+        $detectorChecks = [];
+        $browscapChecks = [];
+
         foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            if (isset($existingTests[$useragent])) {
+            if (isset($detectorChecks[$useragent])) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $existingTests[$useragent] = 1;
+            $detectorChecks[$useragent] = 1;
+        }
+
+        foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
+
+            if (array_key_exists($useragent, $browscapChecks)) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $browscapChecks[$useragent] = 1;
         }
 
         $output->writeln('init sources ...');
@@ -145,23 +166,31 @@ class CopyTestsCommand extends Command
                 new UapCoreSource($this->logger),
                 new WhichBrowserSource($this->logger, $this->cache),
                 new WootheeSource($this->logger, $this->cache),
+                new DetectorSource($this->logger, $this->cache),
             ]
         );
 
         $output->writeln('import tests ...');
 
         $detectorTestWriter = new DetectorTestWriter($this->logger);
+        $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
         foreach ($source->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
 
-            if (isset($existingTests[$useragent])) {
+            if (!array_key_exists($useragent, $browscapChecks) && false !== stripos($useragent, 'bingweb')) {
+                $browscapTestWriter->write($result, $number, $useragent);
+            }
+
+            $browscapChecks[$useragent] = 1;
+
+            if (isset($detectorChecks[$useragent])) {
                 $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $existingTests[$useragent] = 1;
+            $detectorChecks[$useragent] = 1;
 
             if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
                 $number          = $targetDirectoryHelper->getNextTest();

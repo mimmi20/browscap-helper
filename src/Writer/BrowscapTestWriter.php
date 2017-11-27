@@ -30,10 +30,10 @@ class BrowscapTestWriter
 
     private $outputBrowscap = '';
     private $counter        = 0;
+    private $number         = 0;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
-     * @param string                   $file
      * @param string                   $dir
      */
     public function __construct(LoggerInterface $logger, string $dir)
@@ -55,6 +55,11 @@ class BrowscapTestWriter
         $device   = clone $result->getDevice();
         $engine   = clone $result->getEngine();
         $browser  = clone $result->getBrowser();
+
+        if ($this->number !== $number) {
+            $this->number  = $number;
+            $this->counter = 0;
+        }
 
         $formatedIssue   = sprintf('%1$05d', $number);
         $formatedCounter = sprintf('%1$05d', $this->counter);
@@ -98,7 +103,7 @@ class BrowscapTestWriter
         'full' => true,
     ],\n";
 
-        file_put_contents($this->dir . 'issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
+        file_put_contents($this->dir . '/issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
 
         ++$this->counter;
 

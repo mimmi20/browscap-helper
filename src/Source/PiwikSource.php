@@ -111,10 +111,12 @@ class PiwikSource implements SourceInterface
                 $browserName = (new BrowserNameMapper())->mapBrowserName((string) $row->bot->name);
 
                 if (!empty($row->bot->producer->name)) {
+                    $brandFullBotnameKey = (new MakerMapper())->mapMaker(Mobile::getFullName((string) $row->bot->producer->name));
+
                     try {
-                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load((string) $row->bot->producer->name);
+                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load((string) $brandFullBotnameKey);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical('company not found: ' . (string) $row->bot->producer->name);
+                        $this->logger->critical('company not found: ' . (string) $row->bot->producer->name . ' [' . (string) $brandFullBotnameKey . ']');
                         $browserManufacturer = null;
                     }
                 }
@@ -158,9 +160,9 @@ class PiwikSource implements SourceInterface
 
                 if (isset($row->device->model) && $brandFullnameKey) {
                     try {
-                        $deviceBrand = CompanyLoader::getInstance($this->cache)->load($brandFullnameKey);
+                        $deviceBrand = CompanyLoader::getInstance($this->cache)->load((string) $brandFullnameKey);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical('company not found: ' . (string) $row->device->brand);
+                        $this->logger->critical('company not found: ' . (string) $row->device->brand . ' [' . (string) $brandFullnameKey . ']');
                         $deviceBrand = null;
                     }
                 } else {
