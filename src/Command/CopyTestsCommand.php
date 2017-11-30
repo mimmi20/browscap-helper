@@ -15,12 +15,15 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\DetectorSource;
+use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
+use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use BrowscapHelper\Writer\BrowscapTestWriter;
+use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Writer\DetectorTestWriter;
+use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -56,11 +59,12 @@ class CopyTestsCommand extends Command
     /**
      * @param \Monolog\Logger                   $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
+     * @param string                            $targetDirectory
      */
     public function __construct(Logger $logger, CacheItemPoolInterface $cache, string $targetDirectory)
     {
-        $this->logger = $logger;
-        $this->cache  = $cache;
+        $this->logger           = $logger;
+        $this->cache            = $cache;
         $this->targetDirectory  = $targetDirectory;
 
         parent::__construct();
@@ -73,7 +77,7 @@ class CopyTestsCommand extends Command
     {
         $this
             ->setName('copy-tests')
-            ->setDescription('Copies tests from browscap and other libraries to browser-detector');
+            ->setDescription('Copies tests from browscap and other libraries');
     }
 
     /**
@@ -99,11 +103,12 @@ class CopyTestsCommand extends Command
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $targetDirectoryHelper = new TargetDirectory();
+        $testSource            = 'tests/';
 
-        $output->writeln('detect next test number ...');
+        $output->writeln('detect next test number for Browscap helper ...');
 
         try {
-            $number = $targetDirectoryHelper->getNextTest();
+            $number = $targetDirectoryHelper->getNextTest($testSource);
         } catch (\UnexpectedValueException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
@@ -111,39 +116,25 @@ class CopyTestsCommand extends Command
             return 1;
         }
 
-        $output->writeln('next test: ' . $number);
-        $output->writeln('detect directory to write new tests ...');
+        $output->writeln('next test for Browscap helper: ' . $number);
+        $output->writeln('read existing tests for Browscap helper ...');
 
-        try {
-            $targetDirectory = $targetDirectoryHelper->getPath();
-        } catch (\UnexpectedValueException $e) {
-            $this->logger->critical($e);
-            $output->writeln($e->getMessage());
-
-            return 1;
-        }
-
-        $output->writeln('target directory: ' . $targetDirectory);
-
-        if (!file_exists($targetDirectory)) {
-            mkdir($targetDirectory);
-        }
-
-        $output->writeln('read existing tests ...');
-        $detectorChecks = [];
         $browscapChecks = [];
+        $txtChecks      = [];
 
-        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
+        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            if (isset($detectorChecks[$useragent])) {
+            if (array_key_exists($useragent, $txtChecks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $detectorChecks[$useragent] = 1;
+            $txtChecks[$useragent] = 1;
         }
+
+        $output->writeln('read existing tests for Browscap ...');
 
         foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -158,55 +149,53 @@ class CopyTestsCommand extends Command
         }
 
         $output->writeln('init sources ...');
-        $totalCounter = 0;
-        $source       = new CollectionSource(
+
+        $browscapTotalCounter = 0;
+        $txtTotalCounter      = 0;
+
+        $source = new CollectionSource(
             [
                 new BrowscapSource($this->logger, $this->cache),
                 new PiwikSource($this->logger, $this->cache),
                 new UapCoreSource($this->logger),
                 new WhichBrowserSource($this->logger, $this->cache),
                 new WootheeSource($this->logger, $this->cache),
-                new DetectorSource($this->logger, $this->cache),
+                //new DetectorSource($this->logger, $this->cache),
+                new MobileDetectSource($this->logger, $this->cache),
+                new YzalisSource($this->logger, $this->cache),
             ]
         );
 
-        $output->writeln('import tests ...');
+        $output->writeln('copy tests ...');
 
         $detectorTestWriter = new DetectorTestWriter($this->logger);
-        $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
+        $txtWriter          = new TxtTestWriter($this->logger);
 
-        foreach ($source->getTests() as $useragent => $result) {
+        foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            if (!array_key_exists($useragent, $browscapChecks) && false !== stripos($useragent, 'bingweb')) {
-                $browscapTestWriter->write($result, $number, $useragent);
-            }
+            //if (!array_key_exists($useragent, $browscapChecks) && false !== stripos($useragent, 'bingweb')) {
+            //    $browscapTestWriter->write($result, $number, $useragent, $browscapTotalCounter);
+            //}
 
             $browscapChecks[$useragent] = 1;
 
-            if (isset($detectorChecks[$useragent])) {
+            if (isset($txtChecks[$useragent])) {
                 $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $detectorChecks[$useragent] = 1;
+            $txtChecks[$useragent] = 1;
 
-            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
-                $number          = $targetDirectoryHelper->getNextTest();
-                $targetDirectory = $targetDirectoryHelper->getPath();
-
-                $output->writeln('next test: ' . $number);
-                $output->writeln('target directory: ' . $targetDirectory);
-
-                if (!file_exists($targetDirectory)) {
-                    mkdir($targetDirectory);
-                }
+            if ($txtWriter->write($useragent, $testSource, $number, $txtTotalCounter)) {
+                ++$number;
             }
         }
 
         $output->writeln('');
-        $output->writeln('Es wurden ' . $totalCounter . ' Tests exportiert');
+        $output->writeln('tests copied for Browscap helper: ' . $txtTotalCounter);
+        $output->writeln('tests copied for Browscap:        ' . $browscapTotalCounter);
 
         return 0;
     }

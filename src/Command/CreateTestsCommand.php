@@ -118,6 +118,8 @@ class CreateTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
+        $detectorTargetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
+
         $output->writeln('reading already existing tests ...');
         $detectorChecks = [];
         $browscapChecks = [];
@@ -151,7 +153,7 @@ class CreateTestsCommand extends Command
         $output->writeln('detect next test number ...');
 
         try {
-            $number = $targetDirectoryHelper->getNextTest();
+            $number = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
         } catch (\UnexpectedValueException $e) {
             $this->logger->critical($e);
             $output->writeln($e->getMessage());
@@ -162,14 +164,7 @@ class CreateTestsCommand extends Command
         $output->writeln('next test: ' . $number);
         $output->writeln('detect directory to write new tests ...');
 
-        try {
-            $targetDirectory = $targetDirectoryHelper->getPath();
-        } catch (\UnexpectedValueException $e) {
-            $this->logger->critical($e);
-            $output->writeln($e->getMessage());
-
-            return 1;
-        }
+        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $number) . '/';
 
         $output->writeln('target directory: ' . $targetDirectory);
 
@@ -179,16 +174,17 @@ class CreateTestsCommand extends Command
 
         $output->writeln('reading new files ...');
 
-        $sourcesDirectory   = $input->getOption('resources');
-        $totalCounter       = 0;
-        $detectorTestWriter = new DetectorTestWriter($this->logger);
-        $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
+        $sourcesDirectory     = $input->getOption('resources');
+        $detectorTotalCounter = 0;
+        $browscapTotalCounter = 0;
+        $detectorTestWriter   = new DetectorTestWriter($this->logger);
+        $browscapTestWriter   = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
         foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
             $useragent = trim($useragent);
 
             if (!array_key_exists($useragent, $browscapChecks)) {
-                $browscapTestWriter->write($result, $number, $useragent);
+                $browscapTestWriter->write($result, $number, $useragent, $browscapTotalCounter);
             }
 
             $browscapChecks[$useragent] = $number;
@@ -201,9 +197,9 @@ class CreateTestsCommand extends Command
 
             $detectorChecks[$useragent] = $number;
 
-            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $totalCounter)) {
-                $number          = $targetDirectoryHelper->getNextTest();
-                $targetDirectory = $targetDirectoryHelper->getPath();
+            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $detectorTotalCounter)) {
+                $number          = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
+                $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $number) . '/';
 
                 $output->writeln('next test: ' . $number);
                 $output->writeln('target directory: ' . $targetDirectory);
@@ -215,7 +211,8 @@ class CreateTestsCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln($totalCounter . ' tests exported');
+        $output->writeln('tests created for BrowserDestector: ' . $detectorTotalCounter);
+        $output->writeln('tests created for Browscap:         ' . $browscapTotalCounter);
 
         return 0;
     }

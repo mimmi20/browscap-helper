@@ -17,13 +17,13 @@ use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
 use Psr\Cache\CacheItemPoolInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 
 /**
  * Class CompareCommand
@@ -53,6 +53,11 @@ class CompareCommand extends Command
     private $config;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Monolog\Logger                   $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param \Noodlehaus\Config                $config
@@ -62,6 +67,8 @@ class CompareCommand extends Command
         $this->logger = $logger;
         $this->cache  = $cache;
         $this->config = $config;
+
+        $this->jsonParser = new JsonParser();
 
         parent::__construct();
     }
@@ -156,7 +163,6 @@ class CompareCommand extends Command
             $agent = null;
 
             $collection = [];
-            $jsonParser = new JsonParser();
 
             foreach ($modules as $module) {
                 if (!file_exists($path . '/' . $module . '.json')) {
@@ -168,7 +174,7 @@ class CompareCommand extends Command
                 $collection[$module] = (array) json_decode(file_get_contents($path . '/' . $module . '.json'));
 
                 try {
-                    $collection[$module] = $jsonParser->parse(
+                    $collection[$module] = $this->jsonParser->parse(
                         file_get_contents($path . '/' . $module . '.json'),
                         JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
                     );

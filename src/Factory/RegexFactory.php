@@ -136,7 +136,7 @@ class RegexFactory
         }
 
         $deviceCode   = mb_strtolower($this->match['devicecode']);
-        $deviceLoader = new DeviceLoader($this->cache);
+        $deviceLoader = new DeviceLoader($this->cache, $this->logger);
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -281,7 +281,7 @@ class RegexFactory
             throw new \InvalidArgumentException('please call the detect function before trying to get the result');
         }
 
-        $platformLoader = new PlatformLoader($this->cache);
+        $platformLoader = new PlatformLoader($this->cache, $this->logger);
 
         if (!array_key_exists('osname', $this->match)
             && array_key_exists('manufacturercode', $this->match)
@@ -366,7 +366,7 @@ class RegexFactory
         }
 
         $browserCode   = mb_strtolower($this->match['browsername']);
-        $browserLoader = new BrowserLoader($this->cache);
+        $browserLoader = new BrowserLoader($this->cache, $this->logger);
 
         switch ($browserCode) {
             case 'opr':
@@ -460,7 +460,7 @@ class RegexFactory
         }
 
         $engineCode   = mb_strtolower($this->match['enginename']);
-        $engineLoader = new EngineLoader($this->cache);
+        $engineLoader = new EngineLoader($this->cache, $this->logger);
 
         if ('cfnetwork' === $engineCode) {
             return $engineLoader->load('webkit', $this->useragent);

@@ -46,10 +46,11 @@ class BrowscapTestWriter
      * @param \UaResult\Result\ResultInterface $result
      * @param int                              $number
      * @param string                           $useragent
+     * @param int                              &$totalCounter
      *
      * @return bool
      */
-    public function write(ResultInterface $result, int $number, string $useragent): bool
+    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): bool
     {
         $platform = clone $result->getOs();
         $device   = clone $result->getDevice();
@@ -81,10 +82,7 @@ class BrowscapTestWriter
             'Platform_Maker' => '" . $platform->getManufacturer()->getName() . "',
             'Alpha' => false,
             'Beta' => false,
-            'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
-            'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
             'isSyndicationReader' => false,
-            'Crawler' => " . ($browser->getType()->isBot() ? 'true' : 'false') . ",
             'isFake' => false,
             'isAnonymized' => false,
             'isModified' => false,
@@ -106,6 +104,7 @@ class BrowscapTestWriter
         file_put_contents($this->dir . '/issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
 
         ++$this->counter;
+        ++$totalCounter;
 
         return false;
     }

@@ -11,7 +11,10 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\LogFileSource;
+use BrowscapHelper\Source\TxtFileSource;
+use BrowscapHelper\Writer\TxtTestWriter;
 use BrowscapHelper\Writer\TxtWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -112,28 +115,74 @@ class ConvertLogsCommand extends Command
         $targetBulkFile = $targetDirectory . '/' . date('Y-m-d') . '-testagents.txt';
 
         $output->writeln("reading from directory '" . $sourcesDirectory . "'");
-        $output->writeln("writing to file '" . $targetBulkFile . "'");
 
-        $txtWriter = new TxtWriter($this->logger, $targetBulkFile);
-        $allAgents = [];
+        $targetDirectoryHelper = new TargetDirectory();
+        $testSource            = 'tests/';
 
-        foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $agent) {
-            if (array_key_exists($agent, $allAgents)) {
-                $this->logger->info('    UA "' . $agent . '" added more than once --> skipped');
+        $output->writeln('detect next test number for Browscap helper ...');
+
+        try {
+            $number = $targetDirectoryHelper->getNextTest($testSource);
+        } catch (\UnexpectedValueException $e) {
+            $this->logger->critical($e);
+            $output->writeln($e->getMessage());
+
+            return 1;
+        }
+
+        $output->writeln('next test for Browscap helper: ' . $number);
+        $output->writeln('read existing tests for Browscap helper ...');
+
+        $browscapChecks = [];
+        $txtChecks      = [];
+
+        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
+
+            if (array_key_exists($useragent, $txtChecks)) {
+                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $allAgents[$agent] = 1;
+            $txtChecks[$useragent] = 1;
+        }
 
-            $txtWriter->write($agent);
+        $txtWriter       = new TxtWriter($this->logger, $targetBulkFile);
+        $txtTestWriter   = new TxtTestWriter($this->logger);
+        $allAgents       = [];
+        $txtTotalCounter = 0;
+
+        foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
+
+            if (isset($txtChecks[$useragent])) {
+                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $txtChecks[$useragent] = 1;
+
+            if ($txtTestWriter->write($useragent, $testSource, $number, $txtTotalCounter)) {
+                ++$number;
+            }
+
+            if (array_key_exists($useragent, $allAgents)) {
+                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $allAgents[$useragent] = 1;
+
+            $txtWriter->write($useragent);
             ++$counter;
         }
 
         $output->writeln('');
-        $output->writeln('finished reading files.');
-        $output->writeln('');
-        $output->writeln($counter . ' new  agents added');
+        $output->writeln('tests converted for general use:     ' . $counter);
+        $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter);
 
         return 0;
     }

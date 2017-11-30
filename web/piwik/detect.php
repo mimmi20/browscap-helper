@@ -10,6 +10,8 @@
 
 declare(strict_types = 1);
 
+use BrowscapHelper\DataMapper\InputMapper;
+use BrowscapHelper\Module\Mapper\PiwikDetector;
 use DeviceDetector\DeviceDetector;
 use DeviceDetector\Parser\Client\Browser;
 use DeviceDetector\Parser\Device\DeviceParserAbstract;
@@ -21,6 +23,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\MemoryUsageProcessor;
+use Noodlehaus\Config;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 chdir(dirname(dirname(__DIR__)));
 
@@ -59,8 +63,6 @@ ErrorHandler::register($logger);
 
 DeviceParserAbstract::setVersionTruncation(DeviceParserAbstract::VERSION_TRUNCATION_NONE);
 
-header('Content-Type: application/json', true);
-
 $start          = microtime(true);
 $deviceDetector = new DeviceDetector($_GET['useragent']);
 $deviceDetector->parse();
@@ -92,11 +94,21 @@ $processed = [
     'browser_family' => false !== $browserFamily ? $browserFamily : 'Unknown',
 ];
 $duration = microtime(true) - $start;
+$memory   = memory_get_usage(true);
+
+$config       = new Config(['data/configs/config.json']);
+$moduleConfig = $config['modules']['piwik'];
+
+$inputMapper = new InputMapper();
+$moduleCache = new ArrayAdapter();
+$mapper      = new PiwikDetector($inputMapper, $moduleCache);
+
+header('Content-Type: application/json', true);
 
 echo htmlentities(json_encode(
     [
-        'result'   => $processed,
+        'result'   => $mapper->map((object) $processed, $_GET['useragent'])->toArray(),
         'duration' => $duration,
-        'memory'   => memory_get_usage(true),
+        'memory'   => $memory,
     ]
 ));

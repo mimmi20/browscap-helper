@@ -10,6 +10,8 @@
 
 declare(strict_types = 1);
 
+use BrowscapHelper\DataMapper\InputMapper;
+use BrowscapHelper\Module\Mapper\Browscap;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
@@ -17,6 +19,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\MemoryUsageProcessor;
+use Noodlehaus\Config;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 chdir(dirname(dirname(__DIR__)));
 
@@ -34,8 +38,6 @@ foreach ($autoloadPaths as $path) {
 }
 
 ini_set('memory_limit', '-1');
-
-header('Content-Type: application/json', true);
 
 $buildNumber = (int) file_get_contents('vendor/browscap/browscap/BUILD_NUMBER');
 $iniFile     = 'data/browscap-ua-test-' . $buildNumber . '/full_php_browscap.ini';
@@ -61,11 +63,21 @@ ErrorHandler::register($logger);
 $start    = microtime(true);
 $result   = get_browser($_GET['useragent'], false);
 $duration = microtime(true) - $start;
+$memory   = memory_get_usage(true);
+
+$config       = new Config(['data/configs/config.json']);
+$moduleConfig = $config['modules']['native-get-browser'];
+
+$inputMapper = new InputMapper();
+$moduleCache = new FilesystemAdapter('', 0, $moduleConfig['cache-dir']);
+$mapper      = new Browscap($inputMapper, $moduleCache);
+
+header('Content-Type: application/json', true);
 
 echo htmlentities(json_encode(
     [
-        'result'   => $result,
+        'result'   => $mapper->map($result, $_GET['useragent'])->toArray(),
         'duration' => $duration,
-        'memory'   => memory_get_usage(true),
+        'memory'   => $memory,
     ]
 ));

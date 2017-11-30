@@ -13,10 +13,10 @@ namespace BrowscapHelper\Source;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Finder\Finder;
-use UaResult\Result\ResultFactory;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
+use Symfony\Component\Finder\Finder;
+use UaResult\Result\ResultFactory;
 
 /**
  * Class DirectorySource
@@ -36,6 +36,11 @@ class DetectorSource implements SourceInterface
     private $cache;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Psr\Log\LoggerInterface          $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      */
@@ -43,6 +48,8 @@ class DetectorSource implements SourceInterface
     {
         $this->logger = $logger;
         $this->cache  = $cache;
+
+        $this->jsonParser = new JsonParser();
     }
 
     /**
@@ -111,8 +118,6 @@ class DetectorSource implements SourceInterface
         $finder->ignoreUnreadableDirs();
         $finder->in($path);
 
-        $jsonParser = new JsonParser();
-
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             if (!$file->isFile()) {
@@ -132,12 +137,12 @@ class DetectorSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
 
             try {
-                $data = $jsonParser->parse(
+                $data = $this->jsonParser->parse(
                     file_get_contents($filepath),
                     JsonParser::DETECT_KEY_CONFLICTS
                 );
             } catch (ParsingException $e) {
-                $this->logger->crit(new \Exception('    parsing file content [' . $filepath . '] failed', 0, $e));
+                $this->logger->critical(new \Exception('    parsing file content [' . $filepath . '] failed', 0, $e));
 
                 continue;
             }

@@ -24,6 +24,8 @@ use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use UaResult\Browser\Browser;
@@ -31,8 +33,6 @@ use UaResult\Device\Device;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
-use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 
 /**
  * Class DirectorySource
@@ -52,6 +52,11 @@ class WhichBrowserSource implements SourceInterface
     private $cache;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Psr\Log\LoggerInterface          $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      */
@@ -59,6 +64,8 @@ class WhichBrowserSource implements SourceInterface
     {
         $this->logger = $logger;
         $this->cache  = $cache;
+
+        $this->jsonParser = new JsonParser();
     }
 
     /**
@@ -69,7 +76,6 @@ class WhichBrowserSource implements SourceInterface
     public function getUserAgents(int $limit = 0): iterable
     {
         $counter = 0;
-        $jsonParser = new JsonParser();
 
         foreach ($this->loadFromPath() as $row) {
             if ($limit && $counter >= $limit) {
@@ -77,12 +83,12 @@ class WhichBrowserSource implements SourceInterface
             }
 
             try {
-                $row = $jsonParser->parse(
+                $row = $this->jsonParser->parse(
                     $row,
                     JsonParser::DETECT_KEY_CONFLICTS
                 );
             } catch (ParsingException $e) {
-                $this->logger->crit(new \Exception('    parsing file content failed', 0, $e));
+                $this->logger->critical(new \Exception('    parsing file content failed', 0, $e));
 
                 continue;
             }
@@ -103,16 +109,14 @@ class WhichBrowserSource implements SourceInterface
      */
     public function getTests(): iterable
     {
-        $jsonParser = new JsonParser();
-
         foreach ($this->loadFromPath() as $row) {
             try {
-                $row = $jsonParser->parse(
+                $row = $this->jsonParser->parse(
                     $row,
                     JsonParser::DETECT_KEY_CONFLICTS
                 );
             } catch (ParsingException $e) {
-                $this->logger->crit(new \Exception('    parsing file content failed', 0, $e));
+                $this->logger->critical(new \Exception('    parsing file content failed', 0, $e));
 
                 continue;
             }
@@ -296,7 +300,7 @@ class WhichBrowserSource implements SourceInterface
                 return $row['headers']['User-Agent'];
             }
 
-            if (class_exists('\http\Header')) {
+            if (class_exists(\http\Header::class)) {
                 // pecl_http versions 2.x/3.x
                 $headers = \http\Header::parse($row['headers']);
             } elseif (function_exists('\http_parse_headers')) {

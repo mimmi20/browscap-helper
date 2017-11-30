@@ -22,6 +22,8 @@ use BrowserDetector\Loader\NotFoundException;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -31,8 +33,6 @@ use UaResult\Device\Device;
 use UaResult\Result\Result;
 use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
-use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 
 /**
  * Class RewriteTestsCommand
@@ -59,6 +59,11 @@ class RewriteTestsCommand extends Command
     private $detector;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Monolog\Logger                   $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param \BrowserDetector\Detector         $detector
@@ -68,6 +73,8 @@ class RewriteTestsCommand extends Command
         $this->logger   = $logger;
         $this->cache    = $cache;
         $this->detector = $detector;
+
+        $this->jsonParser = new JsonParser();
 
         parent::__construct();
     }
@@ -230,15 +237,15 @@ class RewriteTestsCommand extends Command
 
         while (count($circleTestsCopy)) {
             foreach ($circleTestsCopy as $group => $count) {
-                if (($c + $count) > 1000) {
+                if (1000 < ($c + $count)) {
                     ++$i;
-                    $c = 0;
+                    $c               = 0;
                     $circleLines[$i] = [];
                     $circleCount[$i] = 0;
                 }
                 $c += $count;
                 $circleLines[$i][] = $group;
-                $circleCount[$i]  += $count;
+                $circleCount[$i] += $count;
 
                 unset($circleTestsCopy[$group]);
             }
@@ -356,9 +363,8 @@ class T' . $group . 'Test extends TestCase
 
         $this->logger->info('    reading ...');
 
-        $jsonParser = new JsonParser();
         try {
-            $tests = $jsonParser->parse(
+            $tests = $this->jsonParser->parse(
                 file_get_contents($file->getPathname()),
                 JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
             );
@@ -485,8 +491,8 @@ class T' . $group . 'Test extends TestCase
         $device   = clone $oldResult->getDevice();
         $replaced = true;
 
-        if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-            $device = clone $oldResult->getDevice();
+        if (in_array($device->getDeviceName(), [null, 'unknown'])) {
+            $device   = clone $oldResult->getDevice();
             $replaced = true;
         }
 
@@ -521,7 +527,7 @@ class T' . $group . 'Test extends TestCase
 
                 $device = clone $oldResult->getDevice();
             } catch (GeneralDeviceException $e) {
-                $deviceLoader = new DeviceLoader($this->cache);
+                $deviceLoader = new DeviceLoader($this->cache, $this->logger);
 
                 try {
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
