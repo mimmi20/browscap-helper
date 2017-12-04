@@ -21,44 +21,38 @@ namespace BrowscapHelper\Helper;
 class TargetDirectory
 {
     /**
-     * @throws \UnexpectedValueException
+     * @param string $targetDirectory
      *
-     * @return string
-     */
-    public function getPath(): string
-    {
-        $number = $this->getNextTest();
-
-        return 'vendor/mimmi20/browser-detector-tests/tests/issues/' . sprintf('%1$07d', $number) . '/';
-    }
-
-    /**
      * @throws \UnexpectedValueException
      *
      * @return int
      */
-    public function getNextTest(): int
+    public function getNextTest(string $targetDirectory): int
     {
-        $targetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
-
         if (!is_readable($targetDirectory)) {
             throw new \UnexpectedValueException('directory "' . $targetDirectory . '" is not readable');
         }
 
         $filesArray = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
         $number     = 0;
+        $filesFound = false;
 
         foreach ($filesArray as $filename) {
-            if (in_array($filename, ['.', '..'])) {
+            if (in_array($filename, ['.', '..', '.gitkeep'])) {
                 continue;
             }
 
-            $file     = new \SplFileInfo($targetDirectory . $filename);
-            $basename = $file->getBasename('.' . $file->getExtension());
+            $filesFound = true;
+            $file       = new \SplFileInfo($targetDirectory . $filename);
+            $basename   = $file->getBasename('.' . $file->getExtension());
 
             if ((int) $basename > $number) {
                 $number = (int) $basename;
             }
+        }
+
+        if (!$filesFound) {
+            return 0;
         }
 
         ++$number;

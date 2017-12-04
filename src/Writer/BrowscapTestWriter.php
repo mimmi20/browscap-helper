@@ -30,10 +30,10 @@ class BrowscapTestWriter
 
     private $outputBrowscap = '';
     private $counter        = 0;
+    private $number         = 0;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
-     * @param string                   $file
      * @param string                   $dir
      */
     public function __construct(LoggerInterface $logger, string $dir)
@@ -46,15 +46,21 @@ class BrowscapTestWriter
      * @param \UaResult\Result\ResultInterface $result
      * @param int                              $number
      * @param string                           $useragent
+     * @param int                              &$totalCounter
      *
      * @return bool
      */
-    public function write(ResultInterface $result, int $number, string $useragent): bool
+    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): bool
     {
         $platform = clone $result->getOs();
         $device   = clone $result->getDevice();
         $engine   = clone $result->getEngine();
         $browser  = clone $result->getBrowser();
+
+        if ($this->number !== $number) {
+            $this->number  = $number;
+            $this->counter = 0;
+        }
 
         $formatedIssue   = sprintf('%1$05d', $number);
         $formatedCounter = sprintf('%1$05d', $this->counter);
@@ -76,10 +82,7 @@ class BrowscapTestWriter
             'Platform_Maker' => '" . $platform->getManufacturer()->getName() . "',
             'Alpha' => false,
             'Beta' => false,
-            'isMobileDevice' => " . ($device->getType()->isMobile() ? 'true' : 'false') . ",
-            'isTablet' => " . ($device->getType()->isTablet() ? 'true' : 'false') . ",
             'isSyndicationReader' => false,
-            'Crawler' => " . ($browser->getType()->isBot() ? 'true' : 'false') . ",
             'isFake' => false,
             'isAnonymized' => false,
             'isModified' => false,
@@ -98,9 +101,10 @@ class BrowscapTestWriter
         'full' => true,
     ],\n";
 
-        file_put_contents($this->dir . 'issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
+        file_put_contents($this->dir . '/issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
 
         ++$this->counter;
+        ++$totalCounter;
 
         return false;
     }

@@ -24,6 +24,8 @@ use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use UaResult\Browser\Browser;
@@ -50,6 +52,11 @@ class WhichBrowserSource implements SourceInterface
     private $cache;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Psr\Log\LoggerInterface          $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      */
@@ -57,6 +64,8 @@ class WhichBrowserSource implements SourceInterface
     {
         $this->logger = $logger;
         $this->cache  = $cache;
+
+        $this->jsonParser = new JsonParser();
     }
 
     /**
@@ -73,7 +82,17 @@ class WhichBrowserSource implements SourceInterface
                 return;
             }
 
-            $row   = json_decode($row, false);
+            try {
+                $row = $this->jsonParser->parse(
+                    $row,
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->critical(new \Exception('    parsing file content failed', 0, $e));
+
+                continue;
+            }
+
             $agent = trim($row->{'User-Agent'});
 
             if (empty($agent)) {
@@ -91,7 +110,17 @@ class WhichBrowserSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row   = json_decode($row, false);
+            try {
+                $row = $this->jsonParser->parse(
+                    $row,
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->critical(new \Exception('    parsing file content failed', 0, $e));
+
+                continue;
+            }
+
             $agent = trim($row->{'User-Agent'});
 
             if (empty($agent)) {
@@ -271,7 +300,7 @@ class WhichBrowserSource implements SourceInterface
                 return $row['headers']['User-Agent'];
             }
 
-            if (class_exists('\http\Header')) {
+            if (class_exists(\http\Header::class)) {
                 // pecl_http versions 2.x/3.x
                 $headers = \http\Header::parse($row['headers']);
             } elseif (function_exists('\http_parse_headers')) {

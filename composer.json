@@ -23,6 +23,10 @@
     "whichbrowser/parser": "dev-master",
     "woothee/woothee": "dev-master",
     "woothee/woothee-testset": "dev-master",
+    "wolfcast/browser-detection": "dev-master",
+    "mobiledetect/mobiledetectlib": "dev-master",
+    "yzalis/ua-parser": "dev-master",
+    "mimmi20/wurfl": "dev-master",
 
     "mimmi20/ua-result": "~5.1.0",
     "mimmi20/ua-result-company": "~3.0.3",
@@ -34,12 +38,13 @@
 
     "devster/ubench": "^1.2",
     "hassankhan/config": "^0.10",
-    "beberlei/assert": "^2.7"
+    "beberlei/assert": "^2.7",
+    "seld/jsonlint": "^1.6"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.1",
     "friendsofphp/php-cs-fixer": "2.7.1",
-    "phpstan/phpstan": "^0.8.5"
+    "phpstan/phpstan-shim": "^0.8.5"
   },
   "license": "MIT",
   "authors": [

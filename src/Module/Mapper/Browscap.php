@@ -76,7 +76,7 @@ class Browscap implements MapperInterface
             if (!empty($parserResult->browser_type)) {
                 $browserType = $parserResult->browser_type;
             } else {
-                $browserType = null;
+                $browserType = '';
             }
 
             //if (!empty($parserResult->browser_modus) && 'unknown' !== $parserResult->browser_modus) {

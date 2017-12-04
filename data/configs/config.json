@@ -29,6 +29,22 @@
         "params": {},
         "headers": {}
       },
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
+    },
+    "mobile-detect": {
+      "name": "Mobile Detect",
+      "enabled": true,
+      "class": "Http",
+      "requires-cache": true,
+      "cache-dir": "data/cache/mobile-detect/",
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/mobile-detect/detect.php",
+        "params": {},
+        "headers": {}
+      },
       "check": "Local",
       "mapper": "Browscap"
     },
@@ -45,8 +61,8 @@
         "params": {},
         "headers": {}
       },
-      "check": "Local",
-      "mapper": "Browscap"
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
     },
     "piwik": {
       "name": "Piwik",
@@ -60,8 +76,8 @@
         "params": {},
         "headers": {}
       },
-      "check": "Local",
-      "mapper": "PiwikDetector"
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
     },
     "ua-parser": {
       "name": "UAParser",
@@ -75,8 +91,8 @@
         "params": {},
         "headers": {}
       },
-      "check": "Local",
-      "mapper": "UaParser"
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
     },
     "which-browser": {
       "name": "WhichBrowser",
@@ -90,8 +106,8 @@
         "params": {},
         "headers": {}
       },
-      "check": "Local",
-      "mapper": "WhichBrowser"
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
     },
     "woothee": {
       "name": "Woothee",
@@ -102,6 +118,21 @@
         "method": "GET",
         "ua-key": "useragent",
         "uri": "http://localhost:8000/web/woothee/detect.php",
+        "params": {},
+        "headers": {}
+      },
+      "check": "BrowserDetectorModule",
+      "mapper": "BrowserDetectorModule"
+    },
+    "yzalis": {
+      "name": "Yzalis",
+      "enabled": true,
+      "class": "Http",
+      "requires-cache": false,
+      "request": {
+        "method": "GET",
+        "ua-key": "useragent",
+        "uri": "http://localhost:8000/web/yzalis/detect.php",
         "params": {},
         "headers": {}
       },

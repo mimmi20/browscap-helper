@@ -10,6 +10,8 @@
 
 declare(strict_types = 1);
 
+use BrowscapHelper\DataMapper\InputMapper;
+use BrowscapHelper\Module\Mapper\Woothee;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
@@ -17,6 +19,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\MemoryUsageProcessor;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Woothee\Classifier;
 
 chdir(dirname(dirname(__DIR__)));
@@ -35,8 +38,6 @@ foreach ($autoloadPaths as $path) {
 }
 
 ini_set('memory_limit', '-1');
-
-header('Content-Type: application/json', true);
 
 $logger = new Logger('ua-comparator');
 
@@ -60,11 +61,18 @@ $start    = microtime(true);
 $parser   = new Classifier();
 $result   = $parser->parse($_GET['useragent']);
 $duration = microtime(true) - $start;
+$memory   = memory_get_usage(true);
+
+$inputMapper = new InputMapper();
+$moduleCache = new ArrayAdapter();
+$mapper      = new Woothee($inputMapper, $moduleCache);
+
+header('Content-Type: application/json', true);
 
 echo htmlentities(json_encode(
     [
-        'result'   => $result,
+        'result'   => $mapper->map($result, $_GET['useragent'])->toArray(),
         'duration' => $duration,
-        'memory'   => memory_get_usage(true),
+        'memory'   => $memory,
     ]
 ));

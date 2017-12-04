@@ -10,6 +10,8 @@
 
 declare(strict_types = 1);
 
+use BrowscapHelper\DataMapper\InputMapper;
+use BrowscapHelper\Module\Mapper\WhichBrowser;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
@@ -17,6 +19,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\MemoryUsageProcessor;
+use Noodlehaus\Config;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use WhichBrowser\Parser;
 
 chdir(dirname(dirname(__DIR__)));
@@ -36,8 +40,6 @@ foreach ($autoloadPaths as $path) {
 
 ini_set('memory_limit', '-1');
 
-header('Content-Type: application/json', true);
-
 $logger = new Logger('ua-comparator');
 
 $stream = new StreamHandler('log/error-which-browser.log', Logger::ERROR);
@@ -56,8 +58,11 @@ $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logg
 
 ErrorHandler::register($logger);
 
-$start       = microtime(true);
-$parser      = new Parser(['User-Agent' => $_GET['useragent']]);
+$start    = microtime(true);
+$parser   = new Parser(['User-Agent' => $_GET['useragent']]);
+$duration = microtime(true) - $start;
+$memory   = memory_get_usage(true);
+
 $resultArray = [
     'browser' => [
         'using'   => (isset($parser->browser->using) ? $parser->browser->using : null),
@@ -96,12 +101,20 @@ $resultArray = [
     ],
     'camouflage' => $parser->camouflage,
 ];
-$duration = microtime(true) - $start;
+
+$config       = new Config(['data/configs/config.json']);
+$moduleConfig = $config['modules']['which-browser'];
+
+$inputMapper = new InputMapper();
+$moduleCache = new ArrayAdapter();
+$mapper      = new WhichBrowser($inputMapper, $moduleCache);
+
+header('Content-Type: application/json', true);
 
 echo htmlentities(json_encode(
     [
-        'result'   => $resultArray,
+        'result'   => $mapper->map(json_decode(json_encode($resultArray), false), $_GET['useragent'])->toArray(),
         'duration' => $duration,
-        'memory'   => memory_get_usage(true),
+        'memory'   => $memory,
     ]
 ));
