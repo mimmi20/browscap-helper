@@ -17,6 +17,8 @@ use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
 use Psr\Cache\CacheItemPoolInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,6 +53,11 @@ class CompareCommand extends Command
     private $config;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Monolog\Logger                   $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      * @param \Noodlehaus\Config                $config
@@ -60,6 +67,8 @@ class CompareCommand extends Command
         $this->logger = $logger;
         $this->cache  = $cache;
         $this->config = $config;
+
+        $this->jsonParser = new JsonParser();
 
         parent::__construct();
     }
@@ -156,14 +165,31 @@ class CompareCommand extends Command
             $collection = [];
 
             foreach ($modules as $module) {
-                if (file_exists($path . '/' . $module . '.json')) {
-                    $collection[$module] = (array) json_decode(file_get_contents($path . '/' . $module . '.json'));
+                if (!file_exists($path . '/' . $module . '.json')) {
+                    $collection[$module] = ['result' => []];
+
+                    continue;
+                }
+
+                $collection[$module] = (array) json_decode(file_get_contents($path . '/' . $module . '.json'));
+
+                try {
+                    $collection[$module] = $this->jsonParser->parse(
+                        file_get_contents($path . '/' . $module . '.json'),
+                        JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
+                    );
 
                     if (null === $agent) {
                         $agent = $collection[$module]['ua'];
                     }
-                } else {
+                } catch (ParsingException $e) {
+                    $this->logger->crit(new \Exception('    parsing file content [' . $path . '/' . $module . '.json] failed', 0, $e));
+
                     $collection[$module] = ['result' => []];
+
+                    if (null === $agent) {
+                        $agent = '';
+                    }
                 }
             }
 

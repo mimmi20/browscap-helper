@@ -26,6 +26,8 @@ use BrowserDetector\Loader\NotFoundException;
 use DeviceDetector\Parser\Device\Mobile;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Finder\Finder;
 use UaResult\Browser\Browser;
 use UaResult\Company\CompanyLoader;
@@ -52,6 +54,11 @@ class PiwikSource implements SourceInterface
     private $cache;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Psr\Log\LoggerInterface          $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      */
@@ -59,6 +66,8 @@ class PiwikSource implements SourceInterface
     {
         $this->logger = $logger;
         $this->cache  = $cache;
+
+        $this->jsonParser = new JsonParser();
     }
 
     /**
@@ -75,7 +84,17 @@ class PiwikSource implements SourceInterface
                 return;
             }
 
-            $row   = json_decode($row, false);
+            try {
+                $row = $this->jsonParser->parse(
+                    $row,
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->critical(new \Exception('    parsing file content failed', 0, $e));
+
+                continue;
+            }
+
             $agent = trim($row->user_agent);
 
             if (empty($agent)) {
@@ -93,7 +112,17 @@ class PiwikSource implements SourceInterface
     public function getTests(): iterable
     {
         foreach ($this->loadFromPath() as $row) {
-            $row   = json_decode($row, false);
+            try {
+                $row = $this->jsonParser->parse(
+                    $row,
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->critical(new \Exception('    parsing file content failed', 0, $e));
+
+                continue;
+            }
+
             $agent = trim($row->user_agent);
 
             if (empty($agent)) {
@@ -111,10 +140,18 @@ class PiwikSource implements SourceInterface
                 $browserName = (new BrowserNameMapper())->mapBrowserName((string) $row->bot->name);
 
                 if (!empty($row->bot->producer->name)) {
+                    $fullName = Mobile::getFullName((string) $row->bot->producer->name);
+
+                    if ('' === $fullName) {
+                        $fullName = (string) $row->bot->producer->name;
+                    }
+
+                    $brandFullBotnameKey = (new MakerMapper())->mapMaker($fullName);
+
                     try {
-                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load((string) $row->bot->producer->name);
+                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load((string) $brandFullBotnameKey);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical('company not found: ' . (string) $row->bot->producer->name);
+                        $this->logger->critical('company not found: ' . (string) $row->bot->producer->name . ' [' . (string) $brandFullBotnameKey . ']');
                         $browserManufacturer = null;
                     }
                 }
@@ -152,15 +189,21 @@ class PiwikSource implements SourceInterface
             );
 
             if (isset($row->device->model)) {
-                $deviceName       = (new DeviceNameMapper())->mapDeviceName((string) $row->device->model);
-                $deviceBrand      = null;
-                $brandFullnameKey = (new MakerMapper())->mapMaker(Mobile::getFullName((string) $row->device->brand));
+                $deviceName  = (new DeviceNameMapper())->mapDeviceName((string) $row->device->model);
+                $deviceBrand = null;
+                $fullName    = Mobile::getFullName((string) $row->device->brand);
+
+                if ('' === $fullName) {
+                    $fullName = (string) $row->device->brand;
+                }
+
+                $brandFullnameKey = (new MakerMapper())->mapMaker($fullName);
 
                 if (isset($row->device->model) && $brandFullnameKey) {
                     try {
                         $deviceBrand = CompanyLoader::getInstance($this->cache)->load($brandFullnameKey);
                     } catch (NotFoundException $e) {
-                        $this->logger->critical('company not found: ' . (string) $row->device->brand);
+                        $this->logger->critical('company not found: ' . (string) $row->device->brand . ' [' . $brandFullnameKey . ']');
                         $deviceBrand = null;
                     }
                 } else {

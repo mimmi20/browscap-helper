@@ -13,6 +13,8 @@ namespace BrowscapHelper\Source;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Finder\Finder;
 use UaResult\Result\ResultFactory;
 
@@ -34,6 +36,11 @@ class DetectorSource implements SourceInterface
     private $cache;
 
     /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonParser;
+
+    /**
      * @param \Psr\Log\LoggerInterface          $logger
      * @param \Psr\Cache\CacheItemPoolInterface $cache
      */
@@ -41,6 +48,8 @@ class DetectorSource implements SourceInterface
     {
         $this->logger = $logger;
         $this->cache  = $cache;
+
+        $this->jsonParser = new JsonParser();
     }
 
     /**
@@ -126,9 +135,19 @@ class DetectorSource implements SourceInterface
             $filepath = $file->getPathname();
 
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
-            $data = json_decode(file_get_contents($filepath));
 
-            if (!is_array($data) && !($data instanceof \stdClass)) {
+            try {
+                $data = $this->jsonParser->parse(
+                    file_get_contents($filepath),
+                    JsonParser::DETECT_KEY_CONFLICTS
+                );
+            } catch (ParsingException $e) {
+                $this->logger->critical(new \Exception('    parsing file content [' . $filepath . '] failed', 0, $e));
+
+                continue;
+            }
+
+            if (!($data instanceof \stdClass)) {
                 continue;
             }
 

@@ -37,8 +37,6 @@ foreach ($autoloadPaths as $path) {
 
 ini_set('memory_limit', '-1');
 
-header('Content-Type: x-application/serialize', true);
-
 $logger = new Logger('ua-comparator');
 
 $stream = new StreamHandler('log/error-browser-detector.log', Logger::ERROR);
@@ -72,11 +70,14 @@ try {
 }
 
 $duration = microtime(true) - $start;
+$memory   = memory_get_usage(true);
 
-echo htmlentities(serialize(
+header('Content-Type: application/json', true);
+
+echo htmlentities(json_encode(
     [
         'result'   => $detectionResult,
         'duration' => $duration,
-        'memory'   => memory_get_usage(true),
+        'memory'   => $memory,
     ]
 ));

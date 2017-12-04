@@ -57,8 +57,8 @@ class BrowscapHelper extends Application
 
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\CopyTestsCommand($logger, $cache),
-            new Command\CreateTestsCommand($logger, $cache, $detector, $sourcesDirectory),
+            new Command\CopyTestsCommand($logger, $cache, $targetDirectory),
+            new Command\CreateTestsCommand($logger, $cache, $detector, $sourcesDirectory, $targetDirectory),
             new Command\RewriteTestsCommand($logger, $cache, $detector),
             new Command\CompareCommand($logger, $cache, $config),
             new Command\ParseCommand($logger, $cache, $config),
