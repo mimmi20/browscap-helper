@@ -7,10 +7,10 @@
     "psr/log": "^1.0",
     "psr/cache": "^1.0",
 
-    "symfony/console": "^3.3",
-    "symfony/cache": "^3.3",
-    "symfony/finder": "^3.3",
-    "symfony/yaml": "^3.3",
+    "symfony/console": "^3.3||^4.0",
+    "symfony/cache": "^3.3||^4.0",
+    "symfony/finder": "^3.3||^4.0",
+    "symfony/yaml": "^3.3||^4.0",
 
     "monolog/monolog": "^1.23",
 
@@ -28,11 +28,11 @@
     "yzalis/ua-parser": "dev-master",
     "mimmi20/wurfl": "dev-master",
 
-    "mimmi20/ua-result": "~5.1.0",
-    "mimmi20/ua-result-company": "~3.0.3",
-    "mimmi20/browser-detector-version": "~4.0.2",
-    "mimmi20/browser-detector": "~3.0.4",
-    "mimmi20/browser-detector-tests": "*",
+    "mimmi20/ua-result": "~5.1.1",
+    "mimmi20/ua-result-company": "~3.0.6",
+    "mimmi20/browser-detector-version": "~4.0.3",
+    "mimmi20/browser-detector": "~3.0.8",
+    "mimmi20/browser-detector-tests": "~2.0.4",
 
     "mimmi20/file-loader": "~3.0.3",
 
@@ -43,8 +43,8 @@
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.1",
-    "friendsofphp/php-cs-fixer": "2.7.1",
-    "phpstan/phpstan-shim": "^0.8.5"
+    "friendsofphp/php-cs-fixer": "^2.7.1",
+    "phpstan/phpstan-shim": "^0.9"
   },
   "license": "MIT",
   "authors": [

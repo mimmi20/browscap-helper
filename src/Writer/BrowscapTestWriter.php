@@ -46,7 +46,7 @@ class BrowscapTestWriter
      * @param \UaResult\Result\ResultInterface $result
      * @param int                              $number
      * @param string                           $useragent
-     * @param int                              &$totalCounter
+     * @param int                              $totalCounter
      *
      * @return bool
      */

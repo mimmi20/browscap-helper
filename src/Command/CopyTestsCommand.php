@@ -14,7 +14,6 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
-use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\TxtFileSource;
@@ -22,7 +21,6 @@ use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
-use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -63,9 +61,9 @@ class CopyTestsCommand extends Command
      */
     public function __construct(Logger $logger, CacheItemPoolInterface $cache, string $targetDirectory)
     {
-        $this->logger           = $logger;
-        $this->cache            = $cache;
-        $this->targetDirectory  = $targetDirectory;
+        $this->logger          = $logger;
+        $this->cache           = $cache;
+        $this->targetDirectory = $targetDirectory;
 
         parent::__construct();
     }
@@ -102,25 +100,10 @@ class CopyTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $targetDirectoryHelper = new TargetDirectory();
-        $testSource            = 'tests/';
+        $testSource = 'tests/';
 
-        $output->writeln('detect next test number for Browscap helper ...');
-
-        try {
-            $number = $targetDirectoryHelper->getNextTest($testSource);
-        } catch (\UnexpectedValueException $e) {
-            $this->logger->critical($e);
-            $output->writeln($e->getMessage());
-
-            return 1;
-        }
-
-        $output->writeln('next test for Browscap helper: ' . $number);
-        $output->writeln('read existing tests for Browscap helper ...');
-
-        $browscapChecks = [];
-        $txtChecks      = [];
+        $output->writeln('reading already existing tests ...');
+        $txtChecks = [];
 
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -134,24 +117,14 @@ class CopyTestsCommand extends Command
             $txtChecks[$useragent] = 1;
         }
 
-        $output->writeln('read existing tests for Browscap ...');
+        $targetDirectoryHelper = new TargetDirectory();
 
-        foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
+        $output->writeln('detect next test numbers ...');
 
-            if (array_key_exists($useragent, $browscapChecks)) {
-                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+        $txtNumber = $targetDirectoryHelper->getNextTest($testSource);
 
-                continue;
-            }
-
-            $browscapChecks[$useragent] = 1;
-        }
-
+        $output->writeln('next test for Browscap helper: ' . $txtNumber);
         $output->writeln('init sources ...');
-
-        $browscapTotalCounter = 0;
-        $txtTotalCounter      = 0;
 
         $source = new CollectionSource(
             [
@@ -160,7 +133,6 @@ class CopyTestsCommand extends Command
                 new UapCoreSource($this->logger),
                 new WhichBrowserSource($this->logger, $this->cache),
                 new WootheeSource($this->logger, $this->cache),
-                //new DetectorSource($this->logger, $this->cache),
                 new MobileDetectSource($this->logger, $this->cache),
                 new YzalisSource($this->logger, $this->cache),
             ]
@@ -168,34 +140,26 @@ class CopyTestsCommand extends Command
 
         $output->writeln('copy tests ...');
 
-        $detectorTestWriter = new DetectorTestWriter($this->logger);
+        $browscapTotalCounter = 0;
+        $txtTotalCounter      = 0;
+
         $txtWriter          = new TxtTestWriter($this->logger);
 
         foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            //if (!array_key_exists($useragent, $browscapChecks) && false !== stripos($useragent, 'bingweb')) {
-            //    $browscapTestWriter->write($result, $number, $useragent, $browscapTotalCounter);
-            //}
-
-            $browscapChecks[$useragent] = 1;
-
-            if (isset($txtChecks[$useragent])) {
-                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
-
-                continue;
+            if (!array_key_exists($useragent, $txtChecks)
+                && $txtWriter->write($useragent, $testSource, $txtNumber, $txtTotalCounter)
+            ) {
+                ++$txtNumber;
             }
 
             $txtChecks[$useragent] = 1;
-
-            if ($txtWriter->write($useragent, $testSource, $number, $txtTotalCounter)) {
-                ++$number;
-            }
         }
 
         $output->writeln('');
-        $output->writeln('tests copied for Browscap helper: ' . $txtTotalCounter);
-        $output->writeln('tests copied for Browscap:        ' . $browscapTotalCounter);
+        $output->writeln('tests copied for Browscap helper:  ' . $txtTotalCounter);
+        $output->writeln('tests copied for Browscap:         ' . $browscapTotalCounter);
 
         return 0;
     }

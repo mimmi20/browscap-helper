@@ -45,7 +45,7 @@ class DetectorTestWriter
      * @param string                           $dir
      * @param int                              $number
      * @param string                           $useragent
-     * @param int                              &$totalCounter
+     * @param int                              $totalCounter
      *
      * @return bool
      */
@@ -59,12 +59,19 @@ class DetectorTestWriter
             'result' => $result->toArray(),
         ];
 
+        $content = json_encode(
+            $this->outputDetector,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
+        );
+
+        if (false === $content) {
+            $this->logger->critical('could not encode content');
+            return false;
+        }
+
         file_put_contents(
             $dir . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $this->fileCounter) . '.json',
-            json_encode(
-                $this->outputDetector,
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
-            ) . PHP_EOL
+            $content . PHP_EOL
         );
         ++$this->counter;
         ++$this->chunkCounter;

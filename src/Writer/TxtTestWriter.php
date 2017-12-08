@@ -41,7 +41,7 @@ class TxtTestWriter
      * @param string $useragent
      * @param string $dir
      * @param int    $number
-     * @param int    &$totalCounter
+     * @param int    $totalCounter
      *
      * @return bool
      */

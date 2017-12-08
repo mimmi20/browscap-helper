@@ -25,7 +25,7 @@ class BrowserNameMapper
     /**
      * mapps the browser
      *
-     * @param string|null $browserInput
+     * @param string $browserInput
      *
      * @throws \UnexpectedValueException
      *

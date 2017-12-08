@@ -71,7 +71,7 @@ $os       = $deviceDetector->getOs();
 $osFamily = OperatingSystem::getOsFamily($deviceDetector->getOs('short_name'));
 
 $client        = $deviceDetector->getClient();
-$browserFamily = Browser::getBrowserFamily($deviceDetector->getClient('short_name'));
+$browserFamily = Browser::getBrowserFamily((string) $deviceDetector->getClient('short_name'));
 
 $processed = [
     'user_agent' => $deviceDetector->getUserAgent(),

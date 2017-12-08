@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use Assert\Assertion;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
@@ -19,6 +20,7 @@ use BrowserDetector\Factory\NormalizerFactory;
 use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\NotFoundException;
+use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -62,6 +64,11 @@ class RewriteTestsCommand extends Command
      * @var \Seld\JsonLint\JsonParser
      */
     private $jsonParser;
+
+    /**
+     * @var array
+     */
+    private $tests = [];
 
     /**
      * @param \Monolog\Logger                   $logger
@@ -136,8 +143,7 @@ class RewriteTestsCommand extends Command
             $this->logger->info('  checking directory: ' . $filename);
 
             if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
-                $files[] = $filename;
-                $this->logger->warn('file ' . $filename . ' is out of strcture');
+                $this->logger->critical('file ' . $filename . ' is out of strcture');
 
                 continue;
             }
@@ -411,12 +417,24 @@ class T' . $group . 'Test extends TestCase
             $this->logger->info('    processing Test ' . $key . ' ...');
 
             $checks[$test['ua']] = $key;
-            $newKey              = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
+            $result              = $this->handleTest($test['ua'], $test['result']);
+
+            if (null === $result) {
+                // similar UA already tested
+                $this->logger->error('    UA "' . $test['ua'] . '" removed because a similar one is already tested');
+                unset($tests->$key);
+
+                continue;
+            }
+
+            Assertion::isInstanceOf($result, ResultInterface::class);
+
+            $newKey = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
 
             $outputDetector += [
                 $newKey => [
                     'ua'     => $test['ua'],
-                    'result' => $this->handleTest($test['ua'], $test['result'])->toArray(),
+                    'result' => $result->toArray(),
                 ],
             ];
             ++$groupCounter;
@@ -454,28 +472,58 @@ class T' . $group . 'Test extends TestCase
      * @param string $useragent
      * @param array  $oldResultArray
      *
-     * @return \UaResult\Result\ResultInterface
+     * @return \UaResult\Result\ResultInterface|null
      */
-    private function handleTest(string $useragent, array $oldResultArray): ResultInterface
+    private function handleTest(string $useragent, array $oldResultArray): ?ResultInterface
     {
-        $this->logger->info('        rewriting');
+        $this->logger->info('        detect for new result');
+
+        $newResult = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
+
+        if (!$newResult->getDevice()->getType()->isMobile()
+            && !$newResult->getDevice()->getType()->isTablet()
+            && !$newResult->getDevice()->getType()->isTv()
+        ) {
+            $keys = [
+                (string) $newResult->getBrowser()->getName(),
+                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                (string) $newResult->getEngine()->getName(),
+                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                (string) $newResult->getOs()->getName(),
+                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                (string) $newResult->getDevice()->getDeviceName(),
+                (string) $newResult->getDevice()->getMarketingName(),
+                (string) $newResult->getDevice()->getManufacturer()->getName(),
+            ];
+
+            $key = implode('-', $keys);
+
+            if (array_key_exists($key, $this->tests)) {
+                return null;
+            }
+
+            $this->tests[$key] = 1;
+        }
+
+        $this->logger->info('        get old result');
 
         $oldResult = (new ResultFactory())->fromArray($this->cache, $this->logger, $oldResultArray);
-        //$result    = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
+
+        $this->logger->info('        rewriting');
 
         /* rewrite browsers */
 
         $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
-        //$browser = clone $result->getBrowser();
+        //$browser = clone $newResult->getBrowser();
         $browser = clone $oldResult->getBrowser();
 
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
-        //$platform = clone $result->getOs();
+        //$platform = clone $newResult->getOs();
         $platform = clone $oldResult->getOs();
 
         /* @var $platform \UaResult\Os\OsInterface|null */
@@ -487,7 +535,7 @@ class T' . $group . 'Test extends TestCase
         /* rewrite devices */
 
         /** @var \UaResult\Device\DeviceInterface|null $device */
-        //$device   = clone $result->getDevice();
+        //$device   = clone $newResult->getDevice();
         $device   = clone $oldResult->getDevice();
         $replaced = true;
 
@@ -552,7 +600,7 @@ class T' . $group . 'Test extends TestCase
         $this->logger->info('        rewriting engine');
 
         /** @var \UaResult\Engine\EngineInterface $engine */
-        //$engine = clone $result->getEngine();
+        //$engine = clone $newResult->getEngine();
         $engine = clone $oldResult->getEngine();
 
         $this->logger->info('        generating result');
