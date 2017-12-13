@@ -15,6 +15,9 @@ use Assert\Assertion;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
+use BrowscapHelper\Helper\TargetDirectory;
+use BrowscapHelper\Source\TxtFileSource;
+use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
 use BrowserDetector\Helper\GenericRequestFactory;
@@ -30,8 +33,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
+use UaResult\Engine\Engine;
+use UaResult\Os\Os;
 use UaResult\Result\Result;
 use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
@@ -119,99 +125,75 @@ class RewriteTestsCommand extends Command
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $basePath = 'vendor/mimmi20/browser-detector-tests/';
-
-        $sourceDirectory = $basePath . 'tests/issues/';
-
-        if (!file_exists($sourceDirectory)) {
-            $this->logger->crit('source directory not found');
-
-            return 1;
-        }
-
-        $filesArray  = scandir($sourceDirectory, SCANDIR_SORT_ASCENDING);
-        $files       = [];
-        $testCounter = [];
-        $groups      = [];
-
-        $output->writeln('count and check directories ...');
-
-        foreach ($filesArray as $filename) {
-            if (in_array($filename, ['.', '..'])) {
-                continue;
-            }
-
-            $this->logger->info('  checking directory: ' . $filename);
-
-            if (!is_dir($sourceDirectory . DIRECTORY_SEPARATOR . $filename)) {
-                $this->logger->critical('file ' . $filename . ' is out of strcture');
-
-                continue;
-            }
-
-            $subdirFilesArray = scandir($sourceDirectory . DIRECTORY_SEPARATOR . $filename, SCANDIR_SORT_ASCENDING);
-
-            foreach ($subdirFilesArray as $subdirFilename) {
-                if (in_array($subdirFilename, ['.', '..'])) {
-                    continue;
-                }
-
-                $fullFilename = $filename . DIRECTORY_SEPARATOR . $subdirFilename;
-                $files[]      = $fullFilename;
-                $group        = $filename;
-
-                $groups[$fullFilename]              = $group;
-                $testCounter[$group][$fullFilename] = 0;
-            }
-        }
-
-        $checks       = [];
-        $g            = null;
-        $groupCounter = 0;
-
-        $output->writeln('handling files ...');
-
-        foreach ($files as $fullFilename) {
-            $output->writeln('  handling file: ' . $fullFilename);
-
-            $file  = new \SplFileInfo($sourceDirectory . DIRECTORY_SEPARATOR . $fullFilename);
-            $group = $groups[$fullFilename];
-
-            if ($g !== $group) {
-                $groupCounter = 0;
-                $g            = $group;
-            }
-
-            $newCounter = $this->handleFile($file, $checks, $groupCounter, (int) $group);
-
-            if (!$newCounter) {
-                continue;
-            }
-
-            $testCounter[$group][$fullFilename] += $newCounter;
-        }
+        $detectorTargetDirectory = $basePath . 'tests/issues/';
+        $testSource              = 'tests/';
 
         $output->writeln('remove old test files ...');
 
-        $testFilesArray  = scandir($basePath . 'tests/UserAgentsTest/', SCANDIR_SORT_ASCENDING);
+        $finder   = new Finder();
+        $finder->files();
+        $finder->ignoreDotFiles(true);
+        $finder->ignoreVCS(true);
+        $finder->sortByName();
+        $finder->ignoreUnreadableDirs();
+        $finder->in($detectorTargetDirectory);
 
-        foreach ($testFilesArray as $filename) {
-            if (in_array($filename, ['.', '..']) || !file_exists($basePath . 'tests/UserAgentsTest/' . $filename)) {
+        foreach ($finder as $file) {
+            unlink($file->getPathname());
+        }
+
+        $finder   = new Finder();
+        $finder->files();
+        $finder->ignoreDotFiles(true);
+        $finder->ignoreVCS(true);
+        $finder->sortByName();
+        $finder->ignoreUnreadableDirs();
+        $finder->in($basePath . 'tests/UserAgentsTest/');
+
+        foreach ($finder as $file) {
+            unlink($file->getPathname());
+        }
+
+        $detectorTestWriter = new DetectorTestWriter($this->logger);
+        $detectorNumber = 0;
+        $testCounter = [$detectorNumber => 0];
+        $detectorTotalCounter = 0;
+        $detectorCounter = 0;
+
+        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
+
+        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
+            $useragent = trim($useragent);
+            $result    = $this->handleTest($useragent);
+
+            if (null === $result) {
+                $this->logger->error('UA "' . $useragent . '" was skipped because a similar UA was already added');
                 continue;
             }
 
-            unlink($basePath . 'tests/UserAgentsTest/' . $filename);
+            if ($detectorTestWriter->write($result, $targetDirectory, $detectorNumber, $useragent, $detectorCounter)) {
+                $testCounter[$detectorNumber] = $detectorCounter;
+                $detectorNumber++;
+                $testCounter[$detectorNumber] = 0;
+                $detectorTotalCounter += $detectorCounter;
+                $detectorCounter = 0;
+
+                $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
+
+                $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
+
+                if (!file_exists($targetDirectory)) {
+                    mkdir($targetDirectory);
+                }
+            }
         }
 
         $output->writeln('count and order tests ...');
 
         $circleTests = [];
 
-        foreach ($testCounter as $group => $filesinGroup) {
-            $count = 0;
-
-            foreach (array_keys($filesinGroup) as $fileinGroup) {
-                $count += $testCounter[$group][$fileinGroup];
-            }
+        foreach ($testCounter as $detectorNumber => $count) {
+            $group = sprintf('%1$07d', $detectorNumber);
 
             $circleTests[$group] = $count;
         }
@@ -347,134 +329,11 @@ class T' . $group . 'Test extends TestCase
     }
 
     /**
-     * @param \SplFileInfo $file
-     * @param array        $checks
-     * @param int          $groupCounter
-     * @param int          $group
-     *
-     * @return int
-     */
-    private function handleFile(
-        \SplFileInfo $file,
-        array &$checks,
-        int &$groupCounter,
-        int $group
-    ): int {
-        $this->logger->info('    checking ...');
-
-        /** @var $file \SplFileInfo */
-        if (!$file->isFile() || 'json' !== $file->getExtension()) {
-            return 0;
-        }
-
-        $this->logger->info('    reading ...');
-
-        try {
-            $tests = $this->jsonParser->parse(
-                file_get_contents($file->getPathname()),
-                JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
-            );
-        } catch (ParsingException $e) {
-            $this->logger->crit(new \Exception('    parsing file content [' . $file->getPathname() . '] failed', 0, $e));
-
-            return 0;
-        }
-
-        if (null === $tests) {
-            $this->logger->info('    file does not contain any test');
-            unlink($file->getPathname());
-
-            return 0;
-        }
-
-        $oldCounter = count($tests);
-
-        if (1 > $oldCounter) {
-            $this->logger->info('    file does not contain any test');
-            unlink($file->getPathname());
-
-            return 0;
-        }
-
-        if (1 === $oldCounter) {
-            $this->logger->info('    contains 1 test');
-        } else {
-            $this->logger->info('    contains ' . $oldCounter . ' tests');
-        }
-
-        $this->logger->info('    processing ...');
-        $outputDetector = [];
-
-        foreach ($tests as $key => $test) {
-            if (isset($checks[$test['ua']])) {
-                // UA was added more than once
-                $this->logger->error('    UA "' . $test['ua'] . '" added more than once, now for key "' . $key . '", before for key "' . $checks[$test['ua']] . '"');
-                unset($tests->$key);
-
-                continue;
-            }
-
-            $this->logger->info('    processing Test ' . $key . ' ...');
-
-            $checks[$test['ua']] = $key;
-            $result              = $this->handleTest($test['ua'], $test['result']);
-
-            if (null === $result) {
-                // similar UA already tested
-                $this->logger->error('    UA "' . $test['ua'] . '" removed because a similar one is already tested');
-                unset($tests->$key);
-
-                continue;
-            }
-
-            Assertion::isInstanceOf($result, ResultInterface::class);
-
-            $newKey = 'test-' . sprintf('%1$07d', $group) . '-' . sprintf('%1$03d', $groupCounter);
-
-            $outputDetector += [
-                $newKey => [
-                    'ua'     => $test['ua'],
-                    'result' => $result->toArray(),
-                ],
-            ];
-            ++$groupCounter;
-        }
-
-        $newCounter = count($outputDetector);
-
-        $this->logger->info('    contains now ' . $newCounter . ' tests');
-
-        if (1 > $newCounter) {
-            $this->logger->info('    all tests are removed from the file');
-            unlink($file->getPathname());
-
-            return 0;
-        }
-
-        if ($newCounter < $oldCounter) {
-            $this->logger->info('    ' . ($oldCounter - $newCounter) . ' test(s) is/are removed from the file');
-        }
-
-        $this->logger->info('    removing old file');
-        unlink($file->getPathname());
-
-        $this->logger->info('    rewriting file');
-
-        file_put_contents(
-            $file->getPathname(),
-            json_encode($outputDetector, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT) . PHP_EOL
-        );
-
-        return $newCounter;
-    }
-
-    /**
      * @param string $useragent
-     * @param array  $oldResultArray
      *
      * @return \UaResult\Result\ResultInterface|null
      */
-    private function handleTest(string $useragent, array $oldResultArray): ?ResultInterface
+    private function handleTest(string $useragent): ?ResultInterface
     {
         $this->logger->info('        detect for new result');
 
@@ -505,10 +364,6 @@ class T' . $group . 'Test extends TestCase
             $this->tests[$key] = 1;
         }
 
-        $this->logger->info('        get old result');
-
-        $oldResult = (new ResultFactory())->fromArray($this->cache, $this->logger, $oldResultArray);
-
         $this->logger->info('        rewriting');
 
         /* rewrite browsers */
@@ -516,15 +371,13 @@ class T' . $group . 'Test extends TestCase
         $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
-        //$browser = clone $newResult->getBrowser();
-        $browser = clone $oldResult->getBrowser();
+        $browser = clone $newResult->getBrowser();
 
         /* rewrite platforms */
 
         $this->logger->info('        rewriting platform');
 
-        //$platform = clone $newResult->getOs();
-        $platform = clone $oldResult->getOs();
+        $platform = clone $newResult->getOs();
 
         /* @var $platform \UaResult\Os\OsInterface|null */
 
@@ -535,12 +388,11 @@ class T' . $group . 'Test extends TestCase
         /* rewrite devices */
 
         /** @var \UaResult\Device\DeviceInterface|null $device */
-        //$device   = clone $newResult->getDevice();
-        $device   = clone $oldResult->getDevice();
+        $device   = clone $newResult->getDevice();
         $replaced = true;
 
         if (in_array($device->getDeviceName(), [null, 'unknown'])) {
-            $device   = clone $oldResult->getDevice();
+            $device   = new Device(null, null);
             $replaced = true;
         }
 
@@ -569,11 +421,11 @@ class T' . $group . 'Test extends TestCase
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error($e);
 
-                $device = clone $oldResult->getDevice();
+                $device   = new Device(null, null);
             } catch (NotFoundException $e) {
                 $this->logger->debug($e);
 
-                $device = clone $oldResult->getDevice();
+                $device   = new Device(null, null);
             } catch (GeneralDeviceException $e) {
                 $deviceLoader = new DeviceLoader($this->cache, $this->logger);
 
@@ -582,16 +434,16 @@ class T' . $group . 'Test extends TestCase
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 
-                    $device = clone $oldResult->getDevice();
+                    $device   = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
                 $this->logger->debug($e);
 
-                $device = clone $oldResult->getDevice();
+                $device   = new Device(null, null);
             } catch (\Exception $e) {
                 $this->logger->error($e);
 
-                $device = clone $oldResult->getDevice();
+                $device   = new Device(null, null);
             }
         }
 
@@ -600,8 +452,7 @@ class T' . $group . 'Test extends TestCase
         $this->logger->info('        rewriting engine');
 
         /** @var \UaResult\Engine\EngineInterface $engine */
-        //$engine = clone $newResult->getEngine();
-        $engine = clone $oldResult->getEngine();
+        $engine = clone $newResult->getEngine();
 
         $this->logger->info('        generating result');
 

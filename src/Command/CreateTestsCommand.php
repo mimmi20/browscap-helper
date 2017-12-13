@@ -13,10 +13,8 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\DetectorSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Writer\BrowscapTestWriter;
-use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
 use BrowserDetector\Helper\GenericRequestFactory;
 use Monolog\Handler\PsrHandler;
@@ -128,20 +126,7 @@ class CreateTestsCommand extends Command
         $testSource              = 'tests/';
 
         $output->writeln('reading already existing tests ...');
-        $detectorChecks = [];
         $browscapChecks = [];
-
-        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
-            if (array_key_exists($useragent, $detectorChecks)) {
-                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
-
-                continue;
-            }
-
-            $detectorChecks[$useragent] = 1;
-        }
 
         foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -182,7 +167,6 @@ class CreateTestsCommand extends Command
         $platform = new Os(null, null);
         $engine   = new Engine(null);
 
-        $detectorTestWriter = new DetectorTestWriter($this->logger);
         $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
@@ -196,21 +180,6 @@ class CreateTestsCommand extends Command
             }
 
             $browscapChecks[$useragent] = 1;
-
-            if (!array_key_exists($useragent, $detectorChecks)
-                && $detectorTestWriter->write($result, $targetDirectory, $detectorNumber, $useragent, $detectorTotalCounter)
-            ) {
-                $detectorNumber        = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
-                $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
-
-                $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
-
-                if (!file_exists($targetDirectory)) {
-                    mkdir($targetDirectory);
-                }
-            }
-
-            $detectorChecks[$useragent] = 1;
         }
 
         $output->writeln('');

@@ -159,7 +159,6 @@ class CopyTestsCommand extends Command
 
         $output->writeln('');
         $output->writeln('tests copied for Browscap helper:  ' . $txtTotalCounter);
-        $output->writeln('tests copied for Browscap:         ' . $browscapTotalCounter);
 
         return 0;
     }
