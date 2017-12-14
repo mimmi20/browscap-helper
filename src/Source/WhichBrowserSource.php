@@ -264,7 +264,7 @@ class WhichBrowserSource implements SourceInterface
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
             $data = Yaml::parse(file_get_contents($filepath));
 
-            if (!is_array($data) && !($data instanceof \stdClass)) {
+            if (!is_array($data)) {
                 continue;
             }
 

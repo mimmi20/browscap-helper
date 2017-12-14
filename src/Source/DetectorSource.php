@@ -96,7 +96,7 @@ class DetectorSource implements SourceInterface
     }
 
     /**
-     * @return iterable|\StdClass[]
+     * @return iterable|\stdClass[]
      */
     private function loadFromPath(): iterable
     {
@@ -136,10 +136,19 @@ class DetectorSource implements SourceInterface
 
             $this->logger->info('    reading file ' . str_pad($filepath, 100, ' ', STR_PAD_RIGHT));
 
+            $content = file_get_contents($filepath);
+
+            if ('' === $content || PHP_EOL === $content) {
+                $this->logger->critical('    file [' . $filepath . '] is empty');
+                unlink($filepath);
+
+                continue;
+            }
+
             try {
                 $data = $this->jsonParser->parse(
-                    file_get_contents($filepath),
-                    JsonParser::DETECT_KEY_CONFLICTS
+                    $content,
+                    JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
                 );
             } catch (ParsingException $e) {
                 $this->logger->critical(new \Exception('    parsing file content [' . $filepath . '] failed', 0, $e));
@@ -147,22 +156,22 @@ class DetectorSource implements SourceInterface
                 continue;
             }
 
-            if (!($data instanceof \stdClass)) {
+            if (!is_array($data)) {
                 continue;
             }
 
             foreach ($data as $test) {
-                if (!isset($test->ua)) {
+                if (!isset($test['ua'])) {
                     continue;
                 }
 
-                $agent = trim($test->ua);
+                $agent = trim($test['ua']);
 
                 if (array_key_exists($agent, $allTests)) {
                     continue;
                 }
 
-                yield $test;
+                yield (object) $test;
                 $allTests[$agent] = 1;
             }
         }

@@ -39,6 +39,6 @@ class FrameSupportMapper
             return 'none';
         }
 
-        return (string) $support;
+        return $support;
     }
 }

@@ -46,6 +46,8 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * @param \BrowscapHelper\Module\ModuleInterface $module
+     *
+     * @return void
      */
     public function addModule(ModuleInterface $module): void
     {
@@ -141,9 +143,7 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
      *
      * @link http://php.net/manual/en/arrayaccess.offsetexists.php
      *
-     * @param mixed $offset <p>
-     *                      An offset to check for.
-     *                      </p>
+     * @param int $offset
      *
      * @return bool true on success or false on failure
      */
@@ -158,13 +158,11 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
      *
      * @link http://php.net/manual/en/arrayaccess.offsetget.php
      *
-     * @param mixed $offset <p>
-     *                      The offset to retrieve.
-     *                      </p>
+     * @param int $offset
      *
-     * @return mixed can return all value types
+     * @return \BrowscapHelper\Module\ModuleInterface|null
      */
-    public function offsetGet($offset): ModuleInterface
+    public function offsetGet($offset): ?ModuleInterface
     {
         return isset($this->modules[$offset]) ? $this->modules[$offset] : null;
     }
@@ -175,12 +173,8 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
      *
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      *
-     * @param mixed $offset <p>
-     *                      The offset to assign the value to.
-     *                      </p>
-     * @param mixed $value  <p>
-     *                      The value to set.
-     *                      </p>
+     * @param int|null                               $offset
+     * @param \BrowscapHelper\Module\ModuleInterface $value
      */
     public function offsetSet($offset, $value): void
     {
@@ -197,9 +191,7 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
      *
      * @link http://php.net/manual/en/arrayaccess.offsetunset.php
      *
-     * @param mixed $offset <p>
-     *                      The offset to unset.
-     *                      </p>
+     * @param int $offset
      */
     public function offsetUnset($offset): void
     {

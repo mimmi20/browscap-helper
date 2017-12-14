@@ -13,11 +13,10 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\DetectorSource;
-use BrowscapHelper\Source\DirectorySource;
+use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Writer\BrowscapTestWriter;
-use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
+use BrowserDetector\Helper\GenericRequestFactory;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -26,6 +25,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaResult\Browser\Browser;
+use UaResult\Device\Device;
+use UaResult\Engine\Engine;
+use UaResult\Os\Os;
+use UaResult\Result\Result;
 
 /**
  * Class CreateTestsCommand
@@ -119,22 +123,10 @@ class CreateTestsCommand extends Command
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $detectorTargetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
+        $testSource              = 'tests/';
 
         $output->writeln('reading already existing tests ...');
-        $detectorChecks = [];
         $browscapChecks = [];
-
-        foreach ((new DetectorSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
-            if (array_key_exists($useragent, $detectorChecks)) {
-                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
-
-                continue;
-            }
-
-            $detectorChecks[$useragent] = 1;
-        }
 
         foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -150,64 +142,44 @@ class CreateTestsCommand extends Command
 
         $targetDirectoryHelper = new TargetDirectory();
 
-        $output->writeln('detect next test number ...');
+        $output->writeln('detect next test numbers ...');
 
-        try {
-            $number = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
-        } catch (\UnexpectedValueException $e) {
-            $this->logger->critical($e);
-            $output->writeln($e->getMessage());
+        $txtNumber      = $targetDirectoryHelper->getNextTest($testSource);
+        $detectorNumber = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
 
-            return 1;
-        }
+        $output->writeln('next test for Browscap helper: ' . $txtNumber);
+        $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
 
-        $output->writeln('next test: ' . $number);
-        $output->writeln('detect directory to write new tests ...');
-
-        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $number) . '/';
-
-        $output->writeln('target directory: ' . $targetDirectory);
+        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
         if (!file_exists($targetDirectory)) {
             mkdir($targetDirectory);
         }
 
-        $output->writeln('reading new files ...');
+        $output->writeln('reading files from Browscap helper ...');
 
-        $sourcesDirectory     = $input->getOption('resources');
         $detectorTotalCounter = 0;
         $browscapTotalCounter = 0;
-        $detectorTestWriter   = new DetectorTestWriter($this->logger);
-        $browscapTestWriter   = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
-        foreach ((new DirectorySource($this->logger, $sourcesDirectory))->getTests() as $useragent => $result) {
+        $genericRequest = new GenericRequestFactory();
+        $browser        = new Browser(null);
+        $device         = new Device(null, null);
+        $platform       = new Os(null, null);
+        $engine         = new Engine(null);
+
+        $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
+
+        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            if (!array_key_exists($useragent, $browscapChecks)) {
-                $browscapTestWriter->write($result, $number, $useragent, $browscapTotalCounter);
+            $request  = $genericRequest->createRequestFromString($useragent);
+            $result   = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+
+            if (!array_key_exists($useragent, $browscapChecks) && false !== mb_stripos($useragent, 'bingweb')) {
+                $browscapTestWriter->write($result, $txtNumber, $useragent, $browscapTotalCounter);
             }
 
-            $browscapChecks[$useragent] = $number;
-
-            if (array_key_exists($useragent, $detectorChecks)) {
-                $this->logger->info('    UA "' . $useragent . '" added more than once --> skipped');
-
-                continue;
-            }
-
-            $detectorChecks[$useragent] = $number;
-
-            if ($detectorTestWriter->write($result, $targetDirectory, $number, $useragent, $detectorTotalCounter)) {
-                $number          = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
-                $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $number) . '/';
-
-                $output->writeln('next test: ' . $number);
-                $output->writeln('target directory: ' . $targetDirectory);
-
-                if (!file_exists($targetDirectory)) {
-                    mkdir($targetDirectory);
-                }
-            }
+            $browscapChecks[$useragent] = 1;
         }
 
         $output->writeln('');

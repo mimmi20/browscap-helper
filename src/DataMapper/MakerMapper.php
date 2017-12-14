@@ -42,12 +42,14 @@ class MakerMapper
                 break;
             case 'microsoft':
             case 'microsoft corporation.':
+            case 'microsoft corporation':
                 $maker = 'Microsoft';
 
                 break;
             case 'apple':
             case 'apple inc.':
             case 'apple computer, inc.':
+            case 'apple inc':
                 $maker = 'Apple';
 
                 break;
@@ -114,7 +116,7 @@ class MakerMapper
 
                 break;
             case 'mojeek ltd.':
-                $maker = 'OnlineMediaGroup';
+                $maker = 'Mojeek';
 
                 break;
             case 'online media group, inc.':
@@ -303,6 +305,434 @@ class MakerMapper
                 break;
             case 'daum communications corp.':
                 $maker = 'DaumCorporation';
+
+                break;
+            case 'aboundex.com':
+                $maker = 'Aboundex';
+
+                break;
+            case 'acoon gmbh':
+                $maker = 'Acoon';
+
+                break;
+            case 'clearspring technologies, inc.':
+                $maker = 'Clearspring';
+
+                break;
+            case 'alexa internet':
+                $maker = 'AlexaInternet';
+
+                break;
+            case 'amorank':
+                $maker = 'Amorank';
+
+                break;
+            case 'analytics seo':
+                $maker = 'AnalyticsSEO';
+
+                break;
+            case 'webmeup':
+                $maker = 'WebmeupCrawlerCom';
+
+                break;
+            case 'the laboratory for web algorithmics (law)':
+                $maker = 'LAW';
+
+                break;
+            case 'mediagreen medienservice':
+                $maker = 'Mediagreen';
+
+                break;
+            case '2.0promotion gbr':
+                $maker = '2.0Promotion';
+
+                break;
+            case 'baidu':
+                $maker = 'Baidu';
+
+                break;
+            case 'bitly, inc.':
+                $maker = 'Bitly';
+
+                break;
+            case 'blekko':
+                $maker = 'BlekkoCom';
+
+                break;
+            case 'blogtrottr ltd':
+                $maker = 'Blogtrottr';
+
+                break;
+            case 'bountii inc.':
+                $maker = 'Bountii';
+
+                break;
+            case 'browsershots.org':
+                $maker = 'Browsershots';
+
+                break;
+            case 'topsy labs':
+                $maker = 'TopsyLabs';
+
+                break;
+            case 'career-x gmbh':
+                $maker = 'Careerx';
+
+                break;
+            case 'supertop':
+                $maker = 'Supertop';
+
+                break;
+            case '10betterpages gmbh':
+                $maker = 'Tenbetterpages';
+
+                break;
+            case 'cloudflare':
+                $maker = 'CloudFlare';
+
+                break;
+            case 'cốc cốc':
+                $maker = 'CocCocCompany';
+
+                break;
+            case 'datadog':
+                $maker = 'Datadog';
+
+                break;
+            case 'dataprovider b.v.':
+                $maker = 'Dataprovider';
+
+                break;
+            case 'dazoo.fr':
+                $maker = 'DAZOO.FR';
+
+                break;
+            case 'discovery engine':
+                $maker = 'DiscoveryEngine';
+
+                break;
+            case 'domain re-animator, llc':
+                $maker = 'Domain Re-Animator';
+
+                break;
+            case 'duckduckgo':
+                $maker = 'DuckDuckGo';
+
+                break;
+            case 'easou icp':
+                $maker = 'Easou';
+
+                break;
+            case 'dassault systèmes':
+                $maker = 'DassaultSystemes';
+
+                break;
+            case 'jayde online, inc.':
+                $maker = 'JaydeOnline';
+
+                break;
+            case 'facebook':
+                $maker = 'Facebook';
+
+                break;
+            case 'david smith & developing perspective, llc':
+                $maker = 'DavidSmith';
+
+                break;
+            case 'flipboard':
+                $maker = 'Flipboard';
+
+                break;
+            case 'genieo':
+                $maker = 'Genieo';
+
+                break;
+            case 'matt wells':
+                $maker = 'MattWells';
+
+                break;
+            case 'ntt resonant':
+                $maker = 'NttResonant';
+
+                break;
+            case 'grapeshot':
+                $maker = 'GrapeshotLimited';
+
+                break;
+            case 'towards gmbh':
+                $maker = 'towards';
+
+                break;
+            case 'heureka.cz, a.s.':
+                $maker = 'Heureka';
+
+                break;
+            case 'hubpages':
+                $maker = 'HubPages Inc.';
+
+                break;
+            case 'let\'s encrypt':
+                $maker = 'LetsEncrypt';
+
+                break;
+            case 'linkedin':
+                $maker = 'LinkedIn';
+
+                break;
+            case 'brandwatch':
+                $maker = 'Brandwatch';
+
+                break;
+            case 'mail.ru group':
+                $maker = 'MailRu';
+
+                break;
+            case 'meanpath':
+                $maker = 'Meanpath';
+
+                break;
+            case 'metajob':
+                $maker = 'MetaJob';
+
+                break;
+            case 'lavtech.com corp.':
+                $maker = 'Lavtech';
+
+                break;
+            case 'monitor.us':
+                $maker = 'MonitorUs';
+
+                break;
+            case 'munin':
+                $maker = 'Munin';
+
+                break;
+            case 'northern light':
+                $maker = 'Northern Light';
+
+                break;
+            case 'jaroslav kuboš':
+                $maker = 'JaroslavKubos';
+
+                break;
+            case 'netcraft':
+                $maker = 'Netcraft Ltd.';
+
+                break;
+            case 'nmap':
+                $maker = 'Nmap';
+
+                break;
+            case 'omgili':
+                $maker = 'Omgili';
+
+                break;
+            case 'axandra gmbh':
+                $maker = 'Axandra';
+
+                break;
+            case 'openwebspider lab':
+                $maker = 'OpenWebSpider';
+
+                break;
+            case 'openindex b.v.':
+                $maker = 'Openindex';
+
+                break;
+            case 'orange':
+                $maker = 'Orange';
+
+                break;
+            case 'outbrain':
+                $maker = 'Outbrain';
+
+                break;
+            case 'php server monitor':
+                $maker = 'PHP Server Monitor';
+
+                break;
+            case 'smallrivers sa':
+                $maker = 'Smallrivers';
+
+                break;
+            case 'picsearch':
+                $maker = 'Picsearch';
+
+                break;
+            case 'pingdom ab':
+                $maker = 'Pingdom';
+
+                break;
+            case 'pinterest':
+                $maker = 'Pinterest';
+
+                break;
+            case 'pocket':
+                $maker = 'Pocket';
+
+                break;
+            case 'bitlove':
+                $maker = 'Bitlove';
+
+                break;
+            case 'queryeye inc.':
+                $maker = 'QueryEye';
+
+                break;
+            case 'qwant corporation':
+                $maker = 'Qwant';
+
+                break;
+            case 'roihunter a.s.':
+                $maker = 'Roihunter';
+
+                break;
+            case 'seo engine':
+                $maker = 'SEO Engine';
+
+                break;
+            case 'seokicks':
+                $maker = 'SEOkicks';
+
+                break;
+            case 'ssl labs':
+                $maker = 'SSL Labs';
+
+                break;
+            case 'safedns, inc.':
+                $maker = 'SafeDNS';
+
+                break;
+            case 'screaming frog ltd':
+                $maker = 'Screaming Frog';
+
+                break;
+            case 'sensika':
+                $maker = 'Sensika';
+
+                break;
+            case 'visual meta':
+                $maker = 'Visual Meta';
+
+                break;
+            case 'shopwiki corp.':
+                $maker = 'ShopWiki';
+
+                break;
+            case 'site24x7':
+                $maker = 'Site24x7';
+
+                break;
+            case 'manuel kasper':
+                $maker = 'Manuel Kasper';
+
+                break;
+            case 'skype communications s.à.r.l.':
+                $maker = 'Skype';
+
+                break;
+            case 'slack technologies':
+                $maker = 'Slack';
+
+                break;
+            case 'sohu, inc.':
+                $maker = 'Sohu';
+
+                break;
+            case 'tencent holdings':
+                $maker = 'Tencent';
+
+                break;
+            case 'tailrank inc':
+                $maker = 'Tailrank';
+
+                break;
+            case 'superfeedr':
+                $maker = 'Superfeedr';
+
+                break;
+            case 'domain tools':
+                $maker = 'Domain Tools';
+
+                break;
+            case 'venafi trustnet':
+                $maker = 'Venafi TrustNet';
+
+                break;
+            case 'idée inc.':
+                $maker = 'Idee';
+
+                break;
+            case 'talkwalker inc.':
+                $maker = 'Talkwalker';
+
+                break;
+            case 'iparadigms, llc.':
+                $maker = 'Iparadigms';
+
+                break;
+            case 'tweetedtimes':
+                $maker = 'TweetedTimes';
+
+                break;
+            case 'mediasift':
+                $maker = 'Mediasift';
+
+                break;
+            case 'twitter':
+                $maker = 'Twitter';
+
+                break;
+            case 'profound networks':
+                $maker = 'ProfoundNetworks';
+
+                break;
+            case 'kurt mckee':
+                $maker = 'Kurt McKee';
+
+                break;
+            case 'uptime robot':
+                $maker = 'Uptime Robot';
+
+                break;
+            case 'uptime':
+                $maker = 'Uptime';
+
+                break;
+            case 'wiseguys':
+                $maker = 'WiseGuysNl';
+
+                break;
+            case 'alentum software ltd.':
+                $maker = 'Alentum Software';
+
+                break;
+            case 'aliasio':
+                $maker = 'AliasIO';
+
+                break;
+            case 'wesee ltd':
+                $maker = 'Wesee';
+
+                break;
+            case 'websitepulse':
+                $maker = 'WebSitePulse';
+
+                break;
+            case 'steve webb':
+                $maker = 'Steve Webb';
+
+                break;
+            case 'wotbox':
+                $maker = 'Wotbox';
+
+                break;
+            case 'yacy':
+                $maker = 'YaCy';
+
+                break;
+            case 'yahoo! inc.':
+                $maker = 'Yahoo';
 
                 break;
             default:

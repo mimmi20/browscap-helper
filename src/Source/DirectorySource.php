@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
+use BrowscapHelper\Source\Helper\FilePath;
 use BrowserDetector\Helper\GenericRequestFactory;
 use FileLoader\Loader;
 use Psr\Log\LoggerInterface;
@@ -115,6 +116,8 @@ class DirectorySource implements SourceInterface
         $finder->ignoreUnreadableDirs();
         $finder->in($this->dir);
 
+        $fileHelper = new FilePath();
+
         foreach ($finder as $file) {
             if (!$file->isFile()) {
                 $this->logger->emergency('not-files selected with finder');
@@ -124,7 +127,15 @@ class DirectorySource implements SourceInterface
 
             $this->logger->info('    reading file ' . str_pad($file->getPathname(), 100, ' ', STR_PAD_RIGHT));
 
-            $this->loader->setLocalFile($file->getPathname());
+            $fullPath = $fileHelper->getPath($file);
+
+            if (null === $fullPath) {
+                $this->logger->error('could not detect path for file "' . $file->getPathname() . '"');
+
+                continue;
+            }
+
+            $this->loader->setLocalFile($fullPath);
 
             /** @var \GuzzleHttp\Psr7\Response $response */
             $response = $this->loader->load();
@@ -151,6 +162,8 @@ class DirectorySource implements SourceInterface
                     $line = $stream->read(65535);
                 } catch (\Throwable $e) {
                     $this->logger->emergency(new \RuntimeException('reading file ' . $file->getPathname() . ' caused an error on line ' . $i, 0, $e));
+
+                    continue;
                 }
                 ++$i;
 
@@ -159,6 +172,8 @@ class DirectorySource implements SourceInterface
                 }
 
                 $line = trim($line);
+
+                $this->logger->info('    reading line ' . $line);
 
                 if (array_key_exists($line, $allLines)) {
                     continue;
