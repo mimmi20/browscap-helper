@@ -66,6 +66,7 @@ class DetectorTestWriter
 
         if (false === $content) {
             $this->logger->critical('could not encode content');
+
             return false;
         }
 

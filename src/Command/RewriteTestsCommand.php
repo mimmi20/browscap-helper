@@ -11,11 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use Assert\Assertion;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
-use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Detector;
@@ -28,7 +26,6 @@ use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
 use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -37,9 +34,7 @@ use Symfony\Component\Finder\Finder;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
 use UaResult\Engine\Engine;
-use UaResult\Os\Os;
 use UaResult\Result\Result;
-use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
 
 /**
@@ -124,7 +119,7 @@ class RewriteTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $basePath = 'vendor/mimmi20/browser-detector-tests/';
+        $basePath                = 'vendor/mimmi20/browser-detector-tests/';
         $detectorTargetDirectory = $basePath . 'tests/issues/';
         $testSource              = 'tests/';
 
@@ -154,11 +149,11 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
-        $detectorTestWriter = new DetectorTestWriter($this->logger);
-        $detectorNumber = 0;
-        $testCounter = [$detectorNumber => 0];
+        $detectorTestWriter   = new DetectorTestWriter($this->logger);
+        $detectorNumber       = 0;
+        $testCounter          = [$detectorNumber => 0];
         $detectorTotalCounter = 0;
-        $detectorCounter = 0;
+        $detectorCounter      = 0;
 
         $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -167,13 +162,14 @@ class RewriteTestsCommand extends Command
             $result    = $this->handleTest($useragent);
 
             if (null === $result) {
-                $this->logger->error('UA "' . $useragent . '" was skipped because a similar UA was already added');
+                $this->logger->info('UA "' . $useragent . '" was skipped because a similar UA was already added');
+
                 continue;
             }
 
             if ($detectorTestWriter->write($result, $targetDirectory, $detectorNumber, $useragent, $detectorCounter)) {
                 $testCounter[$detectorNumber] = $detectorCounter;
-                $detectorNumber++;
+                ++$detectorNumber;
                 $testCounter[$detectorNumber] = 0;
                 $detectorTotalCounter += $detectorCounter;
                 $detectorCounter = 0;
@@ -267,7 +263,7 @@ test:
 
             $testContent = '<?php
 /**
- * This file is part of the browscap-helper package.
+ * This file is part of the browser-detector-tests package.
  *
  * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
  *
@@ -295,7 +291,7 @@ class T' . $group . 'Test extends TestCase
     use UserAgentsTestTrait;
 
     /**
-     * @var string
+     * @var string[]
      */
     private $sourceDirectory = [';
 
@@ -387,7 +383,7 @@ class T' . $group . 'Test extends TestCase
 
         /* rewrite devices */
 
-        /** @var \UaResult\Device\DeviceInterface|null $device */
+        /** @var \UaResult\Device\DeviceInterface $device */
         $device   = clone $newResult->getDevice();
         $replaced = true;
 

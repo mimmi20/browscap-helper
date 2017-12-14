@@ -127,7 +127,15 @@ class DirectorySource implements SourceInterface
 
             $this->logger->info('    reading file ' . str_pad($file->getPathname(), 100, ' ', STR_PAD_RIGHT));
 
-            $this->loader->setLocalFile($fileHelper->getPath($file));
+            $fullPath = $fileHelper->getPath($file);
+
+            if (null === $fullPath) {
+                $this->logger->error('could not detect path for file "' . $file->getPathname() . '"');
+
+                continue;
+            }
+
+            $this->loader->setLocalFile($fullPath);
 
             /** @var \GuzzleHttp\Psr7\Response $response */
             $response = $this->loader->load();
@@ -154,6 +162,7 @@ class DirectorySource implements SourceInterface
                     $line = $stream->read(65535);
                 } catch (\Throwable $e) {
                     $this->logger->emergency(new \RuntimeException('reading file ' . $file->getPathname() . ' caused an error on line ' . $i, 0, $e));
+
                     continue;
                 }
                 ++$i;

@@ -162,10 +162,10 @@ class CreateTestsCommand extends Command
         $browscapTotalCounter = 0;
 
         $genericRequest = new GenericRequestFactory();
-        $browser  = new Browser(null);
-        $device   = new Device(null, null);
-        $platform = new Os(null, null);
-        $engine   = new Engine(null);
+        $browser        = new Browser(null);
+        $device         = new Device(null, null);
+        $platform       = new Os(null, null);
+        $engine         = new Engine(null);
 
         $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
@@ -175,7 +175,7 @@ class CreateTestsCommand extends Command
             $request  = $genericRequest->createRequestFromString($useragent);
             $result   = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            if (!array_key_exists($useragent, $browscapChecks) && false !== stripos($useragent, 'bingweb')) {
+            if (!array_key_exists($useragent, $browscapChecks) && false !== mb_stripos($useragent, 'bingweb')) {
                 $browscapTestWriter->write($result, $txtNumber, $useragent, $browscapTotalCounter);
             }
 
