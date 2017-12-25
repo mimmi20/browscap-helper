@@ -71,27 +71,4 @@ class CollectionSource implements SourceInterface
             }
         }
     }
-
-    /**
-     * @return iterable|\UaResult\Result\Result[]
-     */
-    public function getTests(): iterable
-    {
-        $allTests = [];
-
-        foreach ($this->collection as $source) {
-            foreach ($source->getTests() as $agent => $test) {
-                if (empty($agent)) {
-                    continue;
-                }
-
-                if (array_key_exists($agent, $allTests)) {
-                    continue;
-                }
-
-                yield $agent => $test;
-                $allTests[$agent] = 1;
-            }
-        }
-    }
 }

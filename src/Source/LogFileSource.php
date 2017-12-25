@@ -75,28 +75,6 @@ class LogFileSource implements SourceInterface
     }
 
     /**
-     * @return iterable|\UaResult\Result\Result[]
-     */
-    public function getTests(): iterable
-    {
-        foreach ($this->getAgents() as $agent) {
-            $agent = trim($agent);
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
-            $browser  = new Browser(null);
-            $device   = new Device(null, null);
-            $platform = new Os(null, null);
-            $engine   = new Engine(null);
-
-            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
-        }
-    }
-
-    /**
      * @return iterable|string[]
      */
     private function loadFromPath(): iterable

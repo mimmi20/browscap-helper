@@ -735,6 +735,670 @@ class MakerMapper
                 $maker = 'Yahoo';
 
                 break;
+            case 'naver':
+                $maker = 'Naver';
+
+                break;
+            case 'netease, inc.':
+                $maker = 'NetEase';
+
+                break;
+            case 'yunyun':
+                $maker = 'YunYun';
+
+                break;
+            case 'hwacha aps':
+                $maker = 'Hwacha';
+
+                break;
+            case 'robert graham':
+                $maker = 'Robert Graham';
+
+                break;
+            case 'sqlmap':
+                $maker = 'sqlmap';
+
+                break;
+            case 'nikon':
+            case 'nn':
+                $maker = 'Nikon';
+
+                break;
+            case 'ouya':
+            case 'ou':
+                $maker = 'OUYA';
+
+                break;
+            case 'dexp':
+            case 'dx':
+                $maker = 'Dexp';
+
+                break;
+            case 'hyrican':
+            case 'hy':
+                $maker = 'Hyrican';
+
+                break;
+            case 'airness':
+            case 'ai':
+                $maker = 'Airness';
+
+                break;
+            case 'benq':
+                $maker = 'Benq';
+
+                break;
+            case 'cricket':
+            case 'ck':
+                $maker = 'Cricket';
+
+                break;
+            case 'ericsson':
+            case 'ec':
+                $maker = 'Ericsson';
+
+                break;
+            case 'kddi':
+            case 'kd':
+                $maker = 'Kddi';
+
+                break;
+            case 'sagem':
+            case 'sg':
+                $maker = 'Sagem';
+
+                break;
+            case 'tianyu':
+            case 'ti':
+                $maker = 'TIANYU';
+
+                break;
+            case 'utstarcom':
+            case 'ut':
+                $maker = 'UtStarcom';
+
+                break;
+            case 'vk mobile':
+            case 'vk':
+                $maker = 'VK Mobile';
+
+                break;
+            case 'cowon':
+            case 'cw':
+                $maker = 'Cowon';
+
+                break;
+            case 'goly':
+            case 'gl':
+                $maker = 'Goly';
+
+                break;
+            case 'homtom':
+            case 'hm':
+                $maker = 'HOMTOM';
+
+                break;
+            case 'hosin':
+            case 'ho':
+                $maker = 'Hosin';
+
+                break;
+            case 'hasee':
+            case 'hs':
+                $maker = 'Hasee';
+
+                break;
+            case 'iocean':
+            case 'i1':
+                $maker = 'iOcean';
+
+                break;
+            case 'iconbit':
+            case 'i2':
+                $maker = 'IconBit';
+
+                break;
+            case 'inkti':
+            case 'ii':
+                $maker = 'Inkti';
+
+                break;
+            case 'i-joy':
+            case 'ij':
+                $maker = 'i-Joy';
+
+                break;
+            case 'inq':
+            case 'iq':
+                $maker = 'INQ';
+
+                break;
+            case 'inew':
+            case 'iw':
+                $maker = 'Inew';
+
+                break;
+            case 'iberry':
+            case 'iy':
+                $maker = 'iBerry';
+
+                break;
+            case 'itel':
+            case 'iz':
+                $maker = 'Itel';
+
+                break;
+            case 'koobee':
+            case 'kb':
+                $maker = 'Koobee';
+
+                break;
+            case 'kt-tech':
+            case 'kh':
+                $maker = 'KT-Tech';
+
+                break;
+            case 'kingsun':
+            case 'ki':
+                $maker = 'Kingsun';
+
+                break;
+            case 'kopo':
+            case 'kp':
+                $maker = 'KOPO';
+
+                break;
+            case 'koridy':
+            case 'kr':
+                $maker = 'Koridy';
+
+                break;
+            case 'kumai':
+            case 'ku':
+                $maker = 'Kumai';
+
+                break;
+            case 'konrow':
+            case 'kw':
+                $maker = 'Konrow';
+
+                break;
+            case 'Lingwin':
+            case 'li':
+                $maker = 'Lingwin';
+
+                break;
+            case 'lyf':
+            case 'ly':
+                $maker = 'Lyf';
+
+                break;
+            case 'meeg':
+            case 'm2':
+                $maker = 'MEEG';
+
+                break;
+            case 'mixc':
+            case 'm5':
+                $maker = 'MIXC';
+
+                break;
+            case 'Mofut':
+            case 'mf':
+                $maker = 'Mofut';
+
+                break;
+            case 'Majestic':
+            case 'mj':
+                $maker = 'Majestic';
+
+                break;
+            case 'mlled':
+            case 'ml':
+                $maker = 'MLLED';
+
+                break;
+            case 'm.t.t.':
+            case 'mq':
+                $maker = 'MTT';
+
+                break;
+            case 'meu':
+            case 'mx':
+                $maker = 'MEU';
+
+                break;
+            case 'myphone':
+            case 'my':
+                $maker = 'myPhone';
+
+                break;
+            case 'noain':
+            case 'n1':
+                $maker = 'Noain';
+
+                break;
+            case 'neffos':
+            case 'nf':
+                $maker = 'Neffos';
+
+                break;
+            case 'nous':
+            case 'no':
+                $maker = 'Nous';
+
+                break;
+            case 'nexian':
+            case 'nx':
+                $maker = 'Nexian';
+
+                break;
+            case 'ouki':
+            case 'ok':
+                $maker = 'Oukitel';
+
+                break;
+            case 'opsson':
+            case 'oo':
+                $maker = 'Opsson';
+
+                break;
+            case 'pioneer':
+            case 'pi':
+                $maker = 'Pioneer';
+
+                break;
+            case 'polaroid':
+            case 'pl':
+                $maker = 'Polaroid';
+
+                break;
+            case 'Positivo':
+            case 'ps':
+                $maker = 'Positivo';
+
+                break;
+            case 'qilive':
+            case 'qi':
+                $maker = 'Qilive';
+
+                break;
+            case 'quechua':
+            case 'qu':
+                $maker = 'Quechua';
+
+                break;
+            case 'sencor':
+            case 's1':
+                $maker = 'Sencor';
+
+                break;
+            case 'stonex':
+            case 's2':
+                $maker = 'Stonex';
+
+                break;
+            case 'sunvan':
+            case 's3':
+                $maker = 'SunVan';
+
+                break;
+            case 'telenor':
+            case 't2':
+                $maker = 'Telenor';
+
+                break;
+            case 'tiphone':
+            case 'th':
+                $maker = 'TiPhone';
+
+                break;
+            case 'tunisie telecom':
+            case 'tu':
+                $maker = 'Tunisie Telecom';
+
+                break;
+            case 'tvc':
+            case 'tv':
+                $maker = 'TVC';
+
+                break;
+            case 'umidigi':
+            case 'um':
+                $maker = 'UMIDIGI';
+
+                break;
+            case 'uniscope':
+            case 'us':
+                $maker = 'Uniscope';
+
+                break;
+            case 'walton':
+            case 'wa':
+                $maker = 'Walton';
+
+                break;
+            case 'wolfgang':
+            case 'wg':
+                $maker = 'Wolfgang';
+
+                break;
+            case 'wolder':
+            case 'wl':
+                $maker = 'Wolder Electronics';
+
+                break;
+            case 'yusun':
+            case 'ys':
+                $maker = 'Yusun';
+
+                break;
+            case 'ytone':
+            case 'yt':
+                $maker = 'Ytone';
+
+                break;
+            case 'zeemi':
+            case 'ze':
+                $maker = 'Zeemi';
+
+                break;
+            case 'bird':
+            case 'bi':
+                $maker = 'Bird';
+
+                break;
+            case 'brondi':
+            case 'br':
+                $maker = 'Brondi';
+
+                break;
+            case 'boway':
+            case 'bw':
+                $maker = 'Boway';
+
+                break;
+            case 'crosscall':
+            case 'c1':
+                $maker = 'CROSSCALL';
+
+                break;
+            case 'china mobile':
+            case 'c3':
+                $maker = 'China Mobile';
+
+                break;
+            case 'concorde':
+            case 'cc':
+                $maker = 'ConCorde';
+
+                break;
+            case 'cherry mobile':
+            case 'ch':
+                $maker = 'Cherry Mobile';
+
+                break;
+            case 'desay':
+            case 'ds':
+                $maker = 'Desay';
+
+                break;
+            case 'datang':
+            case 'dt':
+                $maker = 'Datang';
+
+                break;
+            case 'doov':
+            case 'dv':
+                $maker = 'Doov';
+
+                break;
+            case 'ebest':
+            case 'ea':
+                $maker = 'EBEST';
+
+                break;
+            case 'eton':
+            case 'en':
+                $maker = 'Eton';
+
+                break;
+            case 'evertek':
+            case 'ev':
+                $maker = 'Evertek';
+
+                break;
+            case 'iball':
+            case 'ib':
+                $maker = 'Iball';
+
+                break;
+            case 'le pan':
+            case 'lepan':
+            case 'lp':
+                $maker = 'LePan';
+
+                break;
+            case 'lexibook':
+            case 'lx':
+                $maker = 'Lexibook';
+
+                break;
+            case 'mecer':
+            case 'm3':
+                $maker = 'Mecer';
+
+                break;
+            case 'manta multimedia':
+            case 'ma':
+                $maker = 'Manta Multimedia';
+
+                break;
+            case 'nvidia':
+            case 'nv':
+                $maker = 'NVIDIA';
+
+                break;
+            case 'proscan':
+            case 'p1':
+                $maker = 'ProScan';
+
+                break;
+            case 'readboy':
+            case 'rb':
+                $maker = 'Readboy';
+
+                break;
+            case 'rca tablets':
+            case 'rc':
+                $maker = 'RCA Tablets';
+
+                break;
+            case 'storex':
+            case 'st':
+                $maker = 'Storex';
+
+                break;
+            case 'supersonic':
+            case 'su':
+                $maker = 'SuperSonic';
+
+                break;
+            case 'sumvision':
+            case 'sz':
+                $maker = 'Sumvision';
+
+                break;
+            case 'tb touch':
+            case 't5':
+                $maker = 'TbTouch';
+
+                break;
+            case 'unowhy':
+            case 'un':
+                $maker = 'Unowhy';
+
+                break;
+            case 'axxion':
+            case 'ay':
+                $maker = 'Axxion';
+
+                break;
+            case 'carrefour':
+            case 'cf':
+                $maker = 'Carrefour';
+
+                break;
+            case 'crius mea':
+            case 'cm':
+                $maker = 'Crius Mea';
+
+                break;
+            case 'cnm':
+            case 'cn':
+                $maker = 'CnM';
+
+                break;
+            case 'danew':
+            case 'da':
+                $maker = 'Danew';
+
+                break;
+            case 'energy sistem':
+            case 'e1':
+                $maker = 'Energy Sistem';
+
+                break;
+            case 'ecs':
+            case 'es':
+                $maker = 'ECS';
+
+                break;
+            case 'gemini':
+            case 'gd':
+                $maker = 'Gemini';
+
+                break;
+            case 'grundig':
+            case 'gu':
+                $maker = 'Grundig';
+
+                break;
+            case 'hi-level':
+            case 'hl':
+                $maker = 'Hi-Level';
+
+                break;
+            case 'hyundai':
+            case 'hn':
+                $maker = 'Hyundai';
+
+                break;
+            case 'altech uec':
+            case 'a1':
+                $maker = 'Altech UEC';
+
+                break;
+            case 'arris':
+            case 'as':
+                $maker = 'ARRIS';
+
+                break;
+            case 'airties':
+            case 'at':
+                $maker = 'Airties';
+
+                break;
+            case 'bangolufsen':
+            case 'bo':
+                $maker = 'BangOlufsen';
+
+                break;
+            case 'crenova':
+            case 'cr':
+                $maker = 'CreNova';
+
+                break;
+            case 'dmm':
+            case 'dm':
+                $maker = 'DMM';
+
+                break;
+            case 'dune hd':
+            case 'du':
+                $maker = 'Dune HD';
+
+                break;
+            case 'humax':
+            case 'hx':
+                $maker = 'Humax';
+
+                break;
+            case 'ikea':
+            case 'ia':
+                $maker = 'Ikea';
+
+                break;
+            case 'intek':
+            case 'it':
+                $maker = 'Intek';
+
+                break;
+            case 'inverto':
+            case 'iv':
+                $maker = 'Inverto';
+
+                break;
+            case 'mediatek':
+            case 'mk':
+                $maker = 'MediaTek';
+
+                break;
+            case 'netgear':
+            case 'na':
+                $maker = 'Netgear';
+
+                break;
+            case 'peaq':
+            case 'pe':
+                $maker = 'PEAQ';
+
+                break;
+            case 'rikomagic':
+            case 'ri':
+                $maker = 'Rikomagic';
+
+                break;
+            case 'skyworth':
+            case 'sk':
+                $maker = 'Skyworth';
+
+                break;
+            case 'smart':
+            case 'sr':
+                $maker = 'Smart';
+
+                break;
+            case 'selevision':
+            case 'sv':
+                $maker = 'Selevision';
+
+                break;
+            case 'technotrend':
+            case 'tt':
+                $maker = 'TechnoTrend';
+
+                break;
+            case 'vestel':
+            case 'vt':
+                $maker = 'Vestel';
+
+                break;
+            case 'videoweb':
+            case 'vw':
+                $maker = 'Videoweb';
+
+                break;
             default:
                 // nothing to do here
                 break;

@@ -78,24 +78,6 @@ class DetectorSource implements SourceInterface
     }
 
     /**
-     * @return iterable|\UaResult\Result\Result[]
-     */
-    public function getTests(): iterable
-    {
-        $resultFactory = new ResultFactory();
-
-        foreach ($this->loadFromPath() as $test) {
-            $agent = trim($test->ua);
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            yield $agent => $resultFactory->fromArray($this->cache, $this->logger, (array) $test->result);
-        }
-    }
-
-    /**
      * @return iterable|\stdClass[]
      */
     private function loadFromPath(): iterable

@@ -21,12 +21,7 @@ interface SourceInterface
     /**
      * @param int $limit
      *
-     * @return string[]
+     * @return iterable
      */
     public function getUserAgents(int $limit = 0): iterable;
-
-    /**
-     * @return \UaResult\Result\Result[]
-     */
-    public function getTests(): iterable;
 }

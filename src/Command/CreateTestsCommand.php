@@ -148,7 +148,7 @@ class CreateTestsCommand extends Command
         $detectorNumber = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
 
         $output->writeln('next test for Browscap helper: ' . $txtNumber);
-        $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
+        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
 
         $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -183,7 +183,7 @@ class CreateTestsCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln('tests created for BrowserDestector: ' . $detectorTotalCounter);
+        $output->writeln('tests created for BrowserDetector: ' . $detectorTotalCounter);
         $output->writeln('tests created for Browscap:         ' . $browscapTotalCounter);
 
         return 0;

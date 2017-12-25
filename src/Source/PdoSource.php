@@ -59,22 +59,6 @@ class PdoSource implements SourceInterface
     }
 
     /**
-     * @return iterable|\UaResult\Result\Result[]
-     */
-    public function getTests(): iterable
-    {
-        foreach ($this->getAgents() as $agent) {
-            $request  = (new GenericRequestFactory())->createRequestFromString($agent);
-            $browser  = new Browser(null);
-            $device   = new Device(null, null);
-            $platform = new Os(null, null);
-            $engine   = new Engine(null);
-
-            yield $agent => new Result($request->getHeaders(), $device, $platform, $browser, $engine);
-        }
-    }
-
-    /**
      * @param int $limit
      *
      * @return iterable|string[]
