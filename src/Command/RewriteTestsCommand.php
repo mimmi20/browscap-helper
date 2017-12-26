@@ -149,11 +149,15 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
+        $output->writeln('add new tests ...');
+
         $detectorTestWriter   = new DetectorTestWriter($this->logger);
         $detectorNumber       = 0;
         $testCounter          = [$detectorNumber => 0];
         $detectorTotalCounter = 0;
         $detectorCounter      = 0;
+
+        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
 
         $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -174,7 +178,7 @@ class RewriteTestsCommand extends Command
                 $detectorTotalCounter += $detectorCounter;
                 $detectorCounter = 0;
 
-                $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
+                $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
 
                 $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -237,23 +241,8 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('preparing circle.yml ...');
 
-        $circleFile      = $basePath . 'circle.yml';
-        $circleciContent = 'machine:
-  php:
-    version: 7.1.9
-  timezone:
-    Europe/Berlin
-
-dependencies:
-  pre:
-    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
-  override:
-    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
-
-test:
-  override:
-    - composer validate
-';
+        $circleFile      = $basePath . '.circleci/config.yml';
+        $circleciContent = '';
 
         foreach (array_reverse(array_keys($circleCount)) as $i) {
             $count  = $circleCount[$i];
@@ -261,63 +250,36 @@ test:
 
             $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
-            $testContent = '<?php
-/**
- * This file is part of the browser-detector-tests package.
- *
- * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-declare(strict_types = 1);
-namespace BrowserDetectorTest\UserAgentsTest;
-
-use BrowserDetectorTest\UserAgentsTestTrait;
-use PHPUnit\Framework\TestCase;
-
-/**
- * Class T' . $group . 'Test
- *
- * has ' . trim($tests) . '
- * this file was created/edited automatically, please do not edit it
- *
- * @author     Thomas Mueller <mimmi20@live.de>
- * @group      ' . $group . '
- */
-class T' . $group . 'Test extends TestCase
-{
-    use UserAgentsTestTrait;
-
-    /**
-     * @var string[]
-     */
-    private $sourceDirectory = [';
+            $testContent = [];
 
             foreach (array_reverse($circleLines[$i]) as $groupx) {
-                $testContent .= '
-        \'tests/issues/' . $groupx . '/\',';
+                $testContent[] = '        \'tests/issues/' . $groupx . '/\',';
             }
 
-            $testContent .= '
-    ];
-}
-';
             $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
-            file_put_contents($testFile, $testContent);
+            file_put_contents(
+                $testFile,
+                str_replace(
+                    '//### tests ###',
+                    implode(PHP_EOL, $testContent),
+                    file_get_contents('templates/test.php.txt')
+                )
+            );
 
             $columns = 111 + 2 * mb_strlen((string) $count);
 
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
         }
 
         $output->writeln('writing ' . $circleFile . ' ...');
-        file_put_contents($circleFile, $circleciContent);
+        file_put_contents(
+            $circleFile,
+            str_replace('### tests ###', $circleciContent, file_get_contents('templates/config.yml.txt'))
+        );
 
         $output->writeln('done');
 
