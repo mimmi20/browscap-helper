@@ -11,21 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
-use BrowscapHelper\DataMapper\BrowserTypeMapper;
-use BrowscapHelper\DataMapper\BrowserVersionMapper;
-use BrowscapHelper\DataMapper\DeviceTypeMapper;
-use BrowscapHelper\DataMapper\EngineVersionMapper;
-use BrowserDetector\Helper\GenericRequestFactory;
-use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
-use UaResult\Browser\Browser;
-use UaResult\Company\CompanyLoader;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class DirectorySource

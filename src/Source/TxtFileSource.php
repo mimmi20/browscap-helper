@@ -11,15 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
-use BrowserDetector\Helper\GenericRequestFactory;
 use FileLoader\Loader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class DirectorySource
@@ -57,8 +51,9 @@ class TxtFileSource implements SourceInterface
     /**
      * @param int $limit
      *
-     * @return iterable|string[]
      * @throws \FileLoader\Exception
+     *
+     * @return iterable|string[]
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -81,8 +76,9 @@ class TxtFileSource implements SourceInterface
     }
 
     /**
-     * @return iterable|string[]
      * @throws \FileLoader\Exception
+     *
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {

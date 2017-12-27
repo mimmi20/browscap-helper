@@ -11,28 +11,12 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
-use BrowscapHelper\DataMapper\BrowserNameMapper;
-use BrowscapHelper\DataMapper\BrowserTypeMapper;
-use BrowscapHelper\DataMapper\BrowserVersionMapper;
-use BrowscapHelper\DataMapper\DeviceMarketingnameMapper;
-use BrowscapHelper\DataMapper\DeviceTypeMapper;
-use BrowscapHelper\DataMapper\EngineNameMapper;
-use BrowscapHelper\DataMapper\EngineVersionMapper;
-use BrowscapHelper\DataMapper\PlatformNameMapper;
-use BrowscapHelper\DataMapper\PlatformVersionMapper;
-use BrowserDetector\Helper\GenericRequestFactory;
-use BrowserDetector\Loader\NotFoundException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class DirectorySource

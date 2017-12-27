@@ -11,16 +11,10 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
-use BrowserDetector\Helper\GenericRequestFactory;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class DirectorySource
@@ -73,7 +67,7 @@ class YzalisSource implements SourceInterface
     }
 
     /**
-     * @return string[]|iterable
+     * @return iterable|string[]
      */
     private function loadFromPath(): iterable
     {

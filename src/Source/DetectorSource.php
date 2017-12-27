@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\Finder\Finder;
-use UaResult\Result\ResultFactory;
 
 /**
  * Class DirectorySource

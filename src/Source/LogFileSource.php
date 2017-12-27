@@ -13,14 +13,8 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Helper\FilePath;
 use BrowscapHelper\Source\Reader\LogFileReader;
-use BrowserDetector\Helper\GenericRequestFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
-use UaResult\Browser\Browser;
-use UaResult\Device\Device;
-use UaResult\Engine\Engine;
-use UaResult\Os\Os;
-use UaResult\Result\Result;
 
 /**
  * Class DirectorySource
