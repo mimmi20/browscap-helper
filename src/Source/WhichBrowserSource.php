@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
+use http\Header;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Seld\JsonLint\JsonParser;
@@ -161,14 +162,16 @@ class WhichBrowserSource implements SourceInterface
      */
     private function getAgentFromRow(array $row): string
     {
+        $headers = [];
+
         if (isset($row['headers'])) {
             if (isset($row['headers']['User-Agent'])) {
                 return $row['headers']['User-Agent'];
             }
 
-            if (class_exists(\http\Header::class)) {
+            if (class_exists(Header::class)) {
                 // pecl_http versions 2.x/3.x
-                $headers = \http\Header::parse($row['headers']);
+                $headers = Header::parse($row['headers']);
             } elseif (function_exists('\http_parse_headers')) {
                 // pecl_http version 1.x
                 $headers = \http_parse_headers($row['headers']);

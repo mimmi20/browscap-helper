@@ -90,10 +90,9 @@ class CopyTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \LogicException When this abstract method is not implemented
-     *
      * @return int|null null or 0 if everything went fine, or an error code
-     *
      * @see    setCode()
+     * @throws \FileLoader\Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -140,7 +139,6 @@ class CopyTestsCommand extends Command
 
         $output->writeln('copy tests ...');
 
-        $browscapTotalCounter = 0;
         $txtTotalCounter      = 0;
 
         $txtWriter          = new TxtTestWriter($this->logger);

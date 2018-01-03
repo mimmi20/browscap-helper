@@ -59,7 +59,13 @@ $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logg
 ErrorHandler::register($logger);
 
 $start    = microtime(true);
-$parser   = Parser::create();
+try {
+    $parser = Parser::create();
+} catch (\UAParser\Exception\FileNotFoundException $e) {
+    $logger->critical($e);
+    exit;
+}
+
 $result   = (object) $parser->parse($_GET['useragent']);
 $duration = microtime(true) - $start;
 $memory   = memory_get_usage(true);

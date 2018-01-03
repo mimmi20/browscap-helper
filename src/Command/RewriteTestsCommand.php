@@ -31,9 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use UaResult\Browser\Browser;
 use UaResult\Device\Device;
-use UaResult\Engine\Engine;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
@@ -108,10 +106,10 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
-     *
      * @return int|null null or 0 if everything went fine, or an error code
-     *
+     * @throws \FileLoader\Exception
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -290,6 +288,8 @@ class RewriteTestsCommand extends Command
      * @param string $useragent
      *
      * @return \UaResult\Result\ResultInterface|null
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      */
     private function handleTest(string $useragent): ?ResultInterface
     {

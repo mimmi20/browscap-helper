@@ -13,6 +13,7 @@ namespace BrowscapHelper\Module\Mapper;
 
 use BrowscapHelper\DataMapper\InputMapper;
 use BrowserDetector\Helper\GenericRequestFactory;
+use BrowserDetector\Version\Version;
 use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
@@ -75,7 +76,7 @@ class Woothee implements MapperInterface
             $osName    = $this->mapper->mapOsName($parserResult->os);
             $osVersion = $this->mapper->mapOsVersion($parserResult->os_version, $osName);
 
-            if (!($osVersion instanceof \BrowserDetector\Version\Version)) {
+            if (!($osVersion instanceof Version)) {
                 $osVersion = null;
             }
 

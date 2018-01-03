@@ -11,6 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Module\Mapper;
 
+use BrowscapHelper\DataMapper\InputMapper;
+use Psr\Cache\CacheItemPoolInterface;
 use UaResult\Result\ResultInterface;
 
 /**
@@ -24,6 +26,12 @@ use UaResult\Result\ResultInterface;
  */
 interface MapperInterface
 {
+    /**
+     * @param \BrowscapHelper\DataMapper\InputMapper $mapper
+     * @param \Psr\Cache\CacheItemPoolInterface      $cache
+     */
+    public function __construct(InputMapper $mapper, CacheItemPoolInterface $cache);
+
     /**
      * Gets the information about the browser by User Agent
      *

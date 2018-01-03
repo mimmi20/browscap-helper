@@ -36,6 +36,8 @@ class LogFileReader implements ReaderInterface
 
     /**
      * @param string $file
+     *
+     * @throws \FileLoader\Exception
      */
     public function setLocalFile(string $file): void
     {

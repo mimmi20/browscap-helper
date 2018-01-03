@@ -81,8 +81,8 @@ class RegexFactory
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
-     *
      * @return void
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function detect($useragent): void
     {
@@ -113,9 +113,9 @@ class RegexFactory
     }
 
     /**
-     * @throws \BrowserDetector\Loader\NotFoundException
-     *
      * @return array
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      */
     public function getDevice(): array
     {
@@ -266,6 +266,8 @@ class RegexFactory
 
     /**
      * @return \UaResult\Os\OsInterface
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      */
     public function getPlatform(): OsInterface
     {
@@ -346,6 +348,8 @@ class RegexFactory
 
     /**
      * @return array
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      */
     public function getBrowser(): array
     {
@@ -440,6 +444,8 @@ class RegexFactory
 
     /**
      * @return \UaResult\Engine\EngineInterface
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      */
     public function getEngine(): EngineInterface
     {

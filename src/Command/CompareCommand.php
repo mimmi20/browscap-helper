@@ -35,7 +35,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CompareCommand extends Command
 {
     private const COL_LENGTH       = 50;
-    private const FIRST_COL_LENGTH = 20;
 
     /**
      * @var \Monolog\Logger
@@ -208,7 +207,7 @@ class CompareCommand extends Command
                     $propertyName = $x['key'];
                 }
 
-                $detectionResults = $messageFormatter->formatMessage($propertyName, $this->cache, $this->logger);
+                $detectionResults = $messageFormatter->formatMessage($propertyName, $this->logger);
 
                 foreach ($detectionResults as $result) {
                     $matches[] = mb_substr($result, 0, 1);
@@ -266,6 +265,8 @@ class CompareCommand extends Command
         }
 
         echo "\n";
+
+        return 0;
     }
 
     /**

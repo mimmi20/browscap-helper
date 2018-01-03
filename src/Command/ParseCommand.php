@@ -41,10 +41,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ParseCommand extends Command
 {
-    private const SOURCE_SQL  = 'sql';
-    private const SOURCE_DIR  = 'dir';
-    private const SOURCE_TEST = 'tests';
-
     /**
      * @var array
      */
@@ -277,5 +273,7 @@ class ParseCommand extends Command
 
             $existingTests[$useragent] = 1;
         }
+
+        return 0;
     }
 }

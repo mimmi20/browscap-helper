@@ -64,7 +64,7 @@ $parser = new Detector($cache, $logger);
 try {
     /** @var array $detectionResult */
     $detectionResult = $parser->getBrowser($_GET['useragent'])->toArray();
-} catch (\Exception $e) {
+} catch (\Psr\Cache\InvalidArgumentException | \Exception $e) {
     $logger->critical($e);
     $detectionResult = [];
 }

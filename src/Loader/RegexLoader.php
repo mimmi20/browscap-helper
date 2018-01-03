@@ -51,9 +51,8 @@ class RegexLoader
     }
 
     /**
-     * @throws \BrowserDetector\Loader\NotFoundException
-     *
      * @return array|null
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getRegexes(): ?array
     {
@@ -77,6 +76,7 @@ class RegexLoader
      * @param \Psr\Cache\CacheItemInterface $cacheInitialized
      *
      * @throws \BrowserDetector\Loader\NotFoundException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     private function initCache(CacheItemInterface $cacheInitialized): void
     {

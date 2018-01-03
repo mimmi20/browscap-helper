@@ -81,7 +81,7 @@ class ModuleCollection implements Iterator, Countable, ArrayAccess
      *
      * @link http://php.net/manual/en/iterator.next.php
      */
-    public function next(): int
+    public function next(): void
     {
         ++$this->position;
     }

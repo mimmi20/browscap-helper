@@ -74,6 +74,6 @@ class BrowserDetectorModule implements CheckInterface
             );
         }
 
-        return (new ResultFactory())->fromArray($cache, $logger, $content['result']);
+        return (new ResultFactory())->fromArray($logger, $content['result']);
     }
 }

@@ -67,12 +67,22 @@ $moduleConfig = $config['modules']['browscap3'];
 $cache = new File([File::DIR => $moduleConfig['cache-dir']]);
 
 $browscap = new Browscap();
-$browscap
-    ->setLogger($logger)
-    ->setCache($cache);
+try {
+    $browscap
+        ->setLogger($logger)
+        ->setCache($cache);
+} catch (\BrowscapPHP\Exception $e) {
+    $logger->critical($e);
+    exit;
+}
 
 $start    = microtime(true);
-$result   = $browscap->getBrowser($_GET['useragent']);
+try {
+    $result = $browscap->getBrowser($_GET['useragent']);
+} catch (\BrowscapPHP\Exception $e) {
+    $logger->critical($e);
+    exit;
+}
 $duration = microtime(true) - $start;
 $memory   = memory_get_usage(true);
 

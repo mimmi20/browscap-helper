@@ -13,7 +13,6 @@ namespace BrowscapHelper\Writer;
 
 use BrowserDetector\Version\VersionInterface;
 use Psr\Log\LoggerInterface;
-use UaResult\Browser\Browser;
 use UaResult\Result\ResultInterface;
 
 class BrowscapTestWriter

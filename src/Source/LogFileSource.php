@@ -47,6 +47,7 @@ class LogFileSource implements SourceInterface
      * @param int $limit
      *
      * @return iterable|string[]
+     * @throws \FileLoader\Exception
      */
     public function getUserAgents(int $limit = 0): iterable
     {
@@ -118,6 +119,7 @@ class LogFileSource implements SourceInterface
 
     /**
      * @return iterable|string[]
+     * @throws \FileLoader\Exception
      */
     private function getAgents(): iterable
     {

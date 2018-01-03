@@ -40,18 +40,12 @@ class Browscap implements MapperInterface
     private $mapper;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
      * @param \BrowscapHelper\DataMapper\InputMapper $mapper
      * @param \Psr\Cache\CacheItemPoolInterface      $cache
      */
     public function __construct(InputMapper $mapper, CacheItemPoolInterface $cache)
     {
         $this->mapper = $mapper;
-        $this->cache  = $cache;
     }
 
     /**
@@ -90,7 +84,7 @@ class Browscap implements MapperInterface
 
             if (null !== $browserMakerKey) {
                 try {
-                    $browserManufacturer = CompanyLoader::getInstance($this->cache)->load($browserMakerKey);
+                    $browserManufacturer = CompanyLoader::getInstance()->load($browserMakerKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -115,7 +109,7 @@ class Browscap implements MapperInterface
 
             if (null !== $deviceMakerKey) {
                 try {
-                    $deviceManufacturer = CompanyLoader::getInstance($this->cache)->load($deviceMakerKey);
+                    $deviceManufacturer = CompanyLoader::getInstance()->load($deviceMakerKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -126,7 +120,7 @@ class Browscap implements MapperInterface
 
             if (null !== $deviceBrandKey) {
                 try {
-                    $deviceBrand = CompanyLoader::getInstance($this->cache)->load($deviceBrandKey);
+                    $deviceBrand = CompanyLoader::getInstance()->load($deviceBrandKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -153,7 +147,7 @@ class Browscap implements MapperInterface
 
             if (null !== $osMakerKey) {
                 try {
-                    $osManufacturer = CompanyLoader::getInstance($this->cache)->load($osMakerKey);
+                    $osManufacturer = CompanyLoader::getInstance()->load($osMakerKey);
                 } catch (NotFoundException $e) {
                     //$this->logger->info($e);
                 }
@@ -176,7 +170,7 @@ class Browscap implements MapperInterface
             $engineManufacturer = null;
 
             try {
-                $engineManufacturer = CompanyLoader::getInstance($this->cache)->load($parserResult->renderingengine_maker);
+                $engineManufacturer = CompanyLoader::getInstance()->load($parserResult->renderingengine_maker);
             } catch (NotFoundException $e) {
                 //$this->logger->info($e);
             }

@@ -40,18 +40,12 @@ class PiwikDetector implements MapperInterface
     private $mapper;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
      * @param \BrowscapHelper\DataMapper\InputMapper $mapper
      * @param \Psr\Cache\CacheItemPoolInterface      $cache
      */
     public function __construct(InputMapper $mapper, CacheItemPoolInterface $cache)
     {
         $this->mapper = $mapper;
-        $this->cache  = $cache;
     }
 
     /**
@@ -75,7 +69,7 @@ class PiwikDetector implements MapperInterface
 
                 if (null !== $browserMakerKey) {
                     try {
-                        $browserManufacturer = CompanyLoader::getInstance($this->cache)->load($browserMakerKey);
+                        $browserManufacturer = CompanyLoader::getInstance()->load($browserMakerKey);
                     } catch (NotFoundException $e) {
                         //$this->logger->info($e);
                     }
@@ -116,7 +110,7 @@ class PiwikDetector implements MapperInterface
 
         if (null !== $deviceBrandKey) {
             try {
-                $deviceBrand = CompanyLoader::getInstance($this->cache)->load($deviceBrandKey);
+                $deviceBrand = CompanyLoader::getInstance()->load($deviceBrandKey);
             } catch (NotFoundException $e) {
                 //$this->logger->info($e);
             }

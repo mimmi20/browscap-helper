@@ -12,16 +12,10 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Writer;
 
 use Psr\Log\LoggerInterface;
-use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
 class DetectorTestWriter
 {
-    /**
-     * @var string
-     */
-    private $dir;
-
     /**
      * @var \Psr\Log\LoggerInterface
      */
