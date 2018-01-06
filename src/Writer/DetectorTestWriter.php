@@ -79,10 +79,10 @@ class DetectorTestWriter
         }
 
         if (10 <= $this->fileCounter) {
-            $this->chunkCounter    = 0;
-            $this->outputDetector  = [];
-            $this->fileCounter     = 0;
-            $this->counter         = 0;
+            $this->chunkCounter   = 0;
+            $this->outputDetector = [];
+            $this->fileCounter    = 0;
+            $this->counter        = 0;
 
             return true;
         }

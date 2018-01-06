@@ -16,6 +16,7 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Writer\DetectorTestWriter;
+use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
 use BrowserDetector\Helper\GenericRequestFactory;
@@ -24,7 +25,7 @@ use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,7 +51,7 @@ class RewriteTestsCommand extends Command
     private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
+     * @var \Psr\SimpleCache\CacheInterface
      */
     private $cache;
 
@@ -70,11 +71,11 @@ class RewriteTestsCommand extends Command
     private $tests = [];
 
     /**
-     * @param \Monolog\Logger                   $logger
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param \BrowserDetector\Detector         $detector
+     * @param \Monolog\Logger                 $logger
+     * @param \Psr\SimpleCache\CacheInterface $cache
+     * @param \BrowserDetector\Detector       $detector
      */
-    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector)
+    public function __construct(Logger $logger, PsrCacheInterface $cache, Detector $detector)
     {
         $this->logger   = $logger;
         $this->cache    = $cache;
@@ -106,10 +107,12 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return int|null null or 0 if everything went fine, or an error code
      * @throws \FileLoader\Exception
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return int|null null or 0 if everything went fine, or an error code
+     *
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -123,7 +126,7 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('remove old test files ...');
 
-        $finder   = new Finder();
+        $finder = new Finder();
         $finder->files();
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
@@ -135,7 +138,7 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
-        $finder   = new Finder();
+        $finder = new Finder();
         $finder->files();
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
@@ -214,8 +217,8 @@ class RewriteTestsCommand extends Command
             $circleTests
         );
 
-        $i           = 0;
-        $c           = 0;
+        $i = 0;
+        $c = 0;
 
         $circleLines     = [$i => []];
         $circleCount     = [$i => 0];
@@ -243,10 +246,10 @@ class RewriteTestsCommand extends Command
         $circleciContent = '';
 
         foreach (array_reverse(array_keys($circleCount)) as $i) {
-            $count  = $circleCount[$i];
-            $group  = sprintf('%1$07d', $i);
+            $count = $circleCount[$i];
+            $group = sprintf('%1$07d', $i);
 
-            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
+            $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
             $testContent = [];
 
@@ -287,9 +290,10 @@ class RewriteTestsCommand extends Command
     /**
      * @param string $useragent
      *
-     * @return \UaResult\Result\ResultInterface|null
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return \UaResult\Result\ResultInterface|null
      */
     private function handleTest(string $useragent): ?ResultInterface
     {
@@ -362,8 +366,8 @@ class RewriteTestsCommand extends Command
             try {
                 $regexFactory = new RegexFactory($this->cache, $this->logger);
                 $regexFactory->detect($normalizedUa);
-                [$device]     = $regexFactory->getDevice();
-                $replaced     = false;
+                [$device] = $regexFactory->getDevice();
+                $replaced = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device   = new Device(null, null);
@@ -379,29 +383,29 @@ class RewriteTestsCommand extends Command
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             } catch (NotFoundException $e) {
                 $this->logger->debug($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             } catch (GeneralDeviceException $e) {
-                $deviceLoader = new DeviceLoader($this->cache, $this->logger);
+                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
 
                 try {
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 
-                    $device   = new Device(null, null);
+                    $device = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
                 $this->logger->debug($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             } catch (\Exception $e) {
                 $this->logger->error($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             }
         }
 

@@ -13,14 +13,15 @@ namespace BrowscapHelper\Factory;
 
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Loader\RegexLoader;
+use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\BrowserLoader;
 use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\EngineLoader;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Loader\PlatformLoader;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Stringy\Stringy;
 use UaResult\Engine\EngineInterface;
 use UaResult\Os\OsInterface;
@@ -37,7 +38,7 @@ use UaResult\Os\OsInterface;
 class RegexFactory
 {
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
+     * @var \BrowserDetector\Cache\Cache
      */
     private $cache;
 
@@ -64,12 +65,12 @@ class RegexFactory
     private $runDetection = false;
 
     /**
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param \Psr\Log\LoggerInterface          $logger
+     * @param \Psr\SimpleCache\CacheInterface $cache
+     * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(CacheItemPoolInterface $cache, LoggerInterface $logger)
+    public function __construct(PsrCacheInterface $cache, LoggerInterface $logger)
     {
-        $this->cache  = $cache;
+        $this->cache  = new Cache($cache);
         $this->logger = $logger;
     }
 
@@ -81,21 +82,17 @@ class RegexFactory
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
-     * @return void
      * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return void
      */
     public function detect($useragent): void
     {
-        $regexes = (new RegexLoader($this->cache, $this->logger))->getRegexes();
-
         $this->match     = null;
         $this->useragent = $useragent;
 
-        if (!is_array($regexes)) {
-            throw new \InvalidArgumentException('no regexes are defined');
-        }
-
-        foreach ($regexes as $regex) {
+        foreach (RegexLoader::getInstance($this->cache, $this->logger)->getRegexes() as $regex) {
             $matches = [];
 
             if (preg_match($regex, $useragent, $matches)) {
@@ -113,9 +110,9 @@ class RegexFactory
     }
 
     /**
-     * @return array
      * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return array
      */
     public function getDevice(): array
     {
@@ -136,7 +133,7 @@ class RegexFactory
         }
 
         $deviceCode   = mb_strtolower($this->match['devicecode']);
-        $deviceLoader = new DeviceLoader($this->cache, $this->logger);
+        $deviceLoader = DeviceLoader::getInstance($this->cache, $this->logger);
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -265,9 +262,9 @@ class RegexFactory
     }
 
     /**
-     * @return \UaResult\Os\OsInterface
      * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return \UaResult\Os\OsInterface
      */
     public function getPlatform(): OsInterface
     {
@@ -283,7 +280,7 @@ class RegexFactory
             throw new \InvalidArgumentException('please call the detect function before trying to get the result');
         }
 
-        $platformLoader = new PlatformLoader($this->cache, $this->logger);
+        $platformLoader = PlatformLoader::getInstance($this->cache, $this->logger);
 
         if (!array_key_exists('osname', $this->match)
             && array_key_exists('manufacturercode', $this->match)
@@ -347,9 +344,9 @@ class RegexFactory
     }
 
     /**
-     * @return array
      * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return array
      */
     public function getBrowser(): array
     {
@@ -370,7 +367,7 @@ class RegexFactory
         }
 
         $browserCode   = mb_strtolower($this->match['browsername']);
-        $browserLoader = new BrowserLoader($this->cache, $this->logger);
+        $browserLoader = BrowserLoader::getInstance($this->cache, $this->logger);
 
         switch ($browserCode) {
             case 'opr':
@@ -443,9 +440,9 @@ class RegexFactory
     }
 
     /**
-     * @return \UaResult\Engine\EngineInterface
      * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return \UaResult\Engine\EngineInterface
      */
     public function getEngine(): EngineInterface
     {
@@ -466,7 +463,7 @@ class RegexFactory
         }
 
         $engineCode   = mb_strtolower($this->match['enginename']);
-        $engineLoader = new EngineLoader($this->cache, $this->logger);
+        $engineLoader = EngineLoader::getInstance($this->cache, $this->logger);
 
         if ('cfnetwork' === $engineCode) {
             return $engineLoader->load('webkit', $this->useragent);

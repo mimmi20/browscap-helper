@@ -11,11 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Loader;
 
-use BrowserDetector\Loader\NotFoundException;
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use BrowserDetector\Cache\CacheInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Yaml\Yaml;
+use Seld\JsonLint\JsonParser;
 
 /**
  * detection class using regexes
@@ -28,8 +26,10 @@ use Symfony\Component\Yaml\Yaml;
  */
 class RegexLoader
 {
+    private const CACHE_PREFIX = 'regex';
+
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
+     * @var \BrowserDetector\Cache\CacheInterface
      */
     private $cache;
 
@@ -41,61 +41,112 @@ class RegexLoader
     private $logger;
 
     /**
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param \Psr\Log\LoggerInterface          $logger
+     * @var self|null
      */
-    public function __construct(CacheItemPoolInterface $cache, LoggerInterface $logger)
+    private static $instance;
+
+    /**
+     * @param \BrowserDetector\Cache\CacheInterface $cache
+     * @param \Psr\Log\LoggerInterface              $logger
+     */
+    private function __construct(CacheInterface $cache, LoggerInterface $logger)
     {
         $this->cache  = $cache;
         $this->logger = $logger;
     }
 
     /**
-     * @return array|null
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @param \BrowserDetector\Cache\CacheInterface $cache
+     * @param \Psr\Log\LoggerInterface              $logger
+     *
+     * @return self
      */
-    public function getRegexes(): ?array
+    public static function getInstance(CacheInterface $cache, LoggerInterface $logger)
     {
-        $cacheInitializedId = hash('sha512', 'regex-cache is initialized');
-        $cacheInitialized   = $this->cache->getItem($cacheInitializedId);
-
-        if (!$cacheInitialized->isHit() || !$cacheInitialized->get()) {
-            $this->initCache($cacheInitialized);
+        if (null === self::$instance) {
+            self::$instance = new self($cache, $logger);
         }
 
-        $cacheItem = $this->cache->getItem(hash('sha512', 'regex-cache'));
-
-        if (!$cacheItem->isHit()) {
-            throw new NotFoundException('no regexes are found');
-        }
-
-        return $cacheItem->get();
+        return self::$instance;
     }
 
     /**
-     * @param \Psr\Cache\CacheItemInterface $cacheInitialized
-     *
-     * @throws \BrowserDetector\Loader\NotFoundException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @return void
      */
-    private function initCache(CacheItemInterface $cacheInitialized): void
+    public static function resetInstance(): void
+    {
+        self::$instance = null;
+    }
+
+    /**
+     * initializes cache
+     *
+     * @throws \Seld\JsonLint\ParsingException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *
+     * @return void
+     */
+    private function init(): void
+    {
+        $initKey = $this->getCacheKey('initialized');
+
+        if ($this->cache->hasItem($initKey) && $this->cache->getItem($initKey)) {
+            return;
+        }
+
+        foreach ($this->getRegexes() as $regexKey => $data) {
+            $cacheKey = $this->getCacheKey((string) $regexKey);
+
+            if ($this->cache->hasItem($cacheKey)) {
+                continue;
+            }
+
+            $this->cache->setItem($cacheKey, $data);
+        }
+
+        $this->cache->setItem($initKey, true);
+    }
+
+    /**
+     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return \Generator|\stdClass[]
+     */
+    public function getRegexes(): \Generator
     {
         static $regexes = null;
 
         if (null === $regexes) {
-            $regexes = Yaml::parse(file_get_contents(__DIR__ . '/../../data/regexes.yaml'));
+            $jsonParser = new JsonParser();
+            $regexes    = $jsonParser->parse(
+                file_get_contents(__DIR__ . '/../../data/regexes.yaml'),
+                JsonParser::DETECT_KEY_CONFLICTS
+            );
         }
 
-        if (!isset($regexes['regexes']) || !is_array($regexes['regexes'])) {
-            throw new NotFoundException('no regexes are defined in the regexes.yaml file');
+        foreach ($regexes as $regexKey => $data) {
+            yield $regexKey => $data;
         }
+    }
 
-        $cacheItem = $this->cache->getItem(hash('sha512', 'regex-cache'));
-        $cacheItem->set($regexes['regexes']);
+    /**
+     * @param string $deviceKey
+     *
+     * @return string
+     */
+    private function getCacheKey(string $deviceKey): string
+    {
+        return self::CACHE_PREFIX . '_' . str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '_', $deviceKey);
+    }
 
-        $this->cache->save($cacheItem);
-
-        $cacheInitialized->set(true);
-        $this->cache->save($cacheInitialized);
+    /**
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
+     *
+     * @return void
+     */
+    public function warmupCache(): void
+    {
+        $this->init();
     }
 }
