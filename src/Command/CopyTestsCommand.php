@@ -14,6 +14,7 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
+use BrowscapHelper\Source\CrawlerDetectSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\TxtFileSource;
@@ -24,7 +25,6 @@ use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -45,24 +45,17 @@ class CopyTestsCommand extends Command
     private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
      * @var string
      */
     private $targetDirectory = '';
 
     /**
-     * @param \Monolog\Logger                   $logger
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param string                            $targetDirectory
+     * @param \Monolog\Logger $logger
+     * @param string          $targetDirectory
      */
-    public function __construct(Logger $logger, CacheItemPoolInterface $cache, string $targetDirectory)
+    public function __construct(Logger $logger, string $targetDirectory)
     {
         $this->logger          = $logger;
-        $this->cache           = $cache;
         $this->targetDirectory = $targetDirectory;
 
         parent::__construct();
@@ -89,10 +82,12 @@ class CopyTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
-     * @return int|null null or 0 if everything went fine, or an error code
-     * @see    setCode()
+     * @throws \LogicException       When this abstract method is not implemented
      * @throws \FileLoader\Exception
+     *
+     * @return int|null null or 0 if everything went fine, or an error code
+     *
+     * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -127,21 +122,22 @@ class CopyTestsCommand extends Command
 
         $source = new CollectionSource(
             [
-                new BrowscapSource($this->logger, $this->cache),
-                new PiwikSource($this->logger, $this->cache),
+                new BrowscapSource($this->logger),
+                new PiwikSource($this->logger),
                 new UapCoreSource($this->logger),
-                new WhichBrowserSource($this->logger, $this->cache),
-                new WootheeSource($this->logger, $this->cache),
-                new MobileDetectSource($this->logger, $this->cache),
-                new YzalisSource($this->logger, $this->cache),
+                new WhichBrowserSource($this->logger),
+                new WootheeSource($this->logger),
+                new MobileDetectSource($this->logger),
+                new YzalisSource($this->logger),
+                new CrawlerDetectSource($this->logger),
             ]
         );
 
         $output->writeln('copy tests ...');
 
-        $txtTotalCounter      = 0;
+        $txtTotalCounter = 0;
 
-        $txtWriter          = new TxtTestWriter($this->logger);
+        $txtWriter = new TxtTestWriter($this->logger);
 
         foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim($useragent);

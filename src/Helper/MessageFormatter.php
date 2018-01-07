@@ -65,8 +65,8 @@ class MessageFormatter
     }
 
     /**
-     * @param string                            $propertyName
-     * @param \Psr\Log\LoggerInterface          $logger
+     * @param string                   $propertyName
+     * @param \Psr\Log\LoggerInterface $logger
      *
      * @return string[]
      */
