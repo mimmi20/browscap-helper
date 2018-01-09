@@ -16,6 +16,7 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Writer\DetectorTestWriter;
+use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
 use BrowserDetector\Helper\GenericRequestFactory;
@@ -24,16 +25,14 @@ use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use UaResult\Browser\Browser;
 use UaResult\Device\Device;
-use UaResult\Engine\Engine;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
@@ -52,7 +51,7 @@ class RewriteTestsCommand extends Command
     private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
+     * @var \Psr\SimpleCache\CacheInterface
      */
     private $cache;
 
@@ -72,11 +71,11 @@ class RewriteTestsCommand extends Command
     private $tests = [];
 
     /**
-     * @param \Monolog\Logger                   $logger
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param \BrowserDetector\Detector         $detector
+     * @param \Monolog\Logger                 $logger
+     * @param \Psr\SimpleCache\CacheInterface $cache
+     * @param \BrowserDetector\Detector       $detector
      */
-    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector)
+    public function __construct(Logger $logger, PsrCacheInterface $cache, Detector $detector)
     {
         $this->logger   = $logger;
         $this->cache    = $cache;
@@ -108,7 +107,9 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws \FileLoader\Exception
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -125,7 +126,7 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('remove old test files ...');
 
-        $finder   = new Finder();
+        $finder = new Finder();
         $finder->files();
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
@@ -137,7 +138,7 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
-        $finder   = new Finder();
+        $finder = new Finder();
         $finder->files();
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
@@ -149,11 +150,15 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
+        $output->writeln('add new tests ...');
+
         $detectorTestWriter   = new DetectorTestWriter($this->logger);
         $detectorNumber       = 0;
         $testCounter          = [$detectorNumber => 0];
         $detectorTotalCounter = 0;
         $detectorCounter      = 0;
+
+        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
 
         $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -174,7 +179,7 @@ class RewriteTestsCommand extends Command
                 $detectorTotalCounter += $detectorCounter;
                 $detectorCounter = 0;
 
-                $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
+                $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
 
                 $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -212,8 +217,8 @@ class RewriteTestsCommand extends Command
             $circleTests
         );
 
-        $i           = 0;
-        $c           = 0;
+        $i = 0;
+        $c = 0;
 
         $circleLines     = [$i => []];
         $circleCount     = [$i => 0];
@@ -237,87 +242,45 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('preparing circle.yml ...');
 
-        $circleFile      = $basePath . 'circle.yml';
-        $circleciContent = 'machine:
-  php:
-    version: 7.1.9
-  timezone:
-    Europe/Berlin
-
-dependencies:
-  pre:
-    - rm /opt/circleci/php/$(phpenv global)/etc/conf.d/xdebug.ini
-  override:
-    - composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv
-
-test:
-  override:
-    - composer validate
-';
+        $circleFile      = $basePath . '.circleci/config.yml';
+        $circleciContent = '';
 
         foreach (array_reverse(array_keys($circleCount)) as $i) {
-            $count  = $circleCount[$i];
-            $group  = sprintf('%1$07d', $i);
+            $count = $circleCount[$i];
+            $group = sprintf('%1$07d', $i);
 
-            $tests   = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
+            $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
-            $testContent = '<?php
-/**
- * This file is part of the browser-detector-tests package.
- *
- * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-declare(strict_types = 1);
-namespace BrowserDetectorTest\UserAgentsTest;
-
-use BrowserDetectorTest\UserAgentsTestTrait;
-use PHPUnit\Framework\TestCase;
-
-/**
- * Class T' . $group . 'Test
- *
- * has ' . trim($tests) . '
- * this file was created/edited automatically, please do not edit it
- *
- * @author     Thomas Mueller <mimmi20@live.de>
- * @group      ' . $group . '
- */
-class T' . $group . 'Test extends TestCase
-{
-    use UserAgentsTestTrait;
-
-    /**
-     * @var string[]
-     */
-    private $sourceDirectory = [';
+            $testContent = [];
 
             foreach (array_reverse($circleLines[$i]) as $groupx) {
-                $testContent .= '
-        \'tests/issues/' . $groupx . '/\',';
+                $testContent[] = '        \'tests/issues/' . $groupx . '/\',';
             }
 
-            $testContent .= '
-    ];
-}
-';
             $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
-            file_put_contents($testFile, $testContent);
+            file_put_contents(
+                $testFile,
+                str_replace(
+                    '//### tests ###',
+                    implode(PHP_EOL, $testContent),
+                    file_get_contents('templates/test.php.txt')
+                )
+            );
 
             $columns = 111 + 2 * mb_strlen((string) $count);
 
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    - php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
         }
 
         $output->writeln('writing ' . $circleFile . ' ...');
-        file_put_contents($circleFile, $circleciContent);
+        file_put_contents(
+            $circleFile,
+            str_replace('### tests ###', $circleciContent, file_get_contents('templates/config.yml.txt'))
+        );
 
         $output->writeln('done');
 
@@ -327,13 +290,19 @@ class T' . $group . 'Test extends TestCase
     /**
      * @param string $useragent
      *
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Seld\JsonLint\ParsingException
+     *
      * @return \UaResult\Result\ResultInterface|null
      */
     private function handleTest(string $useragent): ?ResultInterface
     {
         $this->logger->info('        detect for new result');
 
-        $newResult = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
+        $detector = new Detector($this->cache, $this->logger);
+        $detector->warmupCache();
+
+        $newResult = $detector->getBrowser($useragent);
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
@@ -400,8 +369,8 @@ class T' . $group . 'Test extends TestCase
             try {
                 $regexFactory = new RegexFactory($this->cache, $this->logger);
                 $regexFactory->detect($normalizedUa);
-                [$device]     = $regexFactory->getDevice();
-                $replaced     = false;
+                [$device] = $regexFactory->getDevice();
+                $replaced = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
                     $device   = new Device(null, null);
@@ -417,29 +386,29 @@ class T' . $group . 'Test extends TestCase
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             } catch (NotFoundException $e) {
                 $this->logger->debug($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             } catch (GeneralDeviceException $e) {
-                $deviceLoader = new DeviceLoader($this->cache, $this->logger);
+                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
 
                 try {
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
                 } catch (\Exception $e) {
                     $this->logger->crit($e);
 
-                    $device   = new Device(null, null);
+                    $device = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
                 $this->logger->debug($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             } catch (\Exception $e) {
                 $this->logger->error($e);
 
-                $device   = new Device(null, null);
+                $device = new Device(null, null);
             }
         }
 

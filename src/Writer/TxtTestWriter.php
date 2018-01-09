@@ -16,18 +16,12 @@ use Psr\Log\LoggerInterface;
 class TxtTestWriter
 {
     /**
-     * @var string
-     */
-    private $dir;
-
-    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
     private $outputTxt    = [];
     private $chunkCounter = 0;
-    private $fileCounter  = 0;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger

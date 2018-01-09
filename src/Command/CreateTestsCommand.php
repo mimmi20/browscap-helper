@@ -19,7 +19,6 @@ use BrowserDetector\Detector;
 use BrowserDetector\Helper\GenericRequestFactory;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -56,28 +55,21 @@ class CreateTestsCommand extends Command
     private $logger;
 
     /**
-     * @var \Psr\Cache\CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
      * @var \BrowserDetector\Detector
      */
     private $detector;
 
     /**
-     * @param \Monolog\Logger                   $logger
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param \BrowserDetector\Detector         $detector
-     * @param string                            $sourcesDirectory
-     * @param string                            $targetDirectory
+     * @param \Monolog\Logger           $logger
+     * @param \BrowserDetector\Detector $detector
+     * @param string                    $sourcesDirectory
+     * @param string                    $targetDirectory
      */
-    public function __construct(Logger $logger, CacheItemPoolInterface $cache, Detector $detector, string $sourcesDirectory, string $targetDirectory)
+    public function __construct(Logger $logger, Detector $detector, string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;
         $this->logger           = $logger;
-        $this->cache            = $cache;
         $this->detector         = $detector;
 
         parent::__construct();
@@ -111,7 +103,8 @@ class CreateTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws \LogicException       When this abstract method is not implemented
+     * @throws \FileLoader\Exception
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -128,7 +121,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ((new BrowscapSource($this->logger, $this->cache))->getUserAgents() as $useragent) {
+        foreach ((new BrowscapSource($this->logger))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
             if (array_key_exists($useragent, $browscapChecks)) {
@@ -148,7 +141,7 @@ class CreateTestsCommand extends Command
         $detectorNumber = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
 
         $output->writeln('next test for Browscap helper: ' . $txtNumber);
-        $output->writeln('next test for BrowserDestector: ' . $detectorNumber);
+        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
 
         $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
 
@@ -172,8 +165,8 @@ class CreateTestsCommand extends Command
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            $request  = $genericRequest->createRequestFromString($useragent);
-            $result   = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+            $request = $genericRequest->createRequestFromString($useragent);
+            $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
             if (!array_key_exists($useragent, $browscapChecks) && false !== mb_stripos($useragent, 'bingweb')) {
                 $browscapTestWriter->write($result, $txtNumber, $useragent, $browscapTotalCounter);
@@ -183,7 +176,7 @@ class CreateTestsCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln('tests created for BrowserDestector: ' . $detectorTotalCounter);
+        $output->writeln('tests created for BrowserDetector: ' . $detectorTotalCounter);
         $output->writeln('tests created for Browscap:         ' . $browscapTotalCounter);
 
         return 0;

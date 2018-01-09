@@ -13,7 +13,6 @@ namespace BrowscapHelper\Helper;
 
 use BrowserDetector\Version\Version;
 use BrowserDetector\Version\VersionInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use UaResult\Result\Result;
 use UaResult\Result\ResultFactory;
@@ -66,13 +65,12 @@ class MessageFormatter
     }
 
     /**
-     * @param string                            $propertyName
-     * @param \Psr\Cache\CacheItemPoolInterface $cache
-     * @param \Psr\Log\LoggerInterface          $logger
+     * @param string                   $propertyName
+     * @param \Psr\Log\LoggerInterface $logger
      *
      * @return string[]
      */
-    public function formatMessage(string $propertyName, CacheItemPoolInterface $cache, LoggerInterface $logger): array
+    public function formatMessage(string $propertyName, LoggerInterface $logger): array
     {
         $modules = array_keys($this->collection);
         /** @var \UaResult\Result\Result|null $firstElement */
@@ -81,7 +79,7 @@ class MessageFormatter
         if (null === $firstElement) {
             $strReality = '(NULL)';
         } else {
-            $strReality = $this->getValue($this->resultFactory->fromArray($cache, $logger, (array) $firstElement), $propertyName);
+            $strReality = $this->getValue($this->resultFactory->fromArray($logger, (array) $firstElement), $propertyName);
         }
 
         $detectionResults = [];
@@ -92,7 +90,7 @@ class MessageFormatter
             if (null === $element) {
                 $strTarget = '(NULL)';
             } else {
-                $strTarget = $this->getValue($this->resultFactory->fromArray($cache, $logger, (array) $element), $propertyName);
+                $strTarget = $this->getValue($this->resultFactory->fromArray($logger, (array) $element), $propertyName);
             }
 
             if (mb_strtolower($strTarget) === mb_strtolower($strReality)) {

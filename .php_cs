@@ -23,8 +23,6 @@ $finder = PhpCsFixer\Finder::create()
     ->files()
     ->name('*.php')
     ->in(__DIR__ . '/src')
-    ->in(__DIR__ . '/web')
-    ->in(__DIR__ . '/bin')
     ->append([__FILE__]);
 
 return PhpCsFixer\Config::create()

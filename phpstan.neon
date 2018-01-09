@@ -6,7 +6,3 @@ parameters:
     - */tests/*/data/*
   ignoreErrors:
     - '~of function array_multisort is passed by reference, so it expects variables only~'
-    - '~Function http_parse_headers not found~'
-    - '~Class http\\Header not found~'
-    - '~Call to static method parse\(\) on an unknown class http\\Header~'
-    - '~might not be defined~'

@@ -5,18 +5,25 @@ dist: trusty
 php:
   - 7.1
   - 7.2
+  - nightly
 
 os: linux
 
 env:
-  - COMPOSER_FLAGS="--prefer-lowest"
-  - COMPOSER_FLAGS=""
+  - COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
+  - COMPOSER_FLAGS="--ignore-platform-reqs"
 
 cache:
   directories:
     - $HOME/.composer/cache
 
+stages:
+  - composer validate
+  - check coding style
+  - static code analysis
+
 before_install:
+  - stty cols 130
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo 'opcache.enable=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'opcache.enable_cli=1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -24,27 +31,32 @@ before_install:
 
 install: travis_retry composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction --no-suggest $COMPOSER_FLAGS -vv
 
-script: composer validate
+script: skip
 
 jobs:
   fast_finish: true
   allow_failures:
     - php: nightly
   include:
-    - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
+    - stage: composer validate
+      php: 7.1
+      install: skip
+      script: composer validate
+
     - stage: check coding style
       php: 7.1
-      env: COMPOSER_FLAGS=""
+      env: TEST=phpcs
       script: vendor/bin/phpcs --colors
+
     - stage: check coding style
       php: 7.1
-      env: COMPOSER_FLAGS=""
+      env: TEST=php-cs-fixer
       script: vendor/bin/php-cs-fixer fix --dry-run -vv
+
     - stage: static code analysis
       php: 7.1
-      env: COMPOSER_FLAGS=""
-      script: vendor/bin/phpstan.phar analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress src web bin
+      env: TEST=phpstan
+      script: vendor/bin/phpstan analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress src
 
 notifications:
   email: false
