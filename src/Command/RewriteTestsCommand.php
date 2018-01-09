@@ -299,7 +299,10 @@ class RewriteTestsCommand extends Command
     {
         $this->logger->info('        detect for new result');
 
-        $newResult = (new Detector($this->cache, $this->logger))->getBrowser($useragent);
+        $detector = new Detector($this->cache, $this->logger);
+        $detector->warmupCache();
+
+        $newResult = $detector->getBrowser($useragent);
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
