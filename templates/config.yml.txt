@@ -70,7 +70,7 @@ jobs:
           key: composer-v1-{{ checksum "composer.json" }}
           paths:
             - vendor
-      - run: vendor/bin/phpstan.phar analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress tests
+      - run: vendor/bin/phpstan analyse -l 7 -c phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=768M --no-progress tests
 
 workflows:
   version: 2
