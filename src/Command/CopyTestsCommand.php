@@ -34,8 +34,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class CopyTestsCommand
  *
  * @category   Browscap Helper
- *
- * @author     Thomas Müller <mimmi20@live.de>
  */
 class CopyTestsCommand extends Command
 {

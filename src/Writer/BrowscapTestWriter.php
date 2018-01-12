@@ -28,8 +28,10 @@ class BrowscapTestWriter
     private $logger;
 
     private $outputBrowscap = '';
-    private $counter        = 0;
-    private $number         = 0;
+
+    private $counter = 0;
+
+    private $number = 0;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
@@ -64,7 +66,7 @@ class BrowscapTestWriter
         $formatedIssue   = sprintf('%1$05d', $number);
         $formatedCounter = sprintf('%1$05d', $this->counter);
 
-        $this->outputBrowscap .= "    'issue-$formatedIssue-$formatedCounter' => [
+        $this->outputBrowscap .= "    'issue-" . $formatedIssue . '-' . $formatedCounter . "' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $useragent) . "',
         'properties' => [
             'Comment' => 'Default Browser',

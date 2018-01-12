@@ -34,8 +34,6 @@ use UaResult\Result\Result;
  * Class CreateTestsCommand
  *
  * @category   Browscap Helper
- *
- * @author     Thomas Müller <mimmi20@live.de>
  */
 class CreateTestsCommand extends Command
 {

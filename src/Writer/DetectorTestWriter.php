@@ -22,9 +22,12 @@ class DetectorTestWriter
     private $logger;
 
     private $outputDetector = [];
-    private $counter        = 0;
-    private $chunkCounter   = 0;
-    private $fileCounter    = 0;
+
+    private $counter = 0;
+
+    private $chunkCounter = 0;
+
+    private $fileCounter = 0;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger

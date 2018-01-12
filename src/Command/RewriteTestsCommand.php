@@ -40,8 +40,6 @@ use UaResult\Result\ResultInterface;
  * Class RewriteTestsCommand
  *
  * @category   Browscap Helper
- *
- * @author     Thomas Müller <mimmi20@live.de>
  */
 class RewriteTestsCommand extends Command
 {
@@ -108,7 +106,7 @@ class RewriteTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \FileLoader\Exception
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Seld\JsonLint\ParsingException
      *
      * @return int|null null or 0 if everything went fine, or an error code
@@ -261,8 +259,8 @@ class RewriteTestsCommand extends Command
             file_put_contents(
                 $testFile,
                 str_replace(
-                    '//### tests ###',
-                    implode(PHP_EOL, $testContent),
+                    ['//### tests ###', '### group ###'],
+                    [implode(PHP_EOL, $testContent), $group],
                     file_get_contents('templates/test.php.txt')
                 )
             );
@@ -290,7 +288,7 @@ class RewriteTestsCommand extends Command
     /**
      * @param string $useragent
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Seld\JsonLint\ParsingException
      *
      * @return \UaResult\Result\ResultInterface|null
@@ -331,30 +329,30 @@ class RewriteTestsCommand extends Command
 
         $this->logger->info('        rewriting');
 
-        /* rewrite browsers */
+        // rewrite browsers
 
         $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $newResult->getBrowser();
 
-        /* rewrite platforms */
+        // rewrite platforms
 
         $this->logger->info('        rewriting platform');
 
         $platform = clone $newResult->getOs();
 
-        /* @var $platform \UaResult\Os\OsInterface|null */
+        // @var $platform \UaResult\Os\OsInterface|null
 
         $this->logger->info('        rewriting device');
 
         $normalizedUa = (new NormalizerFactory())->build()->normalize($useragent);
 
-        /* rewrite devices */
+        // rewrite devices
 
         /** @var \UaResult\Device\DeviceInterface $device */
         $device   = clone $newResult->getDevice();
-        $replaced = true;
+        $replaced = false;
 
         if (in_array($device->getDeviceName(), [null, 'unknown'])) {
             $device   = new Device(null, null);
@@ -412,7 +410,7 @@ class RewriteTestsCommand extends Command
             }
         }
 
-        /* rewrite engines */
+        // rewrite engines
 
         $this->logger->info('        rewriting engine');
 

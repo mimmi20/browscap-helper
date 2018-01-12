@@ -30,10 +30,6 @@ use UaResult\Os\OsInterface;
  * detection class using regexes
  *
  * @category  BrowserDetector
- *
- * @author    Thomas Mueller <mimmi20@live.de>
- * @copyright 2012-2017 Thomas Mueller
- * @license   http://www.opensource.org/licenses/MIT MIT License
  */
 class RegexFactory
 {
@@ -82,8 +78,6 @@ class RegexFactory
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
      *
      * @return void
      */
@@ -92,7 +86,7 @@ class RegexFactory
         $this->match     = null;
         $this->useragent = $useragent;
 
-        foreach (RegexLoader::getInstance($this->cache, $this->logger)->getRegexes() as $regex) {
+        foreach (RegexLoader::getInstance($this->logger)->getRegexes() as $regex) {
             $matches = [];
 
             if (preg_match($regex, $useragent, $matches)) {
@@ -110,8 +104,6 @@ class RegexFactory
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
-     *
      * @return array
      */
     public function getDevice(): array
@@ -262,8 +254,6 @@ class RegexFactory
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
-     *
      * @return \UaResult\Os\OsInterface
      */
     public function getPlatform(): OsInterface
@@ -344,8 +334,6 @@ class RegexFactory
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
-     *
      * @return array
      */
     public function getBrowser(): array
@@ -440,8 +428,6 @@ class RegexFactory
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
-     *
      * @return \UaResult\Engine\EngineInterface
      */
     public function getEngine(): EngineInterface

@@ -15,8 +15,6 @@ namespace BrowscapHelper\Helper;
  * Class TargetDirectory
  *
  * @category   Browscap Helper
- *
- * @author     Thomas Mueller <mimmi20@live.de>
  */
 class TargetDirectory
 {
