@@ -20,10 +20,6 @@ use Psr\Http\Message\RequestInterface;
  * BrowscapHelper.ini parsing class with caching and update capabilities
  *
  * @category  BrowscapHelper
- *
- * @author    Thomas Mueller <mimmi20@live.de>
- * @copyright 2015 Thomas Mueller
- * @license   http://www.opensource.org/licenses/MIT MIT License
  */
 class Request
 {
@@ -39,7 +35,7 @@ class Request
      */
     public function getResponse(RequestInterface $request, Client $client): Response
     {
-        /* @var $response \GuzzleHttp\Psr7\Response */
+        // @var $response \GuzzleHttp\Psr7\Response
         $response = $client->send($request);
 
         if (200 !== $response->getStatusCode()) {

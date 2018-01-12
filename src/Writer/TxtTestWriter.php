@@ -20,7 +20,8 @@ class TxtTestWriter
      */
     private $logger;
 
-    private $outputTxt    = [];
+    private $outputTxt = [];
+
     private $chunkCounter = 0;
 
     /**

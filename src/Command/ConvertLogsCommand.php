@@ -27,8 +27,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class ConvertLogsCommand
  *
  * @category   Browscap Helper
- *
- * @author     Thomas Müller <mimmi20@live.de>
  */
 class ConvertLogsCommand extends Command
 {

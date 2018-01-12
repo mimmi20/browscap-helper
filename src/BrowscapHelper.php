@@ -23,8 +23,6 @@ use Symfony\Component\Console\Application;
  * Class BrowscapHelper
  *
  * @category   Browscap Helper
- *
- * @author     Thomas Mueller <mimmi20@live.de>
  */
 class BrowscapHelper extends Application
 {
