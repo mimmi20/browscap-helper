@@ -259,8 +259,8 @@ class RewriteTestsCommand extends Command
             file_put_contents(
                 $testFile,
                 str_replace(
-                    ['//### tests ###', '### group ###'],
-                    [implode(PHP_EOL, $testContent), $group],
+                    ['//### tests ###', '### group ###', '### count ###'],
+                    [implode(PHP_EOL, $testContent), $group, $count],
                     file_get_contents('templates/test.php.txt')
                 )
             );
