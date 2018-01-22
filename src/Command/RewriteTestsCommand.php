@@ -187,73 +187,19 @@ class RewriteTestsCommand extends Command
             }
         }
 
-        $output->writeln('count and order tests ...');
-
-        $circleTests = [];
-
-        foreach ($testCounter as $detectorNumber => $count) {
-            $group = sprintf('%1$07d', $detectorNumber);
-
-            $circleTests[$group] = $count;
-        }
-
-        $countArray = [];
-        $groupArray = [];
-
-        foreach ($circleTests as $group => $count) {
-            $countArray[$group] = $count;
-            $groupArray[$group] = $group;
-        }
-
-        array_multisort(
-            $countArray,
-            SORT_NUMERIC,
-            SORT_DESC,
-            $groupArray,
-            SORT_NUMERIC,
-            SORT_DESC,
-            $circleTests
-        );
-
-        $i = 0;
-        $c = 0;
-
-        $circleLines     = [$i => []];
-        $circleCount     = [$i => 0];
-        $circleTestsCopy = $circleTests;
-
-        while (count($circleTestsCopy)) {
-            foreach ($circleTestsCopy as $group => $count) {
-                if (1000 < ($c + $count)) {
-                    ++$i;
-                    $c               = 0;
-                    $circleLines[$i] = [];
-                    $circleCount[$i] = 0;
-                }
-                $c += $count;
-                $circleLines[$i][] = $group;
-                $circleCount[$i] += $count;
-
-                unset($circleTestsCopy[$group]);
-            }
-        }
-
         $output->writeln('preparing circle.yml ...');
 
         $circleFile      = $basePath . '.circleci/config.yml';
         $circleciContent = '';
 
-        foreach (array_reverse(array_keys($circleCount)) as $i) {
-            $count = $circleCount[$i];
-            $group = sprintf('%1$07d', $i);
+        foreach (array_reverse($testCounter) as $detectorNumber => $count) {
+            $group = sprintf('%1$07d', $detectorNumber);
 
             $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
-            $testContent = [];
-
-            foreach (array_reverse($circleLines[$i]) as $groupx) {
-                $testContent[] = '        \'tests/issues/' . $groupx . '/\',';
-            }
+            $testContent = [
+                '        \'tests/issues/' . $group . '/\','
+            ];
 
             $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
             file_put_contents(
@@ -270,7 +216,9 @@ class RewriteTestsCommand extends Command
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '    #  - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= PHP_EOL;
+            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
         }
 
