@@ -198,7 +198,7 @@ class RewriteTestsCommand extends Command
             $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
             $testContent = [
-                '        \'tests/issues/' . $group . '/\','
+                '        \'tests/issues/' . $group . '/\',',
             ];
 
             $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
