@@ -147,7 +147,7 @@ class RegexFactory
             } catch (NotFoundException $e) {
                 throw $e;
             }
-        } elseif (in_array($deviceCode, ['dalvik', 'android'])) {
+        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'generic'])) {
             throw new GeneralDeviceException('use general mobile device');
         } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
             throw new GeneralDeviceException('use general mobile device');
@@ -313,6 +313,16 @@ class RegexFactory
             $platformCode = 'rim os';
         } elseif ('cros' === $platformCode) {
             $platformCode = 'chromeos';
+        } elseif (in_array($platformCode, ['j2me/midp', 'java'])) {
+            $platformCode = 'java';
+        } elseif (in_array($platformCode, ['maui runtime', 'spreadtrum', 'vre'])) {
+            $platformCode = 'android';
+        } elseif ('series 60' === $platformCode) {
+            $platformCode = 'symbian';
+        } elseif ('windows mobile' === $platformCode) {
+            $platformCode = 'windows mobile os';
+        } elseif ('windows phone' === $platformCode) {
+            $platformCode = 'windows phone';
         }
 
         if (false !== mb_strpos($platformCode, 'windows nt') && array_key_exists('devicetype', $this->match)) {
