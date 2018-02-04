@@ -5,6 +5,10 @@
     {
       "type": "git",
       "url": "https://github.com/mimmi20/Apple-iOS-build.git"
+    },
+    {
+      "type": "git",
+      "url":  "https://github.com/mimmi20/Apple-OS-X-build.git"
     }
   ],
   "require": {
@@ -36,7 +40,8 @@
     "mimmi20/file-loader": "~3.0.4",
     "beberlei/assert": "^2.9",
     "seld/jsonlint": "^1.7",
-    "peterkahl/apple-ios-build-version": "dev-master"
+    "peterkahl/apple-ios-build-version": "dev-master",
+    "peterkahl/apple-os-x-build-version": "dev-master"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.2",
