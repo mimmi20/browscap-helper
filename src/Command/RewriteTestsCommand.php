@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Factory\RegexFactory;
@@ -337,6 +338,16 @@ class RewriteTestsCommand extends Command
                 $this->logger->debug($e);
 
                 $device = new Device(null, null);
+            } catch (GeneralBlackberryException $e) {
+                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
+
+                try {
+                    [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
+                } catch (\Exception $e) {
+                    $this->logger->crit($e);
+
+                    $device = new Device(null, null);
+                }
             } catch (GeneralDeviceException $e) {
                 $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
 
