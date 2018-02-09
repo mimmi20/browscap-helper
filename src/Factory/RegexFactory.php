@@ -153,7 +153,7 @@ class RegexFactory
             && 'blackberry' === mb_strtolower($this->match['osname'])
         ) {
             throw new GeneralBlackberryException('use general mobile device');
-        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'])) {
+        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic', ''])) {
             throw new GeneralDeviceException('use general mobile device');
         } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
             throw new GeneralDeviceException('use general mobile device');
