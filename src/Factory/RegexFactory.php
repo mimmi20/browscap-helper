@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Factory;
 
+use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Loader\RegexLoader;
 use BrowserDetector\Cache\Cache;
@@ -147,7 +148,12 @@ class RegexFactory
             } catch (NotFoundException $e) {
                 throw $e;
             }
-        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'generic'])) {
+        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'])
+            && array_key_exists('osname', $this->match)
+            && 'blackberry' === mb_strtolower($this->match['osname'])
+        ) {
+            throw new GeneralBlackberryException('use general mobile device');
+        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic', ''])) {
             throw new GeneralDeviceException('use general mobile device');
         } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
             throw new GeneralDeviceException('use general mobile device');

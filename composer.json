@@ -5,6 +5,10 @@
     {
       "type": "git",
       "url": "https://github.com/mimmi20/Apple-iOS-build.git"
+    },
+    {
+      "type": "git",
+      "url":  "https://github.com/mimmi20/Apple-OS-X-build.git"
     }
   ],
   "require": {
@@ -31,12 +35,13 @@
     "mimmi20/ua-result": "~5.2.1",
     "mimmi20/ua-result-company": "~3.2.3",
     "mimmi20/browser-detector-version": "~4.0.4",
-    "mimmi20/browser-detector": "~3.1.5",
-    "mimmi20/browser-detector-tests": "~2.0.11",
+    "mimmi20/browser-detector": "~3.1.6",
+    "mimmi20/browser-detector-tests": "~2.0.12",
     "mimmi20/file-loader": "~3.0.4",
     "beberlei/assert": "^2.9",
     "seld/jsonlint": "^1.7",
-    "peterkahl/apple-ios-build-version": "dev-master"
+    "peterkahl/apple-ios-build-version": "dev-master",
+    "peterkahl/apple-os-x-build-version": "dev-master"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.2",

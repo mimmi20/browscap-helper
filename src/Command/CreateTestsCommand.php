@@ -147,7 +147,7 @@ class CreateTestsCommand extends Command
             mkdir($targetDirectory);
         }
 
-        $output->writeln('reading files from Browscap helper ...');
+        $output->writeln('writing new browscap tests ...');
 
         $detectorTotalCounter = 0;
         $browscapTotalCounter = 0;
