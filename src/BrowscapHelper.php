@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2018, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,6 +31,11 @@ class BrowscapHelper extends Application
      */
     public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
+    /**
+     * BrowscapHelper constructor.
+     *
+     * @throws \Exception
+     */
     public function __construct()
     {
         parent::__construct('Browscap Helper Project', 'dev-master');
@@ -52,7 +57,7 @@ class BrowscapHelper extends Application
 
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\CopyTestsCommand($logger, $targetDirectory),
+            new Command\CopyTestsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\CreateTestsCommand($logger, $detector, $sourcesDirectory, $targetDirectory),
             new Command\RewriteTestsCommand($logger, $cache, $detector),
         ];

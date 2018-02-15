@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2017, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2018, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -27,6 +27,7 @@ use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -48,13 +49,20 @@ class CopyTestsCommand extends Command
     private $targetDirectory = '';
 
     /**
+     * @var string
+     */
+    private $sourcesDirectory = '';
+
+    /**
      * @param \Monolog\Logger $logger
+     * @param string          $sourcesDirectory
      * @param string          $targetDirectory
      */
-    public function __construct(Logger $logger, string $targetDirectory)
+    public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
     {
-        $this->logger          = $logger;
-        $this->targetDirectory = $targetDirectory;
+        $this->logger           = $logger;
+        $this->targetDirectory  = $targetDirectory;
+        $this->sourcesDirectory = $sourcesDirectory;
 
         parent::__construct();
     }
@@ -66,7 +74,14 @@ class CopyTestsCommand extends Command
     {
         $this
             ->setName('copy-tests')
-            ->setDescription('Copies tests from browscap and other libraries');
+            ->setDescription('Copies tests from browscap and other libraries')
+            ->addOption(
+                'resources',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Where the resource files are located',
+                $this->sourcesDirectory
+            );
     }
 
     /**
@@ -118,6 +133,8 @@ class CopyTestsCommand extends Command
         $output->writeln('next test for Browscap helper: ' . $txtNumber);
         $output->writeln('init sources ...');
 
+        $sourcesDirectory = $input->getOption('resources');
+
         $source = new CollectionSource(
             [
                 new BrowscapSource($this->logger),
@@ -128,6 +145,7 @@ class CopyTestsCommand extends Command
                 new MobileDetectSource($this->logger),
                 new YzalisSource($this->logger),
                 new CrawlerDetectSource($this->logger),
+                new TxtFileSource($this->logger, $sourcesDirectory),
             ]
         );
 
