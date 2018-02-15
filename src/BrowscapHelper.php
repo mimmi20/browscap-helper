@@ -31,6 +31,11 @@ class BrowscapHelper extends Application
      */
     public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
+    /**
+     * BrowscapHelper constructor.
+     *
+     * @throws \Exception
+     */
     public function __construct()
     {
         parent::__construct('Browscap Helper Project', 'dev-master');
@@ -52,7 +57,7 @@ class BrowscapHelper extends Application
 
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\CopyTestsCommand($logger, $targetDirectory),
+            new Command\CopyTestsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\CreateTestsCommand($logger, $detector, $sourcesDirectory, $targetDirectory),
             new Command\RewriteTestsCommand($logger, $cache, $detector),
         ];
