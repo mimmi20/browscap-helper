@@ -129,7 +129,6 @@ class RewriteTestsCommand extends Command
         $finder->files();
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
-        $finder->sortByName();
         $finder->ignoreUnreadableDirs();
         $finder->in($detectorTargetDirectory);
 
@@ -141,7 +140,6 @@ class RewriteTestsCommand extends Command
         $finder->files();
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
-        $finder->sortByName();
         $finder->ignoreUnreadableDirs();
         $finder->in($basePath . 'tests/UserAgentsTest/');
 
@@ -254,6 +252,31 @@ class RewriteTestsCommand extends Command
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
             && !$newResult->getDevice()->getType()->isTv()
+        ) {
+            $keys = [
+                (string) $newResult->getBrowser()->getName(),
+                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                (string) $newResult->getEngine()->getName(),
+                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                (string) $newResult->getOs()->getName(),
+                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                (string) $newResult->getDevice()->getDeviceName(),
+                (string) $newResult->getDevice()->getMarketingName(),
+                (string) $newResult->getDevice()->getManufacturer()->getName(),
+            ];
+
+            $key = implode('-', $keys);
+
+            if (array_key_exists($key, $this->tests)) {
+                return null;
+            }
+
+            $this->tests[$key] = 1;
+        } elseif (($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet())
+            && false === mb_strpos((string) $newResult->getBrowser()->getName(), 'general')
+            && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'])
+            && false === mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general')
+            && !in_array($newResult->getDevice()->getDeviceName(), [null, 'unknown'])
         ) {
             $keys = [
                 (string) $newResult->getBrowser()->getName(),
