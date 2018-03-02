@@ -273,9 +273,9 @@ class RewriteTestsCommand extends Command
 
             $this->tests[$key] = 1;
         } elseif (($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet())
-            && false === strpos((string) $newResult->getBrowser()->getName(), 'general')
+            && false === mb_strpos((string) $newResult->getBrowser()->getName(), 'general')
             && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'])
-            && false === strpos((string) $newResult->getDevice()->getDeviceName(), 'general')
+            && false === mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general')
             && !in_array($newResult->getDevice()->getDeviceName(), [null, 'unknown'])
         ) {
             $keys = [
