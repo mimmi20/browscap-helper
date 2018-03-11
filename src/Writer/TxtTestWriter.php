@@ -11,36 +11,21 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Writer;
 
-use Psr\Log\LoggerInterface;
-
 class TxtTestWriter
 {
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var string[]
      */
-    private $logger;
-
     private $outputTxt = [];
-
-    private $chunkCounter = 0;
-
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
 
     /**
      * @param string $useragent
      * @param string $dir
      * @param int    $number
-     * @param int    $totalCounter
      *
-     * @return bool
+     * @return void
      */
-    public function write(string $useragent, string $dir, int $number, int &$totalCounter): bool
+    public function write(string $useragent, string $dir, int $number): void
     {
         $this->outputTxt[] = $useragent;
 
@@ -48,17 +33,5 @@ class TxtTestWriter
             $dir . sprintf('%1$07d', $number) . '.txt',
             implode(PHP_EOL, $this->outputTxt) . PHP_EOL
         );
-
-        ++$this->chunkCounter;
-        ++$totalCounter;
-
-        if (1000 <= $this->chunkCounter) {
-            $this->chunkCounter = 0;
-            $this->outputTxt    = [];
-
-            return true;
-        }
-
-        return false;
     }
 }

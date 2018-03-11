@@ -35,6 +35,7 @@ class BrowscapHelper extends Application
      * BrowscapHelper constructor.
      *
      * @throws \Exception
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function __construct()
     {
@@ -54,11 +55,12 @@ class BrowscapHelper extends Application
 
         $cache    = new FilesystemCache('', 0, __DIR__ . '/../cache/');
         $detector = new Detector($cache, $logger);
+        $detector->warmupCache();
 
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\CopyTestsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\CreateTestsCommand($logger, $detector, $sourcesDirectory, $targetDirectory),
+            new Command\CreateTestsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\RewriteTestsCommand($logger, $cache, $detector),
         ];
 

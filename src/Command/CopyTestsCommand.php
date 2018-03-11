@@ -11,7 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
@@ -124,13 +123,6 @@ class CopyTestsCommand extends Command
             $txtChecks[$useragent] = 1;
         }
 
-        $targetDirectoryHelper = new TargetDirectory();
-
-        $output->writeln('detect next test numbers ...');
-
-        $txtNumber = $targetDirectoryHelper->getNextTest($testSource);
-
-        $output->writeln('next test for Browscap helper: ' . $txtNumber);
         $output->writeln('init sources ...');
 
         $sourcesDirectory = $input->getOption('resources');
@@ -153,22 +145,31 @@ class CopyTestsCommand extends Command
 
         $txtTotalCounter = 0;
 
-        $txtWriter = new TxtTestWriter($this->logger);
-
         foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
-            if (!array_key_exists($useragent, $txtChecks)
-                && $txtWriter->write($useragent, $testSource, $txtNumber, $txtTotalCounter)
-            ) {
-                ++$txtNumber;
+            if (array_key_exists($useragent, $txtChecks)) {
+                continue;
             }
 
             $txtChecks[$useragent] = 1;
+            ++$txtTotalCounter;
+        }
+
+        $folderChunks  = array_chunk($txtChecks, 1000, true);
+        $txtTestWriter = new TxtTestWriter();
+
+        foreach ($folderChunks as $folderId => $folderChunk) {
+            $txtTestWriter->write(
+                implode(PHP_EOL, array_keys($folderChunk)),
+                $testSource,
+                $folderId
+            );
         }
 
         $output->writeln('');
-        $output->writeln('tests copied for Browscap helper:  ' . $txtTotalCounter);
+        $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter);
+        $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
 
         return 0;
     }

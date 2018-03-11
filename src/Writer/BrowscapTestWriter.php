@@ -49,9 +49,9 @@ class BrowscapTestWriter
      * @param string                           $useragent
      * @param int                              $totalCounter
      *
-     * @return bool
+     * @return void
      */
-    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): bool
+    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): void
     {
         $platform = clone $result->getOs();
         $device   = clone $result->getDevice();
@@ -106,7 +106,5 @@ class BrowscapTestWriter
 
         ++$this->counter;
         ++$totalCounter;
-
-        return false;
     }
 }

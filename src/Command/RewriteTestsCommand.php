@@ -108,7 +108,6 @@ class RewriteTestsCommand extends Command
      *
      * @throws \FileLoader\Exception
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -147,17 +146,8 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
-        $output->writeln('add new tests ...');
-
-        $detectorTestWriter   = new DetectorTestWriter($this->logger);
-        $detectorNumber       = 0;
-        $testCounter          = [$detectorNumber => 0];
-        $detectorTotalCounter = 0;
-        $detectorCounter      = 0;
-
-        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
-
-        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
+        $output->writeln('rewrite tests and circleci ...');
+        $testResults = [];
 
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -169,30 +159,34 @@ class RewriteTestsCommand extends Command
                 continue;
             }
 
-            if ($detectorTestWriter->write($result, $targetDirectory, $detectorNumber, $useragent, $detectorCounter)) {
-                $testCounter[$detectorNumber] = $detectorCounter;
-                ++$detectorNumber;
-                $testCounter[$detectorNumber] = 0;
-                $detectorTotalCounter += $detectorCounter;
-                $detectorCounter = 0;
-
-                $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
-
-                $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
-
-                if (!file_exists($targetDirectory)) {
-                    mkdir($targetDirectory);
-                }
-            }
+            $testResults[] = $useragent;
         }
 
-        $output->writeln('preparing circle.yml ...');
+        $detectorTestWriter = new DetectorTestWriter($this->logger);
+        $folderChunks       = array_chunk($testResults, 1000);
+        $circleFile         = $basePath . '.circleci/config.yml';
+        $circleciContent    = '';
 
-        $circleFile      = $basePath . '.circleci/config.yml';
-        $circleciContent = '';
+        foreach ($folderChunks as $folderId => $folderChunk) {
+            $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId) . '/';
+            $fileChunks      = array_chunk($folderChunk, 100);
 
-        foreach (array_reverse($testCounter) as $detectorNumber => $count) {
-            $group = sprintf('%1$07d', $detectorNumber);
+            foreach ($fileChunks as $fileId => $fileChunk) {
+                foreach ($fileChunk as $useragent) {
+                    $result = $this->handleTest($useragent);
+
+                    if (null === $result) {
+                        $this->logger->error('UA "' . $useragent . '" was skipped because a similar UA was already added');
+
+                        continue;
+                    }
+
+                    $detectorTestWriter->write($result, $targetDirectory, $folderId);
+                }
+            }
+
+            $count = count($folderChunk);
+            $group = sprintf('%1$07d', $folderId);
 
             $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
@@ -215,7 +209,7 @@ class RewriteTestsCommand extends Command
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #  - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '    #  - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --group ' . $group . ' -- ' . $tests;
             $circleciContent .= PHP_EOL;
             $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
@@ -236,7 +230,6 @@ class RewriteTestsCommand extends Command
      * @param string $useragent
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
@@ -244,10 +237,7 @@ class RewriteTestsCommand extends Command
     {
         $this->logger->info('        detect for new result');
 
-        $detector = new Detector($this->cache, $this->logger);
-        $detector->warmupCache();
-
-        $newResult = $detector->getBrowser($useragent);
+        $newResult = $this->detector->parseString($useragent);
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()

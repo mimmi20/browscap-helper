@@ -15,7 +15,6 @@ use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Writer\BrowscapTestWriter;
-use BrowserDetector\Detector;
 use BrowserDetector\Helper\GenericRequestFactory;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -53,22 +52,15 @@ class CreateTestsCommand extends Command
     private $logger;
 
     /**
-     * @var \BrowserDetector\Detector
+     * @param \Monolog\Logger $logger
+     * @param string          $sourcesDirectory
+     * @param string          $targetDirectory
      */
-    private $detector;
-
-    /**
-     * @param \Monolog\Logger           $logger
-     * @param \BrowserDetector\Detector $detector
-     * @param string                    $sourcesDirectory
-     * @param string                    $targetDirectory
-     */
-    public function __construct(Logger $logger, Detector $detector, string $sourcesDirectory, string $targetDirectory)
+    public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;
         $this->logger           = $logger;
-        $this->detector         = $detector;
 
         parent::__construct();
     }
@@ -113,8 +105,7 @@ class CreateTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $detectorTargetDirectory = 'vendor/mimmi20/browser-detector-tests/tests/issues/';
-        $testSource              = 'tests/';
+        $testSource = 'tests/';
 
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
@@ -135,47 +126,39 @@ class CreateTestsCommand extends Command
 
         $output->writeln('detect next test numbers ...');
 
-        $txtNumber      = $targetDirectoryHelper->getNextTest($testSource);
-        $detectorNumber = $targetDirectoryHelper->getNextTest($detectorTargetDirectory);
+        $txtNumber = $targetDirectoryHelper->getNextTest($testSource);
 
-        $output->writeln('next test for Browscap helper: ' . $txtNumber);
-        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
-
-        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
-
-        if (!file_exists($targetDirectory)) {
-            mkdir($targetDirectory);
-        }
-
+        $output->writeln('next test for Browscap: ' . $txtNumber);
         $output->writeln('writing new browscap tests ...');
 
-        $detectorTotalCounter = 0;
         $browscapTotalCounter = 0;
-
-        $genericRequest = new GenericRequestFactory();
-        $browser        = new Browser(null);
-        $device         = new Device(null, null);
-        $platform       = new Os(null, null);
-        $engine         = new Engine(null);
-
-        $browscapTestWriter = new BrowscapTestWriter($this->logger, $this->targetDirectory);
+        $genericRequest       = new GenericRequestFactory();
+        $browser              = new Browser(null);
+        $device               = new Device(null, null);
+        $platform             = new Os(null, null);
+        $engine               = new Engine(null);
+        $browscapTestWriter   = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
 
+            if (array_key_exists($useragent, $browscapChecks)) {
+                continue;
+            }
+
+            if (false === mb_stripos($useragent, 'bingweb')) {
+                continue;
+            }
+
             $request = $genericRequest->createRequestFromString($useragent);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            if (!array_key_exists($useragent, $browscapChecks) && false !== mb_stripos($useragent, 'bingweb')) {
-                $browscapTestWriter->write($result, $txtNumber, $useragent, $browscapTotalCounter);
-            }
-
+            $browscapTestWriter->write($result, $txtNumber, $useragent, $browscapTotalCounter);
             $browscapChecks[$useragent] = 1;
         }
 
         $output->writeln('');
-        $output->writeln('tests created for BrowserDetector: ' . $detectorTotalCounter);
-        $output->writeln('tests created for Browscap:         ' . $browscapTotalCounter);
+        $output->writeln('tests created for Browscap: ' . $browscapTotalCounter);
 
         return 0;
     }
