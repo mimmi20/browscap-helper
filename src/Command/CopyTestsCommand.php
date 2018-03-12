@@ -105,10 +105,9 @@ class CopyTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $testSource = 'tests/';
-
         $output->writeln('reading already existing tests ...');
-        $txtChecks = [];
+        $txtChecks  = [];
+        $testSource = 'tests/';
 
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -140,7 +139,7 @@ class CopyTestsCommand extends Command
             ]
         );
 
-        $output->writeln('read tests from sources ...');
+        $output->writeln('copy tests from sources ...');
 
         $txtTotalCounter = 0;
 
@@ -155,7 +154,7 @@ class CopyTestsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $output->writeln('copy tests ...');
+        $output->writeln('rewrite tests ...');
 
         $folderChunks  = array_chunk($txtChecks, 1000, true);
 
