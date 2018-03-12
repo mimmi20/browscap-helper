@@ -11,6 +11,10 @@
 declare(strict_types = 1);
 namespace BrowscapHelper;
 
+use BrowscapHelper\Command\Helper\BrowscapTestWriter;
+use BrowscapHelper\Command\Helper\DetectorTestWriter;
+use BrowscapHelper\Command\Helper\RegexFactory;
+use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowserDetector\Detector;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
@@ -67,5 +71,20 @@ class BrowscapHelper extends Application
         foreach ($commands as $command) {
             $this->add($command);
         }
+
+        $targetDirectoryHelper = new Command\Helper\TargetDirectory();
+        $this->getHelperSet()->set($targetDirectoryHelper);
+
+        $browscapTestWriter   = new BrowscapTestWriter($logger, $targetDirectory);
+        $this->getHelperSet()->set($browscapTestWriter);
+
+        $txtTestWriter = new TxtTestWriter();
+        $this->getHelperSet()->set($txtTestWriter);
+
+        $detectorTestWriter = new DetectorTestWriter($logger);
+        $this->getHelperSet()->set($detectorTestWriter);
+
+        $regexFactory = new RegexFactory($cache, $logger);
+        $this->getHelperSet()->set($regexFactory);
     }
 }

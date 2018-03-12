@@ -9,12 +9,13 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Writer;
+namespace BrowscapHelper\Command\Helper;
 
 use Psr\Log\LoggerInterface;
 use UaResult\Result\ResultInterface;
+use Symfony\Component\Console\Helper\Helper;
 
-class DetectorTestWriter
+class DetectorTestWriter extends Helper
 {
     /**
      * @var \Psr\Log\LoggerInterface
@@ -33,6 +34,11 @@ class DetectorTestWriter
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    public function getName()
+    {
+        return 'detector-test-writer';
     }
 
     /**

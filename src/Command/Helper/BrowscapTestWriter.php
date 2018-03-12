@@ -9,13 +9,14 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Writer;
+namespace BrowscapHelper\Command\Helper;
 
 use BrowserDetector\Version\VersionInterface;
 use Psr\Log\LoggerInterface;
 use UaResult\Result\ResultInterface;
+use Symfony\Component\Console\Helper\Helper;
 
-class BrowscapTestWriter
+class BrowscapTestWriter extends Helper
 {
     /**
      * @var string
@@ -41,6 +42,11 @@ class BrowscapTestWriter
     {
         $this->logger = $logger;
         $this->dir    = $dir;
+    }
+
+    public function getName()
+    {
+        return 'browscap-test-writer';
     }
 
     /**

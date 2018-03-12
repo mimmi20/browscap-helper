@@ -14,9 +14,7 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
-use BrowscapHelper\Factory\RegexFactory;
 use BrowscapHelper\Source\TxtFileSource;
-use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
@@ -162,7 +160,6 @@ class RewriteTestsCommand extends Command
             $testResults[] = $useragent;
         }
 
-        $detectorTestWriter = new DetectorTestWriter($this->logger);
         $folderChunks       = array_chunk($testResults, 1000);
         $circleFile         = $basePath . '.circleci/config.yml';
         $circleciContent    = '';
@@ -181,7 +178,7 @@ class RewriteTestsCommand extends Command
                         continue;
                     }
 
-                    $detectorTestWriter->write($result, $targetDirectory, $folderId);
+                    $this->getHelper('detector-test-writer')->write($result, $targetDirectory, $folderId);
                 }
             }
 
@@ -327,7 +324,7 @@ class RewriteTestsCommand extends Command
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             try {
-                $regexFactory = new RegexFactory($this->cache, $this->logger);
+                $regexFactory = $this->getHelper('regex-factory');
                 $regexFactory->detect($normalizedUa);
                 [$device] = $regexFactory->getDevice();
                 $replaced = false;

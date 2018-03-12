@@ -9,11 +9,12 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Factory;
+namespace BrowscapHelper\Command\Helper;
 
+use BrowscapHelper\Factory\Regex\NoMatchException;
+use Symfony\Component\Console\Helper\Helper;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
-use BrowscapHelper\Loader\RegexLoader;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\BrowserLoader;
@@ -32,7 +33,7 @@ use UaResult\Os\OsInterface;
  *
  * @category  BrowserDetector
  */
-class RegexFactory
+class RegexFactory extends Helper
 {
     /**
      * @var \BrowserDetector\Cache\Cache
@@ -71,6 +72,11 @@ class RegexFactory
         $this->logger = $logger;
     }
 
+    public function getName()
+    {
+        return 'regex-factory';
+    }
+
     /**
      * Gets the information about the rendering engine by User Agent
      *
@@ -87,7 +93,7 @@ class RegexFactory
         $this->match     = null;
         $this->useragent = $useragent;
 
-        foreach (RegexLoader::getInstance($this->logger)->getRegexes() as $regex) {
+        foreach ($this->helperSet->get('regex-loader')->getRegexes() as $regex) {
             $matches = [];
 
             if (preg_match($regex, $useragent, $matches)) {
@@ -101,7 +107,7 @@ class RegexFactory
 
         $this->runDetection = true;
 
-        throw new Regex\NoMatchException('no regex did match');
+        throw new NoMatchException('no regex did match');
     }
 
     /**
@@ -122,7 +128,7 @@ class RegexFactory
         }
 
         if (!array_key_exists('devicecode', $this->match) || '' === $this->match['devicecode']) {
-            throw new Regex\NoMatchException('device not detected via regexes');
+            throw new NoMatchException('device not detected via regexes');
         }
 
         $deviceCode   = mb_strtolower($this->match['devicecode']);
@@ -288,7 +294,7 @@ class RegexFactory
         }
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
-            throw new Regex\NoMatchException('platform not detected via regexes');
+            throw new NoMatchException('platform not detected via regexes');
         }
 
         $platformCode = mb_strtolower($this->match['osname']);
@@ -367,7 +373,7 @@ class RegexFactory
         }
 
         if (!array_key_exists('browsername', $this->match) || '' === $this->match['browsername']) {
-            throw new Regex\NoMatchException('browser not detected via regexes');
+            throw new NoMatchException('browser not detected via regexes');
         }
 
         $browserCode   = mb_strtolower($this->match['browsername']);
@@ -461,7 +467,7 @@ class RegexFactory
         }
 
         if (!array_key_exists('enginename', $this->match) || '' === $this->match['enginename']) {
-            throw new Regex\NoMatchException('engine not detected via regexes');
+            throw new NoMatchException('engine not detected via regexes');
         }
 
         $engineCode   = mb_strtolower($this->match['enginename']);

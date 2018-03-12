@@ -21,7 +21,6 @@ use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
-use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -141,7 +140,7 @@ class CopyTestsCommand extends Command
             ]
         );
 
-        $output->writeln('copy tests ...');
+        $output->writeln('read tests from sources ...');
 
         $txtTotalCounter = 0;
 
@@ -156,12 +155,13 @@ class CopyTestsCommand extends Command
             ++$txtTotalCounter;
         }
 
+        $output->writeln('copy tests ...');
+
         $folderChunks  = array_chunk($txtChecks, 1000, true);
-        $txtTestWriter = new TxtTestWriter();
 
         foreach ($folderChunks as $folderId => $folderChunk) {
-            $txtTestWriter->write(
-                implode(PHP_EOL, array_keys($folderChunk)),
+            $this->getHelper('txt-test-writer')->write(
+                array_keys($folderChunk),
                 $testSource,
                 $folderId
             );

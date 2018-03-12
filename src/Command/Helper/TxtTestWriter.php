@@ -9,14 +9,16 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Writer;
+namespace BrowscapHelper\Command\Helper;
 
-class TxtTestWriter
+use Symfony\Component\Console\Helper\Helper;
+
+class TxtTestWriter extends Helper
 {
-    /**
-     * @var string[]
-     */
-    private $outputTxt = [];
+    public function getName()
+    {
+        return 'txt-test-writer';
+    }
 
     /**
      * @param string $useragent
@@ -25,13 +27,11 @@ class TxtTestWriter
      *
      * @return void
      */
-    public function write(string $useragent, string $dir, int $number): void
+    public function write(array $useragents, string $dir, int $number): void
     {
-        $this->outputTxt[] = $useragent;
-
         file_put_contents(
             $dir . sprintf('%1$07d', $number) . '.txt',
-            implode(PHP_EOL, $this->outputTxt) . PHP_EOL
+            implode(PHP_EOL, $useragents) . PHP_EOL
         );
     }
 }

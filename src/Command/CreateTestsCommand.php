@@ -11,10 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\TxtFileSource;
-use BrowscapHelper\Writer\BrowscapTestWriter;
 use BrowserDetector\Helper\GenericRequestFactory;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -122,11 +120,9 @@ class CreateTestsCommand extends Command
             $browscapChecks[$useragent] = 1;
         }
 
-        $targetDirectoryHelper = new TargetDirectory();
-
         $output->writeln('detect next test numbers ...');
 
-        $txtNumber = $targetDirectoryHelper->getNextTest($testSource);
+        $txtNumber = $this->getHelper('target-directory')->getNextTest($testSource);
 
         $output->writeln('next test for Browscap: ' . $txtNumber);
         $output->writeln('writing new browscap tests ...');
@@ -137,7 +133,6 @@ class CreateTestsCommand extends Command
         $device               = new Device(null, null);
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
-        $browscapTestWriter   = new BrowscapTestWriter($this->logger, $this->targetDirectory);
 
         foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
             $useragent = trim($useragent);
@@ -153,7 +148,7 @@ class CreateTestsCommand extends Command
             $request = $genericRequest->createRequestFromString($useragent);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            $browscapTestWriter->write($result, $txtNumber, $useragent, $browscapTotalCounter);
+            $this->getHelper('txt-test-writer')->write($result, $txtNumber, $useragent, $browscapTotalCounter);
             $browscapChecks[$useragent] = 1;
         }
 

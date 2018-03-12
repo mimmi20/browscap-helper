@@ -13,7 +13,6 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\LogFileSource;
 use BrowscapHelper\Source\TxtFileSource;
-use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -139,11 +138,10 @@ class ConvertLogsCommand extends Command
         }
 
         $folderChunks  = array_chunk($txtChecks, 1000, true);
-        $txtTestWriter = new TxtTestWriter();
 
         foreach ($folderChunks as $folderId => $folderChunk) {
-            $txtTestWriter->write(
-                implode(PHP_EOL, array_keys($folderChunk)),
+            $this->getHelper('txt-test-writer')->write(
+                array_keys($folderChunk),
                 $testSource,
                 $folderId
             );
