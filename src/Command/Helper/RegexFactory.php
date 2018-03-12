@@ -11,10 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
-use BrowscapHelper\Factory\Regex\NoMatchException;
-use Symfony\Component\Console\Helper\Helper;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
+use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\BrowserLoader;
@@ -25,6 +24,7 @@ use BrowserDetector\Loader\PlatformLoader;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Stringy\Stringy;
+use Symfony\Component\Console\Helper\Helper;
 use UaResult\Engine\EngineInterface;
 use UaResult\Os\OsInterface;
 

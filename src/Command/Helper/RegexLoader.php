@@ -11,8 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
-use Symfony\Component\Console\Helper\Helper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Yaml\Yaml;
 
 /**

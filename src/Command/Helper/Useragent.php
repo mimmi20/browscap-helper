@@ -34,7 +34,7 @@ class Useragent extends Helper
      */
     public function __construct(LoggerInterface $logger)
     {
-        $this->logger  = $logger;
+        $this->logger = $logger;
     }
 
     public function getName()

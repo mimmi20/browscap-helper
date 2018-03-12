@@ -93,7 +93,7 @@ class CopyTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException       When this abstract method is not implemented
+     * @throws \LogicException When this abstract method is not implemented
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -153,7 +153,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('rewrite tests ...');
 
-        $folderChunks  = array_chunk($txtChecks, 1000, true);
+        $folderChunks = array_chunk($txtChecks, 1000, true);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $this->getHelper('txt-test-writer')->write(

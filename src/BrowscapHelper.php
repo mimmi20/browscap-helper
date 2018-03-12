@@ -76,7 +76,7 @@ class BrowscapHelper extends Application
         $targetDirectoryHelper = new Command\Helper\TargetDirectory();
         $this->getHelperSet()->set($targetDirectoryHelper);
 
-        $browscapTestWriter   = new BrowscapTestWriter($logger, $targetDirectory);
+        $browscapTestWriter = new BrowscapTestWriter($logger, $targetDirectory);
         $this->getHelperSet()->set($browscapTestWriter);
 
         $txtTestWriter = new TxtTestWriter();

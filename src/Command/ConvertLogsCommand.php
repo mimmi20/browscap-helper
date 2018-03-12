@@ -137,7 +137,7 @@ class ConvertLogsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $folderChunks  = array_chunk($txtChecks, 1000, true);
+        $folderChunks = array_chunk($txtChecks, 1000, true);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $this->getHelper('txt-test-writer')->write(

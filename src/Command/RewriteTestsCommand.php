@@ -160,9 +160,9 @@ class RewriteTestsCommand extends Command
             $testResults[] = $useragent;
         }
 
-        $folderChunks       = array_chunk($testResults, 1000);
-        $circleFile         = $basePath . '.circleci/config.yml';
-        $circleciContent    = '';
+        $folderChunks    = array_chunk($testResults, 1000);
+        $circleFile      = $basePath . '.circleci/config.yml';
+        $circleciContent = '';
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId) . '/';

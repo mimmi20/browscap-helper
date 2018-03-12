@@ -12,8 +12,8 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use Psr\Log\LoggerInterface;
-use UaResult\Result\ResultInterface;
 use Symfony\Component\Console\Helper\Helper;
+use UaResult\Result\ResultInterface;
 
 class DetectorTestWriter extends Helper
 {

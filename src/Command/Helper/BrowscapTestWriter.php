@@ -13,8 +13,8 @@ namespace BrowscapHelper\Command\Helper;
 
 use BrowserDetector\Version\VersionInterface;
 use Psr\Log\LoggerInterface;
-use UaResult\Result\ResultInterface;
 use Symfony\Component\Console\Helper\Helper;
+use UaResult\Result\ResultInterface;
 
 class BrowscapTestWriter extends Helper
 {
