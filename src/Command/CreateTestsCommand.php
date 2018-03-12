@@ -108,7 +108,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ((new BrowscapSource($this->logger))->getUserAgents() as $useragent) {
+        foreach ($this->getHelper('useragent')->getUserAgents(new BrowscapSource($this->logger)) as $useragent) {
             $useragent = trim($useragent);
 
             if (array_key_exists($useragent, $browscapChecks)) {
@@ -134,7 +134,7 @@ class CreateTestsCommand extends Command
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
 
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
             $useragent = trim($useragent);
 
             if (array_key_exists($useragent, $browscapChecks)) {

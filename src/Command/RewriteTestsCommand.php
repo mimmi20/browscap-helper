@@ -147,7 +147,7 @@ class RewriteTestsCommand extends Command
         $output->writeln('rewrite tests and circleci ...');
         $testResults = [];
 
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
             $useragent = trim($useragent);
             $result    = $this->handleTest($useragent);
 

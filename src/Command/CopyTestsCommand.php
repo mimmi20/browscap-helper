@@ -94,7 +94,6 @@ class CopyTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \LogicException       When this abstract method is not implemented
-     * @throws \FileLoader\Exception
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -109,7 +108,7 @@ class CopyTestsCommand extends Command
         $txtChecks  = [];
         $testSource = 'tests/';
 
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
             $useragent = trim($useragent);
 
             if (array_key_exists($useragent, $txtChecks)) {
@@ -141,17 +140,15 @@ class CopyTestsCommand extends Command
 
         $output->writeln('copy tests from sources ...');
 
-        $txtTotalCounter = 0;
+        $newTestsCounter = 0;
 
-        foreach ($source->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
+        foreach ($this->getHelper('useragent')->getUserAgents($source) as $useragent) {
             if (array_key_exists($useragent, $txtChecks)) {
                 continue;
             }
 
             $txtChecks[$useragent] = 1;
-            ++$txtTotalCounter;
+            ++$newTestsCounter;
         }
 
         $output->writeln('rewrite tests ...');
@@ -167,7 +164,7 @@ class CopyTestsCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter);
+        $output->writeln('tests copied for Browscap helper:    ' . $newTestsCounter);
         $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
 
         return 0;

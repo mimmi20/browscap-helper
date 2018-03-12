@@ -111,7 +111,7 @@ class ConvertLogsCommand extends Command
         $testSource = 'tests/';
         $txtChecks  = [];
 
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
             $useragent = trim($useragent);
 
             if (array_key_exists($useragent, $txtChecks)) {
@@ -126,7 +126,7 @@ class ConvertLogsCommand extends Command
         $output->writeln("reading new files from directory '" . $sourcesDirectory . "' ...");
         $txtTotalCounter = 0;
 
-        foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
+        foreach ($this->getHelper('useragent')->getUserAgents(new LogFileSource($this->logger, $sourcesDirectory)) as $useragent) {
             $useragent = trim($useragent);
 
             if (array_key_exists($useragent, $txtChecks)) {

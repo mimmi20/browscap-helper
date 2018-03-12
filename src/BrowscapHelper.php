@@ -15,6 +15,7 @@ use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\DetectorTestWriter;
 use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
+use BrowscapHelper\Command\Helper\Useragent;
 use BrowserDetector\Detector;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
@@ -86,5 +87,8 @@ class BrowscapHelper extends Application
 
         $regexFactory = new RegexFactory($cache, $logger);
         $this->getHelperSet()->set($regexFactory);
+
+        $uaHelper = new Useragent($logger);
+        $this->getHelperSet()->set($uaHelper);
     }
 }
