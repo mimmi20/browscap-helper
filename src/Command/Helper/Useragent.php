@@ -25,7 +25,7 @@ class Useragent extends Helper
     private $logger;
 
     /**
-     * @var string[]
+     * @var int[]
      */
     private $allAgents = [];
 
