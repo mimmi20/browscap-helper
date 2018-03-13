@@ -21,7 +21,7 @@ class TxtTestWriter extends Helper
     }
 
     /**
-     * @param string $useragent
+     * @param array  $useragents
      * @param string $dir
      * @param int    $number
      *
