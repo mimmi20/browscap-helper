@@ -148,8 +148,7 @@ class RewriteTestsCommand extends Command
         $testResults = [];
 
         foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
-            $useragent = trim($useragent);
-            $result    = $this->handleTest($useragent);
+            $result = $this->handleTest($useragent);
 
             if (null === $result) {
                 $this->logger->info('UA "' . $useragent . '" was skipped because a similar UA was already added');

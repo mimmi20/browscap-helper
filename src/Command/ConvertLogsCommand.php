@@ -111,9 +111,7 @@ class ConvertLogsCommand extends Command
         $testSource = 'tests/';
         $txtChecks  = [];
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
-            $useragent = trim($useragent);
-
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
             if (array_key_exists($useragent, $txtChecks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
@@ -127,8 +125,6 @@ class ConvertLogsCommand extends Command
         $txtTotalCounter = 0;
 
         foreach ($this->getHelper('useragent')->getUserAgents(new LogFileSource($this->logger, $sourcesDirectory)) as $useragent) {
-            $useragent = trim($useragent);
-
             if (array_key_exists($useragent, $txtChecks)) {
                 continue;
             }

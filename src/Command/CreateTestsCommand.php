@@ -108,9 +108,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new BrowscapSource($this->logger)) as $useragent) {
-            $useragent = trim($useragent);
-
+        foreach ($this->getHelper('useragent')->getUserAgents(new BrowscapSource($this->logger), false) as $useragent) {
             if (array_key_exists($useragent, $browscapChecks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
@@ -135,8 +133,6 @@ class CreateTestsCommand extends Command
         $engine               = new Engine(null);
 
         foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
-            $useragent = trim($useragent);
-
             if (array_key_exists($useragent, $browscapChecks)) {
                 continue;
             }

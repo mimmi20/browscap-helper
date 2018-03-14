@@ -44,16 +44,17 @@ class Useragent extends Helper
 
     /**
      * @param SourceInterface $source
+     * @param bool            $skipDuplicates
      *
      * @return \Generator
      */
-    public function getUserAgents(SourceInterface $source): \Generator
+    public function getUserAgents(SourceInterface $source, bool $skipDuplicates = true): \Generator
     {
         foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim(str_replace(["\r\n", "\r", "\n"], '\n', $useragent));
 
-            if (array_key_exists($useragent, $this->allAgents)) {
-                $this->logger->warning('    UA "' . $useragent . '" added more than once --> skipped');
+            if ($skipDuplicates && array_key_exists($useragent, $this->allAgents)) {
+                $this->logger->debug('    UA "' . $useragent . '" added more than once --> skipped');
                 continue;
             }
 
