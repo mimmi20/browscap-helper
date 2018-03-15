@@ -46,7 +46,7 @@ class RegexLoader extends Helper
     {
         $this->logger  = $logger;
         $this->regexes = Yaml::parseFile(
-            __DIR__ . '/../../data/regexes.yaml',
+            __DIR__ . '/../../../data/regexes.yaml',
             Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE
         );
     }

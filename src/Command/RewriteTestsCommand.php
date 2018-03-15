@@ -33,6 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use UaResult\Device\Device;
 use UaResult\Result\Result;
+use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
 
 /**
@@ -156,7 +157,7 @@ class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $testResults[] = $useragent;
+            $testResults[] = $result->toArray();
         }
 
         $folderChunks    = array_chunk($testResults, 1000);
@@ -168,14 +169,8 @@ class RewriteTestsCommand extends Command
             $fileChunks      = array_chunk($folderChunk, 100);
 
             foreach ($fileChunks as $fileId => $fileChunk) {
-                foreach ($fileChunk as $useragent) {
-                    $result = $this->handleTest($useragent);
-
-                    if (null === $result) {
-                        $this->logger->error('UA "' . $useragent . '" was skipped because a similar UA was already added');
-
-                        continue;
-                    }
+                foreach ($fileChunk as $resultArray) {
+                    $result = (new ResultFactory())->fromArray($this->logger, $resultArray);
 
                     $this->getHelper('detector-test-writer')->write($result, $targetDirectory, $folderId);
                 }

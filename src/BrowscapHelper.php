@@ -14,6 +14,7 @@ namespace BrowscapHelper;
 use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\DetectorTestWriter;
 use BrowscapHelper\Command\Helper\RegexFactory;
+use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\Useragent;
 use BrowserDetector\Detector;
@@ -87,6 +88,9 @@ class BrowscapHelper extends Application
 
         $regexFactory = new RegexFactory($cache, $logger);
         $this->getHelperSet()->set($regexFactory);
+
+        $regexLoader = new RegexLoader($logger);
+        $this->getHelperSet()->set($regexLoader);
 
         $uaHelper = new Useragent($logger);
         $this->getHelperSet()->set($uaHelper);

@@ -209,6 +209,8 @@ class RegexFactory extends Helper
                 $manufacturercode = 'Sony';
             }
 
+            $manufacturercode = str_replace('-', '', $manufacturercode);
+
             $className = '\\BrowserDetector\\Factory\\Device\\Mobile\\' . ucfirst($manufacturercode) . 'Factory';
 
             if (class_exists($className)) {
