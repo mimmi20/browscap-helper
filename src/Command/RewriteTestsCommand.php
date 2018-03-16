@@ -33,7 +33,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use UaResult\Device\Device;
 use UaResult\Result\Result;
-use UaResult\Result\ResultFactory;
 use UaResult\Result\ResultInterface;
 
 /**
@@ -145,7 +144,7 @@ class RewriteTestsCommand extends Command
             unlink($file->getPathname());
         }
 
-        $output->writeln('rewrite tests and circleci ...');
+        $output->writeln('selecting tests ...');
         $testResults = [];
 
         foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
@@ -160,20 +159,36 @@ class RewriteTestsCommand extends Command
             $testResults[] = $result->toArray();
         }
 
+        $output->writeln(sprintf('%d tests selected ...', count($testResults)));
+
+        $output->writeln('rewrite tests and circleci ...');
         $folderChunks    = array_chunk($testResults, 1000);
         $circleFile      = $basePath . '.circleci/config.yml';
         $circleciContent = '';
 
+        $this->logger->info(sprintf('will generate %d directories for the tests', count($folderChunks)));
+
         foreach ($folderChunks as $folderId => $folderChunk) {
             $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId) . '/';
-            $fileChunks      = array_chunk($folderChunk, 100);
+            $this->logger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
+
+            $fileChunks = array_chunk($folderChunk, 100);
+            $this->logger->info(sprintf('    will generate %d test files in directory "%s"', count($fileChunks), $targetDirectory));
+
+            $issueCounter = 0;
 
             foreach ($fileChunks as $fileId => $fileChunk) {
-                foreach ($fileChunk as $resultArray) {
-                    $result = (new ResultFactory())->fromArray($this->logger, $resultArray);
+                $tests = [];
 
-                    $this->getHelper('detector-test-writer')->write($result, $targetDirectory, $folderId);
+                foreach ($fileChunk as $resultArray) {
+                    $formatedIssue   = sprintf('%1$07d', $folderId);
+                    $formatedCounter = sprintf('%1$05d', $issueCounter);
+
+                    $tests['test-' . $formatedIssue . '-' . $formatedCounter] = $resultArray;
+                    ++$issueCounter;
                 }
+
+                $this->getHelper('detector-test-writer')->write($tests, $targetDirectory, $folderId, $fileId);
             }
 
             $count = count($folderChunk);
@@ -202,7 +217,7 @@ class RewriteTestsCommand extends Command
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #  - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --group ' . $group . ' -- ' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
         }
 
@@ -280,24 +295,16 @@ class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         }
 
-        $this->logger->info('        rewriting');
-
         // rewrite browsers
-
-        $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $newResult->getBrowser();
 
         // rewrite platforms
 
-        $this->logger->info('        rewriting platform');
-
         $platform = clone $newResult->getOs();
 
         // @var $platform \UaResult\Os\OsInterface|null
-
-        $this->logger->info('        rewriting device');
 
         $normalizedUa = (new NormalizerFactory())->build()->normalize($useragent);
 
@@ -374,8 +381,6 @@ class RewriteTestsCommand extends Command
         }
 
         // rewrite engines
-
-        $this->logger->info('        rewriting engine');
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();

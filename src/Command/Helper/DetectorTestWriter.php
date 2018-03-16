@@ -13,7 +13,6 @@ namespace BrowscapHelper\Command\Helper;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
-use UaResult\Result\ResultInterface;
 
 class DetectorTestWriter extends Helper
 {
@@ -21,12 +20,6 @@ class DetectorTestWriter extends Helper
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
-
-    private $outputDetector = [];
-
-    private $counter = 0;
-
-    private $fileCounter = 0;
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
@@ -42,21 +35,17 @@ class DetectorTestWriter extends Helper
     }
 
     /**
-     * @param \UaResult\Result\ResultInterface $result
-     * @param string                           $dir
-     * @param int                              $number
+     * @param array  $tests
+     * @param string $dir
+     * @param int    $folderId
+     * @param int    $fileId
      *
      * @return void
      */
-    public function write(ResultInterface $result, string $dir, int $number): void
+    public function write(array $tests, string $dir, int $folderId, int $fileId): void
     {
-        $formatedIssue   = sprintf('%1$07d', $number);
-        $formatedCounter = sprintf('%1$05d', $this->counter);
-
-        $this->outputDetector['test-' . $formatedIssue . '-' . $formatedCounter] = $result->toArray();
-
         $content = json_encode(
-            $this->outputDetector,
+            $tests,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
         );
 
@@ -67,7 +56,7 @@ class DetectorTestWriter extends Helper
         }
 
         file_put_contents(
-            $dir . 'test-' . sprintf('%1$07d', $number) . '-' . sprintf('%1$03d', $this->fileCounter) . '.json',
+            $dir . 'test-' . sprintf('%1$07d', $folderId) . '-' . sprintf('%1$03d', $fileId) . '.json',
             $content . PHP_EOL
         );
     }
