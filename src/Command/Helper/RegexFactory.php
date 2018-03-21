@@ -206,7 +206,7 @@ class RegexFactory extends Helper
 
         if ($manufacturercode) {
             if ('sonyericsson' === mb_strtolower($manufacturercode)) {
-                $manufacturercode = 'Sony';
+                $manufacturercode = 'sony';
             }
 
             $manufacturercode = str_replace('-', '', $manufacturercode);
