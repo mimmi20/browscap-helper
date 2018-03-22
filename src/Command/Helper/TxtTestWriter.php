@@ -30,7 +30,7 @@ class TxtTestWriter extends Helper
     public function write(array $useragents, string $dir, int $number): void
     {
         file_put_contents(
-            $dir . sprintf('%1$07d', $number) . '.txt',
+            $dir . '/' . sprintf('%1$07d', $number) . '.txt',
             implode(PHP_EOL, $useragents) . PHP_EOL
         );
     }

@@ -118,7 +118,7 @@ class RewriteTestsCommand extends Command
 
         $basePath                = 'vendor/mimmi20/browser-detector-tests/';
         $detectorTargetDirectory = $basePath . 'tests/issues/';
-        $testSource              = 'tests/';
+        $testSource              = 'tests';
 
         $output->writeln('remove old test files ...');
 
@@ -138,7 +138,7 @@ class RewriteTestsCommand extends Command
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
         $finder->ignoreUnreadableDirs();
-        $finder->in($basePath . 'tests/UserAgentsTest/');
+        $finder->in($basePath . 'tests/UserAgentsTest');
 
         foreach ($finder as $file) {
             unlink($file->getPathname());
@@ -169,7 +169,7 @@ class RewriteTestsCommand extends Command
         $this->logger->info(sprintf('will generate %d directories for the tests', count($folderChunks)));
 
         foreach ($folderChunks as $folderId => $folderChunk) {
-            $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId) . '/';
+            $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId);
             $this->logger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
 
             $fileChunks = array_chunk($folderChunk, 100);

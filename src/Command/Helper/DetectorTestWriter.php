@@ -56,7 +56,7 @@ class DetectorTestWriter extends Helper
         }
 
         file_put_contents(
-            $dir . 'test-' . sprintf('%1$07d', $folderId) . '-' . sprintf('%1$03d', $fileId) . '.json',
+            $dir . '/test-' . sprintf('%1$07d', $folderId) . '-' . sprintf('%1$03d', $fileId) . '.json',
             $content . PHP_EOL
         );
     }

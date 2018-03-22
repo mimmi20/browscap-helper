@@ -103,7 +103,7 @@ class CreateTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $testSource = 'tests/';
+        $testSource = 'tests';
 
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
@@ -144,7 +144,7 @@ class CreateTestsCommand extends Command
             $request = $genericRequest->createRequestFromString($useragent);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            $this->getHelper('txt-test-writer')->write($result, $txtNumber, $useragent, $browscapTotalCounter);
+            $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $useragent, $browscapTotalCounter);
             $browscapChecks[$useragent] = 1;
         }
 

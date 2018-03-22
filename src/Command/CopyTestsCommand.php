@@ -106,7 +106,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
         $txtChecks  = [];
-        $testSource = 'tests/';
+        $testSource = 'tests';
 
         foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
             if (array_key_exists($useragent, $txtChecks)) {

@@ -108,7 +108,7 @@ class ConvertLogsCommand extends Command
 
         $output->writeln('read existing tests for Browscap helper ...');
 
-        $testSource = 'tests/';
+        $testSource = 'tests';
         $txtChecks  = [];
 
         foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
