@@ -9,15 +9,17 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Helper;
+namespace BrowscapHelper\Command\Helper;
 
-/**
- * Class TargetDirectory
- *
- * @category   Browscap Helper
- */
-class TargetDirectory
+use Symfony\Component\Console\Helper\Helper;
+
+class TargetDirectory extends Helper
 {
+    public function getName()
+    {
+        return 'target-directory';
+    }
+
     /**
      * @param string $targetDirectory
      *

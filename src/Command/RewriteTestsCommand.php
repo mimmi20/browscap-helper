@@ -14,9 +14,7 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
-use BrowscapHelper\Factory\RegexFactory;
 use BrowscapHelper\Source\TxtFileSource;
-use BrowscapHelper\Writer\DetectorTestWriter;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Factory\NormalizerFactory;
@@ -108,7 +106,6 @@ class RewriteTestsCommand extends Command
      *
      * @throws \FileLoader\Exception
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -121,7 +118,7 @@ class RewriteTestsCommand extends Command
 
         $basePath                = 'vendor/mimmi20/browser-detector-tests/';
         $detectorTargetDirectory = $basePath . 'tests/issues/';
-        $testSource              = 'tests/';
+        $testSource              = 'tests';
 
         $output->writeln('remove old test files ...');
 
@@ -141,27 +138,17 @@ class RewriteTestsCommand extends Command
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
         $finder->ignoreUnreadableDirs();
-        $finder->in($basePath . 'tests/UserAgentsTest/');
+        $finder->in($basePath . 'tests/UserAgentsTest');
 
         foreach ($finder as $file) {
             unlink($file->getPathname());
         }
 
-        $output->writeln('add new tests ...');
+        $output->writeln('selecting tests ...');
+        $testResults = [];
 
-        $detectorTestWriter   = new DetectorTestWriter($this->logger);
-        $detectorNumber       = 0;
-        $testCounter          = [$detectorNumber => 0];
-        $detectorTotalCounter = 0;
-        $detectorCounter      = 0;
-
-        $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
-
-        $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
-
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-            $result    = $this->handleTest($useragent);
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
+            $result = $this->handleTest($useragent);
 
             if (null === $result) {
                 $this->logger->info('UA "' . $useragent . '" was skipped because a similar UA was already added');
@@ -169,30 +156,43 @@ class RewriteTestsCommand extends Command
                 continue;
             }
 
-            if ($detectorTestWriter->write($result, $targetDirectory, $detectorNumber, $useragent, $detectorCounter)) {
-                $testCounter[$detectorNumber] = $detectorCounter;
-                ++$detectorNumber;
-                $testCounter[$detectorNumber] = 0;
-                $detectorTotalCounter += $detectorCounter;
-                $detectorCounter = 0;
-
-                $output->writeln('next test for BrowserDetector: ' . $detectorNumber);
-
-                $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $detectorNumber) . '/';
-
-                if (!file_exists($targetDirectory)) {
-                    mkdir($targetDirectory);
-                }
-            }
+            $testResults[] = $result->toArray();
         }
 
-        $output->writeln('preparing circle.yml ...');
+        $output->writeln(sprintf('%d tests selected ...', count($testResults)));
 
+        $output->writeln('rewrite tests and circleci ...');
+        $folderChunks    = array_chunk($testResults, 1000);
         $circleFile      = $basePath . '.circleci/config.yml';
         $circleciContent = '';
 
-        foreach (array_reverse($testCounter) as $detectorNumber => $count) {
-            $group = sprintf('%1$07d', $detectorNumber);
+        $this->logger->info(sprintf('will generate %d directories for the tests', count($folderChunks)));
+
+        foreach ($folderChunks as $folderId => $folderChunk) {
+            $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId);
+            $this->logger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
+
+            $fileChunks = array_chunk($folderChunk, 100);
+            $this->logger->info(sprintf('    will generate %d test files in directory "%s"', count($fileChunks), $targetDirectory));
+
+            $issueCounter = 0;
+
+            foreach ($fileChunks as $fileId => $fileChunk) {
+                $tests = [];
+
+                foreach ($fileChunk as $resultArray) {
+                    $formatedIssue   = sprintf('%1$07d', $folderId);
+                    $formatedCounter = sprintf('%1$05d', $issueCounter);
+
+                    $tests['test-' . $formatedIssue . '-' . $formatedCounter] = $resultArray;
+                    ++$issueCounter;
+                }
+
+                $this->getHelper('detector-test-writer')->write($tests, $targetDirectory, $folderId, $fileId);
+            }
+
+            $count = count($folderChunk);
+            $group = sprintf('%1$07d', $folderId);
 
             $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
 
@@ -215,9 +215,9 @@ class RewriteTestsCommand extends Command
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #  - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '    #  - run: php -n -d memory_limit=768M vendor/bin/phpunit --printer \'ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter\' --colors --no-coverage --group ' . $group . ' -- ' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . '  tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
             $circleciContent .= PHP_EOL;
         }
 
@@ -236,7 +236,6 @@ class RewriteTestsCommand extends Command
      * @param string $useragent
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
@@ -244,10 +243,7 @@ class RewriteTestsCommand extends Command
     {
         $this->logger->info('        detect for new result');
 
-        $detector = new Detector($this->cache, $this->logger);
-        $detector->warmupCache();
-
-        $newResult = $detector->getBrowser($useragent);
+        $newResult = $this->detector->parseString($useragent);
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
@@ -299,24 +295,16 @@ class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         }
 
-        $this->logger->info('        rewriting');
-
         // rewrite browsers
-
-        $this->logger->info('        rewriting browser');
 
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $newResult->getBrowser();
 
         // rewrite platforms
 
-        $this->logger->info('        rewriting platform');
-
         $platform = clone $newResult->getOs();
 
         // @var $platform \UaResult\Os\OsInterface|null
-
-        $this->logger->info('        rewriting device');
 
         $normalizedUa = (new NormalizerFactory())->build()->normalize($useragent);
 
@@ -337,7 +325,7 @@ class RewriteTestsCommand extends Command
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             try {
-                $regexFactory = new RegexFactory($this->cache, $this->logger);
+                $regexFactory = $this->getHelper('regex-factory');
                 $regexFactory->detect($normalizedUa);
                 [$device] = $regexFactory->getDevice();
                 $replaced = false;
@@ -393,8 +381,6 @@ class RewriteTestsCommand extends Command
         }
 
         // rewrite engines
-
-        $this->logger->info('        rewriting engine');
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();

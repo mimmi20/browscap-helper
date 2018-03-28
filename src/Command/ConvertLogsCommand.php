@@ -11,10 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\LogFileSource;
 use BrowscapHelper\Source\TxtFileSource;
-use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -108,30 +106,12 @@ class ConvertLogsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        $output->writeln("reading from directory '" . $sourcesDirectory . "'");
-
-        $targetDirectoryHelper = new TargetDirectory();
-        $testSource            = 'tests/';
-
-        $output->writeln('detect next test number for Browscap helper ...');
-
-        try {
-            $number = $targetDirectoryHelper->getNextTest($testSource);
-        } catch (\UnexpectedValueException $e) {
-            $this->logger->critical($e);
-            $output->writeln($e->getMessage());
-
-            return 1;
-        }
-
-        $output->writeln('next test for Browscap helper: ' . $number);
         $output->writeln('read existing tests for Browscap helper ...');
 
-        $txtChecks = [];
+        $testSource = 'tests';
+        $txtChecks  = [];
 
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
             if (array_key_exists($useragent, $txtChecks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
@@ -141,25 +121,31 @@ class ConvertLogsCommand extends Command
             $txtChecks[$useragent] = 1;
         }
 
-        $txtTestWriter   = new TxtTestWriter($this->logger);
+        $output->writeln("reading new files from directory '" . $sourcesDirectory . "' ...");
         $txtTotalCounter = 0;
 
-        $output->writeln('reading new files ...');
-
-        foreach ((new LogFileSource($this->logger, $sourcesDirectory))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
-            if (!array_key_exists($useragent, $txtChecks)
-                && $txtTestWriter->write($useragent, $testSource, $number, $txtTotalCounter)
-            ) {
-                ++$number;
+        foreach ($this->getHelper('useragent')->getUserAgents(new LogFileSource($this->logger, $sourcesDirectory)) as $useragent) {
+            if (array_key_exists($useragent, $txtChecks)) {
+                continue;
             }
 
             $txtChecks[$useragent] = 1;
+            ++$txtTotalCounter;
+        }
+
+        $folderChunks = array_chunk($txtChecks, 1000, true);
+
+        foreach ($folderChunks as $folderId => $folderChunk) {
+            $this->getHelper('txt-test-writer')->write(
+                array_keys($folderChunk),
+                $testSource,
+                $folderId
+            );
         }
 
         $output->writeln('');
         $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter);
+        $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
 
         return 0;
     }

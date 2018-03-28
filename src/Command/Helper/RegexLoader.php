@@ -9,9 +9,10 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Loader;
+namespace BrowscapHelper\Command\Helper;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @category  BrowserDetector
  */
-class RegexLoader
+class RegexLoader extends Helper
 {
     /**
      * an logger instance
@@ -41,35 +42,18 @@ class RegexLoader
     /**
      * @param \Psr\Log\LoggerInterface $logger
      */
-    private function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger  = $logger;
         $this->regexes = Yaml::parseFile(
-            __DIR__ . '/../../data/regexes.yaml',
+            __DIR__ . '/../../../data/regexes.yaml',
             Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE
         );
     }
 
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     *
-     * @return self
-     */
-    public static function getInstance(LoggerInterface $logger)
+    public function getName()
     {
-        if (null === self::$instance) {
-            self::$instance = new self($logger);
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * @return void
-     */
-    public static function resetInstance(): void
-    {
-        self::$instance = null;
+        return 'regex-loader';
     }
 
     /**

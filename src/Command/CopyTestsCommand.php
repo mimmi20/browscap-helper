@@ -11,7 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Helper\TargetDirectory;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
@@ -22,7 +21,6 @@ use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
-use BrowscapHelper\Writer\TxtTestWriter;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -95,8 +93,7 @@ class CopyTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException       When this abstract method is not implemented
-     * @throws \FileLoader\Exception
+     * @throws \LogicException When this abstract method is not implemented
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -107,14 +104,11 @@ class CopyTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $testSource = 'tests/';
-
         $output->writeln('reading already existing tests ...');
-        $txtChecks = [];
+        $txtChecks  = [];
+        $testSource = 'tests';
 
-        foreach ((new TxtFileSource($this->logger, $testSource))->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
+        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
             if (array_key_exists($useragent, $txtChecks)) {
                 $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
 
@@ -124,13 +118,6 @@ class CopyTestsCommand extends Command
             $txtChecks[$useragent] = 1;
         }
 
-        $targetDirectoryHelper = new TargetDirectory();
-
-        $output->writeln('detect next test numbers ...');
-
-        $txtNumber = $targetDirectoryHelper->getNextTest($testSource);
-
-        $output->writeln('next test for Browscap helper: ' . $txtNumber);
         $output->writeln('init sources ...');
 
         $sourcesDirectory = $input->getOption('resources');
@@ -149,26 +136,34 @@ class CopyTestsCommand extends Command
             ]
         );
 
-        $output->writeln('copy tests ...');
+        $output->writeln('copy tests from sources ...');
 
-        $txtTotalCounter = 0;
+        $newTestsCounter = 0;
 
-        $txtWriter = new TxtTestWriter($this->logger);
-
-        foreach ($source->getUserAgents() as $useragent) {
-            $useragent = trim($useragent);
-
-            if (!array_key_exists($useragent, $txtChecks)
-                && $txtWriter->write($useragent, $testSource, $txtNumber, $txtTotalCounter)
-            ) {
-                ++$txtNumber;
+        foreach ($this->getHelper('useragent')->getUserAgents($source) as $useragent) {
+            if (array_key_exists($useragent, $txtChecks)) {
+                continue;
             }
 
             $txtChecks[$useragent] = 1;
+            ++$newTestsCounter;
+        }
+
+        $output->writeln('rewrite tests ...');
+
+        $folderChunks = array_chunk($txtChecks, 1000, true);
+
+        foreach ($folderChunks as $folderId => $folderChunk) {
+            $this->getHelper('txt-test-writer')->write(
+                array_keys($folderChunk),
+                $testSource,
+                $folderId
+            );
         }
 
         $output->writeln('');
-        $output->writeln('tests copied for Browscap helper:  ' . $txtTotalCounter);
+        $output->writeln('tests copied for Browscap helper:    ' . $newTestsCounter);
+        $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
 
         return 0;
     }

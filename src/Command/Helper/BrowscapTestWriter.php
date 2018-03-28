@@ -9,13 +9,14 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Writer;
+namespace BrowscapHelper\Command\Helper;
 
 use BrowserDetector\Version\VersionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\Helper;
 use UaResult\Result\ResultInterface;
 
-class BrowscapTestWriter
+class BrowscapTestWriter extends Helper
 {
     /**
      * @var string
@@ -43,15 +44,20 @@ class BrowscapTestWriter
         $this->dir    = $dir;
     }
 
+    public function getName()
+    {
+        return 'browscap-test-writer';
+    }
+
     /**
      * @param \UaResult\Result\ResultInterface $result
      * @param int                              $number
      * @param string                           $useragent
      * @param int                              $totalCounter
      *
-     * @return bool
+     * @return void
      */
-    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): bool
+    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): void
     {
         $platform = clone $result->getOs();
         $device   = clone $result->getDevice();
@@ -106,7 +112,5 @@ class BrowscapTestWriter
 
         ++$this->counter;
         ++$totalCounter;
-
-        return false;
     }
 }
