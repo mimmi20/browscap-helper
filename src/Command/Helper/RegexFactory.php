@@ -16,17 +16,13 @@ use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
-use BrowserDetector\Loader\BrowserLoader;
-use BrowserDetector\Loader\DeviceLoader;
-use BrowserDetector\Loader\EngineLoader;
+use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
-use BrowserDetector\Loader\PlatformLoader;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Stringy\Stringy;
 use Symfony\Component\Console\Helper\Helper;
-use UaResult\Engine\EngineInterface;
-use UaResult\Os\OsInterface;
 
 /**
  * detection class using regexes
@@ -35,6 +31,11 @@ use UaResult\Os\OsInterface;
  */
 class RegexFactory extends Helper
 {
+    /**
+     * @var \Symfony\Component\Console\Helper\HelperSet
+     */
+    protected $helperSet;
+
     /**
      * @var \BrowserDetector\Cache\Cache
      */
@@ -92,8 +93,10 @@ class RegexFactory extends Helper
     {
         $this->match     = null;
         $this->useragent = $useragent;
+        /** @var \BrowscapHelper\Command\Helper\RegexLoader $regexLoader */
+        $regexLoader     = $this->helperSet->get('regex-loader');
 
-        foreach ($this->helperSet->get('regex-loader')->getRegexes() as $regex) {
+        foreach ($regexLoader->getRegexes() as $regex) {
             $matches = [];
 
             if (preg_match($regex, $useragent, $matches)) {
@@ -132,7 +135,8 @@ class RegexFactory extends Helper
         }
 
         $deviceCode   = mb_strtolower($this->match['devicecode']);
-        $deviceLoader = DeviceLoader::getInstance($this->cache, $this->logger);
+        $deviceLoaderFactory = new DeviceLoaderFactory($this->cache, $this->logger);
+        $deviceLoader = $deviceLoaderFactory('blackberry', 'unknown');
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -150,9 +154,10 @@ class RegexFactory extends Helper
         }
         if ('cfnetwork' === $deviceCode) {
             try {
-                return (new Factory\Device\DarwinFactory($deviceLoader))->detect($this->useragent, $s);
-            } catch (NotFoundException $e) {
-                throw $e;
+                $factory = new Factory\Device\DarwinFactory($this->cache, $this->logger);
+                return $factory($this->useragent);
+            } catch (InvalidArgumentException $e) {
+                throw new NotFoundException('not found', 0, $e);
             }
         } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'])
             && array_key_exists('osname', $this->match)
@@ -182,7 +187,7 @@ class RegexFactory extends Helper
             $manufacturercode = '';
         }
 
-        if ($deviceLoader->has($manufacturercode . ' ' . $deviceCode)) {
+        if (null !== $deviceLoader->load($manufacturercode . ' ' . $deviceCode)) {
             /** @var \UaResult\Device\DeviceInterface $device */
             [$device, $platform] = $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
 
@@ -193,7 +198,7 @@ class RegexFactory extends Helper
             }
         }
 
-        if ($deviceLoader->has($deviceCode)) {
+        if (null !== $deviceLoader->load($deviceCode)) {
             /** @var \UaResult\Device\DeviceInterface $device */
             [$device, $platform] = $deviceLoader->load($deviceCode, $this->useragent);
 
@@ -234,11 +239,11 @@ class RegexFactory extends Helper
 
         if (array_key_exists('devicetype', $this->match)) {
             if ('wpdesktop' === mb_strtolower($this->match['devicetype']) || 'xblwp7' === mb_strtolower($this->match['devicetype'])) {
-                $factory = new Factory\Device\MobileFactory($deviceLoader);
+                $factory = new Factory\Device\MobileFactory($this->cache, $this->logger);
 
                 try {
-                    return $factory->detect($this->useragent, $s);
-                } catch (NotFoundException $e) {
+                    return $factory($this->useragent);
+                } catch (InvalidArgumentException $e) {
                     throw new GeneralDeviceException('use general mobile device', 0, $e);
                 }
             } elseif (!empty($this->match['devicetype'])) {
@@ -265,244 +270,5 @@ class RegexFactory extends Helper
         }
 
         throw new NotFoundException('device not found via regexes');
-    }
-
-    /**
-     * @return \UaResult\Os\OsInterface
-     */
-    public function getPlatform(): OsInterface
-    {
-        if (null === $this->useragent) {
-            throw new \InvalidArgumentException('no useragent was set');
-        }
-
-        if (!is_array($this->match) && $this->runDetection) {
-            throw new NotFoundException('platform not found via regexes');
-        }
-
-        if (!is_array($this->match)) {
-            throw new \InvalidArgumentException('please call the detect function before trying to get the result');
-        }
-
-        $platformLoader = PlatformLoader::getInstance($this->cache, $this->logger);
-
-        if (!array_key_exists('osname', $this->match)
-            && array_key_exists('manufacturercode', $this->match)
-            && 'blackberry' === mb_strtolower($this->match['manufacturercode'])
-        ) {
-            $this->logger->debug('platform forced to rim os');
-
-            return $platformLoader->load('rim os', $this->useragent);
-        }
-
-        if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
-            throw new NoMatchException('platform not detected via regexes');
-        }
-
-        $platformCode = mb_strtolower($this->match['osname']);
-
-        $s = new Stringy($this->useragent);
-
-        if ('darwin' === $platformCode) {
-            $darwinFactory = new Factory\Platform\DarwinFactory($platformLoader);
-
-            return $darwinFactory->detect($this->useragent, $s);
-        }
-
-        if ('linux' === $platformCode && array_key_exists('devicecode', $this->match)) {
-            // Android Desktop Mode
-            $platformCode = 'android';
-        } elseif ('adr' === $platformCode) {
-            // Android Desktop Mode with UCBrowser
-            $platformCode = 'android';
-        } elseif ('linux' === $platformCode && $s->containsAll(['opera mini', 'ucbrowser'], false)) {
-            // Android Desktop Mode with UCBrowser
-            $platformCode = 'android';
-        } elseif ('linux' === $platformCode) {
-            $linuxFactory = new Factory\Platform\LinuxFactory($platformLoader);
-
-            return $linuxFactory->detect($this->useragent, $s);
-        } elseif ('bb10' === $platformCode || 'blackberry' === $platformCode) {
-            // Rim OS
-            $platformCode = 'rim os';
-        } elseif ('cros' === $platformCode) {
-            $platformCode = 'chromeos';
-        } elseif (in_array($platformCode, ['j2me/midp', 'java'])) {
-            $platformCode = 'java';
-        } elseif (in_array($platformCode, ['maui runtime', 'spreadtrum', 'vre'])) {
-            $platformCode = 'android';
-        } elseif ('series 60' === $platformCode) {
-            $platformCode = 'symbian';
-        } elseif ('windows mobile' === $platformCode) {
-            $platformCode = 'windows mobile os';
-        } elseif ('windows phone' === $platformCode) {
-            $platformCode = 'windows phone';
-        }
-
-        if (false !== mb_strpos($platformCode, 'windows nt') && array_key_exists('devicetype', $this->match)) {
-            // Windows Phone Desktop Mode
-            $platformCode = 'windows phone';
-        }
-
-        if ($platformLoader->has($platformCode)) {
-            $platform = $platformLoader->load($platformCode, $this->useragent);
-
-            if (!in_array($platform->getName(), ['unknown', null])) {
-                return $platform;
-            }
-
-            $this->logger->info('platform with code "' . $platformCode . '" not found via regexes');
-        }
-
-        throw new NotFoundException('platform not found via regexes');
-    }
-
-    /**
-     * @return array
-     */
-    public function getBrowser(): array
-    {
-        if (null === $this->useragent) {
-            throw new \InvalidArgumentException('no useragent was set');
-        }
-
-        if (!is_array($this->match) && $this->runDetection) {
-            throw new NotFoundException('browser not found via regexes');
-        }
-
-        if (!is_array($this->match)) {
-            throw new \InvalidArgumentException('please call the detect function before trying to get the result');
-        }
-
-        if (!array_key_exists('browsername', $this->match) || '' === $this->match['browsername']) {
-            throw new NoMatchException('browser not detected via regexes');
-        }
-
-        $browserCode   = mb_strtolower($this->match['browsername']);
-        $browserLoader = BrowserLoader::getInstance($this->cache, $this->logger);
-
-        switch ($browserCode) {
-            case 'opr':
-                $browserCode = 'opera';
-
-                break;
-            case 'msie':
-                $browserCode = 'internet explorer';
-
-                break;
-            case 'ucweb':
-            case 'ubrowser':
-                $browserCode = 'ucbrowser';
-
-                break;
-            case 'crmo':
-                $browserCode = 'chrome';
-
-                break;
-            case 'granparadiso':
-                $browserCode = 'firefox';
-
-                break;
-            default:
-                // do nothing here
-        }
-
-        if ('safari' === $browserCode) {
-            if (array_key_exists('osname', $this->match)) {
-                $osname = mb_strtolower($this->match['osname']);
-
-                if ('android' === $osname || 'linux' === $osname) {
-                    return $browserLoader->load('android webkit', $this->useragent);
-                }
-
-                if ('tizen' === $osname) {
-                    return $browserLoader->load('samsungbrowser', $this->useragent);
-                }
-
-                if ('blackberry' === $osname) {
-                    return $browserLoader->load('blackberry', $this->useragent);
-                }
-
-                if ('symbian' === $osname || 'symbianos' === $osname) {
-                    return $browserLoader->load('android webkit', $this->useragent);
-                }
-            }
-
-            if (array_key_exists('manufacturercode', $this->match)) {
-                $devicemaker = mb_strtolower($this->match['manufacturercode']);
-
-                if ('nokia' === $devicemaker) {
-                    return $browserLoader->load('nokiabrowser', $this->useragent);
-                }
-            }
-        }
-
-        if ($browserLoader->has($browserCode)) {
-            /** @var \UaResult\Browser\BrowserInterface $browser */
-            [$browser] = $browserLoader->load($browserCode, $this->useragent);
-
-            if (!in_array($browser->getName(), ['unknown', null])) {
-                return [$browser];
-            }
-
-            $this->logger->info('browser with code "' . $browserCode . '" not found via regexes');
-        }
-
-        throw new NotFoundException('browser not found via regexes');
-    }
-
-    /**
-     * @return \UaResult\Engine\EngineInterface
-     */
-    public function getEngine(): EngineInterface
-    {
-        if (null === $this->useragent) {
-            throw new \InvalidArgumentException('no useragent was set');
-        }
-
-        if (!is_array($this->match) && $this->runDetection) {
-            throw new NotFoundException('engine not found via regexes');
-        }
-
-        if (!is_array($this->match)) {
-            throw new \InvalidArgumentException('please call the detect function before trying to get the result');
-        }
-
-        if (!array_key_exists('enginename', $this->match) || '' === $this->match['enginename']) {
-            throw new NoMatchException('engine not detected via regexes');
-        }
-
-        $engineCode   = mb_strtolower($this->match['enginename']);
-        $engineLoader = EngineLoader::getInstance($this->cache, $this->logger);
-
-        if ('cfnetwork' === $engineCode) {
-            return $engineLoader->load('webkit', $this->useragent);
-        }
-
-        if (in_array($engineCode, ['applewebkit', 'webkit'])) {
-            if (array_key_exists('chromeversion', $this->match)) {
-                $chromeversion = (int) $this->match['chromeversion'];
-            } else {
-                $chromeversion = 0;
-            }
-
-            if (28 <= $chromeversion) {
-                $engineCode = 'blink';
-            } else {
-                $engineCode = 'webkit';
-            }
-        }
-
-        if ($engineLoader->has($engineCode)) {
-            $engine = $engineLoader->load($engineCode, $this->useragent);
-
-            if (!in_array($engine->getName(), ['unknown', null])) {
-                return $engine;
-            }
-
-            $this->logger->info('engine with code "' . $engineCode . '" not found via regexes');
-        }
-
-        throw new NotFoundException('engine not found via regexes');
     }
 }

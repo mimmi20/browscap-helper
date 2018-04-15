@@ -13,7 +13,6 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\TxtFileSource;
-use BrowserDetector\Helper\GenericRequestFactory;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -21,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaRequest\GenericRequestFactory;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
 use UaResult\Engine\Engine;
@@ -92,7 +92,6 @@ class CreateTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \LogicException       When this abstract method is not implemented
-     * @throws \FileLoader\Exception
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *

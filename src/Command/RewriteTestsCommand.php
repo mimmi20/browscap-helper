@@ -17,9 +17,8 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
-use BrowserDetector\Factory\NormalizerFactory;
-use BrowserDetector\Helper\GenericRequestFactory;
 use BrowserDetector\Loader\DeviceLoader;
+use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
@@ -31,6 +30,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use UaNormalizer\NormalizerFactory;
+use UaRequest\GenericRequestFactory;
 use UaResult\Device\Device;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
@@ -243,7 +244,8 @@ class RewriteTestsCommand extends Command
     {
         $this->logger->info('        detect for new result');
 
-        $newResult = $this->detector->parseString($useragent);
+        $detector  = $this->detector;
+        $newResult = $detector($useragent);
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
@@ -350,7 +352,8 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
-                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory =  new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader = $deviceLoaderFactory('blackberry', 'unknown');
 
                 try {
                     [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
@@ -360,7 +363,8 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory =  new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);

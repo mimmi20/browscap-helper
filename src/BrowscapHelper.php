@@ -17,7 +17,7 @@ use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\Useragent;
-use BrowserDetector\Detector;
+use BrowserDetector\DetectorFactory;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
@@ -41,7 +41,6 @@ class BrowscapHelper extends Application
      * BrowscapHelper constructor.
      *
      * @throws \Exception
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function __construct()
     {
@@ -60,8 +59,8 @@ class BrowscapHelper extends Application
         ErrorHandler::register($logger);
 
         $cache    = new FilesystemCache('', 0, __DIR__ . '/../cache/');
-        $detector = new Detector($cache, $logger);
-        $detector->warmupCache();
+        $factory  = new DetectorFactory($cache, $logger);
+        $detector = $factory();
 
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
