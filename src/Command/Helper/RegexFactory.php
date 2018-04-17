@@ -94,7 +94,7 @@ class RegexFactory extends Helper
         $this->match     = null;
         $this->useragent = $useragent;
         /** @var \BrowscapHelper\Command\Helper\RegexLoader $regexLoader */
-        $regexLoader     = $this->helperSet->get('regex-loader');
+        $regexLoader = $this->helperSet->get('regex-loader');
 
         foreach ($regexLoader->getRegexes() as $regex) {
             $matches = [];
@@ -134,9 +134,9 @@ class RegexFactory extends Helper
             throw new NoMatchException('device not detected via regexes');
         }
 
-        $deviceCode   = mb_strtolower($this->match['devicecode']);
+        $deviceCode          = mb_strtolower($this->match['devicecode']);
         $deviceLoaderFactory = new DeviceLoaderFactory($this->cache, $this->logger);
-        $deviceLoader = $deviceLoaderFactory('blackberry', 'unknown');
+        $deviceLoader        = $deviceLoaderFactory('blackberry', 'unknown');
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -155,6 +155,7 @@ class RegexFactory extends Helper
         if ('cfnetwork' === $deviceCode) {
             try {
                 $factory = new Factory\Device\DarwinFactory($this->cache, $this->logger);
+
                 return $factory($this->useragent);
             } catch (InvalidArgumentException $e) {
                 throw new NotFoundException('not found', 0, $e);

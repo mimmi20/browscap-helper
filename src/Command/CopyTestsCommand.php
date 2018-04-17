@@ -121,7 +121,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('remove tests ...');
 
-        $finder   = new Finder();
+        $finder = new Finder();
         $finder->files();
         $finder->name('*.txt');
         $finder->ignoreDotFiles(true);
