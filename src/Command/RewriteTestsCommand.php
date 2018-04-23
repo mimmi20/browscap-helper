@@ -17,7 +17,6 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
-use BrowserDetector\Loader\DeviceLoader;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
@@ -352,8 +351,8 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
-                $deviceLoaderFactory =  new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
-                $deviceLoader = $deviceLoaderFactory('blackberry', 'unknown');
+                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader        = $deviceLoaderFactory('blackberry', 'unknown');
 
                 try {
                     [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
@@ -363,8 +362,8 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoaderFactory =  new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
-                $deviceLoader = $deviceLoaderFactory('unknown', 'unknown');
+                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);

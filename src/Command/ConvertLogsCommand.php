@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Class ConvertLogsCommand
@@ -121,6 +122,21 @@ class ConvertLogsCommand extends Command
             $txtChecks[$useragent] = 1;
         }
 
+        $output->writeln('remove tests ...');
+
+        $finder = new Finder();
+        $finder->files();
+        $finder->name('*.txt');
+        $finder->ignoreDotFiles(true);
+        $finder->ignoreVCS(true);
+        $finder->sortByName();
+        $finder->ignoreUnreadableDirs();
+        $finder->in($testSource);
+
+        foreach ($finder as $file) {
+            unlink($file->getPathname());
+        }
+
         $output->writeln("reading new files from directory '" . $sourcesDirectory . "' ...");
         $txtTotalCounter = 0;
 
@@ -133,11 +149,13 @@ class ConvertLogsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $folderChunks = array_chunk($txtChecks, 1000, true);
+        $output->writeln('rewrite tests ...');
+
+        $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $this->getHelper('txt-test-writer')->write(
-                array_keys($folderChunk),
+                $folderChunk,
                 $testSource,
                 $folderId
             );
