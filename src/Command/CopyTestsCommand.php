@@ -124,6 +124,7 @@ class CopyTestsCommand extends Command
         $finder = new Finder();
         $finder->files();
         $finder->name('*.txt');
+        $finder->name('*.yaml');
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
         $finder->sortByName();
@@ -172,6 +173,18 @@ class CopyTestsCommand extends Command
         foreach ($folderChunks as $folderId => $folderChunk) {
             $this->getHelper('txt-test-writer')->write(
                 $folderChunk,
+                $testSource,
+                $folderId
+            );
+
+            $yamlTests = [];
+
+            foreach ($folderChunk as $id => $useragent) {
+                $yamlTests[$id] = ['user-agent' => $useragent];
+            }
+
+            $this->getHelper('yaml-test-writer')->write(
+                $yamlTests,
                 $testSource,
                 $folderId
             );

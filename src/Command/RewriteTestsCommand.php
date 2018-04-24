@@ -246,6 +246,8 @@ class RewriteTestsCommand extends Command
         $detector  = $this->detector;
         $newResult = $detector($useragent);
 
+        $this->logger->info('        analyze new result');
+
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
             && !$newResult->getDevice()->getType()->isTv()
@@ -352,11 +354,12 @@ class RewriteTestsCommand extends Command
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
                 $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
-                $deviceLoader        = $deviceLoaderFactory('blackberry', 'unknown');
+                $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
 
                 try {
+                    $deviceLoader->init();
                     [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->logger->crit($e);
 
                     $device = new Device(null, null);
@@ -366,8 +369,9 @@ class RewriteTestsCommand extends Command
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
+                    $deviceLoader->init();
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->logger->crit($e);
 
                     $device = new Device(null, null);

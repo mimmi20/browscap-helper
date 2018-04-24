@@ -17,6 +17,7 @@ use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\Useragent;
+use BrowscapHelper\Command\Helper\YamlTestWriter;
 use BrowserDetector\DetectorFactory;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
@@ -84,6 +85,9 @@ class BrowscapHelper extends Application
 
         $detectorTestWriter = new DetectorTestWriter($logger);
         $this->getHelperSet()->set($detectorTestWriter);
+
+        $yamlTestWriter = new YamlTestWriter();
+        $this->getHelperSet()->set($yamlTestWriter);
 
         $regexFactory = new RegexFactory($cache, $logger);
         $this->getHelperSet()->set($regexFactory);

@@ -115,6 +115,7 @@ class RegexFactory extends Helper
 
     /**
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getDevice(): array
     {
@@ -136,7 +137,6 @@ class RegexFactory extends Helper
 
         $deviceCode          = mb_strtolower($this->match['devicecode']);
         $deviceLoaderFactory = new DeviceLoaderFactory($this->cache, $this->logger);
-        $deviceLoader        = $deviceLoaderFactory('blackberry', 'unknown');
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -144,14 +144,18 @@ class RegexFactory extends Helper
             $platformCode = mb_strtolower($this->match['osname']);
         }
 
-        $s = new Stringy($this->useragent);
-
         if ('windows' === $deviceCode) {
+            $deviceLoader        = $deviceLoaderFactory('unknown', 'desktop');
+            $deviceLoader->init();
             return $deviceLoader->load('windows desktop', $this->useragent);
         }
+
         if ('macintosh' === $deviceCode) {
+            $deviceLoader        = $deviceLoaderFactory('apple', 'desktop');
+            $deviceLoader->init();
             return $deviceLoader->load('macintosh', $this->useragent);
         }
+
         if ('cfnetwork' === $deviceCode) {
             try {
                 $factory = new Factory\Device\DarwinFactory($this->cache, $this->logger);
@@ -160,35 +164,64 @@ class RegexFactory extends Helper
             } catch (InvalidArgumentException $e) {
                 throw new NotFoundException('not found', 0, $e);
             }
-        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'])
+        }
+
+        if (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'])
             && array_key_exists('osname', $this->match)
             && 'blackberry' === mb_strtolower($this->match['osname'])
         ) {
             throw new GeneralBlackberryException('use general mobile device');
-        } elseif (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic', ''])) {
+        }
+
+        if (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic', ''])) {
             throw new GeneralDeviceException('use general mobile device');
-        } elseif (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
+        }
+
+        if (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
             throw new GeneralDeviceException('use general mobile device');
-        } elseif ('philipstv' === $deviceCode) {
+        }
+
+        if ('philipstv' === $deviceCode) {
+            $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
+            $deviceLoader->init();
             return $deviceLoader->load('general philips tv', $this->useragent);
-        } elseif (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
+        }
+
+        if (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
             throw new GeneralDeviceException('use general mobile device');
-        } elseif ('linux' === $deviceCode || 'cros' === $deviceCode) {
+        }
+
+        if ('linux' === $deviceCode || 'cros' === $deviceCode) {
+            $deviceLoader        = $deviceLoaderFactory('unknown', 'desktop');
+            $deviceLoader->init();
             return $deviceLoader->load('linux desktop', $this->useragent);
-        } elseif ('touch' === $deviceCode
+        }
+
+        if ('touch' === $deviceCode
             && array_key_exists('osname', $this->match)
             && 'bb10' === mb_strtolower($this->match['osname'])
         ) {
+            $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
+            $deviceLoader->init();
             return $deviceLoader->load('z10', $this->useragent);
         }
 
         if (array_key_exists('manufacturercode', $this->match)) {
             $manufacturercode = mb_strtolower($this->match['manufacturercode']);
+
+            $manufacturercode = str_replace('-', '', $manufacturercode);
+
+            if ('sonyericsson' === mb_strtolower($manufacturercode)) {
+                $manufacturercode = 'sony';
+            }
         } else {
-            $manufacturercode = '';
+            throw new NotFoundException('device not found via regexes');
         }
 
-        if (null !== $deviceLoader->load($manufacturercode . ' ' . $deviceCode)) {
+        try {
+            $deviceLoader = $deviceLoaderFactory($manufacturercode, 'mobile');
+            $deviceLoader->init();
+
             /** @var \UaResult\Device\DeviceInterface $device */
             [$device, $platform] = $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
 
@@ -197,45 +230,8 @@ class RegexFactory extends Helper
 
                 return [$device, $platform];
             }
-        }
-
-        if (null !== $deviceLoader->load($deviceCode)) {
-            /** @var \UaResult\Device\DeviceInterface $device */
-            [$device, $platform] = $deviceLoader->load($deviceCode, $this->useragent);
-
-            if (!in_array($device->getDeviceName(), ['unknown', null])) {
-                $this->logger->debug('device detected via devicecode');
-
-                return [$device, $platform];
-            }
-        }
-
-        if ($manufacturercode) {
-            if ('sonyericsson' === mb_strtolower($manufacturercode)) {
-                $manufacturercode = 'sony';
-            }
-
-            $manufacturercode = str_replace('-', '', $manufacturercode);
-
-            $className = '\\BrowserDetector\\Factory\\Device\\Mobile\\' . ucfirst($manufacturercode) . 'Factory';
-
-            if (class_exists($className)) {
-                $this->logger->debug('device detected via manufacturer');
-                /** @var \BrowserDetector\Factory\FactoryInterface $factory */
-                $factory = new $className($deviceLoader);
-
-                try {
-                    return $factory->detect($this->useragent, $s);
-                } catch (NotFoundException $e) {
-                    $this->logger->warning($e);
-
-                    throw $e;
-                }
-            } else {
-                $this->logger->error('factory "' . $className . '" not found');
-            }
-
-            $this->logger->info('device manufacturer class was not found');
+        } catch (\Throwable $e) {
+            $this->logger->info($e);
         }
 
         if (array_key_exists('devicetype', $this->match)) {
@@ -247,16 +243,18 @@ class RegexFactory extends Helper
                 } catch (InvalidArgumentException $e) {
                     throw new GeneralDeviceException('use general mobile device', 0, $e);
                 }
-            } elseif (!empty($this->match['devicetype'])) {
+            }
+
+            if (!empty($this->match['devicetype'])) {
                 $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst(mb_strtolower($this->match['devicetype'])) . 'Factory';
 
                 if (class_exists($className)) {
                     $this->logger->debug('device detected via device type (mobile or tv)');
-                    /** @var \BrowserDetector\Factory\FactoryInterface $factory */
-                    $factory = new $className($deviceLoader);
+                    /** @var \BrowserDetector\Factory\DeviceFactoryInterface $factory */
+                    $factory = new $className($this->cache, $this->logger);
 
                     try {
-                        return $factory->detect($this->useragent, $s);
+                        return $factory($this->useragent);
                     } catch (NotFoundException $e) {
                         $this->logger->warning($e);
 
