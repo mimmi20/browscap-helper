@@ -170,6 +170,11 @@ class RewriteTestsCommand extends Command
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId);
+
+            if (!file_exists($targetDirectory)) {
+                mkdir($targetDirectory, 0777, true);
+            }
+
             $this->logger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
 
             $fileChunks = array_chunk($folderChunk, 100);
@@ -241,12 +246,12 @@ class RewriteTestsCommand extends Command
      */
     private function handleTest(string $useragent): ?ResultInterface
     {
-        $this->logger->info('        detect for new result');
+        $this->logger->debug('        detect for new result');
 
         $detector  = $this->detector;
         $newResult = $detector($useragent);
 
-        $this->logger->info('        analyze new result');
+        $this->logger->debug('        analyze new result');
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
@@ -328,6 +333,7 @@ class RewriteTestsCommand extends Command
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             try {
+                /** @var \BrowscapHelper\Command\Helper\RegexFactory $regexFactory */
                 $regexFactory = $this->getHelper('regex-factory');
                 $regexFactory->detect($normalizedUa);
                 [$device] = $regexFactory->getDevice();
@@ -392,7 +398,7 @@ class RewriteTestsCommand extends Command
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();
 
-        $this->logger->info('        generating result');
+        $this->logger->debug('        generating result');
 
         $request = (new GenericRequestFactory())->createRequestFromString($useragent);
 

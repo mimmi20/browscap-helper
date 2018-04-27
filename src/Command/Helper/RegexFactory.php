@@ -208,30 +208,48 @@ class RegexFactory extends Helper
 
         if (array_key_exists('manufacturercode', $this->match)) {
             $manufacturercode = mb_strtolower($this->match['manufacturercode']);
-
             $manufacturercode = str_replace('-', '', $manufacturercode);
 
             if ('sonyericsson' === mb_strtolower($manufacturercode)) {
                 $manufacturercode = 'sony';
             }
-        } else {
-            throw new NotFoundException('device not found via regexes');
-        }
 
-        try {
-            $deviceLoader = $deviceLoaderFactory($manufacturercode, 'mobile');
-            $deviceLoader->init();
+            if ($manufacturercode) {
+                try {
+                    $deviceLoader = $deviceLoaderFactory($manufacturercode, 'mobile');
+                    $deviceLoader->init();
+                } catch (\Throwable $e) {
+                    $this->logger->info(
+                        new \Exception(
+                            sprintf(
+                                'an error occured while initializing the device loader for manufacturer "%s"',
+                                $manufacturercode
+                            ),
+                            0,
+                            $e
+                        )
+                    );
+                    $deviceLoader = null;
+                }
 
-            /** @var \UaResult\Device\DeviceInterface $device */
-            [$device, $platform] = $deviceLoader->load($manufacturercode . ' ' . $deviceCode, $this->useragent);
+                if (null !== $deviceLoader) {
+                    try {
+                        /** @var \UaResult\Device\DeviceInterface $device */
+                        [$device, $platform] = $deviceLoader->load(
+                            $manufacturercode . ' ' . $deviceCode,
+                            $this->useragent
+                        );
 
-            if (!in_array($device->getDeviceName(), ['unknown', null])) {
-                $this->logger->debug('device detected via manufacturercode and devicecode');
+                        if (!in_array($device->getDeviceName(), ['unknown', null])) {
+                            $this->logger->debug('device detected via manufacturercode and devicecode');
 
-                return [$device, $platform];
+                            return [$device, $platform];
+                        }
+                    } catch (\Throwable $e) {
+                        $this->logger->info(new \Exception(sprintf('an error occured while'), 0, $e));
+                    }
+                }
             }
-        } catch (\Throwable $e) {
-            $this->logger->info($e);
         }
 
         if (array_key_exists('devicetype', $this->match)) {
