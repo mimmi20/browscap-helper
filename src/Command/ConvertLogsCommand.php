@@ -72,13 +72,6 @@ class ConvertLogsCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Where the resource files are located',
                 $this->sourcesDirectory
-            )
-            ->addOption(
-                'target',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Where the target files should be written',
-                $this->targetDirectory
             );
     }
 
@@ -93,8 +86,7 @@ class ConvertLogsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException       When this abstract method is not implemented
-     * @throws \FileLoader\Exception
+     * @throws \LogicException When this abstract method is not implemented
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -136,7 +128,7 @@ class ConvertLogsCommand extends Command
             unlink($file->getPathname());
         }
 
-        $output->writeln("reading new files from directory '" . $sourcesDirectory . "' ...");
+        $output->writeln("reading files from directory '" . $sourcesDirectory . "' ...");
         $txtTotalCounter = 0;
 
         foreach ($this->getHelper('useragent')->getUserAgents(new LogFileSource($this->logger, $sourcesDirectory)) as $useragent) {

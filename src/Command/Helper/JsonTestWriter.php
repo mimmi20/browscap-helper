@@ -32,7 +32,7 @@ class JsonTestWriter extends Helper
     {
         $content = json_encode(
             $headers,
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
         );
 
         if (false === $content) {

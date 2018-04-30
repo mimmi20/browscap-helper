@@ -46,9 +46,9 @@ class Useragent extends Helper
      * @param SourceInterface $source
      * @param bool            $skipDuplicates
      *
-     * @return \Generator
+     * @return iterable|string[]
      */
-    public function getUserAgents(SourceInterface $source, bool $skipDuplicates = true): \Generator
+    public function getUserAgents(SourceInterface $source, bool $skipDuplicates = true): iterable
     {
         foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim(str_replace(["\r\n", "\r", "\n"], '\n', $useragent));
@@ -61,6 +61,29 @@ class Useragent extends Helper
             $this->allAgents[$useragent] = 1;
 
             yield $useragent;
+        }
+    }
+
+    /**
+     * @param SourceInterface $source
+     * @param bool            $skipDuplicates
+     *
+     * @return array[]|iterable
+     */
+    public function getHeaders(SourceInterface $source, bool $skipDuplicates = true): iterable
+    {
+        foreach ($source->getHeaders() as $header) {
+            $header = trim(str_replace(["\r\n", "\r", "\n"], '\n', $header));
+            $seachHeader = json_encode($header);
+
+            if ($skipDuplicates && array_key_exists($seachHeader, $this->allAgents)) {
+                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                continue;
+            }
+
+            $this->allAgents[$seachHeader] = 1;
+
+            yield $header;
         }
     }
 }

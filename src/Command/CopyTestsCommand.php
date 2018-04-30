@@ -38,9 +38,9 @@ use Symfony\Component\Finder\Finder;
 class CopyTestsCommand extends Command
 {
     /**
-     * @var \Monolog\Logger
+     * @var string
      */
-    private $logger;
+    private $sourcesDirectory = '';
 
     /**
      * @var string
@@ -48,9 +48,9 @@ class CopyTestsCommand extends Command
     private $targetDirectory = '';
 
     /**
-     * @var string
+     * @var \Monolog\Logger
      */
-    private $sourcesDirectory = '';
+    private $logger;
 
     /**
      * @param \Monolog\Logger $logger
@@ -59,9 +59,9 @@ class CopyTestsCommand extends Command
      */
     public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
     {
-        $this->logger           = $logger;
-        $this->targetDirectory  = $targetDirectory;
         $this->sourcesDirectory = $sourcesDirectory;
+        $this->targetDirectory  = $targetDirectory;
+        $this->logger           = $logger;
 
         parent::__construct();
     }
@@ -105,18 +105,23 @@ class CopyTestsCommand extends Command
         $consoleLogger = new ConsoleLogger($output);
         $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
-        $output->writeln('reading already existing tests ...');
-        $txtChecks  = [];
-        $testSource = 'tests';
+        $sourcesDirectory = $input->getOption('resources');
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
-            if (array_key_exists($useragent, $txtChecks)) {
-                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+        $output->writeln('reading already existing tests ...');
+
+        $testSource = 'tests';
+        $txtChecks  = [];
+
+        foreach ($this->getHelper('useragent')->getHeaders(new JsonFileSource($this->logger, $testSource), false) as $header) {
+            $seachHeader = json_encode($header);
+
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $txtChecks[$useragent] = 1;
+            $txtChecks[$seachHeader] = $header;
         }
 
         $output->writeln('remove existing tests ...');
@@ -135,8 +140,6 @@ class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
 
-        $sourcesDirectory = $input->getOption('resources');
-
         $source = new CollectionSource(
             [
                 new BrowscapSource($this->logger),
@@ -153,43 +156,33 @@ class CopyTestsCommand extends Command
 
         $output->writeln('copy tests from sources ...');
 
-        $newTestsCounter = 0;
+        $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('useragent')->getUserAgents($source) as $useragent) {
-            if (array_key_exists($useragent, $txtChecks)) {
+        foreach ($this->getHelper('useragent')->getHeaders($source) as $header) {
+            $seachHeader = json_encode($header);
+
+            if (array_key_exists($seachHeader, $txtChecks)) {
                 continue;
             }
 
-            $txtChecks[$useragent] = 1;
-            ++$newTestsCounter;
+            $txtChecks[$seachHeader] = $header;
+            ++$txtTotalCounter;
         }
 
         $output->writeln('rewrite tests ...');
 
-        $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
+        $folderChunks = array_chunk(array_unique($txtChecks), 1000);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
-            $this->getHelper('txt-test-writer')->write(
-                $folderChunk,
-                $testSource,
-                $folderId
-            );
-
-            $jsonTests = [];
-
-            foreach ($folderChunk as $id => $useragent) {
-                $jsonTests[$id] = ['user-agent' => $useragent];
-            }
-
             $this->getHelper('json-test-writer')->write(
-                $jsonTests,
+                $folderChunk,
                 $testSource,
                 $folderId
             );
         }
 
         $output->writeln('');
-        $output->writeln('tests copied for Browscap helper:    ' . $newTestsCounter);
+        $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter);
         $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
 
         return 0;
