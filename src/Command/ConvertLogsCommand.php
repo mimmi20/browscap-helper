@@ -107,7 +107,7 @@ class ConvertLogsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        $output->writeln('read existing tests for Browscap helper ...');
+        $output->writeln('reading already existing tests ...');
 
         $testSource = 'tests';
         $txtChecks  = [];
@@ -122,12 +122,10 @@ class ConvertLogsCommand extends Command
             $txtChecks[$useragent] = 1;
         }
 
-        $output->writeln('remove tests ...');
+        $output->writeln('remove existing tests ...');
 
         $finder = new Finder();
         $finder->files();
-        $finder->name('*.txt');
-        $finder->name('*.yaml');
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
         $finder->sortByName();
@@ -161,14 +159,14 @@ class ConvertLogsCommand extends Command
                 $folderId
             );
 
-            $yamlTests = [];
+            $jsonTests = [];
 
             foreach ($folderChunk as $id => $useragent) {
-                $yamlTests[$id] = ['user-agent' => $useragent];
+                $jsonTests[$id] = ['user-agent' => $useragent];
             }
 
-            $this->getHelper('yaml-test-writer')->write(
-                $yamlTests,
+            $this->getHelper('json-test-writer')->write(
+                $jsonTests,
                 $testSource,
                 $folderId
             );

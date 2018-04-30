@@ -13,6 +13,7 @@ namespace BrowscapHelper;
 
 use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\DetectorTestWriter;
+use BrowscapHelper\Command\Helper\JsonTestWriter;
 use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
@@ -88,6 +89,9 @@ class BrowscapHelper extends Application
 
         $yamlTestWriter = new YamlTestWriter();
         $this->getHelperSet()->set($yamlTestWriter);
+
+        $jsonTestWriter = new JsonTestWriter();
+        $this->getHelperSet()->set($jsonTestWriter);
 
         $regexFactory = new RegexFactory($cache, $logger);
         $this->getHelperSet()->set($regexFactory);
