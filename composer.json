@@ -16,7 +16,7 @@
   "require": {
     "php": "^7.1",
     "beberlei/assert": "^2.9",
-    "browscap/browscap": "^6.0.28",
+    "browscap/browscap": "dev-master",
     "browscap/browscap-php": "^4.1",
     "jaybizzle/crawler-detect": "*",
     "mimmi20/browscap-helper-source": "dev-get-headers as 2.3.2",
@@ -26,10 +26,10 @@
     "mimmi20/file-loader": "~3.0.4",
     "mimmi20/ua-result": "~5.2.3",
     "mimmi20/ua-result-company": "~3.2.7",
-    "mobiledetect/mobiledetectlib": "*",
+    "mobiledetect/mobiledetectlib": "dev-master",
     "monolog/monolog": "^1.23",
     "mustangostang/spyc": "*",
-    "piwik/device-detector": "*",
+    "piwik/device-detector": "dev-master",
     "psr/cache": "^1.0",
     "psr/log": "^1.0",
     "seld/jsonlint": "^1.7",
@@ -37,11 +37,11 @@
     "symfony/console": "^3.3 || ^4.0",
     "symfony/finder": "^3.3 || ^4.0",
     "symfony/yaml": "^3.3 || ^4.0",
-    "ua-parser/uap-php": "*",
-    "whichbrowser/parser": "*",
-    "woothee/woothee": "*",
-    "woothee/woothee-testset": "*",
-    "yzalis/ua-parser": "*"
+    "ua-parser/uap-php": "dev-master",
+    "whichbrowser/parser": "dev-master",
+    "woothee/woothee": "dev-master",
+    "woothee/woothee-testset": "dev-master",
+    "yzalis/ua-parser": "dev-master"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.11",
@@ -63,11 +63,7 @@
   "repositories": [
     {
       "type": "git",
-      "url": "https://github.com/mimmi20/Apple-iOS-build.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mimmi20/Apple-OS-X-build.git"
+      "url": "https://github.com/mimmi20/uap-core"
     }
   ],
   "bin": [
