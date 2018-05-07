@@ -30,7 +30,7 @@ class YamlTestWriter extends Helper
      */
     public function write(array $headers, string $dir, int $number): void
     {
-        $content = Yaml::dump($headers, 2, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
+        $content = Yaml::dump($headers, 2, 1, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
 
         file_put_contents(
             $dir . '/' . sprintf('%1$07d', $number) . '.yaml',

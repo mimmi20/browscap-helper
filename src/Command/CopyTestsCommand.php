@@ -14,6 +14,7 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
+use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\TxtFileSource;
@@ -28,7 +29,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Class CopyTestsCommand
@@ -107,36 +107,22 @@ class CopyTestsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        $output->writeln('reading already existing tests ...');
-
         $testSource = 'tests';
         $txtChecks  = [];
 
-        foreach ($this->getHelper('useragent')->getHeaders(new JsonFileSource($this->logger, $testSource), false) as $header) {
-            $seachHeader = json_encode($header);
-
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $txtChecks[$seachHeader] = $header;
+            $txtChecks[$seachHeader] = 1;
         }
 
-        $output->writeln('remove existing tests ...');
+        $txtChecks = $this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource));
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->sortByName();
-        $finder->ignoreUnreadableDirs();
-        $finder->in($testSource);
-
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
+        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
         $output->writeln('init sources ...');
 
@@ -155,31 +141,20 @@ class CopyTestsCommand extends Command
         );
 
         $output->writeln('copy tests from sources ...');
-
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('useragent')->getHeaders($source) as $header) {
-            $seachHeader = json_encode($header);
-
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, $source) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
+                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+
                 continue;
             }
 
-            $txtChecks[$seachHeader] = $header;
+            $txtChecks[$seachHeader] = 1;
             ++$txtTotalCounter;
         }
 
-        $output->writeln('rewrite tests ...');
-
-        $folderChunks = array_chunk(array_unique($txtChecks), 1000);
-
-        foreach ($folderChunks as $folderId => $folderChunk) {
-            $this->getHelper('json-test-writer')->write(
-                $folderChunk,
-                $testSource,
-                $folderId
-            );
-        }
+        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
 
         $output->writeln('');
         $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter);

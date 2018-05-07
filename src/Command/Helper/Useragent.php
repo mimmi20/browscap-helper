@@ -73,7 +73,12 @@ class Useragent extends Helper
     public function getHeaders(SourceInterface $source, bool $skipDuplicates = true): iterable
     {
         foreach ($source->getHeaders() as $header) {
-            $header = trim(str_replace(["\r\n", "\r", "\n"], '\n', $header));
+            $header = array_map(
+                static function ($value) {
+                    return trim($value);
+                },
+                str_replace(["\r\n", "\r", "\n"], '\n', $header)
+            );
             $seachHeader = json_encode($header);
 
             if ($skipDuplicates && array_key_exists($seachHeader, $this->allAgents)) {

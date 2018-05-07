@@ -21,7 +21,6 @@ use BrowserDetector\Loader\NotFoundException;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
-use Stringy\Stringy;
 use Symfony\Component\Console\Helper\Helper;
 
 /**
@@ -114,8 +113,9 @@ class RegexFactory extends Helper
     }
 
     /**
-     * @return array
      * @throws InvalidArgumentException
+     *
+     * @return array
      */
     public function getDevice(): array
     {
@@ -145,14 +145,16 @@ class RegexFactory extends Helper
         }
 
         if ('windows' === $deviceCode) {
-            $deviceLoader        = $deviceLoaderFactory('unknown', 'desktop');
+            $deviceLoader = $deviceLoaderFactory('unknown', 'desktop');
             $deviceLoader->init();
+
             return $deviceLoader->load('windows desktop', $this->useragent);
         }
 
         if ('macintosh' === $deviceCode) {
-            $deviceLoader        = $deviceLoaderFactory('apple', 'desktop');
+            $deviceLoader = $deviceLoaderFactory('apple', 'desktop');
             $deviceLoader->init();
+
             return $deviceLoader->load('macintosh', $this->useragent);
         }
 
@@ -182,8 +184,9 @@ class RegexFactory extends Helper
         }
 
         if ('philipstv' === $deviceCode) {
-            $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
+            $deviceLoader = $deviceLoaderFactory('philips', 'tv');
             $deviceLoader->init();
+
             return $deviceLoader->load('general philips tv', $this->useragent);
         }
 
@@ -192,8 +195,9 @@ class RegexFactory extends Helper
         }
 
         if ('linux' === $deviceCode || 'cros' === $deviceCode) {
-            $deviceLoader        = $deviceLoaderFactory('unknown', 'desktop');
+            $deviceLoader = $deviceLoaderFactory('unknown', 'desktop');
             $deviceLoader->init();
+
             return $deviceLoader->load('linux desktop', $this->useragent);
         }
 
@@ -201,8 +205,9 @@ class RegexFactory extends Helper
             && array_key_exists('osname', $this->match)
             && 'bb10' === mb_strtolower($this->match['osname'])
         ) {
-            $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
+            $deviceLoader = $deviceLoaderFactory('rim', 'mobile');
             $deviceLoader->init();
+
             return $deviceLoader->load('z10', $this->useragent);
         }
 

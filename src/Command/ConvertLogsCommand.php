@@ -11,8 +11,8 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\LogFileSource;
-use BrowscapHelper\Source\TxtFileSource;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Class ConvertLogsCommand
@@ -99,70 +98,40 @@ class ConvertLogsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        $output->writeln('reading already existing tests ...');
-
         $testSource = 'tests';
         $txtChecks  = [];
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource), false) as $useragent) {
-            if (array_key_exists($useragent, $txtChecks)) {
-                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $txtChecks[$useragent] = 1;
+            $txtChecks[$seachHeader] = 1;
         }
 
-        $output->writeln('remove existing tests ...');
+        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->sortByName();
-        $finder->ignoreUnreadableDirs();
-        $finder->in($testSource);
+        $output->writeln('init sources ...');
 
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
+        $source = new LogFileSource($this->logger, $sourcesDirectory);
 
-        $output->writeln("reading files from directory '" . $sourcesDirectory . "' ...");
+        $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new LogFileSource($this->logger, $sourcesDirectory)) as $useragent) {
-            if (array_key_exists($useragent, $txtChecks)) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, $source) as $seachHeader) {
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+
                 continue;
             }
 
-            $txtChecks[$useragent] = 1;
+            $txtChecks[$seachHeader] = 1;
             ++$txtTotalCounter;
         }
 
-        $output->writeln('rewrite tests ...');
-
-        $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
-
-        foreach ($folderChunks as $folderId => $folderChunk) {
-            $this->getHelper('txt-test-writer')->write(
-                $folderChunk,
-                $testSource,
-                $folderId
-            );
-
-            $jsonTests = [];
-
-            foreach ($folderChunk as $id => $useragent) {
-                $jsonTests[$id] = ['user-agent' => $useragent];
-            }
-
-            $this->getHelper('json-test-writer')->write(
-                $jsonTests,
-                $testSource,
-                $folderId
-            );
-        }
+        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
 
         $output->writeln('');
         $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter);

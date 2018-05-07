@@ -13,9 +13,12 @@ namespace BrowscapHelper;
 
 use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\DetectorTestWriter;
+use BrowscapHelper\Command\Helper\ExistingTestsLoader;
+use BrowscapHelper\Command\Helper\ExistingTestsRemover;
 use BrowscapHelper\Command\Helper\JsonTestWriter;
 use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\RegexLoader;
+use BrowscapHelper\Command\Helper\RewriteTests;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\Useragent;
 use BrowscapHelper\Command\Helper\YamlTestWriter;
@@ -101,5 +104,14 @@ class BrowscapHelper extends Application
 
         $uaHelper = new Useragent($logger);
         $this->getHelperSet()->set($uaHelper);
+
+        $existingTestsLoader = new ExistingTestsLoader($logger);
+        $this->getHelperSet()->set($existingTestsLoader);
+
+        $existingTestsRemover = new ExistingTestsRemover();
+        $this->getHelperSet()->set($existingTestsRemover);
+
+        $rewriteTestsHelper = new RewriteTests();
+        $this->getHelperSet()->set($rewriteTestsHelper);
     }
 }
