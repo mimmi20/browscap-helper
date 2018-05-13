@@ -13,7 +13,7 @@ namespace BrowscapHelper\Command\Helper;
 
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
+use BrowscapHelper\Source\Ua\UserAgent;
 
 /**
  * rewriting tests
@@ -47,8 +47,8 @@ class RewriteTests extends Helper
         foreach ($folderChunks as $folderId => $folderChunk) {
             $headers = [];
 
-            foreach ($folderChunk as $encodeHeaders) {
-                $headers[] = json_decode($encodeHeaders);
+            foreach ($folderChunk as $headerString) {
+                $headers[] = UserAgent::fromString($headerString);
             }
 
             $jsonTestWriter->write(

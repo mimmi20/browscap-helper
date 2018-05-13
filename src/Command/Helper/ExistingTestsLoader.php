@@ -56,8 +56,6 @@ class ExistingTestsLoader extends Helper
         /** @var Useragent $useragentLoader */
         $useragentLoader = $this->getHelperSet()->get('useragent');
 
-        foreach ($useragentLoader->getHeaders($source, false) as $header) {
-            yield json_encode($header);
-        }
+        yield from $useragentLoader->getHeaders($source, false);
     }
 }

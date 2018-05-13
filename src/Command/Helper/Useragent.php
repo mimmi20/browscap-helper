@@ -68,27 +68,10 @@ class Useragent extends Helper
      * @param SourceInterface $source
      * @param bool            $skipDuplicates
      *
-     * @return array[]|iterable
+     * @return iterable|string[]
      */
     public function getHeaders(SourceInterface $source, bool $skipDuplicates = true): iterable
     {
-        foreach ($source->getHeaders() as $header) {
-            $header = array_map(
-                static function ($value) {
-                    return trim($value);
-                },
-                str_replace(["\r\n", "\r", "\n"], '\n', $header)
-            );
-            $seachHeader = json_encode($header);
-
-            if ($skipDuplicates && array_key_exists($seachHeader, $this->allAgents)) {
-                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
-                continue;
-            }
-
-            $this->allAgents[$seachHeader] = 1;
-
-            yield $header;
-        }
+        yield from $source->getHeaders();
     }
 }

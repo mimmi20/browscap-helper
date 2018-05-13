@@ -120,8 +120,6 @@ class CopyTestsCommand extends Command
             $txtChecks[$seachHeader] = 1;
         }
 
-        $txtChecks = $this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource));
-
         $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
         $output->writeln('init sources ...');
