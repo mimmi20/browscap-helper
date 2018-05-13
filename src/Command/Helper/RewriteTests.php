@@ -42,25 +42,21 @@ class RewriteTests extends Helper
         /** @var YamlTestWriter $yamlTestWriter */
         $yamlTestWriter = $this->getHelperSet()->get('yaml-test-writer');
 
+        /** @var TxtTestWriter $txtTestWriter */
+        $txtTestWriter = $this->getHelperSet()->get('txt-test-writer');
+
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $headers = [];
 
             foreach ($folderChunk as $headerString) {
-                $headers[] = UserAgent::fromString($headerString);
+                $headers[] = UserAgent::fromString($headerString)->getHeader();
             }
 
-            $jsonTestWriter->write(
-                $headers,
-                $testSource,
-                $folderId
-            );
-            $yamlTestWriter->write(
-                $headers,
-                $testSource,
-                $folderId
-            );
+            $jsonTestWriter->write($headers, $testSource, $folderId);
+            $yamlTestWriter->write($headers, $testSource, $folderId);
+            $txtTestWriter->write($folderChunk, $testSource, $folderId);
         }
     }
 }
