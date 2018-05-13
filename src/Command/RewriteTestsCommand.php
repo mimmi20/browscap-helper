@@ -14,7 +14,8 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
-use BrowscapHelper\Source\TxtFileSource;
+use BrowscapHelper\Source\JsonFileSource;
+use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoaderFactory;
@@ -104,7 +105,6 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \FileLoader\Exception
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @return int|null null or 0 if everything went fine, or an error code
@@ -146,12 +146,22 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('selecting tests ...');
         $testResults = [];
+        $txtChecks   = [];
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
-            $result = $this->handleTest($useragent);
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $txtChecks[$seachHeader] = 1;
+
+            $headers = UserAgent::fromString($seachHeader);
+            $result  = $this->handleTest($headers);
 
             if (null === $result) {
-                $this->logger->info('UA "' . $useragent . '" was skipped because a similar UA was already added');
+                $this->logger->info('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
 
                 continue;
             }
@@ -238,18 +248,18 @@ class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param string $useragent
+     * @param array $headers
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
-    private function handleTest(string $useragent): ?ResultInterface
+    private function handleTest(array $headers): ?ResultInterface
     {
         $this->logger->debug('        detect for new result');
 
         $detector  = $this->detector;
-        $newResult = $detector($useragent);
+        $newResult = $detector($headers);
 
         $this->logger->debug('        analyze new result');
 
@@ -314,7 +324,8 @@ class RewriteTestsCommand extends Command
 
         // @var $platform \UaResult\Os\OsInterface|null
 
-        $normalizedUa = (new NormalizerFactory())->build()->normalize($useragent);
+        $request = (new GenericRequestFactory())->createRequestFromArray($headers);
+        $normalizedUa = (new NormalizerFactory())->build()->normalize($request->getDeviceUserAgent());
 
         // rewrite devices
 
@@ -399,8 +410,6 @@ class RewriteTestsCommand extends Command
         $engine = clone $newResult->getEngine();
 
         $this->logger->debug('        generating result');
-
-        $request = (new GenericRequestFactory())->createRequestFromString($useragent);
 
         return new Result($request->getHeaders(), $device, $platform, $browser, $engine);
     }

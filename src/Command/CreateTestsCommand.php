@@ -12,7 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\TxtFileSource;
+use BrowscapHelper\Source\JsonFileSource;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -131,7 +131,7 @@ class CreateTestsCommand extends Command
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
+        foreach ($this->getHelper('existing-tests-reader')->getUserAgents($output, new JsonFileSource($this->logger, $testSource)) as $useragent) {
             if (array_key_exists($useragent, $browscapChecks)) {
                 continue;
             }
