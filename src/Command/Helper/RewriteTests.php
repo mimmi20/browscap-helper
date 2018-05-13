@@ -11,9 +11,9 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
+use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
-use BrowscapHelper\Source\Ua\UserAgent;
 
 /**
  * rewriting tests

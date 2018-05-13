@@ -157,7 +157,7 @@ class RewriteTestsCommand extends Command
 
             $txtChecks[$seachHeader] = 1;
 
-            $headers = UserAgent::fromString($seachHeader);
+            $headers = UserAgent::fromString($seachHeader)->getHeader();
             $result  = $this->handleTest($headers);
 
             if (null === $result) {
@@ -324,7 +324,7 @@ class RewriteTestsCommand extends Command
 
         // @var $platform \UaResult\Os\OsInterface|null
 
-        $request = (new GenericRequestFactory())->createRequestFromArray($headers);
+        $request      = (new GenericRequestFactory())->createRequestFromArray($headers);
         $normalizedUa = (new NormalizerFactory())->build()->normalize($request->getDeviceUserAgent());
 
         // rewrite devices
