@@ -14,12 +14,11 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
-use BrowscapHelper\Source\TxtFileSource;
+use BrowscapHelper\Source\JsonFileSource;
+use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
-use BrowserDetector\Factory\NormalizerFactory;
-use BrowserDetector\Helper\GenericRequestFactory;
-use BrowserDetector\Loader\DeviceLoader;
+use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
@@ -31,6 +30,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use UaNormalizer\NormalizerFactory;
+use UaRequest\GenericRequestFactory;
 use UaResult\Device\Device;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
@@ -104,7 +105,6 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \FileLoader\Exception
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @return int|null null or 0 if everything went fine, or an error code
@@ -146,12 +146,22 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('selecting tests ...');
         $testResults = [];
+        $txtChecks   = [];
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
-            $result = $this->handleTest($useragent);
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            $txtChecks[$seachHeader] = 1;
+
+            $headers = UserAgent::fromString($seachHeader)->getHeader();
+            $result  = $this->handleTest($headers);
 
             if (null === $result) {
-                $this->logger->info('UA "' . $useragent . '" was skipped because a similar UA was already added');
+                $this->logger->info('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
 
                 continue;
             }
@@ -170,6 +180,11 @@ class RewriteTestsCommand extends Command
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId);
+
+            if (!file_exists($targetDirectory)) {
+                mkdir($targetDirectory, 0777, true);
+            }
+
             $this->logger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
 
             $fileChunks = array_chunk($folderChunk, 100);
@@ -233,17 +248,20 @@ class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param string $useragent
+     * @param array $headers
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
-    private function handleTest(string $useragent): ?ResultInterface
+    private function handleTest(array $headers): ?ResultInterface
     {
-        $this->logger->info('        detect for new result');
+        $this->logger->debug('        detect for new result');
 
-        $newResult = $this->detector->parseString($useragent);
+        $detector  = $this->detector;
+        $newResult = $detector($headers);
+
+        $this->logger->debug('        analyze new result');
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
@@ -306,7 +324,8 @@ class RewriteTestsCommand extends Command
 
         // @var $platform \UaResult\Os\OsInterface|null
 
-        $normalizedUa = (new NormalizerFactory())->build()->normalize($useragent);
+        $request      = (new GenericRequestFactory())->createRequestFromArray($headers);
+        $normalizedUa = (new NormalizerFactory())->build()->normalize($request->getDeviceUserAgent());
 
         // rewrite devices
 
@@ -325,6 +344,7 @@ class RewriteTestsCommand extends Command
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             try {
+                /** @var \BrowscapHelper\Command\Helper\RegexFactory $regexFactory */
                 $regexFactory = $this->getHelper('regex-factory');
                 $regexFactory->detect($normalizedUa);
                 [$device] = $regexFactory->getDevice();
@@ -350,21 +370,25 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
-                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
 
                 try {
+                    $deviceLoader->init();
                     [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->logger->crit($e);
 
                     $device = new Device(null, null);
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoader = DeviceLoader::getInstance(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
+                    $deviceLoader->init();
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->logger->crit($e);
 
                     $device = new Device(null, null);
@@ -385,9 +409,7 @@ class RewriteTestsCommand extends Command
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();
 
-        $this->logger->info('        generating result');
-
-        $request = (new GenericRequestFactory())->createRequestFromString($useragent);
+        $this->logger->debug('        generating result');
 
         return new Result($request->getHeaders(), $device, $platform, $browser, $engine);
     }

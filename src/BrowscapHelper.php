@@ -13,11 +13,16 @@ namespace BrowscapHelper;
 
 use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\DetectorTestWriter;
+use BrowscapHelper\Command\Helper\ExistingTestsLoader;
+use BrowscapHelper\Command\Helper\ExistingTestsRemover;
+use BrowscapHelper\Command\Helper\JsonTestWriter;
 use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\RegexLoader;
+use BrowscapHelper\Command\Helper\RewriteTests;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\Useragent;
-use BrowserDetector\Detector;
+use BrowscapHelper\Command\Helper\YamlTestWriter;
+use BrowserDetector\DetectorFactory;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
@@ -41,7 +46,6 @@ class BrowscapHelper extends Application
      * BrowscapHelper constructor.
      *
      * @throws \Exception
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function __construct()
     {
@@ -60,8 +64,8 @@ class BrowscapHelper extends Application
         ErrorHandler::register($logger);
 
         $cache    = new FilesystemCache('', 0, __DIR__ . '/../cache/');
-        $detector = new Detector($cache, $logger);
-        $detector->warmupCache();
+        $factory  = new DetectorFactory($cache, $logger);
+        $detector = $factory();
 
         $commands = [
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
@@ -86,6 +90,12 @@ class BrowscapHelper extends Application
         $detectorTestWriter = new DetectorTestWriter($logger);
         $this->getHelperSet()->set($detectorTestWriter);
 
+        $yamlTestWriter = new YamlTestWriter();
+        $this->getHelperSet()->set($yamlTestWriter);
+
+        $jsonTestWriter = new JsonTestWriter();
+        $this->getHelperSet()->set($jsonTestWriter);
+
         $regexFactory = new RegexFactory($cache, $logger);
         $this->getHelperSet()->set($regexFactory);
 
@@ -94,5 +104,14 @@ class BrowscapHelper extends Application
 
         $uaHelper = new Useragent($logger);
         $this->getHelperSet()->set($uaHelper);
+
+        $existingTestsLoader = new ExistingTestsLoader($logger);
+        $this->getHelperSet()->set($existingTestsLoader);
+
+        $existingTestsRemover = new ExistingTestsRemover();
+        $this->getHelperSet()->set($existingTestsRemover);
+
+        $rewriteTestsHelper = new RewriteTests();
+        $this->getHelperSet()->set($rewriteTestsHelper);
     }
 }

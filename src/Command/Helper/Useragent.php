@@ -46,9 +46,9 @@ class Useragent extends Helper
      * @param SourceInterface $source
      * @param bool            $skipDuplicates
      *
-     * @return \Generator
+     * @return iterable|string[]
      */
-    public function getUserAgents(SourceInterface $source, bool $skipDuplicates = true): \Generator
+    public function getUserAgents(SourceInterface $source, bool $skipDuplicates = true): iterable
     {
         foreach ($source->getUserAgents() as $useragent) {
             $useragent = trim(str_replace(["\r\n", "\r", "\n"], '\n', $useragent));
@@ -62,5 +62,16 @@ class Useragent extends Helper
 
             yield $useragent;
         }
+    }
+
+    /**
+     * @param SourceInterface $source
+     * @param bool            $skipDuplicates
+     *
+     * @return iterable|string[]
+     */
+    public function getHeaders(SourceInterface $source, bool $skipDuplicates = true): iterable
+    {
+        yield from $source->getHeaders();
     }
 }

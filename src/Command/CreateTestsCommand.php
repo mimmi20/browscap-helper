@@ -12,8 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\TxtFileSource;
-use BrowserDetector\Helper\GenericRequestFactory;
+use BrowscapHelper\Source\JsonFileSource;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -21,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaRequest\GenericRequestFactory;
 use UaResult\Browser\Browser;
 use UaResult\Device\Device;
 use UaResult\Engine\Engine;
@@ -91,8 +91,7 @@ class CreateTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException       When this abstract method is not implemented
-     * @throws \FileLoader\Exception
+     * @throws \LogicException When this abstract method is not implemented
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -132,7 +131,7 @@ class CreateTestsCommand extends Command
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new TxtFileSource($this->logger, $testSource)) as $useragent) {
+        foreach ($this->getHelper('existing-tests-reader')->getUserAgents($output, new JsonFileSource($this->logger, $testSource)) as $useragent) {
             if (array_key_exists($useragent, $browscapChecks)) {
                 continue;
             }
