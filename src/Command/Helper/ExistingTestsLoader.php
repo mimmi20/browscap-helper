@@ -14,7 +14,6 @@ namespace BrowscapHelper\Command\Helper;
 use BrowscapHelper\Source\SourceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * reading existing tests
@@ -44,15 +43,12 @@ class ExistingTestsLoader extends Helper
     }
 
     /**
-     * @param OutputInterface $output
      * @param SourceInterface $source
      *
      * @return iterable|string[]
      */
-    public function getHeaders(OutputInterface $output, SourceInterface $source): iterable
+    public function getHeaders(SourceInterface $source): iterable
     {
-        $output->writeln('reading already existing tests ...');
-
         /** @var Useragent $useragentLoader */
         $useragentLoader = $this->getHelperSet()->get('useragent');
 

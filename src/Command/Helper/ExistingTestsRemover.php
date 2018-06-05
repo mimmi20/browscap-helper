@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -28,15 +27,12 @@ class ExistingTestsRemover extends Helper
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $testSource
+     * @param string $testSource
      *
      * @return void
      */
-    public function remove(OutputInterface $output, string $testSource): void
+    public function remove(string $testSource): void
     {
-        $output->writeln('remove existing tests ...');
-
         $finder = new Finder();
         $finder->files();
         $finder->ignoreDotFiles(true);

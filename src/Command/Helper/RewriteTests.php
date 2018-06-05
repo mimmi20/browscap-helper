@@ -13,7 +13,6 @@ namespace BrowscapHelper\Command\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * rewriting tests
@@ -26,16 +25,13 @@ class RewriteTests extends Helper
     }
 
     /**
-     * @param OutputInterface $output
-     * @param array           $txtChecks
-     * @param string          $testSource
+     * @param array  $txtChecks
+     * @param string $testSource
      *
      * @return void
      */
-    public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
+    public function rewrite(array $txtChecks, string $testSource): void
     {
-        $output->writeln('rewrite tests ...');
-
         /** @var JsonTestWriter $jsonTestWriter */
         $jsonTestWriter = $this->getHelperSet()->get('json-test-writer');
         $folderChunks   = array_chunk(array_unique(array_keys($txtChecks)), 1000);
