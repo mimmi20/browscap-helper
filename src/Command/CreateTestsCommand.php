@@ -131,7 +131,7 @@ class CreateTestsCommand extends Command
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
 
-        foreach ($this->getHelper('existing-tests-reader')->getUserAgents($output, new JsonFileSource($this->logger, $testSource)) as $useragent) {
+        foreach ($this->getHelper('existing-tests-reader')->getUserAgents(new JsonFileSource($this->logger, $testSource)) as $useragent) {
             if (array_key_exists($useragent, $browscapChecks)) {
                 continue;
             }

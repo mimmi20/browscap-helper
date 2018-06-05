@@ -110,7 +110,9 @@ class CopyTestsCommand extends Command
         $testSource = 'tests';
         $txtChecks  = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+        $output->writeln('reading already existing tests ...');
+
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders(new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -120,7 +122,9 @@ class CopyTestsCommand extends Command
             $txtChecks[$seachHeader] = 1;
         }
 
-        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
+        $output->writeln('remove existing tests ...');
+
+        $this->getHelper('existing-tests-remover')->remove($testSource);
 
         $output->writeln('init sources ...');
 
@@ -141,7 +145,7 @@ class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, $source) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($source) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -152,7 +156,9 @@ class CopyTestsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
+        $output->writeln('rewrite tests ...');
+
+        $this->getHelper('rewrite-tests')->rewrite($txtChecks, $testSource);
 
         $output->writeln('');
         $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter);
