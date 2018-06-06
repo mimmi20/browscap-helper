@@ -39,8 +39,9 @@ jobs:
   include:
     - stage: composer validate
       php: 7.1
-      install: skip
-      script: composer validate
+      script:
+        - composer validate
+        - composer normalize --dry-run
 
     - stage: static code analysis
       php: 7.1
