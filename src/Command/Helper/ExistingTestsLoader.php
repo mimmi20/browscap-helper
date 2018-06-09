@@ -52,6 +52,6 @@ class ExistingTestsLoader extends Helper
         /** @var Useragent $useragentLoader */
         $useragentLoader = $this->getHelperSet()->get('useragent');
 
-        yield from $useragentLoader->getHeaders($source, false);
+        yield from $useragentLoader->getHeaders($source);
     }
 }

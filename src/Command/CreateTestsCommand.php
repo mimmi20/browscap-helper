@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\JsonFileSource;
+use BrowscapHelper\Source\Ua\UserAgent;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -107,14 +108,14 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('useragent')->getUserAgents(new BrowscapSource($this->logger), false) as $useragent) {
-            if (array_key_exists($useragent, $browscapChecks)) {
-                $this->logger->alert('    UA "' . $useragent . '" added more than once --> skipped');
+        foreach ($this->getHelper('useragent')->getHeaders(new BrowscapSource($this->logger), false) as $seachHeader) {
+            if (array_key_exists($seachHeader, $browscapChecks)) {
+                $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
 
-            $browscapChecks[$useragent] = 1;
+            $browscapChecks[$seachHeader] = 1;
         }
 
         $output->writeln('detect next test numbers ...');
@@ -131,20 +132,21 @@ class CreateTestsCommand extends Command
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
 
-        foreach ($this->getHelper('existing-tests-reader')->getUserAgents(new JsonFileSource($this->logger, $testSource)) as $useragent) {
-            if (array_key_exists($useragent, $browscapChecks)) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders(new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+            if (array_key_exists($seachHeader, $browscapChecks)) {
                 continue;
             }
 
-            if (false === mb_stripos($useragent, 'bingweb')) {
+            if (false === mb_stripos($seachHeader, 'bingweb')) {
                 continue;
             }
 
-            $request = $genericRequest->createRequestFromString($useragent);
+            $headers = UserAgent::fromString($seachHeader)->getHeader();
+            $request = $genericRequest->createRequestFromArray($headers);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $useragent, $browscapTotalCounter);
-            $browscapChecks[$useragent] = 1;
+            $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $seachHeader, $browscapTotalCounter);
+            $browscapChecks[$seachHeader] = 1;
         }
 
         $output->writeln('');
