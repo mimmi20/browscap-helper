@@ -24,6 +24,7 @@ use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -105,8 +106,6 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *
      * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
@@ -158,7 +157,18 @@ class RewriteTestsCommand extends Command
             $txtChecks[$seachHeader] = 1;
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
-            $result  = $this->handleTest($headers);
+
+            try {
+                $result = $this->handleTest($headers);
+            } catch (InvalidArgumentException $e) {
+                $this->logger->error($e);
+
+                continue;
+            } catch (\Throwable $e) {
+                $this->logger->warn($e);
+
+                continue;
+            }
 
             if (null === $result) {
                 $this->logger->info('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
@@ -250,7 +260,7 @@ class RewriteTestsCommand extends Command
     /**
      * @param array $headers
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
@@ -366,7 +376,7 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (NotFoundException $e) {
-                $this->logger->debug($e);
+                $this->logger->warn($e);
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
@@ -394,7 +404,7 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
-                $this->logger->debug($e);
+                $this->logger->warn($e);
 
                 $device = new Device(null, null);
             } catch (\Exception $e) {
