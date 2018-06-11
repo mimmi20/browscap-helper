@@ -44,33 +44,10 @@ class Useragent extends Helper
 
     /**
      * @param SourceInterface $source
-     * @param bool            $skipDuplicates
      *
      * @return iterable|string[]
      */
-    public function getUserAgents(SourceInterface $source, bool $skipDuplicates = true): iterable
-    {
-        foreach ($source->getUserAgents() as $useragent) {
-            $useragent = trim(str_replace(["\r\n", "\r", "\n"], '\n', $useragent));
-
-            if ($skipDuplicates && array_key_exists($useragent, $this->allAgents)) {
-                $this->logger->debug('    UA "' . $useragent . '" added more than once --> skipped');
-                continue;
-            }
-
-            $this->allAgents[$useragent] = 1;
-
-            yield $useragent;
-        }
-    }
-
-    /**
-     * @param SourceInterface $source
-     * @param bool            $skipDuplicates
-     *
-     * @return iterable|string[]
-     */
-    public function getHeaders(SourceInterface $source, bool $skipDuplicates = true): iterable
+    public function getHeaders(SourceInterface $source): iterable
     {
         yield from $source->getHeaders();
     }
