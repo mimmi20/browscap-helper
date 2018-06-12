@@ -147,7 +147,7 @@ class RewriteTestsCommand extends Command
         $testResults = [];
         $txtChecks   = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders(new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 

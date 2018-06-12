@@ -43,15 +43,15 @@ class ExistingTestsLoader extends Helper
     }
 
     /**
-     * @param SourceInterface $source
+     * @param SourceInterface[] $sources
      *
      * @return iterable|string[]
      */
-    public function getHeaders(SourceInterface $source): iterable
+    public function getHeaders(array $sources): iterable
     {
         /** @var Useragent $useragentLoader */
         $useragentLoader = $this->getHelperSet()->get('useragent');
 
-        yield from $useragentLoader->getHeaders($source);
+        yield from $useragentLoader->getHeaders($sources);
     }
 }

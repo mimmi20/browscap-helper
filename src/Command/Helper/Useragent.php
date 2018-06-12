@@ -43,12 +43,16 @@ class Useragent extends Helper
     }
 
     /**
-     * @param SourceInterface $source
+     * @param SourceInterface[] $sources
      *
      * @return iterable|string[]
      */
-    public function getHeaders(SourceInterface $source): iterable
+    public function getHeaders(array $sources): iterable
     {
-        yield from $source->getHeaders();
+        foreach ($sources as $source) {
+            $this->logger->info(sprintf('    reading from source %s ...', $source->getName()));
+
+            yield from $source->getHeaders();
+        }
     }
 }

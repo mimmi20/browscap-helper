@@ -118,7 +118,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders(new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -158,7 +158,7 @@ class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders($source) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([$source]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 

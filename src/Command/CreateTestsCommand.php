@@ -108,7 +108,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('useragent')->getHeaders(new BrowscapSource($this->logger), false) as $seachHeader) {
+        foreach ($this->getHelper('useragent')->getHeaders([new BrowscapSource($this->logger)], false) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -132,7 +132,7 @@ class CreateTestsCommand extends Command
         $platform             = new Os(null, null);
         $engine               = new Engine(null);
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders(new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 continue;
             }
