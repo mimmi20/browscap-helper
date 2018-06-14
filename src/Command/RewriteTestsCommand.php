@@ -376,7 +376,7 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (NotFoundException $e) {
-                $this->logger->warn($e);
+                $this->logger->info($e);
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
@@ -404,10 +404,10 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
-                $this->logger->warn($e);
+                $this->logger->info($e);
 
                 $device = new Device(null, null);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->logger->error($e);
 
                 $device = new Device(null, null);
