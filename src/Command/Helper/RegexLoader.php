@@ -35,11 +35,6 @@ class RegexLoader extends Helper
     private $regexes;
 
     /**
-     * @var self|null
-     */
-    private static $instance;
-
-    /**
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
