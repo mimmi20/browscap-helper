@@ -108,9 +108,9 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('useragent')->getHeaders([new BrowscapSource($this->logger)], false) as $seachHeader) {
+        foreach ($this->getHelper('useragent')->getHeaders([new BrowscapSource($this->logger)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
-                $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -137,7 +137,11 @@ class CreateTestsCommand extends Command
                 continue;
             }
 
-            if (false === mb_stripos($seachHeader, 'bingweb')) {
+//            if (false === mb_stripos($seachHeader, 'EdgA')) {
+//                continue;
+//            }
+
+            if (false === preg_match('/TA\-\d{4}/', $seachHeader)) {
                 continue;
             }
 
@@ -145,7 +149,7 @@ class CreateTestsCommand extends Command
             $request = $genericRequest->createRequestFromArray($headers);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $seachHeader, $browscapTotalCounter);
+            $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $headers['user-agent'], $browscapTotalCounter);
             $browscapChecks[$seachHeader] = 1;
         }
 
