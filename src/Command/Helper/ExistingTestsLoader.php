@@ -49,9 +49,10 @@ class ExistingTestsLoader extends Helper
      */
     public function getHeaders(array $sources): iterable
     {
-        /** @var Useragent $useragentLoader */
-        $useragentLoader = $this->getHelperSet()->get('useragent');
+        foreach ($sources as $source) {
+            $this->logger->info(sprintf('    reading from source %s ...', $source->getName()));
 
-        yield from $useragentLoader->getHeaders($sources);
+            yield from $source->getHeaders();
+        }
     }
 }

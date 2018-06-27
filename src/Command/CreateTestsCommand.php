@@ -108,7 +108,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('useragent')->getHeaders([new BrowscapSource($this->logger)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new BrowscapSource($this->logger)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -125,28 +125,34 @@ class CreateTestsCommand extends Command
         $output->writeln('next test for Browscap: ' . $txtNumber);
         $output->writeln('writing new browscap tests ...');
 
-        $browscapTotalCounter = 0;
-        $genericRequest       = new GenericRequestFactory();
-        $browser              = new Browser(null);
-        $device               = new Device(null, null);
-        $platform             = new Os(null, null);
-        $engine               = new Engine(null);
+        $browscapTotalCounter  = 0;
+        $genericRequestFactory = new GenericRequestFactory();
+        $browser               = new Browser(null);
+        $device                = new Device(null, null);
+        $platform              = new Os(null, null);
+        $engine                = new Engine(null);
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
+                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+
                 continue;
             }
 
 //            if (false === mb_stripos($seachHeader, 'EdgA')) {
+//                $this->logger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
+//
 //                continue;
 //            }
 
             if (false === preg_match('/TA\-\d{4}/', $seachHeader)) {
+                $this->logger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
+
                 continue;
             }
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
-            $request = $genericRequest->createRequestFromArray($headers);
+            $request = $genericRequestFactory->createRequestFromArray($headers);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
             $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $headers['user-agent'], $browscapTotalCounter);
