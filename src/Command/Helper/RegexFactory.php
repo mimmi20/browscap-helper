@@ -184,10 +184,7 @@ class RegexFactory extends Helper
         }
 
         if ('philipstv' === $deviceCode) {
-            $deviceLoader = $deviceLoaderFactory('philips', 'tv');
-            $deviceLoader->init();
-
-            return $deviceLoader->load('general philips tv', $this->useragent);
+            throw new GeneralPhilipsTvException('use general philips tv device');
         }
 
         if (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
@@ -215,7 +212,7 @@ class RegexFactory extends Helper
             $manufacturercode = mb_strtolower($this->match['manufacturercode']);
             $manufacturercode = str_replace('-', '', $manufacturercode);
 
-            if ('sonyericsson' === mb_strtolower($manufacturercode)) {
+            if ('sonyericsson' === $manufacturercode) {
                 $manufacturercode = 'sony';
             }
 
@@ -269,7 +266,13 @@ class RegexFactory extends Helper
             }
 
             if (!empty($this->match['devicetype'])) {
-                $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst(mb_strtolower($this->match['devicetype'])) . 'Factory';
+                $deviceType = mb_strtolower($this->match['devicetype']);
+                
+                if (in_array($deviceType, ['mobile', 'tablet']) && isset($this->match['browsername']) && 'firefox' === strtolower($this->match['browsername'])) {
+                    throw new GeneralDeviceException('use general mobile device');
+                }
+                
+                $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst($deviceType) . 'Factory';
 
                 if (class_exists($className)) {
                     $this->logger->debug('device detected via device type (mobile or tv)');

@@ -391,6 +391,18 @@ class RewriteTestsCommand extends Command
 
                     $device = new Device(null, null);
                 }
+            } catch (GeneralPhilipsTvException $e) {
+                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
+
+                try {
+                    $deviceLoader->init();
+                    [$device] = $deviceLoader->load('general philips tv', $normalizedUa);
+                } catch (\Throwable $e) {
+                    $this->logger->crit($e);
+
+                    $device = new Device(null, null);
+                }
             } catch (GeneralDeviceException $e) {
                 $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
