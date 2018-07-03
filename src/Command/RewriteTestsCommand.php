@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
+use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;

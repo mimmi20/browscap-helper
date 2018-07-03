@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command\Helper;
 
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
+use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
@@ -267,11 +268,11 @@ class RegexFactory extends Helper
 
             if (!empty($this->match['devicetype'])) {
                 $deviceType = mb_strtolower($this->match['devicetype']);
-                
-                if (in_array($deviceType, ['mobile', 'tablet']) && isset($this->match['browsername']) && 'firefox' === strtolower($this->match['browsername'])) {
+
+                if (in_array($deviceType, ['mobile', 'tablet']) && isset($this->match['browsername']) && 'firefox' === mb_strtolower($this->match['browsername'])) {
                     throw new GeneralDeviceException('use general mobile device');
                 }
-                
+
                 $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst($deviceType) . 'Factory';
 
                 if (class_exists($className)) {
