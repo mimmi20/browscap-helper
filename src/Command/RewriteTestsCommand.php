@@ -142,11 +142,11 @@ class RewriteTestsCommand extends Command
             try {
                 $result = $this->handleTest($headers);
             } catch (InvalidArgumentException $e) {
-                $this->logger->error($e);
+                $this->logger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
                 continue;
             } catch (\Throwable $e) {
-                $this->logger->warn($e);
+                $this->logger->warn(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
                 continue;
             }
