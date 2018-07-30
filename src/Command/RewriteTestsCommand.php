@@ -31,7 +31,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 use UaNormalizer\NormalizerFactory;
 use UaRequest\GenericRequestFactory;
 use UaResult\Device\Device;
@@ -122,27 +121,8 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('remove old test files ...');
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->ignoreUnreadableDirs();
-        $finder->in($detectorTargetDirectory);
-
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
-
-        $finder = new Finder();
-        $finder->files();
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->ignoreUnreadableDirs();
-        $finder->in($basePath . 'tests/UserAgentsTest');
-
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
+        $this->getHelper('existing-tests-remover')->remove($detectorTargetDirectory);
+        $this->getHelper('existing-tests-remover')->remove($basePath . 'tests/UserAgentsTest');
 
         $output->writeln('selecting tests ...');
         $testResults = [];
@@ -150,7 +130,7 @@ class RewriteTestsCommand extends Command
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -172,7 +152,7 @@ class RewriteTestsCommand extends Command
             }
 
             if (null === $result) {
-                $this->logger->info('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
+                $this->logger->debug('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
 
                 continue;
             }

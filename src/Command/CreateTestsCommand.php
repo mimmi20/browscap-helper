@@ -110,7 +110,7 @@ class CreateTestsCommand extends Command
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders([new BrowscapSource($this->logger)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
-                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }

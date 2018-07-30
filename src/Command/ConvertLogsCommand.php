@@ -126,7 +126,7 @@ class ConvertLogsCommand extends Command
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders([$source]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }

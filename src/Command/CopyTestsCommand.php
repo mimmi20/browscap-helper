@@ -134,8 +134,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
 
-        $cache = new PhpFileCache('cache');
-
+        $cache  = new PhpFileCache('cache');
         $source = new CollectionSource(
             [
                 new BrowscapSource($this->logger),
@@ -160,7 +159,7 @@ class CopyTestsCommand extends Command
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders([$source]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
