@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
+use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
@@ -24,12 +25,12 @@ use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 use UaNormalizer\NormalizerFactory;
 use UaRequest\GenericRequestFactory;
 use UaResult\Device\Device;
@@ -105,8 +106,6 @@ class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *
      * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
@@ -122,35 +121,16 @@ class RewriteTestsCommand extends Command
 
         $output->writeln('remove old test files ...');
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->ignoreUnreadableDirs();
-        $finder->in($detectorTargetDirectory);
-
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
-
-        $finder = new Finder();
-        $finder->files();
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->ignoreUnreadableDirs();
-        $finder->in($basePath . 'tests/UserAgentsTest');
-
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
+        $this->getHelper('existing-tests-remover')->remove($detectorTargetDirectory);
+        $this->getHelper('existing-tests-remover')->remove($basePath . 'tests/UserAgentsTest');
 
         $output->writeln('selecting tests ...');
         $testResults = [];
         $txtChecks   = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders($output, new JsonFileSource($this->logger, $testSource)) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -158,10 +138,21 @@ class RewriteTestsCommand extends Command
             $txtChecks[$seachHeader] = 1;
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
-            $result  = $this->handleTest($headers);
+
+            try {
+                $result = $this->handleTest($headers);
+            } catch (InvalidArgumentException $e) {
+                $this->logger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
+
+                continue;
+            } catch (\Throwable $e) {
+                $this->logger->warn(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
+
+                continue;
+            }
 
             if (null === $result) {
-                $this->logger->info('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
+                $this->logger->debug('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
 
                 continue;
             }
@@ -250,7 +241,7 @@ class RewriteTestsCommand extends Command
     /**
      * @param array $headers
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
@@ -366,7 +357,7 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (NotFoundException $e) {
-                $this->logger->debug($e);
+                $this->logger->info($e);
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
@@ -376,6 +367,18 @@ class RewriteTestsCommand extends Command
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
+                } catch (\Throwable $e) {
+                    $this->logger->crit($e);
+
+                    $device = new Device(null, null);
+                }
+            } catch (GeneralPhilipsTvException $e) {
+                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
+
+                try {
+                    $deviceLoader->init();
+                    [$device] = $deviceLoader->load('general philips tv', $normalizedUa);
                 } catch (\Throwable $e) {
                     $this->logger->crit($e);
 
@@ -394,10 +397,10 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
-                $this->logger->debug($e);
+                $this->logger->info($e);
 
                 $device = new Device(null, null);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->logger->error($e);
 
                 $device = new Device(null, null);

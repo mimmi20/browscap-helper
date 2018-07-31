@@ -20,7 +20,6 @@ use BrowscapHelper\Command\Helper\RegexFactory;
 use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\RewriteTests;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
-use BrowscapHelper\Command\Helper\Useragent;
 use BrowscapHelper\Command\Helper\YamlTestWriter;
 use BrowserDetector\DetectorFactory;
 use Monolog\ErrorHandler;
@@ -101,9 +100,6 @@ class BrowscapHelper extends Application
 
         $regexLoader = new RegexLoader($logger);
         $this->getHelperSet()->set($regexLoader);
-
-        $uaHelper = new Useragent($logger);
-        $this->getHelperSet()->set($uaHelper);
 
         $existingTestsLoader = new ExistingTestsLoader($logger);
         $this->getHelperSet()->set($existingTestsLoader);
