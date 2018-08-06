@@ -212,7 +212,7 @@ class RewriteTestsCommand extends Command
                 str_replace(
                     ['//### tests ###', '### group ###', '### count ###'],
                     [implode(PHP_EOL, $testContent), $group, $count],
-                    file_get_contents('templates/test.php.txt')
+                    (string) file_get_contents('templates/test.php.txt')
                 )
             );
 
@@ -230,7 +230,7 @@ class RewriteTestsCommand extends Command
         $output->writeln('writing ' . $circleFile . ' ...');
         file_put_contents(
             $circleFile,
-            str_replace('### tests ###', $circleciContent, file_get_contents('templates/config.yml.txt'))
+            str_replace('### tests ###', $circleciContent, (string) file_get_contents('templates/config.yml.txt'))
         );
 
         $output->writeln('done');

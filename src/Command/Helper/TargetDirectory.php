@@ -33,7 +33,11 @@ class TargetDirectory extends Helper
             throw new \UnexpectedValueException('directory "' . $targetDirectory . '" is not readable');
         }
 
-        $filesArray = scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
+        if (!is_dir($targetDirectory)) {
+            throw new \UnexpectedValueException('directory "' . $targetDirectory . '" is not a directory');
+        }
+
+        $filesArray = (array) scandir($targetDirectory, SCANDIR_SORT_ASCENDING);
         $number     = 0;
         $filesFound = false;
 
