@@ -76,7 +76,7 @@ class BrowscapTestWriter extends Helper
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $useragent) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $browser->getName()) . "',
+            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], (string) $browser->getName()) . "',
             'Browser_Type' => '" . $browser->getType()->getName() . "',
             'Browser_Bits' => '" . $browser->getBits() . "',
             'Browser_Maker' => '" . $browser->getManufacturer()->getName() . "',
