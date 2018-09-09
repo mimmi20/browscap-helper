@@ -17,7 +17,6 @@ use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
-use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
@@ -26,7 +25,6 @@ use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
-use Seld\JsonLint\JsonParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -60,11 +58,6 @@ class RewriteTestsCommand extends Command
     private $detector;
 
     /**
-     * @var \Seld\JsonLint\JsonParser
-     */
-    private $jsonParser;
-
-    /**
      * @var array
      */
     private $tests = [];
@@ -79,8 +72,6 @@ class RewriteTestsCommand extends Command
         $this->logger   = $logger;
         $this->cache    = $cache;
         $this->detector = $detector;
-
-        $this->jsonParser = new JsonParser();
 
         parent::__construct();
     }
@@ -242,7 +233,7 @@ class RewriteTestsCommand extends Command
      * @param array $headers
      *
      * @throws InvalidArgumentException
-     *
+     * @throws \Seld\JsonLint\ParsingException
      * @return \UaResult\Result\ResultInterface|null
      */
     private function handleTest(array $headers): ?ResultInterface
@@ -361,7 +352,7 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
                 $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
 
                 try {
@@ -373,7 +364,7 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (GeneralPhilipsTvException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
                 $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
 
                 try {
@@ -385,7 +376,7 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
