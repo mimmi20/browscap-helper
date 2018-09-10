@@ -17,7 +17,6 @@ use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
-use BrowserDetector\Cache\Cache;
 use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
@@ -361,7 +360,7 @@ class RewriteTestsCommand extends Command
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
                 $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
 
                 try {
@@ -373,7 +372,7 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (GeneralPhilipsTvException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
                 $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
 
                 try {
@@ -385,7 +384,7 @@ class RewriteTestsCommand extends Command
                     $device = new Device(null, null);
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory(new Cache($this->cache), $this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
