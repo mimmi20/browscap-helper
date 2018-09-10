@@ -22,6 +22,7 @@ use BrowserDetector\Loader\NotFoundException;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Helper\Helper;
 
 /**
@@ -137,7 +138,7 @@ class RegexFactory extends Helper
         }
 
         $deviceCode          = mb_strtolower($this->match['devicecode']);
-        $deviceLoaderFactory = new DeviceLoaderFactory($this->cache, $this->logger);
+        $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -161,10 +162,10 @@ class RegexFactory extends Helper
 
         if ('cfnetwork' === $deviceCode) {
             try {
-                $factory = new Factory\Device\DarwinFactory($this->cache, $this->logger);
+                $factory = new Factory\Device\DarwinFactory($this->logger);
 
                 return $factory($this->useragent);
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException | ParsingException $e) {
                 throw new NotFoundException('not found', 0, $e);
             }
         }
@@ -257,11 +258,11 @@ class RegexFactory extends Helper
 
         if (array_key_exists('devicetype', $this->match)) {
             if ('wpdesktop' === mb_strtolower($this->match['devicetype']) || 'xblwp7' === mb_strtolower($this->match['devicetype'])) {
-                $factory = new Factory\Device\MobileFactory($this->cache, $this->logger);
+                $factory = new Factory\Device\MobileFactory($this->logger);
 
                 try {
                     return $factory($this->useragent);
-                } catch (InvalidArgumentException $e) {
+                } catch (InvalidArgumentException | ParsingException $e) {
                     throw new GeneralDeviceException('use general mobile device', 0, $e);
                 }
             }
