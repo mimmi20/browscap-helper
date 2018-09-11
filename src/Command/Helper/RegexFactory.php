@@ -279,7 +279,7 @@ class RegexFactory extends Helper
                 if (class_exists($className)) {
                     $this->logger->debug('device detected via device type (mobile or tv)');
                     /** @var \BrowserDetector\Factory\DeviceFactoryInterface $factory */
-                    $factory = new $className($this->cache, $this->logger);
+                    $factory = new $className($this->logger);
 
                     try {
                         return $factory($this->useragent);
