@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
+use JsonClass\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
@@ -44,12 +45,12 @@ class DetectorTestWriter extends Helper
      */
     public function write(array $tests, string $dir, int $folderId, int $fileId): void
     {
-        $content = json_encode(
-            $tests,
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
-        );
-
-        if (false === $content) {
+        try {
+            $content = (new Json())->encode(
+                $tests,
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
+            );
+        } catch (\ExceptionalJSON\EncodeErrorException $e) {
             $this->logger->critical('could not encode content');
 
             return;
