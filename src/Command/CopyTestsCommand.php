@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\CollectionSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
 use BrowscapHelper\Source\DonatjSource;
 use BrowscapHelper\Source\EndorphinSource;
@@ -134,30 +133,28 @@ class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
 
-        $cache  = new PhpFileCache('cache');
-        $source = new CollectionSource(
-            [
-                new BrowscapSource($this->logger),
-                new PiwikSource($this->logger),
-                new UapCoreSource($this->logger, $cache),
-                new WhichBrowserSource($this->logger),
-                new WootheeSource($this->logger),
-                new MobileDetectSource($this->logger),
-                new YzalisSource($this->logger),
-                new CrawlerDetectSource($this->logger),
-                new DonatjSource($this->logger),
-                new EndorphinSource($this->logger),
-                new SinergiSource($this->logger),
-                new UaParserJsSource($this->logger),
-                new ZsxsoftSource($this->logger),
-                new TxtFileSource($this->logger, $sourcesDirectory),
-            ]
-        );
+        $cache   = new PhpFileCache('cache');
+        $sources = [
+            new BrowscapSource($this->logger),
+            new PiwikSource($this->logger),
+            new UapCoreSource($this->logger, $cache),
+            new WhichBrowserSource($this->logger),
+            new WootheeSource($this->logger),
+            new MobileDetectSource($this->logger),
+            new YzalisSource($this->logger),
+            new CrawlerDetectSource($this->logger),
+            new DonatjSource($this->logger),
+            new EndorphinSource($this->logger),
+            new SinergiSource($this->logger),
+            new UaParserJsSource($this->logger),
+            new ZsxsoftSource($this->logger),
+            new TxtFileSource($this->logger, $sourcesDirectory),
+        ];
 
         $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([$source]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 

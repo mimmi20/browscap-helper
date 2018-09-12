@@ -234,6 +234,7 @@ class RewriteTestsCommand extends Command
      *
      * @throws InvalidArgumentException
      * @throws \Seld\JsonLint\ParsingException
+     *
      * @return \UaResult\Result\ResultInterface|null
      */
     private function handleTest(array $headers): ?ResultInterface
