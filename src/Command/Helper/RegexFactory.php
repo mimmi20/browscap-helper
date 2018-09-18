@@ -14,6 +14,7 @@ namespace BrowscapHelper\Command\Helper;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
+use BrowscapHelper\Factory\Regex\GeneralTabletException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
@@ -271,6 +272,10 @@ class RegexFactory extends Helper
                 $deviceType = mb_strtolower($this->match['devicetype']);
 
                 if (in_array($deviceType, ['mobile', 'tablet']) && isset($this->match['browsername']) && 'firefox' === mb_strtolower($this->match['browsername'])) {
+                    if ('tablet' === $deviceType) {
+                        throw new GeneralTabletException('use general tablet');
+                    }
+
                     throw new GeneralDeviceException('use general mobile device');
                 }
 
