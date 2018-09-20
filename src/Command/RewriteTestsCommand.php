@@ -14,6 +14,7 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
+use BrowscapHelper\Factory\Regex\GeneralPhoneException;
 use BrowscapHelper\Factory\Regex\GeneralTabletException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
@@ -384,6 +385,18 @@ class RewriteTestsCommand extends Command
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general tablet', $normalizedUa);
+                } catch (\Throwable $e) {
+                    $this->logger->crit($e);
+
+                    $device = new Device(null, null);
+                }
+            } catch (GeneralPhoneException $e) {
+                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
+                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
+
+                try {
+                    $deviceLoader->init();
+                    [$device] = $deviceLoader->load('general mobile phone', $normalizedUa);
                 } catch (\Throwable $e) {
                     $this->logger->crit($e);
 

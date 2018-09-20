@@ -14,6 +14,7 @@ namespace BrowscapHelper\Command\Helper;
 use BrowscapHelper\Factory\Regex\GeneralBlackberryException;
 use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
+use BrowscapHelper\Factory\Regex\GeneralPhoneException;
 use BrowscapHelper\Factory\Regex\GeneralTabletException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Cache\Cache;
@@ -178,7 +179,19 @@ class RegexFactory extends Helper
             throw new GeneralBlackberryException('use general mobile device');
         }
 
-        if (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic', ''])) {
+        if (in_array($deviceCode, ['dalvik', 'android'])) {
+            if (array_key_exists('devicetype', $this->match)) {
+                $deviceType = mb_strtolower($this->match['devicetype']);
+
+                if ('tablet' === $deviceType) {
+                    throw new GeneralTabletException('use general tablet');
+                }
+            }
+
+            throw new GeneralPhoneException('use general mobile phone');
+        }
+
+        if (in_array($deviceCode, ['opera/9.80', 'opera/9.50', 'generic', ''])) {
             throw new GeneralDeviceException('use general mobile device');
         }
 
