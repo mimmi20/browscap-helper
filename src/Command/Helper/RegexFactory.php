@@ -17,12 +17,10 @@ use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\GeneralPhoneException;
 use BrowscapHelper\Factory\Regex\GeneralTabletException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
-use BrowserDetector\Cache\Cache;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Helper\Helper;
@@ -38,11 +36,6 @@ class RegexFactory extends Helper
      * @var \Symfony\Component\Console\Helper\HelperSet
      */
     protected $helperSet;
-
-    /**
-     * @var \BrowserDetector\Cache\Cache
-     */
-    private $cache;
 
     /**
      * @var array|null
@@ -67,12 +60,10 @@ class RegexFactory extends Helper
     private $runDetection = false;
 
     /**
-     * @param \Psr\SimpleCache\CacheInterface $cache
-     * @param \Psr\Log\LoggerInterface        $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(PsrCacheInterface $cache, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->cache  = new Cache($cache);
         $this->logger = $logger;
     }
 
@@ -128,7 +119,7 @@ class RegexFactory extends Helper
         }
 
         if (!is_array($this->match) && $this->runDetection) {
-            throw new \InvalidArgumentException('device not found via regexes');
+            throw new NoMatchException('device not found via regexes');
         }
 
         if (!is_array($this->match)) {

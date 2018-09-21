@@ -25,7 +25,6 @@ use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
-use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,11 +49,6 @@ class RewriteTestsCommand extends Command
     private $logger;
 
     /**
-     * @var \Psr\SimpleCache\CacheInterface
-     */
-    private $cache;
-
-    /**
      * @var \BrowserDetector\Detector
      */
     private $detector;
@@ -65,14 +59,12 @@ class RewriteTestsCommand extends Command
     private $tests = [];
 
     /**
-     * @param \Monolog\Logger                 $logger
-     * @param \Psr\SimpleCache\CacheInterface $cache
-     * @param \BrowserDetector\Detector       $detector
+     * @param \Monolog\Logger           $logger
+     * @param \BrowserDetector\Detector $detector
      */
-    public function __construct(Logger $logger, PsrCacheInterface $cache, Detector $detector)
+    public function __construct(Logger $logger, Detector $detector)
     {
         $this->logger   = $logger;
-        $this->cache    = $cache;
         $this->detector = $detector;
 
         parent::__construct();
