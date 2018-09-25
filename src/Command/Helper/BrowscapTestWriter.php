@@ -70,7 +70,7 @@ class BrowscapTestWriter extends Helper
         }
 
         $formatedIssue   = sprintf('%1$05d', $number);
-        $formatedCounter = sprintf('%1$05d', $this->counter);
+        $formatedCounter = $this->formatTestNumber($this->counter);
 
         $this->outputBrowscap .= "    'issue-" . $formatedIssue . '-' . $formatedCounter . "' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $useragent) . "',
@@ -112,5 +112,23 @@ class BrowscapTestWriter extends Helper
 
         ++$this->counter;
         ++$totalCounter;
+    }
+
+    /**
+     * @param int $counter
+     *
+     * @return string
+     */
+    private function formatTestNumber(int $counter): string
+    {
+        $number = $counter;
+        $chars  = [];
+
+        do {
+            $chars[] = chr(($number % 26) + 65);
+            $number  = (int) ($number / 26);
+        } while (1 <= $number);
+
+        return implode('', array_reverse($chars));
     }
 }
