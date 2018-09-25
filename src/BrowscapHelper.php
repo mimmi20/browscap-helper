@@ -26,7 +26,7 @@ use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Console\Application;
 
 /**
@@ -62,7 +62,7 @@ class BrowscapHelper extends Application
 
         ErrorHandler::register($logger);
 
-        $cache    = new FilesystemCache('', 0, __DIR__ . '/../cache/');
+        $cache    = new NullCache();
         $factory  = new DetectorFactory($cache, $logger);
         $detector = $factory();
 
@@ -70,7 +70,7 @@ class BrowscapHelper extends Application
             new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\CopyTestsCommand($logger, $sourcesDirectory, $targetDirectory),
             new Command\CreateTestsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\RewriteTestsCommand($logger, $cache, $detector),
+            new Command\RewriteTestsCommand($logger, $detector),
         ];
 
         foreach ($commands as $command) {
@@ -95,7 +95,7 @@ class BrowscapHelper extends Application
         $jsonTestWriter = new JsonTestWriter();
         $this->getHelperSet()->set($jsonTestWriter);
 
-        $regexFactory = new RegexFactory($cache, $logger);
+        $regexFactory = new RegexFactory($logger);
         $this->getHelperSet()->set($regexFactory);
 
         $regexLoader = new RegexLoader($logger);

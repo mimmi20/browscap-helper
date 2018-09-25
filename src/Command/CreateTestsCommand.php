@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\JsonFileSource;
+use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Monolog\Handler\PsrHandler;
 use Monolog\Logger;
@@ -123,8 +124,9 @@ class CreateTestsCommand extends Command
         $txtNumber = $this->getHelper('target-directory')->getNextTest($testSource);
 
         $output->writeln('next test for Browscap: ' . $txtNumber);
-        $output->writeln('writing new browscap tests ...');
+        $output->writeln('init sources ...');
 
+        $sourcesDirectory      = $input->getOption('resources');
         $browscapTotalCounter  = 0;
         $genericRequestFactory = new GenericRequestFactory();
         $browser               = new Browser(null);
@@ -132,7 +134,14 @@ class CreateTestsCommand extends Command
         $platform              = new Os(null, null);
         $engine                = new Engine(null);
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
+        $sources = [
+            //new JsonFileSource($this->logger, $testSource),
+            new TxtFileSource($this->logger, $sourcesDirectory),
+        ];
+
+        $output->writeln('copy tests from sources ...');
+
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -145,11 +154,11 @@ class CreateTestsCommand extends Command
 //                continue;
 //            }
 
-            if (false === preg_match('/TA\-\d{4}/', $seachHeader)) {
-                $this->logger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
-
-                continue;
-            }
+//            if (false === preg_match('/TA\-\d{4}/', $seachHeader)) {
+//                $this->logger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
+//
+//                continue;
+//            }
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
             $request = $genericRequestFactory->createRequestFromArray($headers);
