@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\JsonFileSource;
+use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Monolog\Handler\PsrHandler;
@@ -137,6 +138,7 @@ class CreateTestsCommand extends Command
         $sources = [
             //new JsonFileSource($this->logger, $testSource),
             new TxtFileSource($this->logger, $sourcesDirectory),
+            new TxtCounterFileSource($this->logger, $sourcesDirectory),
         ];
 
         $output->writeln('copy tests from sources ...');

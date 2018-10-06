@@ -19,6 +19,7 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\SinergiSource;
+use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\UaParserJsSource;
 use BrowscapHelper\Source\UapCoreSource;
@@ -149,6 +150,7 @@ class CopyTestsCommand extends Command
             new UaParserJsSource($this->logger),
             new ZsxsoftSource($this->logger),
             new TxtFileSource($this->logger, $sourcesDirectory),
+            new TxtCounterFileSource($this->logger, $sourcesDirectory),
         ];
 
         $output->writeln('copy tests from sources ...');
