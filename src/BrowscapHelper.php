@@ -22,10 +22,7 @@ use BrowscapHelper\Command\Helper\RewriteTests;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\YamlTestWriter;
 use BrowserDetector\DetectorFactory;
-use Monolog\ErrorHandler;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
+use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Console\Application;
 
@@ -53,24 +50,15 @@ class BrowscapHelper extends Application
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
         $targetDirectory  = (string) realpath(__DIR__ . '/../results/');
 
-        $formatter = new LineFormatter(null, null, true, true);
-        $stream    = new StreamHandler('log/error.log', Logger::NOTICE);
-        $stream->setFormatter($formatter);
-
-        $logger = new Logger('browser-detector-helper');
-        $logger->pushHandler($stream);
-
-        ErrorHandler::register($logger);
-
         $cache    = new NullCache();
-        $factory  = new DetectorFactory($cache, $logger);
+        $factory  = new DetectorFactory($cache, new NullLogger());
         $detector = $factory();
 
         $commands = [
-            new Command\ConvertLogsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\CopyTestsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\CreateTestsCommand($logger, $sourcesDirectory, $targetDirectory),
-            new Command\RewriteTestsCommand($logger, $detector),
+            new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory),
+            new Command\CopyTestsCommand($sourcesDirectory, $targetDirectory),
+            new Command\CreateTestsCommand($sourcesDirectory, $targetDirectory),
+            new Command\RewriteTestsCommand($detector),
         ];
 
         foreach ($commands as $command) {
@@ -80,13 +68,13 @@ class BrowscapHelper extends Application
         $targetDirectoryHelper = new Command\Helper\TargetDirectory();
         $this->getHelperSet()->set($targetDirectoryHelper);
 
-        $browscapTestWriter = new BrowscapTestWriter($logger, $targetDirectory);
+        $browscapTestWriter = new BrowscapTestWriter($targetDirectory);
         $this->getHelperSet()->set($browscapTestWriter);
 
         $txtTestWriter = new TxtTestWriter();
         $this->getHelperSet()->set($txtTestWriter);
 
-        $detectorTestWriter = new DetectorTestWriter($logger);
+        $detectorTestWriter = new DetectorTestWriter();
         $this->getHelperSet()->set($detectorTestWriter);
 
         $yamlTestWriter = new YamlTestWriter();
@@ -95,13 +83,13 @@ class BrowscapHelper extends Application
         $jsonTestWriter = new JsonTestWriter();
         $this->getHelperSet()->set($jsonTestWriter);
 
-        $regexFactory = new RegexFactory($logger);
+        $regexFactory = new RegexFactory();
         $this->getHelperSet()->set($regexFactory);
 
-        $regexLoader = new RegexLoader($logger);
+        $regexLoader = new RegexLoader();
         $this->getHelperSet()->set($regexLoader);
 
-        $existingTestsLoader = new ExistingTestsLoader($logger);
+        $existingTestsLoader = new ExistingTestsLoader();
         $this->getHelperSet()->set($existingTestsLoader);
 
         $existingTestsRemover = new ExistingTestsRemover();

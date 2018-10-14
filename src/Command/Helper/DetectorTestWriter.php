@@ -17,33 +17,21 @@ use Symfony\Component\Console\Helper\Helper;
 
 class DetectorTestWriter extends Helper
 {
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function getName()
     {
         return 'detector-test-writer';
     }
 
     /**
-     * @param array  $tests
-     * @param string $dir
-     * @param int    $folderId
-     * @param int    $fileId
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param array                    $tests
+     * @param string                   $dir
+     * @param int                      $folderId
+     * @param int                      $fileId
      *
      * @return void
      */
-    public function write(array $tests, string $dir, int $folderId, int $fileId): void
+    public function write(LoggerInterface $logger, array $tests, string $dir, int $folderId, int $fileId): void
     {
         try {
             $content = (new Json())->encode(
@@ -51,7 +39,7 @@ class DetectorTestWriter extends Helper
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
             );
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
-            $this->logger->critical('could not encode content');
+            $logger->critical('could not encode content');
 
             return;
         }

@@ -28,8 +28,6 @@ use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Source\ZsxsoftSource;
 use Doctrine\Common\Cache\PhpFileCache;
-use Monolog\Handler\PsrHandler;
-use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -54,20 +52,13 @@ class CopyTestsCommand extends Command
     private $targetDirectory = '';
 
     /**
-     * @var \Monolog\Logger
+     * @param string $sourcesDirectory
+     * @param string $targetDirectory
      */
-    private $logger;
-
-    /**
-     * @param \Monolog\Logger $logger
-     * @param string          $sourcesDirectory
-     * @param string          $targetDirectory
-     */
-    public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
+    public function __construct(string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;
-        $this->logger           = $logger;
 
         parent::__construct();
     }
@@ -109,7 +100,6 @@ class CopyTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $sourcesDirectory = $input->getOption('resources');
 
@@ -118,9 +108,9 @@ class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -136,21 +126,21 @@ class CopyTestsCommand extends Command
 
         $cache   = new PhpFileCache('cache');
         $sources = [
-            new BrowscapSource($this->logger),
-            new PiwikSource($this->logger),
-            new UapCoreSource($this->logger, $cache),
-            new WhichBrowserSource($this->logger),
-            new WootheeSource($this->logger),
-            new MobileDetectSource($this->logger),
-            new YzalisSource($this->logger),
-            new CrawlerDetectSource($this->logger),
-            new DonatjSource($this->logger),
-            new EndorphinSource($this->logger),
-            new SinergiSource($this->logger),
-            new UaParserJsSource($this->logger),
-            new ZsxsoftSource($this->logger),
-            new TxtFileSource($this->logger, $sourcesDirectory),
-            new TxtCounterFileSource($this->logger, $sourcesDirectory),
+            new BrowscapSource($consoleLogger),
+            new PiwikSource($consoleLogger),
+            new UapCoreSource($consoleLogger, $cache),
+            new WhichBrowserSource($consoleLogger),
+            new WootheeSource($consoleLogger),
+            new MobileDetectSource($consoleLogger),
+            new YzalisSource($consoleLogger),
+            new CrawlerDetectSource($consoleLogger),
+            new DonatjSource($consoleLogger),
+            new EndorphinSource($consoleLogger),
+            new SinergiSource($consoleLogger),
+            new UaParserJsSource($consoleLogger),
+            new ZsxsoftSource($consoleLogger),
+            new TxtFileSource($consoleLogger, $sourcesDirectory),
+            new TxtCounterFileSource($consoleLogger, $sourcesDirectory),
         ];
 
         $output->writeln('copy tests from sources ...');
@@ -158,7 +148,7 @@ class CopyTestsCommand extends Command
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders($sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }

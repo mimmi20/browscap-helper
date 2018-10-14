@@ -11,7 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Yaml\Yaml;
 
@@ -23,23 +22,12 @@ use Symfony\Component\Yaml\Yaml;
 class RegexLoader extends Helper
 {
     /**
-     * an logger instance
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var array|null
      */
     private $regexes;
 
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
+    public function __construct()
     {
-        $this->logger  = $logger;
         $this->regexes = Yaml::parseFile(
             __DIR__ . '/../../../data/regexes.yaml',
             Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE

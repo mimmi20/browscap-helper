@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use JsonClass\Json;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
 class JsonTestWriter extends Helper
@@ -22,13 +23,14 @@ class JsonTestWriter extends Helper
     }
 
     /**
-     * @param array  $headers
-     * @param string $dir
-     * @param int    $number
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param array                    $headers
+     * @param string                   $dir
+     * @param int                      $number
      *
      * @return void
      */
-    public function write(array $headers, string $dir, int $number): void
+    public function write(LoggerInterface $logger, array $headers, string $dir, int $number): void
     {
         try {
             $content = (new Json())->encode(
@@ -36,6 +38,8 @@ class JsonTestWriter extends Helper
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
             );
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
+            $logger->critical('could not encode content');
+
             return;
         }
 

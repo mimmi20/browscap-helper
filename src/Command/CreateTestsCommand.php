@@ -16,8 +16,6 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
-use Monolog\Handler\PsrHandler;
-use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,20 +46,13 @@ class CreateTestsCommand extends Command
     private $targetDirectory = '';
 
     /**
-     * @var \Monolog\Logger
+     * @param string $sourcesDirectory
+     * @param string $targetDirectory
      */
-    private $logger;
-
-    /**
-     * @param \Monolog\Logger $logger
-     * @param string          $sourcesDirectory
-     * @param string          $targetDirectory
-     */
-    public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
+    public function __construct(string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;
-        $this->logger           = $logger;
 
         parent::__construct();
     }
@@ -103,16 +94,15 @@ class CreateTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $testSource = 'tests';
 
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new BrowscapSource($this->logger)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new BrowscapSource($consoleLogger)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
-                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -136,28 +126,28 @@ class CreateTestsCommand extends Command
         $engine                = new Engine(null);
 
         $sources = [
-            //new JsonFileSource($this->logger, $testSource),
-            new TxtFileSource($this->logger, $sourcesDirectory),
-            new TxtCounterFileSource($this->logger, $sourcesDirectory),
+            new JsonFileSource($consoleLogger, $testSource),
+            new TxtFileSource($consoleLogger, $sourcesDirectory),
+            new TxtCounterFileSource($consoleLogger, $sourcesDirectory),
         ];
 
         $output->writeln('copy tests from sources ...');
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders($sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
-                $this->logger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
 
 //            if (false === mb_stripos($seachHeader, 'EdgA')) {
-//                $this->logger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
+//                $consoleLogger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
 //
 //                continue;
 //            }
 
 //            if (false === preg_match('/TA\-\d{4}/', $seachHeader)) {
-//                $this->logger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
+//                $consoleLogger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
 //
 //                continue;
 //            }

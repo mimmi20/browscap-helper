@@ -22,35 +22,21 @@ use Symfony\Component\Console\Helper\Helper;
  */
 class ExistingTestsLoader extends Helper
 {
-    /**
-     * an logger instance
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function getName()
     {
         return 'existing-tests-reader';
     }
 
     /**
-     * @param SourceInterface[] $sources
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param SourceInterface[]        $sources
      *
      * @return iterable|string[]
      */
-    public function getHeaders(array $sources): iterable
+    public function getHeaders(LoggerInterface $logger, array $sources): iterable
     {
         foreach ($sources as $source) {
-            $this->logger->info(sprintf('    reading from source %s ...', $source->getName()));
+            $logger->info(sprintf('    reading from source %s ...', $source->getName()));
 
             yield from $source->getHeaders();
         }
