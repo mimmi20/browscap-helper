@@ -9,7 +9,7 @@ php:
 
 os:
   - linux
-  - windows
+  #- windows
 
 env:
   - COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
@@ -38,7 +38,7 @@ jobs:
   allow_failures:
     - php: 7.3
     - php: nightly
-    - os: windows
+    #- os: windows
   include:
     - stage: composer validate
       php: 7.1
