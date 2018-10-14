@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use BrowserDetector\Version\VersionInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 use UaResult\Result\ResultInterface;
 
@@ -23,11 +22,6 @@ class BrowscapTestWriter extends Helper
      */
     private $dir;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
     private $outputBrowscap = '';
 
     private $counter = 0;
@@ -35,13 +29,11 @@ class BrowscapTestWriter extends Helper
     private $number = 0;
 
     /**
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param string                   $dir
+     * @param string $dir
      */
-    public function __construct(LoggerInterface $logger, string $dir)
+    public function __construct(string $dir)
     {
-        $this->logger = $logger;
-        $this->dir    = $dir;
+        $this->dir = $dir;
     }
 
     public function getName()

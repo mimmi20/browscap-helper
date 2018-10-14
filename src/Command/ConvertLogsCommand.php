@@ -13,8 +13,6 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\LogFileSource;
-use Monolog\Handler\PsrHandler;
-use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,20 +37,13 @@ class ConvertLogsCommand extends Command
     private $targetDirectory = '';
 
     /**
-     * @var \Monolog\Logger
+     * @param string $sourcesDirectory
+     * @param string $targetDirectory
      */
-    private $logger;
-
-    /**
-     * @param \Monolog\Logger $logger
-     * @param string          $sourcesDirectory
-     * @param string          $targetDirectory
-     */
-    public function __construct(Logger $logger, string $sourcesDirectory, string $targetDirectory)
+    public function __construct(string $sourcesDirectory, string $targetDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
         $this->targetDirectory  = $targetDirectory;
-        $this->logger           = $logger;
 
         parent::__construct();
     }
@@ -94,7 +85,6 @@ class ConvertLogsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $sourcesDirectory = $input->getOption('resources');
 
@@ -103,9 +93,9 @@ class ConvertLogsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -119,14 +109,14 @@ class ConvertLogsCommand extends Command
 
         $output->writeln('init sources ...');
 
-        $source = new LogFileSource($this->logger, $sourcesDirectory);
+        $source = new LogFileSource($consoleLogger, $sourcesDirectory);
 
         $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders([$source]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }

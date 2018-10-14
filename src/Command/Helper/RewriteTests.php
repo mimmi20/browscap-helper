@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
 /**
@@ -25,12 +26,13 @@ class RewriteTests extends Helper
     }
 
     /**
-     * @param array  $txtChecks
-     * @param string $testSource
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param array                    $txtChecks
+     * @param string                   $testSource
      *
      * @return void
      */
-    public function rewrite(array $txtChecks, string $testSource): void
+    public function rewrite(LoggerInterface $logger, array $txtChecks, string $testSource): void
     {
         /** @var JsonTestWriter $jsonTestWriter */
         $jsonTestWriter = $this->getHelperSet()->get('json-test-writer');
@@ -43,7 +45,7 @@ class RewriteTests extends Helper
                 $headers[] = UserAgent::fromString($headerString)->getHeader();
             }
 
-            $jsonTestWriter->write($headers, $testSource, $folderId);
+            $jsonTestWriter->write($logger, $headers, $testSource, $folderId);
         }
     }
 }

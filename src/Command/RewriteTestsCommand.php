@@ -23,8 +23,7 @@ use BrowserDetector\Detector;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
-use Monolog\Handler\PsrHandler;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,11 +43,6 @@ use UaResult\Result\ResultInterface;
 class RewriteTestsCommand extends Command
 {
     /**
-     * @var \Monolog\Logger
-     */
-    private $logger;
-
-    /**
      * @var \BrowserDetector\Detector
      */
     private $detector;
@@ -59,12 +53,10 @@ class RewriteTestsCommand extends Command
     private $tests = [];
 
     /**
-     * @param \Monolog\Logger           $logger
      * @param \BrowserDetector\Detector $detector
      */
-    public function __construct(Logger $logger, Detector $detector)
+    public function __construct(Detector $detector)
     {
-        $this->logger   = $logger;
         $this->detector = $detector;
 
         parent::__construct();
@@ -98,7 +90,6 @@ class RewriteTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $consoleLogger = new ConsoleLogger($output);
-        $this->logger->pushHandler(new PsrHandler($consoleLogger));
 
         $basePath                = 'vendor/mimmi20/browser-detector-tests/';
         $detectorTargetDirectory = $basePath . 'tests/issues/';
@@ -113,9 +104,9 @@ class RewriteTestsCommand extends Command
         $testResults = [];
         $txtChecks   = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($this->logger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $this->logger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
                 continue;
             }
@@ -125,19 +116,19 @@ class RewriteTestsCommand extends Command
             $headers = UserAgent::fromString($seachHeader)->getHeader();
 
             try {
-                $result = $this->handleTest($headers);
+                $result = $this->handleTest($consoleLogger, $headers);
             } catch (InvalidArgumentException $e) {
-                $this->logger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
+                $consoleLogger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
                 continue;
             } catch (\Throwable $e) {
-                $this->logger->warn(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
+                $consoleLogger->warning(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
                 continue;
             }
 
             if (null === $result) {
-                $this->logger->debug('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
+                $consoleLogger->debug('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
 
                 continue;
             }
@@ -152,7 +143,7 @@ class RewriteTestsCommand extends Command
         $circleFile      = $basePath . '.circleci/config.yml';
         $circleciContent = '';
 
-        $this->logger->info(sprintf('will generate %d directories for the tests', count($folderChunks)));
+        $consoleLogger->info(sprintf('will generate %d directories for the tests', count($folderChunks)));
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId);
@@ -161,10 +152,10 @@ class RewriteTestsCommand extends Command
                 mkdir($targetDirectory, 0777, true);
             }
 
-            $this->logger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
+            $consoleLogger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
 
             $fileChunks = array_chunk($folderChunk, 100);
-            $this->logger->info(sprintf('    will generate %d test files in directory "%s"', count($fileChunks), $targetDirectory));
+            $consoleLogger->info(sprintf('    will generate %d test files in directory "%s"', count($fileChunks), $targetDirectory));
 
             $issueCounter = 0;
 
@@ -224,21 +215,21 @@ class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array $headers
+     * @param \Psr\Log\LoggerInterface $consoleLogger
+     * @param array                    $headers
      *
-     * @throws InvalidArgumentException
-     * @throws \Seld\JsonLint\ParsingException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
-    private function handleTest(array $headers): ?ResultInterface
+    private function handleTest(LoggerInterface $consoleLogger, array $headers): ?ResultInterface
     {
-        $this->logger->debug('        detect for new result');
+        $consoleLogger->debug('        detect for new result');
 
         $detector  = $this->detector;
         $newResult = $detector($headers);
 
-        $this->logger->debug('        analyze new result');
+        $consoleLogger->debug('        analyze new result');
 
         if (!$newResult->getDevice()->getType()->isMobile()
             && !$newResult->getDevice()->getType()->isTablet()
@@ -324,7 +315,7 @@ class RewriteTestsCommand extends Command
                 /** @var \BrowscapHelper\Command\Helper\RegexFactory $regexFactory */
                 $regexFactory = $this->getHelper('regex-factory');
                 $regexFactory->detect($normalizedUa);
-                [$device] = $regexFactory->getDevice();
+                [$device] = $regexFactory->getDevice($consoleLogger);
                 $replaced = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
@@ -339,79 +330,79 @@ class RewriteTestsCommand extends Command
                     $device = new Device('not found via regexes', null);
                 }
             } catch (\InvalidArgumentException $e) {
-                $this->logger->error($e);
+                $consoleLogger->error($e);
 
                 $device = new Device(null, null);
             } catch (NotFoundException $e) {
-                $this->logger->info($e);
+                $consoleLogger->info($e);
 
                 $device = new Device(null, null);
             } catch (GeneralBlackberryException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
                 $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
 
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
                 } catch (\Throwable $e) {
-                    $this->logger->crit($e);
+                    $consoleLogger->critical($e);
 
                     $device = new Device(null, null);
                 }
             } catch (GeneralPhilipsTvException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
                 $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
 
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general philips tv', $normalizedUa);
                 } catch (\Throwable $e) {
-                    $this->logger->crit($e);
+                    $consoleLogger->critical($e);
 
                     $device = new Device(null, null);
                 }
             } catch (GeneralTabletException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general tablet', $normalizedUa);
                 } catch (\Throwable $e) {
-                    $this->logger->crit($e);
+                    $consoleLogger->critical($e);
 
                     $device = new Device(null, null);
                 }
             } catch (GeneralPhoneException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general mobile phone', $normalizedUa);
                 } catch (\Throwable $e) {
-                    $this->logger->crit($e);
+                    $consoleLogger->critical($e);
 
                     $device = new Device(null, null);
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($this->logger);
+                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
                 $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
 
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
                 } catch (\Throwable $e) {
-                    $this->logger->crit($e);
+                    $consoleLogger->critical($e);
 
                     $device = new Device(null, null);
                 }
             } catch (NoMatchException $e) {
-                $this->logger->info($e);
+                $consoleLogger->info($e);
 
                 $device = new Device(null, null);
             } catch (\Throwable $e) {
-                $this->logger->error($e);
+                $consoleLogger->error($e);
 
                 $device = new Device(null, null);
             }
@@ -422,7 +413,7 @@ class RewriteTestsCommand extends Command
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();
 
-        $this->logger->debug('        generating result');
+        $consoleLogger->debug('        generating result');
 
         return new Result($request->getHeaders(), $device, $platform, $browser, $engine);
     }

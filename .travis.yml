@@ -7,7 +7,9 @@ php:
   - 7.2
   - 7.3
 
-os: linux
+os:
+  - linux
+  #- windows
 
 env:
   - COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
@@ -33,19 +35,21 @@ install: travis_retry composer update --optimize-autoloader --prefer-dist --pref
 script: skip
 
 jobs:
-  fast_finish: true
   allow_failures:
     - php: 7.3
     - php: nightly
+    #- os: windows
   include:
     - stage: composer validate
       php: 7.1
+      os: linux
       install: skip
       script:
         - composer validate
 
     - stage: static code analysis
       php: 7.1
+      os: linux
       env:
         - TEST=phpcs
         - COMPOSER_FLAGS="--ignore-platform-reqs"
@@ -53,6 +57,7 @@ jobs:
 
     - stage: static code analysis
       php: 7.1
+      os: linux
       env:
         - TEST=php-cs-fixer
         - COMPOSER_FLAGS="--ignore-platform-reqs"
@@ -60,6 +65,7 @@ jobs:
 
     - stage: static code analysis
       php: 7.1
+      os: linux
       env:
         - TEST=phpstan
         - COMPOSER_FLAGS="--ignore-platform-reqs"
