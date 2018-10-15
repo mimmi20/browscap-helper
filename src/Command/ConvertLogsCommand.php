@@ -93,7 +93,7 @@ class ConvertLogsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $consoleLogger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -114,7 +114,7 @@ class ConvertLogsCommand extends Command
         $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([$source]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, [$source]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -127,7 +127,7 @@ class ConvertLogsCommand extends Command
 
         $output->writeln('rewrite tests ...');
 
-        $this->getHelper('rewrite-tests')->rewrite($txtChecks, $testSource);
+        $this->getHelper('rewrite-tests')->rewrite($consoleLogger, $txtChecks, $testSource);
 
         $output->writeln('');
         $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter);

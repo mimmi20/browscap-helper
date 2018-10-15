@@ -104,7 +104,7 @@ class RewriteTestsCommand extends Command
         $testResults = [];
         $txtChecks   = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -170,7 +170,7 @@ class RewriteTestsCommand extends Command
                     ++$issueCounter;
                 }
 
-                $this->getHelper('detector-test-writer')->write($tests, $targetDirectory, $folderId, $fileId);
+                $this->getHelper('detector-test-writer')->write($consoleLogger, $tests, $targetDirectory, $folderId, $fileId);
             }
 
             $count = count($folderChunk);
