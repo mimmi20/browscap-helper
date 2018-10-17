@@ -20,11 +20,13 @@ use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
+use BrowserDetector\DetectorFactory;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Version\VersionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -43,24 +45,9 @@ use UaResult\Result\ResultInterface;
 class RewriteTestsCommand extends Command
 {
     /**
-     * @var \BrowserDetector\Detector
-     */
-    private $detector;
-
-    /**
      * @var array
      */
     private $tests = [];
-
-    /**
-     * @param \BrowserDetector\Detector $detector
-     */
-    public function __construct(Detector $detector)
-    {
-        $this->detector = $detector;
-
-        parent::__construct();
-    }
 
     /**
      * Configures the current command.
@@ -91,6 +78,10 @@ class RewriteTestsCommand extends Command
     {
         $consoleLogger = new ConsoleLogger($output);
 
+        $cache    = new NullCache();
+        $factory  = new DetectorFactory($cache, $consoleLogger);
+        $detector = $factory();
+
         $basePath                = 'vendor/mimmi20/browser-detector-tests/';
         $detectorTargetDirectory = $basePath . 'tests/issues/';
         $testSource              = 'tests';
@@ -116,7 +107,7 @@ class RewriteTestsCommand extends Command
             $headers = UserAgent::fromString($seachHeader)->getHeader();
 
             try {
-                $result = $this->handleTest($consoleLogger, $headers);
+                $result = $this->handleTest($consoleLogger, $detector, $headers);
             } catch (InvalidArgumentException $e) {
                 $consoleLogger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
@@ -216,17 +207,16 @@ class RewriteTestsCommand extends Command
 
     /**
      * @param \Psr\Log\LoggerInterface $consoleLogger
-     * @param array                    $headers
-     *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @param Detector $detector
+     * @param array $headers
      *
      * @return \UaResult\Result\ResultInterface|null
+     * @throws InvalidArgumentException
      */
-    private function handleTest(LoggerInterface $consoleLogger, array $headers): ?ResultInterface
+    private function handleTest(LoggerInterface $consoleLogger, Detector $detector, array $headers): ?ResultInterface
     {
         $consoleLogger->debug('        detect for new result');
 
-        $detector  = $this->detector;
         $newResult = $detector($headers);
 
         $consoleLogger->debug('        analyze new result');

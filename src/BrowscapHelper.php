@@ -50,15 +50,11 @@ class BrowscapHelper extends Application
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
         $targetDirectory  = (string) realpath(__DIR__ . '/../results/');
 
-        $cache    = new NullCache();
-        $factory  = new DetectorFactory($cache, new NullLogger());
-        $detector = $factory();
-
         $commands = [
             new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory),
             new Command\CopyTestsCommand($sourcesDirectory, $targetDirectory),
             new Command\CreateTestsCommand($sourcesDirectory, $targetDirectory),
-            new Command\RewriteTestsCommand($detector),
+            new Command\RewriteTestsCommand(),
         ];
 
         foreach ($commands as $command) {
