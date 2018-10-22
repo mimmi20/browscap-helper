@@ -44,8 +44,7 @@ jobs:
       php: 7.1
       os: linux
       install: skip
-      script:
-        - composer validate
+      script: composer validate
 
     - stage: static code analysis
       php: 7.1

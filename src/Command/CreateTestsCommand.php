@@ -100,7 +100,7 @@ class CreateTestsCommand extends Command
         $output->writeln('reading already existing tests ...');
         $browscapChecks = [];
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders([new BrowscapSource($consoleLogger)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, [new BrowscapSource($consoleLogger)]) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -133,7 +133,7 @@ class CreateTestsCommand extends Command
 
         $output->writeln('copy tests from sources ...');
 
-        foreach ($this->getHelper('existing-tests-reader')->getHeaders($sources) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, $sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $consoleLogger->info('    Header "' . $seachHeader . '" added more than once --> skipped');
 
