@@ -21,9 +21,6 @@ use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\RewriteTests;
 use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\YamlTestWriter;
-use BrowserDetector\DetectorFactory;
-use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Console\Application;
 
 /**

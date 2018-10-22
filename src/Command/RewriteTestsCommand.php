@@ -207,11 +207,12 @@ class RewriteTestsCommand extends Command
 
     /**
      * @param \Psr\Log\LoggerInterface $consoleLogger
-     * @param Detector $detector
-     * @param array $headers
+     * @param Detector                 $detector
+     * @param array                    $headers
+     *
+     * @throws InvalidArgumentException
      *
      * @return \UaResult\Result\ResultInterface|null
-     * @throws InvalidArgumentException
      */
     private function handleTest(LoggerInterface $consoleLogger, Detector $detector, array $headers): ?ResultInterface
     {
