@@ -11,11 +11,6 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Factory\Regex;
 
-/**
- * an exception thrown if data were not found
- *
- * @category  BrowserDetector
- */
 class GeneralPhoneException extends \OutOfRangeException
 {
     // nothing to do here

@@ -23,11 +23,6 @@ use BrowscapHelper\Command\Helper\TxtTestWriter;
 use BrowscapHelper\Command\Helper\YamlTestWriter;
 use Symfony\Component\Console\Application;
 
-/**
- * Class BrowscapHelper
- *
- * @category   Browscap Helper
- */
 class BrowscapHelper extends Application
 {
     /**

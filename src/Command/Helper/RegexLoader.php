@@ -14,11 +14,6 @@ namespace BrowscapHelper\Command\Helper;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * detection class using regexes
- *
- * @category  BrowserDetector
- */
 class RegexLoader extends Helper
 {
     /**

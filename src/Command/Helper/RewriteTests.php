@@ -15,9 +15,6 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
-/**
- * rewriting tests
- */
 class RewriteTests extends Helper
 {
     public function getName()

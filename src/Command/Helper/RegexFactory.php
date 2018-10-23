@@ -16,6 +16,7 @@ use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\GeneralPhoneException;
 use BrowscapHelper\Factory\Regex\GeneralTabletException;
+use BrowscapHelper\Factory\Regex\GeneralTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Factory;
 use BrowserDetector\Loader\DeviceLoaderFactory;
@@ -24,11 +25,6 @@ use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Console\Helper\Helper;
 
-/**
- * detection class using regexes
- *
- * @category  BrowserDetector
- */
 class RegexFactory extends Helper
 {
     /**
@@ -159,9 +155,17 @@ class RegexFactory extends Helper
                 if ('tablet' === $deviceType) {
                     throw new GeneralTabletException('use general tablet');
                 }
+
+                if ('mobile' === $deviceType) {
+                    throw new GeneralPhoneException('use general mobile phone');
+                }
+
+                if ('tv' === $deviceType) {
+                    throw new GeneralTvException('general tv device');
+                }
             }
 
-            throw new GeneralPhoneException('use general mobile phone');
+            throw new GeneralDeviceException('use general mobile device');
         }
 
         if (in_array($deviceCode, ['opera/9.80', 'opera/9.50', 'generic', ''])) {

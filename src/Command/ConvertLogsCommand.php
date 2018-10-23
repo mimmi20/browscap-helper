@@ -19,11 +19,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class ConvertLogsCommand
- *
- * @category   Browscap Helper
- */
 class ConvertLogsCommand extends Command
 {
     /**
