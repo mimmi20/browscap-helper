@@ -16,6 +16,7 @@ use BrowscapHelper\Factory\Regex\GeneralDeviceException;
 use BrowscapHelper\Factory\Regex\GeneralPhilipsTvException;
 use BrowscapHelper\Factory\Regex\GeneralPhoneException;
 use BrowscapHelper\Factory\Regex\GeneralTabletException;
+use BrowscapHelper\Factory\Regex\GeneralTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
@@ -37,11 +38,6 @@ use UaResult\Device\Device;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
-/**
- * Class RewriteTestsCommand
- *
- * @category   Browscap Helper
- */
 class RewriteTestsCommand extends Command
 {
     /**
@@ -383,6 +379,18 @@ class RewriteTestsCommand extends Command
                 try {
                     $deviceLoader->init();
                     [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
+                } catch (\Throwable $e) {
+                    $consoleLogger->critical($e);
+
+                    $device = new Device(null, null);
+                }
+            } catch (GeneralTvException $e) {
+                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
+                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
+
+                try {
+                    $deviceLoader->init();
+                    [$device] = $deviceLoader->load('general tv device', $normalizedUa);
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 

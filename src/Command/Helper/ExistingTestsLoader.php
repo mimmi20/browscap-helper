@@ -15,11 +15,6 @@ use BrowscapHelper\Source\SourceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
-/**
- * reading existing tests
- *
- * @category  BrowserDetector
- */
 class ExistingTestsLoader extends Helper
 {
     public function getName()

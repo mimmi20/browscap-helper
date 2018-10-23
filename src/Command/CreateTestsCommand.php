@@ -28,11 +28,6 @@ use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
 
-/**
- * Class CreateTestsCommand
- *
- * @category   Browscap Helper
- */
 class CreateTestsCommand extends Command
 {
     /**

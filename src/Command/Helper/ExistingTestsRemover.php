@@ -14,11 +14,6 @@ namespace BrowscapHelper\Command\Helper;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Finder\Finder;
 
-/**
- * removes existing tests
- *
- * @category  BrowserDetector
- */
 class ExistingTestsRemover extends Helper
 {
     public function getName()
