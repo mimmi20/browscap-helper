@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use BrowserDetector\Version\VersionInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 use UaResult\Result\ResultInterface;
 
@@ -38,31 +37,31 @@ class BrowscapTestWriter extends Helper
 
     /**
      * @param array $tests
-     * @param int $folderId
-     * @param int $totalCounter
+     * @param int   $folderId
+     * @param int   $totalCounter
      *
      * @return void
      */
     public function write(array $tests, int $folderId, int &$totalCounter): void
     {
         $outputBrowscap = '';
-        
+
         foreach ($tests as $counter => $result) {
             /** @var ResultInterface $result */
-            $platform = clone $result->getOs();
-            $device = clone $result->getDevice();
-            $engine = clone $result->getEngine();
-            $browser = clone $result->getBrowser();
+            $platform  = clone $result->getOs();
+            $device    = clone $result->getDevice();
+            $engine    = clone $result->getEngine();
+            $browser   = clone $result->getBrowser();
             $useragent = $result->getHeaders()['user-agent'];
 
-            $formatedIssue = sprintf('%1$05d', $folderId);
+            $formatedIssue   = sprintf('%1$05d', $folderId);
             $formatedCounter = $this->formatTestNumber($counter);
 
             $outputBrowscap .= "    'issue-" . $formatedIssue . '-' . $formatedCounter . "' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $useragent) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], (string)$browser->getName()) . "',
+            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], (string) $browser->getName()) . "',
             'Browser_Type' => '" . $browser->getType()->getName() . "',
             'Browser_Bits' => '" . $browser->getBits() . "',
             'Browser_Maker' => '" . $browser->getManufacturer()->getName() . "',
@@ -96,7 +95,7 @@ class BrowscapTestWriter extends Helper
 
             ++$totalCounter;
         }
-        
+
         file_put_contents($this->dir . '/issue-' . sprintf('%1$05d', $folderId) . '.php', "<?php\n\nreturn [\n" . $outputBrowscap . "];\n");
     }
 
@@ -108,11 +107,11 @@ class BrowscapTestWriter extends Helper
     private function formatTestNumber(int $counter): string
     {
         $folderId = $counter;
-        $chars  = [];
+        $chars    = [];
 
         do {
-            $chars[] = chr(($folderId % 26) + 65);
-            $folderId  = (int) ($folderId / 26);
+            $chars[]  = chr(($folderId % 26) + 65);
+            $folderId = (int) ($folderId / 26);
         } while (1 <= $folderId);
 
         return implode('', array_reverse($chars));
