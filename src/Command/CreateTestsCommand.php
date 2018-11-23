@@ -113,7 +113,7 @@ class CreateTestsCommand extends Command
         $device                = new Device(null, null);
         $platform              = new Os(null, null);
         $engine                = new Engine(null);
-        $sources = [
+        $sources               = [
             new JsonFileSource($consoleLogger, $testSource),
             new TxtFileSource($consoleLogger, $sourcesDirectory),
             new TxtCounterFileSource($consoleLogger, $sourcesDirectory),
@@ -146,13 +146,13 @@ class CreateTestsCommand extends Command
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
             $browscapChecks[$seachHeader] = 1;
-            $testResults[] = $result;
+            $testResults[]                = $result;
         }
 
         $output->writeln('write new test files ...');
 
-        $folderChunks    = array_chunk($testResults, 1000);
-        $browscapTotalCounter  = 0;
+        $folderChunks         = array_chunk($testResults, 1000);
+        $browscapTotalCounter = 0;
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $this->getHelper('browscap-test-writer')->write($folderChunk, $folderId, $browscapTotalCounter);
