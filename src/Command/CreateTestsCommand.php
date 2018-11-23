@@ -105,28 +105,22 @@ class CreateTestsCommand extends Command
             $browscapChecks[$seachHeader] = 1;
         }
 
-        $output->writeln('detect next test numbers ...');
-
-        $txtNumber = $this->getHelper('target-directory')->getNextTest($testSource);
-
-        $output->writeln('next test for Browscap: ' . $txtNumber);
         $output->writeln('init sources ...');
 
         $sourcesDirectory      = $input->getOption('resources');
-        $browscapTotalCounter  = 0;
         $genericRequestFactory = new GenericRequestFactory();
         $browser               = new Browser(null);
         $device                = new Device(null, null);
         $platform              = new Os(null, null);
         $engine                = new Engine(null);
-
         $sources = [
             new JsonFileSource($consoleLogger, $testSource),
             new TxtFileSource($consoleLogger, $sourcesDirectory),
             new TxtCounterFileSource($consoleLogger, $sourcesDirectory),
         ];
 
-        $output->writeln('copy tests from sources ...');
+        $output->writeln('selecting tests from sources ...');
+        $testResults = [];
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, $sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $browscapChecks)) {
@@ -141,18 +135,27 @@ class CreateTestsCommand extends Command
 //                continue;
 //            }
 
-//            if (false === preg_match('/TA\-\d{4}/', $seachHeader)) {
-//                $consoleLogger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
-//
-//                continue;
-//            }
+            if (!preg_match('/ NT-/', $seachHeader)) {
+                $consoleLogger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
+
+                continue;
+            }
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
             $request = $genericRequestFactory->createRequestFromArray($headers);
             $result  = new Result($request->getHeaders(), $device, $platform, $browser, $engine);
 
-            $this->getHelper('browscap-test-writer')->write($result, $txtNumber, $headers['user-agent'], $browscapTotalCounter);
             $browscapChecks[$seachHeader] = 1;
+            $testResults[] = $result;
+        }
+
+        $output->writeln('write new test files ...');
+
+        $folderChunks    = array_chunk($testResults, 1000);
+        $browscapTotalCounter  = 0;
+
+        foreach ($folderChunks as $folderId => $folderChunk) {
+            $this->getHelper('browscap-test-writer')->write($folderChunk, $folderId, $browscapTotalCounter);
         }
 
         $output->writeln('');

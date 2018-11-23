@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use BrowserDetector\Version\VersionInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 use UaResult\Result\ResultInterface;
 
@@ -21,12 +22,6 @@ class BrowscapTestWriter extends Helper
      * @var string
      */
     private $dir;
-
-    private $outputBrowscap = '';
-
-    private $counter = 0;
-
-    private $number = 0;
 
     /**
      * @param string $dir
@@ -42,33 +37,32 @@ class BrowscapTestWriter extends Helper
     }
 
     /**
-     * @param \UaResult\Result\ResultInterface $result
-     * @param int                              $number
-     * @param string                           $useragent
-     * @param int                              $totalCounter
+     * @param array $tests
+     * @param int $folderId
+     * @param int $totalCounter
      *
      * @return void
      */
-    public function write(ResultInterface $result, int $number, string $useragent, int &$totalCounter): void
+    public function write(array $tests, int $folderId, int &$totalCounter): void
     {
-        $platform = clone $result->getOs();
-        $device   = clone $result->getDevice();
-        $engine   = clone $result->getEngine();
-        $browser  = clone $result->getBrowser();
+        $outputBrowscap = '';
+        
+        foreach ($tests as $counter => $result) {
+            /** @var ResultInterface $result */
+            $platform = clone $result->getOs();
+            $device = clone $result->getDevice();
+            $engine = clone $result->getEngine();
+            $browser = clone $result->getBrowser();
+            $useragent = $result->getHeaders()['user-agent'];
 
-        if ($this->number !== $number) {
-            $this->number  = $number;
-            $this->counter = 0;
-        }
+            $formatedIssue = sprintf('%1$05d', $folderId);
+            $formatedCounter = $this->formatTestNumber($counter);
 
-        $formatedIssue   = sprintf('%1$05d', $number);
-        $formatedCounter = $this->formatTestNumber($this->counter);
-
-        $this->outputBrowscap .= "    'issue-" . $formatedIssue . '-' . $formatedCounter . "' => [
+            $outputBrowscap .= "    'issue-" . $formatedIssue . '-' . $formatedCounter . "' => [
         'ua' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], $useragent) . "',
         'properties' => [
             'Comment' => 'Default Browser',
-            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], (string) $browser->getName()) . "',
+            'Browser' => '" . str_replace(['\\', "'"], ['\\\\', "\\'"], (string)$browser->getName()) . "',
             'Browser_Type' => '" . $browser->getType()->getName() . "',
             'Browser_Bits' => '" . $browser->getBits() . "',
             'Browser_Maker' => '" . $browser->getManufacturer()->getName() . "',
@@ -100,10 +94,10 @@ class BrowscapTestWriter extends Helper
         'full' => true,
     ],\n";
 
-        file_put_contents($this->dir . '/issue-' . sprintf('%1$05d', $number) . '.php', "<?php\n\nreturn [\n" . $this->outputBrowscap . "];\n");
-
-        ++$this->counter;
-        ++$totalCounter;
+            ++$totalCounter;
+        }
+        
+        file_put_contents($this->dir . '/issue-' . sprintf('%1$05d', $folderId) . '.php', "<?php\n\nreturn [\n" . $outputBrowscap . "];\n");
     }
 
     /**
@@ -113,13 +107,13 @@ class BrowscapTestWriter extends Helper
      */
     private function formatTestNumber(int $counter): string
     {
-        $number = $counter;
+        $folderId = $counter;
         $chars  = [];
 
         do {
-            $chars[] = chr(($number % 26) + 65);
-            $number  = (int) ($number / 26);
-        } while (1 <= $number);
+            $chars[] = chr(($folderId % 26) + 65);
+            $folderId  = (int) ($folderId / 26);
+        } while (1 <= $folderId);
 
         return implode('', array_reverse($chars));
     }
