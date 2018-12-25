@@ -43,10 +43,10 @@ jobs:
     - stage: composer validate
       php: 7.1
       os: linux
-      install: skip
+      #install: skip
       script:
         - composer validate
-        #- composer normalize --dry-run
+        - composer normalize --dry-run
 
     - stage: static code analysis
       php: 7.1
