@@ -18,11 +18,13 @@ use BrowscapHelper\Factory\Regex\GeneralPhoneException;
 use BrowscapHelper\Factory\Regex\GeneralTabletException;
 use BrowscapHelper\Factory\Regex\GeneralTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
-use BrowserDetector\Factory;
+use BrowserDetector\Loader\CompanyLoaderFactory;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
+use BrowserDetector\Parser;
+use BrowserDetector\Parser\PlatformParserFactory;
+use JsonClass\Json;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Console\Helper\Helper;
 
 class RegexFactory extends Helper
@@ -86,8 +88,6 @@ class RegexFactory extends Helper
     /**
      * @param \Psr\Log\LoggerInterface $logger
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *
      * @return array
      */
     public function getDevice(LoggerInterface $logger): array
@@ -108,8 +108,18 @@ class RegexFactory extends Helper
             throw new NoMatchException('device not detected via regexes');
         }
 
-        $deviceCode          = mb_strtolower($this->match['devicecode']);
-        $deviceLoaderFactory = new DeviceLoaderFactory($logger);
+        $deviceCode = mb_strtolower($this->match['devicecode']);
+
+        $jsonParser           = new Json();
+        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser);
+
+        /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
+        $companyLoader = $companyLoaderFactory();
+
+        $platformParserFactory = new PlatformParserFactory($logger, $jsonParser, $companyLoader);
+        $platformParser        = $platformParserFactory();
+
+        $deviceLoaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser);
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -118,25 +128,26 @@ class RegexFactory extends Helper
         }
 
         if ('windows' === $deviceCode) {
-            $deviceLoader = $deviceLoaderFactory('unknown', 'desktop');
-            $deviceLoader->init();
+            $deviceLoader = $deviceLoaderFactory('unknown');
 
-            return $deviceLoader->load('windows desktop', $this->useragent);
+            return $deviceLoader('windows desktop', $this->useragent);
         }
 
         if ('macintosh' === $deviceCode) {
-            $deviceLoader = $deviceLoaderFactory('apple', 'desktop');
-            $deviceLoader->init();
+            $deviceLoader = $deviceLoaderFactory('apple');
 
-            return $deviceLoader->load('macintosh', $this->useragent);
+            return $deviceLoader('macintosh', $this->useragent);
         }
+
+        $loaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser);
+        $fileParser    = new Parser\Helper\RulefileParser($jsonParser, $logger);
 
         if ('cfnetwork' === $deviceCode) {
             try {
-                $factory = new Factory\Device\DarwinFactory($logger);
+                $factory = new Parser\Device\DarwinParser($fileParser, $loaderFactory);
 
                 return $factory($this->useragent);
-            } catch (InvalidArgumentException $e) {
+            } catch (\Throwable $e) {
                 throw new NotFoundException('not found', 0, $e);
             }
         }
@@ -185,20 +196,18 @@ class RegexFactory extends Helper
         }
 
         if ('linux' === $deviceCode || 'cros' === $deviceCode) {
-            $deviceLoader = $deviceLoaderFactory('unknown', 'desktop');
-            $deviceLoader->init();
+            $deviceLoader = $deviceLoaderFactory('unknown');
 
-            return $deviceLoader->load('linux desktop', $this->useragent);
+            return $deviceLoader('linux desktop', $this->useragent);
         }
 
         if ('touch' === $deviceCode
             && array_key_exists('osname', $this->match)
             && 'bb10' === mb_strtolower($this->match['osname'])
         ) {
-            $deviceLoader = $deviceLoaderFactory('rim', 'mobile');
-            $deviceLoader->init();
+            $deviceLoader = $deviceLoaderFactory('rim');
 
-            return $deviceLoader->load('z10', $this->useragent);
+            return $deviceLoader('z10', $this->useragent);
         }
 
         if (array_key_exists('manufacturercode', $this->match)) {
@@ -211,8 +220,7 @@ class RegexFactory extends Helper
 
             if ($manufacturercode) {
                 try {
-                    $deviceLoader = $deviceLoaderFactory($manufacturercode, 'mobile');
-                    $deviceLoader->init();
+                    $deviceLoader = $deviceLoaderFactory($manufacturercode);
                 } catch (\Throwable $e) {
                     $logger->info(
                         new \Exception(
@@ -230,7 +238,7 @@ class RegexFactory extends Helper
                 if (null !== $deviceLoader) {
                     try {
                         /** @var \UaResult\Device\DeviceInterface $device */
-                        [$device, $platform] = $deviceLoader->load(
+                        [$device, $platform] = $deviceLoader(
                             $manufacturercode . ' ' . $deviceCode,
                             $this->useragent
                         );
@@ -249,11 +257,11 @@ class RegexFactory extends Helper
 
         if (array_key_exists('devicetype', $this->match)) {
             if ('wpdesktop' === mb_strtolower($this->match['devicetype']) || 'xblwp7' === mb_strtolower($this->match['devicetype'])) {
-                $factory = new Factory\Device\MobileFactory($logger);
+                $factory = new Parser\Device\MobileParser($fileParser, $loaderFactory);
 
                 try {
                     return $factory($this->useragent);
-                } catch (InvalidArgumentException $e) {
+                } catch (\Throwable $e) {
                     throw new GeneralDeviceException('use general mobile device', 0, $e);
                 }
             }
@@ -269,11 +277,11 @@ class RegexFactory extends Helper
                     throw new GeneralDeviceException('use general mobile device');
                 }
 
-                $className = '\\BrowserDetector\\Factory\\Device\\' . ucfirst($deviceType) . 'Factory';
+                $className = '\\BrowserDetector\\Parser\\Device\\' . ucfirst($deviceType) . 'Parser';
 
                 if (class_exists($className)) {
                     $logger->debug('device detected via device type (mobile or tv)');
-                    /** @var \BrowserDetector\Factory\DeviceFactoryInterface $factory */
+                    /** @var \BrowserDetector\Parser\DeviceParserInterface $factory */
                     $factory = new $className($logger);
 
                     try {
@@ -284,7 +292,7 @@ class RegexFactory extends Helper
                         throw $e;
                     }
                 } else {
-                    $logger->error('factory "' . $className . '" not found');
+                    $logger->error('parser "' . $className . '" not found');
                 }
 
                 $logger->info('device type class was not found');

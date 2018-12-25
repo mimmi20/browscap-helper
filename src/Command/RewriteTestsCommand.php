@@ -22,9 +22,12 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
+use BrowserDetector\Loader\CompanyLoaderFactory;
 use BrowserDetector\Loader\DeviceLoaderFactory;
 use BrowserDetector\Loader\NotFoundException;
+use BrowserDetector\Parser\PlatformParserFactory;
 use BrowserDetector\Version\VersionInterface;
+use JsonClass\Json;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Cache\Simple\NullCache;
@@ -32,9 +35,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use UaNormalizer\NormalizerFactory;
+use UaDeviceType\Unknown;
 use UaRequest\GenericRequestFactory;
+use UaResult\Company\Company;
 use UaResult\Device\Device;
+use UaResult\Device\Display;
+use UaResult\Device\Market;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
@@ -277,8 +283,7 @@ class RewriteTestsCommand extends Command
 
         // @var $platform \UaResult\Os\OsInterface|null
 
-        $request      = (new GenericRequestFactory())->createRequestFromArray($headers);
-        $normalizedUa = (new NormalizerFactory())->build()->normalize($request->getDeviceUserAgent());
+        $request = (new GenericRequestFactory())->createRequestFromArray($headers);
 
         // rewrite devices
 
@@ -286,10 +291,34 @@ class RewriteTestsCommand extends Command
         $device   = clone $newResult->getDevice();
         $replaced = false;
 
+        $defaultDevice = new Device(
+            null,
+            null,
+            new Company('Unknown', null, null),
+            new Company('Unknown', null, null),
+            new Unknown(),
+            new Display(null, null, null, new \UaDisplaySize\Unknown(), null),
+            false,
+            0,
+            new Market([], [], []),
+            []
+        );
+
         if (in_array($device->getDeviceName(), [null, 'unknown'])) {
-            $device   = new Device(null, null);
+            $device   = clone $defaultDevice;
             $replaced = true;
         }
+
+        $jsonParser           = new Json();
+        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser);
+
+        /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
+        $companyLoader = $companyLoaderFactory();
+
+        $platformParserFactory = new PlatformParserFactory($consoleLogger, $jsonParser, $companyLoader);
+        $platformParser        = $platformParserFactory();
+
+        $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger, $jsonParser, $companyLoader, $platformParser);
 
         if (!$replaced
             && $device->getType()->isMobile()
@@ -299,12 +328,12 @@ class RewriteTestsCommand extends Command
             try {
                 /** @var \BrowscapHelper\Command\Helper\RegexFactory $regexFactory */
                 $regexFactory = $this->getHelper('regex-factory');
-                $regexFactory->detect($normalizedUa);
+                $regexFactory->detect($request->getDeviceUserAgent());
                 [$device] = $regexFactory->getDevice($consoleLogger);
                 $replaced = false;
 
                 if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
-                    $device   = new Device(null, null);
+                    $device   = clone $defaultDevice;
                     $replaced = true;
                 }
 
@@ -312,96 +341,84 @@ class RewriteTestsCommand extends Command
                     && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'])
                     && false !== mb_stripos($device->getDeviceName(), 'general')
                 ) {
-                    $device = new Device('not found via regexes', null);
+                    $device = clone $defaultDevice;
                 }
             } catch (\InvalidArgumentException $e) {
                 $consoleLogger->error($e);
 
-                $device = new Device(null, null);
+                $device = clone $defaultDevice;
             } catch (NotFoundException $e) {
                 $consoleLogger->info($e);
 
-                $device = new Device(null, null);
+                $device = clone $defaultDevice;
             } catch (GeneralBlackberryException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
-                $deviceLoader        = $deviceLoaderFactory('rim', 'mobile');
+                $deviceLoader = $deviceLoaderFactory('rim');
 
                 try {
-                    $deviceLoader->init();
-                    [$device] = $deviceLoader->load('general blackberry device', $normalizedUa);
+                    [$device] = $deviceLoader('general blackberry device', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $defaultDevice;
                 }
             } catch (GeneralPhilipsTvException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
-                $deviceLoader        = $deviceLoaderFactory('philips', 'tv');
+                $deviceLoader = $deviceLoaderFactory('philips');
 
                 try {
-                    $deviceLoader->init();
-                    [$device] = $deviceLoader->load('general philips tv', $normalizedUa);
+                    [$device] = $deviceLoader('general philips tv', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $defaultDevice;
                 }
             } catch (GeneralTabletException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
-                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
+                $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    $deviceLoader->init();
-                    [$device] = $deviceLoader->load('general tablet', $normalizedUa);
+                    [$device] = $deviceLoader('general tablet', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $defaultDevice;
                 }
             } catch (GeneralPhoneException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
-                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
+                $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    $deviceLoader->init();
-                    [$device] = $deviceLoader->load('general mobile phone', $normalizedUa);
+                    [$device] = $deviceLoader('general mobile phone', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $defaultDevice;
                 }
             } catch (GeneralDeviceException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
-                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
+                $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    $deviceLoader->init();
-                    [$device] = $deviceLoader->load('general mobile device', $normalizedUa);
+                    [$device] = $deviceLoader('general mobile device', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $defaultDevice;
                 }
             } catch (GeneralTvException $e) {
-                $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger);
-                $deviceLoader        = $deviceLoaderFactory('unknown', 'unknown');
+                $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    $deviceLoader->init();
-                    [$device] = $deviceLoader->load('general tv device', $normalizedUa);
+                    [$device] = $deviceLoader('general tv device', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
-                    $device = new Device(null, null);
+                    $device = clone $defaultDevice;
                 }
             } catch (NoMatchException $e) {
                 $consoleLogger->info($e);
 
-                $device = new Device(null, null);
+                $device = clone $defaultDevice;
             } catch (\Throwable $e) {
                 $consoleLogger->error($e);
 
-                $device = new Device(null, null);
+                $device = clone $defaultDevice;
             }
         }
 

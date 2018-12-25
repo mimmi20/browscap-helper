@@ -16,14 +16,19 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
+use BrowserDetector\Version\Version;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use UaDeviceType\Unknown;
 use UaRequest\GenericRequestFactory;
 use UaResult\Browser\Browser;
+use UaResult\Company\Company;
 use UaResult\Device\Device;
+use UaResult\Device\Display;
+use UaResult\Device\Market;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
@@ -109,11 +114,39 @@ class CreateTestsCommand extends Command
 
         $sourcesDirectory      = $input->getOption('resources');
         $genericRequestFactory = new GenericRequestFactory();
-        $browser               = new Browser(null);
-        $device                = new Device(null, null);
-        $platform              = new Os(null, null);
-        $engine                = new Engine(null);
-        $sources               = [
+        $browser               = new Browser(
+            null,
+            new Company('Unknown', null, null),
+            new Version('0'),
+            new \UaBrowserType\Unknown(),
+            0,
+            null
+        );
+        $device = new Device(
+            null,
+            null,
+            new Company('Unknown', null, null),
+            new Company('Unknown', null, null),
+            new Unknown(),
+            new Display(null, null, null, new \UaDisplaySize\Unknown(), null),
+            false,
+            0,
+            new Market([], [], []),
+            []
+        );
+        $platform = new Os(
+            null,
+            null,
+            new Company('Unknown', null, null),
+            new Version('0'),
+            null
+        );
+        $engine = new Engine(
+            null,
+            new Company('Unknown', null, null),
+            new Version('0')
+        );
+        $sources = [
             new JsonFileSource($consoleLogger, $testSource),
             new TxtFileSource($consoleLogger, $sourcesDirectory),
             new TxtCounterFileSource($consoleLogger, $sourcesDirectory),

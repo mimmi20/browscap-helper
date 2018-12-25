@@ -14,24 +14,20 @@
     }
   ],
   "require": {
-    "ext-json": "*",
     "php": "^7.1",
-    "beberlei/assert": "^2.9",
-    "browscap/browscap": "dev-master",
+    "ext-json": "*",
+    "browscap/browscap": "dev-update-dependencies",
     "browscap/browscap-php": "^4.1",
-    "doctrine/cache": "^1.6",
     "donatj/phpuseragentparser": "dev-master",
     "endorphin-studio/browser-detector": "*",
     "jaybizzle/crawler-detect": "*",
-    "mimmi20/browscap-helper-source": "~2.5.6",
-    "mimmi20/browser-detector": "~4.0.22",
-    "mimmi20/browser-detector-tests": "~2.0.40",
-    "mimmi20/browser-detector-version": "~5.2.0",
-    "mimmi20/json-class": "~1.0.0",
-    "mimmi20/ua-result": "~5.2.5",
-    "mimmi20/ua-result-company": "~3.2.26",
+    "mimmi20/browscap-helper-source": "dev-update-dependencies",
+    "mimmi20/browser-detector": "dev-updates",
+    "mimmi20/browser-detector-tests": "dev-updates",
+    "mimmi20/browser-detector-version": "~6.0.2",
+    "mimmi20/json-class": "~2.0.1",
+    "mimmi20/ua-result": "~6.0.0",
     "mobiledetect/mobiledetectlib": "dev-master",
-    "monolog/monolog": "^1.24",
     "piwik/device-detector": "dev-master",
     "psr/cache": "^1.0",
     "psr/log": "^1.0",
@@ -49,14 +45,18 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.13",
-    "localheinz/json-normalizer": "^0.5.2||^0.6",
+    "localheinz/composer-normalize": "^1.0.0",
+    "localheinz/phpstan-rules": "^0.4",
     "pepakriz/phpstan-exception-rules": "^0.3",
     "phpstan/phpstan": "^0.10",
-    "phpstan/phpstan-beberlei-assert": "^0.10",
     "phpstan/phpstan-deprecation-rules": "^0.10",
-    "phpstan/phpstan-phpunit": "^0.10",
     "phpstan/phpstan-strict-rules": "^0.10",
-    "squizlabs/php_codesniffer": "^3.3"
+    "squizlabs/php_codesniffer": "^3.4"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
   },
   "autoload": {
     "psr-4": {
@@ -72,12 +72,14 @@
     {
       "type": "git",
       "url": "https://github.com/mimmi20/uap-core"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mimmi20/browscap"
     }
   ],
-  "config": {
-    "preferred-install": "dist",
-    "sort-packages": true
-  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "bin": [
     "bin/browscap-helper.php"
   ]

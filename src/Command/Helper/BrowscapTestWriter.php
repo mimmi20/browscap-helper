@@ -81,7 +81,7 @@ class BrowscapTestWriter extends Helper
             'Device_Name' => '" . $device->getMarketingName() . "',
             'Device_Maker' => '" . $device->getManufacturer()->getName() . "',
             'Device_Type' => '" . $device->getType()->getName() . "',
-            'Device_Pointing_Method' => '" . $device->getPointingMethod() . "',
+            'Device_Pointing_Method' => 'unknown',
             'Device_Code_Name' => '" . $device->getDeviceName() . "',
             'Device_Brand_Name' => '" . $device->getBrand()->getBrandName() . "',
             'RenderingEngine_Name' => '" . $engine->getName() . "',
