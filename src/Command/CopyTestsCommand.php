@@ -27,7 +27,7 @@ use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Source\ZsxsoftSource;
-use Doctrine\Common\Cache\PhpFileCache;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -119,7 +119,7 @@ class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
 
-        $cache   = new PhpFileCache('cache');
+        $cache   = new FilesystemCache('', 0, 'cache');
         $sources = [
             new BrowscapSource($consoleLogger),
             new PiwikSource($consoleLogger),
