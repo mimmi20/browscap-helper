@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use JsonClass\Json;
+use Localheinz\Json\Normalizer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
@@ -32,20 +33,35 @@ class JsonTestWriter extends Helper
      */
     public function write(LoggerInterface $logger, array $headers, string $dir, int $number): void
     {
+        $schema = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
+
+        $normalizer = new Normalizer\SchemaNormalizer($schema);
+        $format     = new Normalizer\Format\Format(
+            Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+            Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
+            Normalizer\Format\NewLine::fromString("\n"),
+            true
+        );
+
         try {
-            $content = (new Json())->encode(
-                $headers,
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-            );
+            $content = (new Json())->encode($headers);
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
             $logger->critical('could not encode content');
 
             return;
         }
 
+        try {
+            $normalized = (new Normalizer\FixedFormatNormalizer($normalizer, $format))->normalize(Normalizer\Json::fromEncoded($content));
+        } catch (\Throwable $e) {
+            $logger->critical(new \Exception(sprintf('content error'), 0, $e));
+
+            return;
+        }
+
         file_put_contents(
             $dir . '/' . sprintf('%1$07d', $number) . '.json',
-            $content . PHP_EOL
+            $normalized
         );
     }
 }
