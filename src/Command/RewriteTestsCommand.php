@@ -272,20 +272,12 @@ class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         }
 
-        // rewrite browsers
-
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $newResult->getBrowser();
 
-        // rewrite platforms
-
+        /** @var \UaResult\Os\OsInterface $platform */
         $platform = clone $newResult->getOs();
-
-        // @var $platform \UaResult\Os\OsInterface|null
-
-        $request = (new GenericRequestFactory())->createRequestFromArray($headers);
-
-        // rewrite devices
+        $request  = (new GenericRequestFactory())->createRequestFromArray($headers);
 
         /** @var \UaResult\Device\DeviceInterface $device */
         $device   = clone $newResult->getDevice();
@@ -421,8 +413,6 @@ class RewriteTestsCommand extends Command
                 $device = clone $defaultDevice;
             }
         }
-
-        // rewrite engines
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();
