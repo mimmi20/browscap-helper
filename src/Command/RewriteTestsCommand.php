@@ -303,8 +303,7 @@ class RewriteTestsCommand extends Command
         }
 
         $jsonParser           = new Json();
-        $finder               = new Finder();
-        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, $finder);
+        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, new Finder());
 
         /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
         $companyLoader = $companyLoaderFactory();
@@ -312,7 +311,7 @@ class RewriteTestsCommand extends Command
         $platformParserFactory = new PlatformParserFactory($consoleLogger, $jsonParser, $companyLoader);
         $platformParser        = $platformParserFactory();
 
-        $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger, $jsonParser, $companyLoader, $platformParser, $finder);
+        $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger, $jsonParser, $companyLoader, $platformParser, new Finder());
 
         if (!$replaced
             && $device->getType()->isMobile()
