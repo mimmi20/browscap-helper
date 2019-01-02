@@ -1,5 +1,9 @@
 parameters:
+  level: max
+  paths:
+    - src
   autoload_files:
+    - %currentWorkingDirectory%/vendor/autoload.php
     - %currentWorkingDirectory%/vendor/squizlabs/php_codesniffer/autoload.php
     - %currentWorkingDirectory%/vendor/squizlabs/php_codesniffer/src/Util/Tokens.php
   includes:
