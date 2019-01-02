@@ -26,6 +26,7 @@ use BrowserDetector\Parser\PlatformParserFactory;
 use JsonClass\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Finder\Finder;
 
 class RegexFactory extends Helper
 {
@@ -111,7 +112,8 @@ class RegexFactory extends Helper
         $deviceCode = mb_strtolower($this->match['devicecode']);
 
         $jsonParser           = new Json();
-        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser);
+        $finder               = new Finder();
+        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, $finder);
 
         /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
         $companyLoader = $companyLoaderFactory();
@@ -119,7 +121,7 @@ class RegexFactory extends Helper
         $platformParserFactory = new PlatformParserFactory($logger, $jsonParser, $companyLoader);
         $platformParser        = $platformParserFactory();
 
-        $deviceLoaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser);
+        $deviceLoaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser, $finder);
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -139,7 +141,7 @@ class RegexFactory extends Helper
             return $deviceLoader('macintosh', $this->useragent);
         }
 
-        $loaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser);
+        $loaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser, $finder);
         $fileParser    = new Parser\Helper\RulefileParser($jsonParser, $logger);
 
         if ('cfnetwork' === $deviceCode) {
