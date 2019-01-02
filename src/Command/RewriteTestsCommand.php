@@ -35,6 +35,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use UaDeviceType\Unknown;
 use UaRequest\GenericRequestFactory;
 use UaResult\Company\Company;
@@ -302,7 +303,8 @@ class RewriteTestsCommand extends Command
         }
 
         $jsonParser           = new Json();
-        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser);
+        $finder               = new Finder();
+        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, $finder);
 
         /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
         $companyLoader = $companyLoaderFactory();
@@ -310,7 +312,7 @@ class RewriteTestsCommand extends Command
         $platformParserFactory = new PlatformParserFactory($consoleLogger, $jsonParser, $companyLoader);
         $platformParser        = $platformParserFactory();
 
-        $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger, $jsonParser, $companyLoader, $platformParser);
+        $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger, $jsonParser, $companyLoader, $platformParser, $finder);
 
         if (!$replaced
             && $device->getType()->isMobile()
