@@ -109,6 +109,8 @@ class RewriteTestsCommand extends Command
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
 
+            $consoleLogger->debug('    Header "' . $seachHeader . '" checking ...');
+
             try {
                 $result = $this->handleTest($consoleLogger, $detector, $headers);
             } catch (InvalidArgumentException $e) {
@@ -122,15 +124,17 @@ class RewriteTestsCommand extends Command
             }
 
             if (null === $result) {
-                $consoleLogger->debug('Header "' . $seachHeader . '" was skipped because a similar UA was already added');
+                $consoleLogger->debug('    Header "' . $seachHeader . '" was skipped because a similar UA was already added');
 
                 continue;
             }
 
+            $consoleLogger->debug('    Header "' . $seachHeader . '" added to list');
+
             $testResults[] = $result->toArray();
         }
 
-        $output->writeln(sprintf('%d tests selected ...', count($testResults)));
+        $output->writeln(sprintf('%d tests selected', count($testResults)));
 
         $output->writeln('rewrite tests and circleci ...');
         $folderChunks    = array_chunk($testResults, 1000);
@@ -273,12 +277,18 @@ class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         }
 
+        $consoleLogger->debug('        clone browser');
+
         /** @var \UaResult\Browser\BrowserInterface $browser */
         $browser = clone $newResult->getBrowser();
+
+        $consoleLogger->debug('        clone platform');
 
         /** @var \UaResult\Os\OsInterface $platform */
         $platform = clone $newResult->getOs();
         $request  = (new GenericRequestFactory())->createRequestFromArray($headers);
+
+        $consoleLogger->debug('        clone device');
 
         /** @var \UaResult\Device\DeviceInterface $device */
         $device   = clone $newResult->getDevice();
@@ -298,6 +308,8 @@ class RewriteTestsCommand extends Command
         );
 
         if (in_array($device->getDeviceName(), [null, 'unknown'])) {
+            $consoleLogger->debug('        cloned device resetted - unknown device name');
+
             $device   = clone $defaultDevice;
             $replaced = true;
         }
@@ -318,6 +330,8 @@ class RewriteTestsCommand extends Command
             && !in_array($device->getDeviceName(), ['general Apple Device'])
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
+            $consoleLogger->debug('        cloned device resetted - checking with regexes');
+
             try {
                 /** @var \BrowscapHelper\Command\Helper\RegexFactory $regexFactory */
                 $regexFactory = $this->getHelper('regex-factory');
@@ -414,6 +428,8 @@ class RewriteTestsCommand extends Command
                 $device = clone $defaultDevice;
             }
         }
+
+        $consoleLogger->debug('        clone engine');
 
         /** @var \UaResult\Engine\EngineInterface $engine */
         $engine = clone $newResult->getEngine();
