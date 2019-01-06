@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use JsonClass\Json;
+use Localheinz\Json\Normalizer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
@@ -33,6 +34,15 @@ class DetectorTestWriter extends Helper
      */
     public function write(LoggerInterface $logger, array $tests, string $dir, int $folderId, int $fileId): void
     {
+        $schema = 'file://' . realpath(__DIR__ . '/../../../vendor/browser-detector/schema/tests.json');
+
+        $normalizer = new Normalizer\SchemaNormalizer($schema);
+        $format     = new Normalizer\Format\Format(
+            Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+            Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
+            Normalizer\Format\NewLine::fromString("\n"),
+            true
+        );
         try {
             $content = (new Json())->encode(
                 $tests,
@@ -44,9 +54,17 @@ class DetectorTestWriter extends Helper
             return;
         }
 
+        try {
+            $normalized = (new Normalizer\FixedFormatNormalizer($normalizer, $format))->normalize(Normalizer\Json::fromEncoded($content));
+        } catch (\Throwable $e) {
+            $logger->critical(new \Exception(sprintf('content error'), 0, $e));
+
+            return;
+        }
+
         file_put_contents(
             $dir . '/test-' . sprintf('%1$07d', $folderId) . '-' . sprintf('%1$03d', $fileId) . '.json',
-            $content . PHP_EOL
+            $normalized
         );
     }
 }
