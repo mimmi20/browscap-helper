@@ -20,13 +20,13 @@ use BrowscapHelper\Factory\Regex\GeneralTvException;
 use BrowscapHelper\Factory\Regex\NoMatchException;
 use BrowserDetector\Loader\CompanyLoaderFactory;
 use BrowserDetector\Loader\DeviceLoaderFactory;
+use BrowserDetector\Loader\Helper\Filter;
 use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Parser;
 use BrowserDetector\Parser\PlatformParserFactory;
 use JsonClass\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Finder\Finder;
 
 class RegexFactory extends Helper
 {
@@ -112,7 +112,7 @@ class RegexFactory extends Helper
         $deviceCode = mb_strtolower($this->match['devicecode']);
 
         $jsonParser           = new Json();
-        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, new Finder());
+        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, new Filter());
 
         /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
         $companyLoader = $companyLoaderFactory();
@@ -120,7 +120,7 @@ class RegexFactory extends Helper
         $platformParserFactory = new PlatformParserFactory($logger, $jsonParser, $companyLoader);
         $platformParser        = $platformParserFactory();
 
-        $deviceLoaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser, new Finder());
+        $deviceLoaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser, new Filter());
 
         if (!array_key_exists('osname', $this->match) || '' === $this->match['osname']) {
             $platformCode = null;
@@ -140,7 +140,7 @@ class RegexFactory extends Helper
             return $deviceLoader('macintosh', $this->useragent);
         }
 
-        $loaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser, new Finder());
+        $loaderFactory = new DeviceLoaderFactory($logger, $jsonParser, $companyLoader, $platformParser, new Filter());
         $fileParser    = new Parser\Helper\RulefileParser($jsonParser, $logger);
 
         if ('cfnetwork' === $deviceCode) {
