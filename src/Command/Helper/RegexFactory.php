@@ -283,7 +283,7 @@ class RegexFactory extends Helper
                 if (class_exists($className)) {
                     $logger->debug('device detected via device type (mobile or tv)');
                     /** @var \BrowserDetector\Parser\DeviceParserInterface $factory */
-                    $factory = new $className($logger);
+                    $factory = new $className($fileParser, $loaderFactory);
 
                     try {
                         return $factory($this->useragent);
