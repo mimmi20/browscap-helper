@@ -34,7 +34,8 @@ class DetectorTestWriter extends Helper
      */
     public function write(LoggerInterface $logger, array $tests, string $dir, int $folderId, int $fileId): void
     {
-        $schema = 'file://' . realpath(__DIR__ . '/../../../vendor/browser-detector/schema/tests.json');
+        $fileName = $dir . '/test-' . sprintf('%1$07d', $folderId) . '-' . sprintf('%1$03d', $fileId) . '.json';
+        $schema   = 'file://' . realpath(__DIR__ . '/../../../vendor/mimmi20/browser-detector-tests/schema/tests.json');
 
         $normalizer = new Normalizer\SchemaNormalizer($schema);
         $format     = new Normalizer\Format\Format(
@@ -46,25 +47,32 @@ class DetectorTestWriter extends Helper
         try {
             $content = (new Json())->encode(
                 $tests,
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
             );
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
-            $logger->critical('could not encode content');
+            $logger->critical(sprintf('could not encode content for file %s', $fileName));
+
+            return;
+        } catch (\Throwable $e) {
+            $logger->critical(new \Exception(sprintf('an error occured while encoding content for file %s', $fileName), 0, $e));
 
             return;
         }
 
         try {
             $normalized = (new Normalizer\FixedFormatNormalizer($normalizer, $format))->normalize(Normalizer\Json::fromEncoded($content));
+        } catch (Normalizer\Exception\OriginalInvalidAccordingToSchemaException $e) {
+            //file_put_contents(__DIR__ . '/../../../cache/error.txt', $e);
+            //file_put_contents(__DIR__ . '/../../../cache/error.json', $content);
+            $logger->critical(new \Exception(sprintf('content for file %s not according to schema', $fileName), 0, $e));
+
+            return;
         } catch (\Throwable $e) {
-            $logger->critical(new \Exception(sprintf('content error'), 0, $e));
+            $logger->critical(new \Exception(sprintf('an error occured while normalizing content for file %s', $fileName), 0, $e));
 
             return;
         }
 
-        file_put_contents(
-            $dir . '/test-' . sprintf('%1$07d', $folderId) . '-' . sprintf('%1$03d', $fileId) . '.json',
-            $normalized
-        );
+        file_put_contents($fileName, $normalized);
     }
 }
