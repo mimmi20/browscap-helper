@@ -300,7 +300,7 @@ class RewriteTestsCommand extends Command
             new Company('Unknown', null, null),
             new Company('Unknown', null, null),
             new Unknown(),
-            new Display(null, null, null, new \UaDisplaySize\Unknown(), null),
+            new Display(null, new \UaDisplaySize\Unknown(), null),
             false,
             0,
             new Market([], [], []),
@@ -362,7 +362,7 @@ class RewriteTestsCommand extends Command
                 $deviceLoader = $deviceLoaderFactory('rim');
 
                 try {
-                    [$device] = $deviceLoader('general blackberry device', $request->getDeviceUserAgent());
+                    [$device] = $deviceLoader->load('general blackberry device', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
@@ -372,7 +372,7 @@ class RewriteTestsCommand extends Command
                 $deviceLoader = $deviceLoaderFactory('philips');
 
                 try {
-                    [$device] = $deviceLoader('general philips tv', $request->getDeviceUserAgent());
+                    [$device] = $deviceLoader->load('general philips tv', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
@@ -382,7 +382,7 @@ class RewriteTestsCommand extends Command
                 $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    [$device] = $deviceLoader('general tablet', $request->getDeviceUserAgent());
+                    [$device] = $deviceLoader->load('general tablet', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
@@ -392,7 +392,7 @@ class RewriteTestsCommand extends Command
                 $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    [$device] = $deviceLoader('general mobile phone', $request->getDeviceUserAgent());
+                    [$device] = $deviceLoader->load('general mobile phone', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
@@ -402,7 +402,7 @@ class RewriteTestsCommand extends Command
                 $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    [$device] = $deviceLoader('general mobile device', $request->getDeviceUserAgent());
+                    [$device] = $deviceLoader->load('general mobile device', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
@@ -412,7 +412,7 @@ class RewriteTestsCommand extends Command
                 $deviceLoader = $deviceLoaderFactory('unknown');
 
                 try {
-                    [$device] = $deviceLoader('general tv device', $request->getDeviceUserAgent());
+                    [$device] = $deviceLoader->load('general tv device', $request->getDeviceUserAgent());
                 } catch (\Throwable $e) {
                     $consoleLogger->critical($e);
 
