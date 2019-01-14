@@ -62,8 +62,6 @@ class DetectorTestWriter extends Helper
         try {
             $normalized = (new Normalizer\FixedFormatNormalizer($normalizer, $format))->normalize(Normalizer\Json::fromEncoded($content));
         } catch (Normalizer\Exception\OriginalInvalidAccordingToSchemaException $e) {
-            //file_put_contents(__DIR__ . '/../../../cache/error.txt', $e);
-            //file_put_contents(__DIR__ . '/../../../cache/error.json', $content);
             $logger->critical(new \Exception(sprintf('content for file %s not according to schema', $fileName), 0, $e));
 
             return;
