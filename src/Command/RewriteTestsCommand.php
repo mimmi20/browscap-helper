@@ -41,7 +41,6 @@ use UaRequest\GenericRequestFactory;
 use UaResult\Company\Company;
 use UaResult\Device\Device;
 use UaResult\Device\Display;
-use UaResult\Device\Market;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
@@ -300,11 +299,7 @@ class RewriteTestsCommand extends Command
             new Company('Unknown', null, null),
             new Company('Unknown', null, null),
             new Unknown(),
-            new Display(null, new \UaDisplaySize\Unknown(), null),
-            false,
-            0,
-            new Market([], [], []),
-            []
+            new Display(null, new \UaDisplaySize\Unknown(), null)
         );
 
         if (in_array($device->getDeviceName(), [null, 'unknown'])) {
