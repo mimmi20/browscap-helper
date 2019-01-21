@@ -28,7 +28,6 @@ use UaResult\Browser\Browser;
 use UaResult\Company\Company;
 use UaResult\Device\Device;
 use UaResult\Device\Display;
-use UaResult\Device\Market;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
@@ -128,11 +127,7 @@ class CreateTestsCommand extends Command
             new Company('Unknown', null, null),
             new Company('Unknown', null, null),
             new Unknown(),
-            new Display(null, new \UaDisplaySize\Unknown(), null),
-            false,
-            0,
-            new Market([], [], []),
-            []
+            new Display(null, new \UaDisplaySize\Unknown(), null)
         );
         $platform = new Os(
             null,
