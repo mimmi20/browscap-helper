@@ -33,7 +33,8 @@ class JsonTestWriter extends Helper
      */
     public function write(LoggerInterface $logger, array $headers, string $dir, int $number): void
     {
-        $schema = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
+        $fileName = $dir . '/' . sprintf('%1$07d', $number) . '.json';
+        $schema   = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
 
         $normalizer = new Normalizer\SchemaNormalizer($schema);
         $format     = new Normalizer\Format\Format(
@@ -46,7 +47,7 @@ class JsonTestWriter extends Helper
         try {
             $content = (new Json())->encode($headers);
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
-            $logger->critical('could not encode content');
+            $logger->critical(new \Exception(sprintf('could not encode content for file %s', $fileName), 0, $e));
 
             return;
         }
@@ -59,9 +60,6 @@ class JsonTestWriter extends Helper
             return;
         }
 
-        file_put_contents(
-            $dir . '/' . sprintf('%1$07d', $number) . '.json',
-            $normalized
-        );
+        file_put_contents($fileName, $normalized);
     }
 }
