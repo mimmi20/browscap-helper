@@ -39,7 +39,9 @@ class DetectorTestWriter extends Helper
 
         $normalizer = new Normalizer\SchemaNormalizer($schema);
         $format     = new Normalizer\Format\Format(
-            Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+            Normalizer\Format\JsonEncodeOptions::fromInt(
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION
+            ),
             Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
             Normalizer\Format\NewLine::fromString("\n"),
             true
@@ -47,7 +49,7 @@ class DetectorTestWriter extends Helper
         try {
             $content = (new Json())->encode(
                 $tests,
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION
             );
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
             $logger->critical(sprintf('could not encode content for file %s', $fileName));
