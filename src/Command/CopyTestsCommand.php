@@ -27,6 +27,7 @@ use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Source\ZsxsoftSource;
+use JsonClass\Json;
 use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -144,6 +145,14 @@ class CopyTestsCommand extends Command
         foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, $sources) as $seachHeader) {
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+
+                continue;
+            }
+
+            try {
+                (new Json())->encode($seachHeader);
+            } catch (\ExceptionalJSON\EncodeErrorException $e) {
+                $consoleLogger->debug('    Header "' . $seachHeader . '" contained illegal characters --> skipped');
 
                 continue;
             }

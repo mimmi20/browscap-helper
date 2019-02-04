@@ -38,14 +38,19 @@ class JsonTestWriter extends Helper
 
         $normalizer = new Normalizer\SchemaNormalizer($schema);
         $format     = new Normalizer\Format\Format(
-            Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+            Normalizer\Format\JsonEncodeOptions::fromInt(
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION
+            ),
             Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
             Normalizer\Format\NewLine::fromString("\n"),
             true
         );
 
         try {
-            $content = (new Json())->encode($headers);
+            $content = (new Json())->encode(
+                $headers,
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION
+            );
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
             $logger->critical(new \Exception(sprintf('could not encode content for file %s', $fileName), 0, $e));
 

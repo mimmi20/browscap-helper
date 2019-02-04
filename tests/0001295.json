@@ -369,7 +369,7 @@
     "user-agent": "Mozilla/4.0 (compatible; MSIE 5.0; CDA 6.0; WTGamesApp 4.0.26.43)"
   },
   {
-    "user-agent": "nessus='%22"
+    "user-agent": "nessus=\u0027%22"
   },
   {
     "user-agent": "- nessus=whatever=\\"
@@ -387,13 +387,13 @@
     "user-agent": "nessus=%27"
   },
   {
-    "user-agent": "nessus='+convert(int,convert(varchar,0x7b5d))+'"
+    "user-agent": "nessus=\u0027+convert(int,convert(varchar,0x7b5d))+\u0027"
   },
   {
     "user-agent": "nessus=convert(int,convert(varchar,0x7b5d))"
   },
   {
-    "user-agent": "'%2Bconvert(varchar%2C0x7b5d)%2B'"
+    "user-agent": "\u0027%2Bconvert(varchar%2C0x7b5d)%2B\u0027"
   },
   {
     "user-agent": "convert(int,convert(varchar%2C0x7b5d))"
@@ -405,13 +405,13 @@
     "user-agent": "- nessus=whatever/\\"
   },
   {
-    "user-agent": "nessus='"
+    "user-agent": "nessus=\u0027"
   },
   {
-    "user-agent": "'%22"
+    "user-agent": "\u0027%22"
   },
   {
-    "user-agent": "nessus=bad_bad_value'"
+    "user-agent": "nessus=bad_bad_value\u0027"
   },
   {
     "user-agent": "%3B"
@@ -420,10 +420,10 @@
     "user-agent": "nessus=#"
   },
   {
-    "user-agent": "'%2Bconvert(int,convert(varchar%2C0x7b5d))%2B'"
+    "user-agent": "\u0027%2Bconvert(int,convert(varchar%2C0x7b5d))%2B\u0027"
   },
   {
-    "user-agent": "nessus=whatever/'"
+    "user-agent": "nessus=whatever/\u0027"
   },
   {
     "user-agent": "%22"
@@ -459,16 +459,16 @@
     "user-agent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; tb-gmx/1.8.2; chromeframe/24.0.1312.56)"
   },
   {
-    "user-agent": "nessus=' or 1=1--"
+    "user-agent": "nessus=\u0027 or 1=1--"
   },
   {
     "user-agent": "nessus=char(39)"
   },
   {
-    "user-agent": "'+convert(varchar,0x7b5d)+'"
+    "user-agent": "\u0027+convert(varchar,0x7b5d)+\u0027"
   },
   {
-    "user-agent": "nessus='%2Bconvert(int,convert(varchar%2C0x7b5d))%2B'"
+    "user-agent": "nessus=\u0027%2Bconvert(int,convert(varchar%2C0x7b5d))%2B\u0027"
   },
   {
     "user-agent": "nessus=%3B"
@@ -480,10 +480,10 @@
     "user-agent": "nessus=convert(varchar,0x7b5d)"
   },
   {
-    "user-agent": "nessus='%2Bconvert(varchar%2C0x7b5d)%2B'"
+    "user-agent": "nessus=\u0027%2Bconvert(varchar%2C0x7b5d)%2B\u0027"
   },
   {
-    "user-agent": "whatever/'"
+    "user-agent": "whatever/\u0027"
   },
   {
     "user-agent": "9%2c+9%2c+9"
@@ -504,13 +504,13 @@
     "user-agent": "nessus=%2527"
   },
   {
-    "user-agent": "'+convert(int,convert(varchar,0x7b5d))+'"
+    "user-agent": "\u0027+convert(int,convert(varchar,0x7b5d))+\u0027"
   },
   {
     "user-agent": "convert(int,convert(varchar,0x7b5d))"
   },
   {
-    "user-agent": "nessus='+convert(varchar,0x7b5d)+'"
+    "user-agent": "nessus=\u0027+convert(varchar,0x7b5d)+\u0027"
   },
   {
     "user-agent": "nessus=convert(int,convert(varchar%2C0x7b5d))"
@@ -522,7 +522,7 @@
     "user-agent": "nessus=9%2c+9%2c+9"
   },
   {
-    "user-agent": "bad_bad_value'"
+    "user-agent": "bad_bad_value\u0027"
   },
   {
     "user-agent": "char(39)"
@@ -543,10 +543,10 @@
     "user-agent": "convert(varchar%2C0x7b5d)"
   },
   {
-    "user-agent": "nessus=whatever='"
+    "user-agent": "nessus=whatever=\u0027"
   },
   {
-    "user-agent": "' or 1=1--"
+    "user-agent": "\u0027 or 1=1--"
   },
   {
     "user-agent": "&#39;+AND+&#39;a&#39;<&#39;b"
@@ -561,7 +561,7 @@
     "user-agent": "- \\"
   },
   {
-    "user-agent": "whatever='"
+    "user-agent": "whatever=\u0027"
   },
   {
     "user-agent": "- nessus=\\"
