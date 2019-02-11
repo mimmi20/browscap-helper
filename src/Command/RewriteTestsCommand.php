@@ -322,7 +322,7 @@ class RewriteTestsCommand extends Command
 
         if (!$replaced
             && $device->getType()->isMobile()
-            && !in_array($device->getDeviceName(), ['general Apple Device'])
+            && !in_array(mb_strtolower($device->getDeviceName()), ['general apple device'])
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             $consoleLogger->debug('        cloned device resetted - checking with regexes');

@@ -180,7 +180,7 @@ class RegexFactory extends Helper
             throw new GeneralDeviceException('use general mobile device');
         }
 
-        if (in_array($deviceCode, ['opera/9.80', 'opera/9.50', 'generic', ''])) {
+        if (in_array($deviceCode, ['opera/9.80', 'opera/9.50', 'series 60', 'generic', ''])) {
             throw new GeneralDeviceException('use general mobile device');
         }
 
