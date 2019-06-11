@@ -32,7 +32,7 @@ use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
 
-class CreateTestsCommand extends Command
+final class CreateTestsCommand extends Command
 {
     /**
      * @var string

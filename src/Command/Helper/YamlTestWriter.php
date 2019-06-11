@@ -14,7 +14,7 @@ namespace BrowscapHelper\Command\Helper;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlTestWriter extends Helper
+final class YamlTestWriter extends Helper
 {
     public function getName()
     {

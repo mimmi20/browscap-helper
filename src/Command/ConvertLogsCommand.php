@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConvertLogsCommand extends Command
+final class ConvertLogsCommand extends Command
 {
     /**
      * @var string

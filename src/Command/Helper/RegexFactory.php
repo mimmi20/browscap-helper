@@ -28,7 +28,7 @@ use JsonClass\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
-class RegexFactory extends Helper
+final class RegexFactory extends Helper
 {
     /**
      * @var \Symfony\Component\Console\Helper\HelperSet

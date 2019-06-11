@@ -44,7 +44,7 @@ use UaResult\Device\Display;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
 
-class RewriteTestsCommand extends Command
+final class RewriteTestsCommand extends Command
 {
     /**
      * @var array

@@ -16,7 +16,7 @@ use Localheinz\Json\Normalizer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
-class JsonTestWriter extends Helper
+final class JsonTestWriter extends Helper
 {
     public function getName()
     {

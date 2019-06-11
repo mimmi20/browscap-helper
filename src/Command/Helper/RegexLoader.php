@@ -14,7 +14,7 @@ namespace BrowscapHelper\Command\Helper;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Yaml\Yaml;
 
-class RegexLoader extends Helper
+final class RegexLoader extends Helper
 {
     /**
      * @var array|null

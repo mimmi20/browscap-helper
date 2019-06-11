@@ -11,7 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Factory\Regex;
 
-class GeneralTvException extends \OutOfRangeException
+final class GeneralTvException extends \OutOfRangeException
 {
     // nothing to do here
 }
