@@ -15,7 +15,7 @@ use BrowserDetector\Version\VersionInterface;
 use Symfony\Component\Console\Helper\Helper;
 use UaResult\Result\ResultInterface;
 
-class BrowscapTestWriter extends Helper
+final class BrowscapTestWriter extends Helper
 {
     /**
      * @var string

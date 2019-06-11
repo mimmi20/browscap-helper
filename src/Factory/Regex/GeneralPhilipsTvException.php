@@ -11,7 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Factory\Regex;
 
-class GeneralPhilipsTvException extends GeneralDeviceException
+final class GeneralPhilipsTvException extends \OutOfRangeException
 {
     // nothing to do here
 }

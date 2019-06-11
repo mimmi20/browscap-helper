@@ -35,7 +35,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CopyTestsCommand extends Command
+final class CopyTestsCommand extends Command
 {
     /**
      * @var string

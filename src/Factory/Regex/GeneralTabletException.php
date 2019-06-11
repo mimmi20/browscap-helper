@@ -11,7 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Factory\Regex;
 
-class GeneralTabletException extends \OutOfRangeException
+final class GeneralTabletException extends \OutOfRangeException
 {
     // nothing to do here
 }

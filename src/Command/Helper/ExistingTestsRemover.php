@@ -14,7 +14,7 @@ namespace BrowscapHelper\Command\Helper;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Finder\Finder;
 
-class ExistingTestsRemover extends Helper
+final class ExistingTestsRemover extends Helper
 {
     public function getName()
     {

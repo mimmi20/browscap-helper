@@ -13,7 +13,7 @@ namespace BrowscapHelper\Command\Helper;
 
 use Symfony\Component\Console\Helper\Helper;
 
-class TxtTestWriter extends Helper
+final class TxtTestWriter extends Helper
 {
     public function getName()
     {

@@ -13,7 +13,7 @@ namespace BrowscapHelper\Command\Helper;
 
 use Symfony\Component\Console\Helper\Helper;
 
-class TargetDirectory extends Helper
+final class TargetDirectory extends Helper
 {
     public function getName()
     {

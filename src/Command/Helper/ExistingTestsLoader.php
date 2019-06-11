@@ -15,7 +15,7 @@ use BrowscapHelper\Source\SourceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
 
-class ExistingTestsLoader extends Helper
+final class ExistingTestsLoader extends Helper
 {
     public function getName()
     {
