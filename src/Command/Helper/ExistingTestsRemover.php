@@ -24,6 +24,9 @@ final class ExistingTestsRemover extends Helper
     /**
      * @param string $testSource
      *
+     * @throws \Symfony\Component\Finder\Exception\DirectoryNotFoundException
+     * @throws \LogicException
+     *
      * @return void
      */
     public function remove(string $testSource): void

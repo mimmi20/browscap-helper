@@ -29,6 +29,11 @@ final class JsonTestWriter extends Helper
      * @param string                   $dir
      * @param int                      $number
      *
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidNewLineStringException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentStyleException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentSizeException
+     *
      * @return void
      */
     public function write(LoggerInterface $logger, array $headers, string $dir, int $number): void

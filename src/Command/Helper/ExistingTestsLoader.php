@@ -26,6 +26,9 @@ final class ExistingTestsLoader extends Helper
      * @param \Psr\Log\LoggerInterface $logger
      * @param SourceInterface[]        $sources
      *
+     * @throws \LogicException
+     * @throws \RuntimeException
+     *
      * @return iterable|string[]
      */
     public function getHeaders(LoggerInterface $logger, array $sources): iterable

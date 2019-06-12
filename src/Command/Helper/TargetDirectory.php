@@ -42,7 +42,7 @@ final class TargetDirectory extends Helper
         $filesFound = false;
 
         foreach ($filesArray as $filename) {
-            if (in_array($filename, ['.', '..', '.gitkeep'])) {
+            if (in_array($filename, ['.', '..', '.gitkeep'], true)) {
                 continue;
             }
 

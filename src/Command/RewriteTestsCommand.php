@@ -30,8 +30,8 @@ use BrowserDetector\Parser\PlatformParserFactory;
 use BrowserDetector\Version\VersionInterface;
 use JsonClass\Json;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\InvalidArgumentException;
-use Symfony\Component\Cache\Simple\NullCache;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -53,6 +53,8 @@ final class RewriteTestsCommand extends Command
 
     /**
      * Configures the current command.
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function configure(): void
     {
@@ -72,6 +74,9 @@ final class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
+     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
      * @return int|null null or 0 if everything went fine, or an error code
      *
      * @see    setCode()
@@ -80,7 +85,7 @@ final class RewriteTestsCommand extends Command
     {
         $consoleLogger = new ConsoleLogger($output);
 
-        $cache    = new NullCache();
+        $cache    = new Psr16Cache(new NullAdapter());
         $factory  = new DetectorFactory($cache, $consoleLogger);
         $detector = $factory();
 
@@ -112,12 +117,8 @@ final class RewriteTestsCommand extends Command
 
             try {
                 $result = $this->handleTest($consoleLogger, $detector, $headers);
-            } catch (InvalidArgumentException $e) {
+            } catch (\UnexpectedValueException $e) {
                 $consoleLogger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
-
-                continue;
-            } catch (\Throwable $e) {
-                $consoleLogger->warning(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
                 continue;
             }
@@ -130,7 +131,11 @@ final class RewriteTestsCommand extends Command
 
             $consoleLogger->debug('    Header "' . $seachHeader . '" added to list');
 
-            $testResults[] = $result->toArray();
+            try {
+                $testResults[] = $result->toArray();
+            } catch (\UnexpectedValueException $e) {
+                $consoleLogger->error(new \Exception('An error occured while converting a result to an array', 0, $e));
+            }
         }
 
         $output->writeln(sprintf('%d tests selected', count($testResults)));
@@ -214,7 +219,7 @@ final class RewriteTestsCommand extends Command
      * @param Detector                 $detector
      * @param array                    $headers
      *
-     * @throws InvalidArgumentException
+     * @throws \UnexpectedValueException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
@@ -251,18 +256,18 @@ final class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         } elseif (($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet())
             && false === mb_strpos((string) $newResult->getBrowser()->getName(), 'general')
-            && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'])
+            && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'], true)
             && false === mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general')
-            && !in_array($newResult->getDevice()->getDeviceName(), [null, 'unknown'])
+            && !in_array($newResult->getDevice()->getDeviceName(), [null, 'unknown'], true)
         ) {
             $keys = [
-                (string) $newResult->getBrowser()->getName(),
+                $newResult->getBrowser()->getName(),
                 $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
                 (string) $newResult->getEngine()->getName(),
                 $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
                 (string) $newResult->getOs()->getName(),
                 $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
-                (string) $newResult->getDevice()->getDeviceName(),
+                $newResult->getDevice()->getDeviceName(),
                 (string) $newResult->getDevice()->getMarketingName(),
                 (string) $newResult->getDevice()->getManufacturer()->getName(),
             ];
@@ -302,7 +307,7 @@ final class RewriteTestsCommand extends Command
             new Display(null, new \UaDisplaySize\Unknown(), null)
         );
 
-        if (in_array($device->getDeviceName(), [null, 'unknown'])) {
+        if (in_array($device->getDeviceName(), [null, 'unknown'], true)) {
             $consoleLogger->debug('        cloned device resetted - unknown device name');
 
             $device   = clone $defaultDevice;
@@ -322,7 +327,7 @@ final class RewriteTestsCommand extends Command
 
         if (!$replaced
             && $device->getType()->isMobile()
-            && !in_array(mb_strtolower($device->getDeviceName()), ['general apple device'])
+            && !in_array(mb_strtolower($device->getDeviceName()), ['general apple device'], true)
             && false !== mb_stripos($device->getDeviceName(), 'general')
         ) {
             $consoleLogger->debug('        cloned device resetted - checking with regexes');
@@ -334,13 +339,13 @@ final class RewriteTestsCommand extends Command
                 [$device] = $regexFactory->getDevice($consoleLogger);
                 $replaced = false;
 
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'])) {
+                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'], true)) {
                     $device   = clone $defaultDevice;
                     $replaced = true;
                 }
 
                 if (!$replaced
-                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'])
+                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'], true)
                     && false !== mb_stripos($device->getDeviceName(), 'general')
                 ) {
                     $device = clone $defaultDevice;

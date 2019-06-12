@@ -60,6 +60,9 @@ final class RegexFactory extends Helper
      *
      * @param string $useragent
      *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \BrowscapHelper\Factory\Regex\NoMatchException
+     *
      * @return void
      */
     public function detect($useragent): void
@@ -72,9 +75,8 @@ final class RegexFactory extends Helper
         foreach ($regexLoader->getRegexes() as $regex) {
             $matches = [];
 
-            if (preg_match($regex, $useragent, $matches)) {
-                $this->match = $matches;
-
+            if ((bool) preg_match($regex, $useragent, $matches)) {
+                $this->match        = $matches;
                 $this->runDetection = true;
 
                 return;
@@ -88,6 +90,16 @@ final class RegexFactory extends Helper
 
     /**
      * @param \Psr\Log\LoggerInterface $logger
+     *
+     * @throws \BrowscapHelper\Factory\Regex\GeneralDeviceException
+     * @throws \BrowscapHelper\Factory\Regex\GeneralTabletException
+     * @throws \BrowscapHelper\Factory\Regex\GeneralPhilipsTvException
+     * @throws \BrowscapHelper\Factory\Regex\GeneralTvException
+     * @throws \BrowscapHelper\Factory\Regex\GeneralPhoneException
+     * @throws \BrowscapHelper\Factory\Regex\GeneralBlackberryException
+     * @throws \BrowscapHelper\Factory\Regex\NoMatchException
+     * @throws \BrowserDetector\Loader\NotFoundException
+     * @throws \InvalidArgumentException
      *
      * @return array
      */
@@ -144,23 +156,19 @@ final class RegexFactory extends Helper
         $fileParser    = new Parser\Helper\RulefileParser($jsonParser, $logger);
 
         if ('cfnetwork' === $deviceCode) {
-            try {
-                $darwinParser = new Parser\Device\DarwinParser($fileParser, $loaderFactory);
+            $darwinParser = new Parser\Device\DarwinParser($fileParser, $loaderFactory);
 
-                return $darwinParser->parse($this->useragent);
-            } catch (\Throwable $e) {
-                throw new NotFoundException('not found', 0, $e);
-            }
+            return $darwinParser->parse($this->useragent);
         }
 
-        if (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'])
+        if (in_array($deviceCode, ['dalvik', 'android', 'opera/9.80', 'opera/9.50', 'generic'], true)
             && array_key_exists('osname', $this->match)
             && 'blackberry' === mb_strtolower($this->match['osname'])
         ) {
             throw new GeneralBlackberryException('use general mobile device');
         }
 
-        if (in_array($deviceCode, ['dalvik', 'android'])) {
+        if (in_array($deviceCode, ['dalvik', 'android'], true)) {
             if (array_key_exists('devicetype', $this->match)) {
                 $deviceType = mb_strtolower($this->match['devicetype']);
 
@@ -180,11 +188,11 @@ final class RegexFactory extends Helper
             throw new GeneralDeviceException('use general mobile device');
         }
 
-        if (in_array($deviceCode, ['opera/9.80', 'opera/9.50', 'series 60', 'generic', ''])) {
+        if (in_array($deviceCode, ['opera/9.80', 'opera/9.50', 'series 60', 'generic', ''], true)) {
             throw new GeneralDeviceException('use general mobile device');
         }
 
-        if (in_array($deviceCode, ['at', 'ap', 'ip', 'it']) && 'linux' === $platformCode) {
+        if (in_array($deviceCode, ['at', 'ap', 'ip', 'it'], true) && 'linux' === $platformCode) {
             throw new GeneralDeviceException('use general mobile device');
         }
 
@@ -192,7 +200,7 @@ final class RegexFactory extends Helper
             throw new GeneralPhilipsTvException('use general philips tv device');
         }
 
-        if (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'])) {
+        if (in_array($deviceCode, ['4g lte', '3g', '709v82_jbla118', 'linux arm'], true)) {
             throw new GeneralDeviceException('use general mobile device');
         }
 
@@ -219,39 +227,23 @@ final class RegexFactory extends Helper
                 $manufacturercode = 'sony';
             }
 
-            if ($manufacturercode) {
+            if ((bool) $manufacturercode) {
+                $deviceLoader = $deviceLoaderFactory($manufacturercode);
+
                 try {
-                    $deviceLoader = $deviceLoaderFactory($manufacturercode);
-                } catch (\Throwable $e) {
-                    $logger->info(
-                        new \Exception(
-                            sprintf(
-                                'an error occured while initializing the device loader for manufacturer "%s"',
-                                $manufacturercode
-                            ),
-                            0,
-                            $e
-                        )
+                    /** @var \UaResult\Device\DeviceInterface $device */
+                    [$device, $platform] = $deviceLoader->load(
+                        $manufacturercode . ' ' . $deviceCode,
+                        $this->useragent
                     );
-                    $deviceLoader = null;
-                }
 
-                if (null !== $deviceLoader) {
-                    try {
-                        /** @var \UaResult\Device\DeviceInterface $device */
-                        [$device, $platform] = $deviceLoader->load(
-                            $manufacturercode . ' ' . $deviceCode,
-                            $this->useragent
-                        );
+                    if (!in_array($device->getDeviceName(), ['unknown', null], true)) {
+                        $logger->debug('device detected via manufacturercode and devicecode');
 
-                        if (!in_array($device->getDeviceName(), ['unknown', null])) {
-                            $logger->debug('device detected via manufacturercode and devicecode');
-
-                            return [$device, $platform];
-                        }
-                    } catch (\Throwable $e) {
-                        $logger->info(new \Exception(sprintf('an error occured while'), 0, $e));
+                        return [$device, $platform];
                     }
+                } catch (\Throwable $e) {
+                    $logger->info(new \Exception(sprintf('an error occured while'), 0, $e));
                 }
             }
         }
@@ -267,37 +259,28 @@ final class RegexFactory extends Helper
                 }
             }
 
-            if (!empty($this->match['devicetype'])) {
-                $deviceType = mb_strtolower($this->match['devicetype']);
+            $deviceType = mb_strtolower($this->match['devicetype']);
 
-                if (in_array($deviceType, ['mobile', 'tablet']) && isset($this->match['browsername']) && 'firefox' === mb_strtolower($this->match['browsername'])) {
-                    if ('tablet' === $deviceType) {
-                        throw new GeneralTabletException('use general tablet');
-                    }
-
-                    throw new GeneralDeviceException('use general mobile device');
+            if (in_array($deviceType, ['mobile', 'tablet'], true) && isset($this->match['browsername']) && 'firefox' === mb_strtolower($this->match['browsername'])) {
+                if ('tablet' === $deviceType) {
+                    throw new GeneralTabletException('use general tablet');
                 }
 
-                $className = '\\BrowserDetector\\Parser\\Device\\' . ucfirst($deviceType) . 'Parser';
-
-                if (class_exists($className)) {
-                    $logger->debug('device detected via device type (mobile or tv)');
-                    /** @var \BrowserDetector\Parser\DeviceParserInterface $parser */
-                    $parser = new $className($fileParser, $loaderFactory);
-
-                    try {
-                        return $parser->parse($this->useragent);
-                    } catch (NotFoundException $e) {
-                        $logger->warning($e);
-
-                        throw $e;
-                    }
-                } else {
-                    $logger->error('parser "' . $className . '" not found');
-                }
-
-                $logger->info('device type class was not found');
+                throw new GeneralDeviceException('use general mobile device');
             }
+
+            $className = '\\BrowserDetector\\Parser\\Device\\' . ucfirst($deviceType) . 'Parser';
+
+            if (class_exists($className)) {
+                $logger->debug('device detected via device type (mobile or tv)');
+                /** @var \BrowserDetector\Parser\DeviceParserInterface $parser */
+                $parser = new $className($fileParser, $loaderFactory);
+
+                return $parser->parse($this->useragent);
+            }
+
+            $logger->error('parser "' . $className . '" not found');
+            $logger->info('device type class was not found');
         }
 
         throw new NotFoundException('device not found via regexes');
