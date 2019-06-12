@@ -21,6 +21,9 @@ final class RegexLoader extends Helper
      */
     private $regexes;
 
+    /**
+     * @throws \Symfony\Component\Yaml\Exception\ParseException
+     */
     public function __construct()
     {
         $this->regexes = Yaml::parseFile(

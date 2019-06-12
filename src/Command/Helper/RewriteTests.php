@@ -27,6 +27,12 @@ final class RewriteTests extends Helper
      * @param array                    $txtChecks
      * @param string                   $testSource
      *
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidNewLineStringException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentStyleException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentSizeException
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
      * @return void
      */
     public function rewrite(LoggerInterface $logger, array $txtChecks, string $testSource): void

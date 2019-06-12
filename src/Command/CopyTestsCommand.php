@@ -28,7 +28,8 @@ use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Source\ZsxsoftSource;
 use JsonClass\Json;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -50,6 +51,8 @@ final class CopyTestsCommand extends Command
     /**
      * @param string $sourcesDirectory
      * @param string $targetDirectory
+     *
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
     public function __construct(string $sourcesDirectory, string $targetDirectory)
     {
@@ -61,6 +64,8 @@ final class CopyTestsCommand extends Command
 
     /**
      * Configures the current command.
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function configure(): void
     {
@@ -87,7 +92,8 @@ final class CopyTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -120,7 +126,7 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...');
 
-        $cache   = new FilesystemCache('', 0, 'cache');
+        $cache   = new Psr16Cache(new NullAdapter());
         $sources = [
             new BrowscapSource($consoleLogger),
             new PiwikSource($consoleLogger),

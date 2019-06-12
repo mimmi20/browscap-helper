@@ -30,6 +30,11 @@ final class DetectorTestWriter extends Helper
      * @param int                      $folderId
      * @param int                      $fileId
      *
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidNewLineStringException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentStyleException
+     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentSizeException
+     *
      * @return void
      */
     public function write(LoggerInterface $logger, array $tests, string $dir, int $folderId, int $fileId): void
@@ -53,10 +58,6 @@ final class DetectorTestWriter extends Helper
             );
         } catch (\ExceptionalJSON\EncodeErrorException $e) {
             $logger->critical(sprintf('could not encode content for file %s', $fileName));
-
-            return;
-        } catch (\Throwable $e) {
-            $logger->critical(new \Exception(sprintf('an error occured while encoding content for file %s', $fileName), 0, $e));
 
             return;
         }

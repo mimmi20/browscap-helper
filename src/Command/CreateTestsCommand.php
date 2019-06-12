@@ -47,6 +47,8 @@ final class CreateTestsCommand extends Command
     /**
      * @param string $sourcesDirectory
      * @param string $targetDirectory
+     *
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
     public function __construct(string $sourcesDirectory, string $targetDirectory)
     {
@@ -58,6 +60,8 @@ final class CreateTestsCommand extends Command
 
     /**
      * Configures the current command.
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function configure(): void
     {
@@ -84,7 +88,8 @@ final class CreateTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -163,7 +168,7 @@ final class CreateTestsCommand extends Command
 //                continue;
 //            }
 
-            if (!preg_match('/ NT-/', $seachHeader)) {
+            if (!(bool) preg_match('/ NT-/', $seachHeader)) {
                 $consoleLogger->info('    Header "' . $seachHeader . '" does not match search --> skipped');
 
                 continue;

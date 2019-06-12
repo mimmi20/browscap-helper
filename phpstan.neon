@@ -10,17 +10,19 @@ parameters:
     reportUnusedCatchesOfUncheckedExceptions: true
     uncheckedExceptions: []
   classesAllowedToBeExtended:
-    - UnexpectedValueException
-    - OutOfRangeException
-    - Symfony\Component\Console\Helper\Helper
+    - Symfony\Component\Console\Application
     - Symfony\Component\Console\Command\Command
+    - Symfony\Component\Console\Helper\Helper
+    - OutOfRangeException
   excludes_analyse:
     - */tests/*/data/*
   ignoreErrors:
     - '~expects string,~'
-    - '~is not subtype of Throwable~'    
-#    - '~of function array_multisort is passed by reference, so it expects variables only~'
+#    - '~is not subtype of Throwable~'
     - '~Useless \@throws~'
+    - '~is not compatible with parent~'
+    - '~Language construct isset\(\) should not be used~'
+    - '~has a nullable return type declaration~'
 
 includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon
