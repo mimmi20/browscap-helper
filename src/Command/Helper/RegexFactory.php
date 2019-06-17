@@ -227,6 +227,18 @@ final class RegexFactory extends Helper
                 $manufacturercode = 'sony';
             }
 
+            if ('blackberry' === $manufacturercode) {
+                $manufacturercode = 'rim';
+            }
+
+            if ('imobile' === $manufacturercode) {
+                $manufacturercode = 'i-mobile';
+            }
+
+            if ('ktouch' === $manufacturercode) {
+                $manufacturercode = 'k-touch';
+            }
+
             if ((bool) $manufacturercode) {
                 $deviceLoader = $deviceLoaderFactory($manufacturercode);
 
@@ -279,7 +291,6 @@ final class RegexFactory extends Helper
                 return $parser->parse($this->useragent);
             }
 
-            $logger->error('parser "' . $className . '" not found');
             $logger->info('device type class was not found');
         }
 
