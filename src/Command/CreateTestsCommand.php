@@ -90,6 +90,7 @@ final class CreateTestsCommand extends Command
      *
      * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \BrowserDetector\Version\NotNumericException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *

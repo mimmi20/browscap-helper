@@ -100,6 +100,7 @@ final class RegexFactory extends Helper
      * @throws \BrowscapHelper\Factory\Regex\NoMatchException
      * @throws \BrowserDetector\Loader\NotFoundException
      * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      *
      * @return array
      */

@@ -199,7 +199,7 @@ final class RewriteTestsCommand extends Command
             $circleciContent .= PHP_EOL;
             $circleciContent .= '    #' . $tests;
             $circleciContent .= PHP_EOL;
-            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php -- ' . $tests;
+            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php';
             $circleciContent .= PHP_EOL;
         }
 
