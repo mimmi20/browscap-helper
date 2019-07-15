@@ -81,7 +81,7 @@ workflows:
       - php-cs-fixer
       - phpstan
       - phpunit:
-        requires:
-          - phpcs
-          - php-cs-fixer
-          - phpstan
+          requires:
+            - phpcs
+            - php-cs-fixer
+            - phpstan
