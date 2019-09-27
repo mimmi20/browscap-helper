@@ -20,11 +20,8 @@ use BrowscapPHP\Browscap;
 use BrowscapPHP\BrowscapUpdater;
 use BrowscapPHP\Exception;
 use BrowscapPHP\Helper\IniLoaderInterface;
-use BrowserDetector\Version\Version;
 use BrowserDetector\Version\VersionFactory;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\NullAdapter;
-use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,7 +29,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaBrowserType\TypeLoader;
-use UaDeviceType\Unknown;
 use UaRequest\GenericRequestFactory;
 use UaResult\Browser\Browser;
 use UaResult\Company\Company;
@@ -101,6 +97,9 @@ final class CreateTestsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \BrowserDetector\Version\NotNumericException
+     * @throws \BrowserDetector\Loader\NotFoundException
+     * @throws \BrowscapPHP\Exception\FetcherException
+     * @throws \BrowscapPHP\Exception\ErrorCachedVersionException
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
@@ -116,7 +115,7 @@ final class CreateTestsCommand extends Command
 
         $browscapChecks = [];
 
-        $cache    = new Psr16Cache(new ArrayAdapter());
+        $cache           = new Psr16Cache(new ArrayAdapter());
         $browscapUpdater = new BrowscapUpdater($cache, $consoleLogger);
         try {
             $browscapUpdater->update(IniLoaderInterface::PHP_INI_FULL);
@@ -142,7 +141,7 @@ final class CreateTestsCommand extends Command
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
 
-            if (count($headers) > 1) {
+            if (1 < count($headers)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" has more than one Header --> skipped');
 
                 continue;
@@ -182,7 +181,7 @@ final class CreateTestsCommand extends Command
 
         $sourcesDirectory      = $input->getOption('resources');
         $genericRequestFactory = new GenericRequestFactory();
-        $sources = [
+        $sources               = [
             //new JsonFileSource($consoleLogger, $testSource),
             new TxtFileSource($consoleLogger, $sourcesDirectory),
             //new TxtCounterFileSource($consoleLogger, $sourcesDirectory),
@@ -215,7 +214,7 @@ final class CreateTestsCommand extends Command
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
 
-            if (count($headers) > 1) {
+            if (1 < count($headers)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" has more than one Header --> skipped');
 
                 continue;
@@ -228,13 +227,13 @@ final class CreateTestsCommand extends Command
                 continue;
             }
 
-            if (in_array($result->device_name, ['general Mobile Phone', 'general Tablet', 'general Mobile Device'])) {
+            if (in_array($result->device_name, ['general Mobile Phone', 'general Tablet', 'general Mobile Device'], true)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" has unknown device --> skipped');
 
                 continue;
             }
 
-            if (in_array($result->browser, ['Default Browser'])) {
+            if (in_array($result->browser, ['Default Browser'], true)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" has unknown browser --> skipped');
 
                 continue;
@@ -260,7 +259,6 @@ final class CreateTestsCommand extends Command
             }
 
             $tests[$key] = 1;
-
 
             $browser = new Browser(
                 $result->browser,
