@@ -88,6 +88,7 @@ return PhpCsFixer\Config::create()
                 'identical' => true,
                 'less_and_greater' => true,
             ],
+            'single_line_throw' => false,
 
             // @Symfony:risky rules configured different from default
             'non_printable_character' => ['use_escape_sequences_in_strings' => true],
