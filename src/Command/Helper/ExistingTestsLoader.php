@@ -19,7 +19,7 @@ final class ExistingTestsLoader extends Helper
 {
     public function getName()
     {
-        return 'existing-tests-reader';
+        return 'existing-tests-loader';
     }
 
     /**

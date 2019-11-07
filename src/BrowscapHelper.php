@@ -12,15 +12,10 @@ declare(strict_types = 1);
 namespace BrowscapHelper;
 
 use BrowscapHelper\Command\Helper\BrowscapTestWriter;
-use BrowscapHelper\Command\Helper\DetectorTestWriter;
 use BrowscapHelper\Command\Helper\ExistingTestsLoader;
 use BrowscapHelper\Command\Helper\ExistingTestsRemover;
 use BrowscapHelper\Command\Helper\JsonTestWriter;
-use BrowscapHelper\Command\Helper\RegexFactory;
-use BrowscapHelper\Command\Helper\RegexLoader;
 use BrowscapHelper\Command\Helper\RewriteTests;
-use BrowscapHelper\Command\Helper\TxtTestWriter;
-use BrowscapHelper\Command\Helper\YamlTestWriter;
 use Symfony\Component\Console\Application;
 
 final class BrowscapHelper extends Application
@@ -42,40 +37,16 @@ final class BrowscapHelper extends Application
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
         $targetDirectory  = (string) realpath(__DIR__ . '/../results/');
 
-        $commands = [
-            new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory),
-            new Command\CopyTestsCommand($sourcesDirectory, $targetDirectory),
-            new Command\CreateTestsCommand($sourcesDirectory, $targetDirectory),
-            new Command\RewriteTestsCommand(),
-        ];
-
-        foreach ($commands as $command) {
-            $this->add($command);
-        }
-
-        $targetDirectoryHelper = new Command\Helper\TargetDirectory();
-        $this->getHelperSet()->set($targetDirectoryHelper);
+        $this->add(new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory));
+        $this->add(new Command\CopyTestsCommand($sourcesDirectory, $targetDirectory));
+        $this->add(new Command\CreateTestsCommand($sourcesDirectory, $targetDirectory));
+        $this->add(new Command\RewriteTestsCommand());
 
         $browscapTestWriter = new BrowscapTestWriter($targetDirectory);
         $this->getHelperSet()->set($browscapTestWriter);
 
-        $txtTestWriter = new TxtTestWriter();
-        $this->getHelperSet()->set($txtTestWriter);
-
-        $detectorTestWriter = new DetectorTestWriter();
-        $this->getHelperSet()->set($detectorTestWriter);
-
-        $yamlTestWriter = new YamlTestWriter();
-        $this->getHelperSet()->set($yamlTestWriter);
-
         $jsonTestWriter = new JsonTestWriter();
         $this->getHelperSet()->set($jsonTestWriter);
-
-        $regexFactory = new RegexFactory();
-        $this->getHelperSet()->set($regexFactory);
-
-        $regexLoader = new RegexLoader();
-        $this->getHelperSet()->set($regexLoader);
 
         $existingTestsLoader = new ExistingTestsLoader();
         $this->getHelperSet()->set($existingTestsLoader);
