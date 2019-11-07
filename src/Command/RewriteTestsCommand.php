@@ -164,7 +164,6 @@ final class RewriteTestsCommand extends Command
             }
 
             ++$testCount;
-            //break;
         }
 
         $output->writeln('');
@@ -182,6 +181,8 @@ final class RewriteTestsCommand extends Command
         $output->writeln('rewrite tests ...');
         $messageLength = 0;
 
+        ksort($testResults, SORT_STRING | SORT_ASC);
+
         foreach ($testResults as $c => $x) {
             $message = sprintf('re-write test files in directory tests/data/%s/', $c);
 
@@ -194,6 +195,8 @@ final class RewriteTestsCommand extends Command
             if (!file_exists(sprintf($basePath . 'tests/data/%s', $c))) {
                 mkdir(sprintf($basePath . 'tests/data/%s', $c));
             }
+
+            ksort($x, SORT_STRING | SORT_ASC);
 
             foreach ($x as $t => $data) {
                 if (!file_exists(sprintf($basePath . 'tests/data/%s/%s', $c, $t))) {
