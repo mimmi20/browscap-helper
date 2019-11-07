@@ -21,8 +21,9 @@ parameters:
 #    - '~is not subtype of Throwable~'
     - '~Useless \@throws~'
     - '~is not compatible with parent~'
-    - '~Language construct isset\(\) should not be used~'
+#    - '~Language construct isset\(\) should not be used~'
     - '~has a nullable return type declaration~'
+    - '~PHPDoc tag @throws with type .* is not subtype of Throwable~'
 
 includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon
