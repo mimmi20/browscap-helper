@@ -29,6 +29,8 @@ use BrowserDetector\Loader\NotFoundException;
 use BrowserDetector\Parser\PlatformParserFactory;
 use BrowserDetector\Version\VersionInterface;
 use JsonClass\Json;
+use Localheinz\Json\Normalizer\FixedFormatNormalizer;
+use Localheinz\Json\Normalizer\SchemaNormalizer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -43,6 +45,7 @@ use UaResult\Device\Device;
 use UaResult\Device\Display;
 use UaResult\Result\Result;
 use UaResult\Result\ResultInterface;
+use Localheinz\Json\Normalizer;
 
 final class RewriteTestsCommand extends Command
 {
@@ -65,7 +68,6 @@ final class RewriteTestsCommand extends Command
 
     /**
      * Executes the current command.
-     *
      * This method is not abstract because you can use this class
      * as a concrete class. In this case, instead of defining the
      * execute() method, you set the code to execute by passing
@@ -74,10 +76,10 @@ final class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     *
      * @return int|null null or 0 if everything went fine, or an error code
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException*@throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @see    setCode()
      */
@@ -89,22 +91,35 @@ final class RewriteTestsCommand extends Command
         $factory  = new DetectorFactory($cache, $consoleLogger);
         $detector = $factory();
 
-        $basePath                = 'vendor/mimmi20/browser-detector-tests/';
-        $detectorTargetDirectory = $basePath . 'tests/issues/';
+        $basePath                = 'vendor/mimmi20/browser-detector/';
+        $detectorTargetDirectory = $basePath . 'tests/data/';
         $testSource              = 'tests';
 
         $output->writeln('remove old test files ...');
 
         $this->getHelper('existing-tests-remover')->remove($detectorTargetDirectory);
-        $this->getHelper('existing-tests-remover')->remove($basePath . 'tests/UserAgentsTest');
 
         $output->writeln('selecting tests ...');
         $testResults = [];
         $txtChecks   = [];
+        $testCount   = 0;
+        $duplicates  = 0;
+        $messageLength = 0;
+        $errors = 0;
+        $counter = 0;
 
         foreach ($this->getHelper('existing-tests-reader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
+            ++$counter;
+            $message     = sprintf('checking Header ... [%7d]', $counter);
+
+            if (strlen($message) > $messageLength) {
+                $messageLength = strlen($message);
+            }
+
+            $output->write("\r" . str_pad($message, $messageLength, ' '));
+
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                ++$duplicates;
 
                 continue;
             }
@@ -113,102 +128,97 @@ final class RewriteTestsCommand extends Command
 
             $headers = UserAgent::fromString($seachHeader)->getHeader();
 
-            $consoleLogger->debug('    Header "' . $seachHeader . '" checking ...');
-
             try {
                 $result = $this->handleTest($consoleLogger, $detector, $headers);
             } catch (\UnexpectedValueException $e) {
+                ++$errors;
+                $output->writeln('');
                 $consoleLogger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
 
                 continue;
             }
 
             if (null === $result) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" was skipped because a similar UA was already added');
+                ++$duplicates;
+                continue;
+            }
+
+            $c = strtolower(utf8_decode($result->getDevice()->getManufacturer()->getType()));
+
+            if (!$c) {
+                $c = 'unknown';
+            } else {
+                $c = str_replace(['.', ' '], ['', '-'], $c);
+            }
+
+            $t = strtolower($result->getDevice()->getType()->getType());
+
+            try {
+                $testResults[$c][$t][] = $result->toArray();
+            } catch (\UnexpectedValueException $e) {
+                ++$errors;
+                $output->writeln('');
+                $consoleLogger->error(new \Exception('An error occured while converting a result to an array', 0, $e));
 
                 continue;
             }
 
-            $consoleLogger->debug('    Header "' . $seachHeader . '" added to list');
-
-            try {
-                $testResults[] = $result->toArray();
-            } catch (\UnexpectedValueException $e) {
-                $consoleLogger->error(new \Exception('An error occured while converting a result to an array', 0, $e));
-            }
+            ++$testCount;
+            //break;
         }
 
-        $output->writeln(sprintf('%d tests selected', count($testResults)));
+        $output->writeln('');
 
-        $output->writeln('rewrite tests and circleci ...');
-        $folderChunks    = array_chunk($testResults, 1000);
-        $circleFile      = $basePath . '.circleci/config.yml';
-        $circleciContent = '';
-
-        $consoleLogger->info(sprintf('will generate %d directories for the tests', count($folderChunks)));
-
-        foreach ($folderChunks as $folderId => $folderChunk) {
-            $targetDirectory = $detectorTargetDirectory . sprintf('%1$07d', $folderId);
-
-            if (!file_exists($targetDirectory)) {
-                mkdir($targetDirectory, 0777, true);
-            }
-
-            $consoleLogger->info(sprintf('    now genearting files in directory "%s"', $targetDirectory));
-
-            $fileChunks = array_chunk($folderChunk, 100);
-            $consoleLogger->info(sprintf('    will generate %d test files in directory "%s"', count($fileChunks), $targetDirectory));
-
-            $issueCounter = 0;
-
-            foreach ($fileChunks as $fileId => $fileChunk) {
-                $tests = [];
-
-                foreach ($fileChunk as $resultArray) {
-                    $formatedIssue   = sprintf('%1$07d', $folderId);
-                    $formatedCounter = sprintf('%1$05d', $issueCounter);
-
-                    $tests['test-' . $formatedIssue . '-' . $formatedCounter] = $resultArray;
-                    ++$issueCounter;
-                }
-
-                $this->getHelper('detector-test-writer')->write($consoleLogger, $tests, $targetDirectory, $folderId, $fileId);
-            }
-
-            $count = count($folderChunk);
-            $group = sprintf('%1$07d', $folderId);
-
-            $tests = str_pad((string) $count, 4, ' ', STR_PAD_LEFT) . ' test' . (1 !== $count ? 's' : '');
-
-            $testContent = [
-                '        \'tests/issues/' . $group . '/\',',
-            ];
-
-            $testFile = $basePath . 'tests/UserAgentsTest/T' . $group . 'Test.php';
-            file_put_contents(
-                $testFile,
-                str_replace(
-                    ['//### tests ###', '### group ###', '### count ###'],
-                    [implode(PHP_EOL, $testContent), $group, $count],
-                    (string) file_get_contents('templates/test.php.txt')
-                )
-            );
-
-            $columns = 111 + 2 * mb_strlen((string) $count);
-
-            $circleciContent .= PHP_EOL;
-            $circleciContent .= '    #' . $tests;
-            $circleciContent .= PHP_EOL;
-            $circleciContent .= '      - run: php -n -d memory_limit=768M vendor/bin/phpunit --colors --no-coverage --columns ' . $columns . ' tests/UserAgentsTest/T' . $group . 'Test.php';
-            $circleciContent .= PHP_EOL;
-        }
-
-        $output->writeln('writing ' . $circleFile . ' ...');
-        file_put_contents(
-            $circleFile,
-            str_replace('### tests ###', $circleciContent, (string) file_get_contents('templates/config.yml.txt'))
+        $jsonParser = new Json();
+        $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
+        $format = new Normalizer\Format\Format(
+            Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+            Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
+            Normalizer\Format\NewLine::fromString("\n"),
+            true
         );
 
+        $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors));
+        $output->writeln('rewrite tests ...');
+        $messageLength = 0;
+
+        foreach ($testResults as $c => $x) {
+            $message = sprintf('re-write test files in directory tests/data/%s/', $c);
+
+            if (strlen($message) > $messageLength) {
+                $messageLength = strlen($message);
+            }
+
+            $output->write("\r" . str_pad($message, $messageLength, ' '));
+
+            if (!file_exists(sprintf($basePath . 'tests/data/%s', $c))) {
+                mkdir(sprintf($basePath . 'tests/data/%s', $c));
+            }
+
+            foreach ($x as $t => $data) {
+                if (!file_exists(sprintf($basePath . 'tests/data/%s/%s', $c, $t))) {
+                    mkdir(sprintf($basePath . 'tests/data/%s/%s', $c, $t));
+                }
+
+                foreach (array_chunk($data, 100) as $number => $parts) {
+                    $path = sprintf($basePath . 'tests/data/%s/%s/%07d.json', $c, $t, $number);
+
+                    try {
+                        $normalized = (new FixedFormatNormalizer(new SchemaNormalizer($testSchemaUri), $format))->normalize(Normalizer\Json::fromEncoded($jsonParser->encode($parts)));
+                    } catch (\Throwable $e) {
+                        $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path), 0, $e));
+                        return 1;
+                    }
+
+                    file_put_contents(
+                        $path,
+                        $normalized
+                    );
+                }
+            }
+        }
+
+        $output->writeln('');
         $output->writeln('done');
 
         return 0;
@@ -219,9 +229,9 @@ final class RewriteTestsCommand extends Command
      * @param Detector                 $detector
      * @param array                    $headers
      *
-     * @throws \UnexpectedValueException
-     *
      * @return \UaResult\Result\ResultInterface|null
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     private function handleTest(LoggerInterface $consoleLogger, Detector $detector, array $headers): ?ResultInterface
     {
@@ -231,9 +241,12 @@ final class RewriteTestsCommand extends Command
 
         $consoleLogger->debug('        analyze new result');
 
-        if (!$newResult->getDevice()->getType()->isMobile()
-            && !$newResult->getDevice()->getType()->isTablet()
-            && !$newResult->getDevice()->getType()->isTv()
+        if (in_array($newResult->getDevice()->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'], true)
+            || (
+                !$newResult->getDevice()->getType()->isMobile()
+                && !$newResult->getDevice()->getType()->isTablet()
+                && !$newResult->getDevice()->getType()->isTv()
+            )
         ) {
             $keys = [
                 (string) $newResult->getBrowser()->getName(),
@@ -254,7 +267,7 @@ final class RewriteTestsCommand extends Command
             }
 
             $this->tests[$key] = 1;
-        } elseif (($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet())
+        } elseif (($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet() || $newResult->getDevice()->getType()->isTv())
             && false === mb_strpos((string) $newResult->getBrowser()->getName(), 'general')
             && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'], true)
             && false === mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general')
@@ -281,161 +294,6 @@ final class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         }
 
-        $consoleLogger->debug('        clone browser');
-
-        /** @var \UaResult\Browser\BrowserInterface $browser */
-        $browser = clone $newResult->getBrowser();
-
-        $consoleLogger->debug('        clone platform');
-
-        /** @var \UaResult\Os\OsInterface $platform */
-        $platform = clone $newResult->getOs();
-        $request  = (new GenericRequestFactory())->createRequestFromArray($headers);
-
-        $consoleLogger->debug('        clone device');
-
-        /** @var \UaResult\Device\DeviceInterface $device */
-        $device   = clone $newResult->getDevice();
-        $replaced = false;
-
-        $defaultDevice = new Device(
-            null,
-            null,
-            new Company('Unknown', null, null),
-            new Company('Unknown', null, null),
-            new Unknown(),
-            new Display(null, new \UaDisplaySize\Unknown(), null)
-        );
-
-        if (in_array($device->getDeviceName(), [null, 'unknown'], true)) {
-            $consoleLogger->debug('        cloned device resetted - unknown device name');
-
-            $device   = clone $defaultDevice;
-            $replaced = true;
-        }
-
-        $jsonParser           = new Json();
-        $companyLoaderFactory = new CompanyLoaderFactory($jsonParser, new Filter());
-
-        /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
-        $companyLoader = $companyLoaderFactory();
-
-        $platformParserFactory = new PlatformParserFactory($consoleLogger, $jsonParser, $companyLoader);
-        $platformParser        = $platformParserFactory();
-
-        $deviceLoaderFactory = new DeviceLoaderFactory($consoleLogger, $jsonParser, $companyLoader, $platformParser, new Filter());
-
-        if (!$replaced
-            && $device->getType()->isMobile()
-            && !in_array(mb_strtolower($device->getDeviceName()), ['general apple device'], true)
-            && false !== mb_stripos($device->getDeviceName(), 'general')
-        ) {
-            $consoleLogger->debug('        cloned device resetted - checking with regexes');
-
-            try {
-                /** @var \BrowscapHelper\Command\Helper\RegexFactory $regexFactory */
-                $regexFactory = $this->getHelper('regex-factory');
-                $regexFactory->detect($request->getDeviceUserAgent());
-                [$device] = $regexFactory->getDevice($consoleLogger);
-                $replaced = false;
-
-                if (null === $device || in_array($device->getDeviceName(), [null, 'unknown'], true)) {
-                    $device   = clone $defaultDevice;
-                    $replaced = true;
-                }
-
-                if (!$replaced
-                    && !in_array($device->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'], true)
-                    && false !== mb_stripos($device->getDeviceName(), 'general')
-                ) {
-                    $device = clone $defaultDevice;
-                }
-            } catch (\InvalidArgumentException $e) {
-                $consoleLogger->error($e);
-
-                $device = clone $defaultDevice;
-            } catch (NotFoundException $e) {
-                $consoleLogger->info($e);
-
-                $device = clone $defaultDevice;
-            } catch (GeneralBlackberryException $e) {
-                $deviceLoader = $deviceLoaderFactory('rim');
-
-                try {
-                    [$device] = $deviceLoader->load('general blackberry device', $request->getDeviceUserAgent());
-                } catch (\Throwable $e) {
-                    $consoleLogger->critical($e);
-
-                    $device = clone $defaultDevice;
-                }
-            } catch (GeneralPhilipsTvException $e) {
-                $deviceLoader = $deviceLoaderFactory('philips');
-
-                try {
-                    [$device] = $deviceLoader->load('general philips tv', $request->getDeviceUserAgent());
-                } catch (\Throwable $e) {
-                    $consoleLogger->critical($e);
-
-                    $device = clone $defaultDevice;
-                }
-            } catch (GeneralTabletException $e) {
-                $deviceLoader = $deviceLoaderFactory('unknown');
-
-                try {
-                    [$device] = $deviceLoader->load('general tablet', $request->getDeviceUserAgent());
-                } catch (\Throwable $e) {
-                    $consoleLogger->critical($e);
-
-                    $device = clone $defaultDevice;
-                }
-            } catch (GeneralPhoneException $e) {
-                $deviceLoader = $deviceLoaderFactory('unknown');
-
-                try {
-                    [$device] = $deviceLoader->load('general mobile phone', $request->getDeviceUserAgent());
-                } catch (\Throwable $e) {
-                    $consoleLogger->critical($e);
-
-                    $device = clone $defaultDevice;
-                }
-            } catch (GeneralDeviceException $e) {
-                $deviceLoader = $deviceLoaderFactory('unknown');
-
-                try {
-                    [$device] = $deviceLoader->load('general mobile device', $request->getDeviceUserAgent());
-                } catch (\Throwable $e) {
-                    $consoleLogger->critical($e);
-
-                    $device = clone $defaultDevice;
-                }
-            } catch (GeneralTvException $e) {
-                $deviceLoader = $deviceLoaderFactory('unknown');
-
-                try {
-                    [$device] = $deviceLoader->load('general tv device', $request->getDeviceUserAgent());
-                } catch (\Throwable $e) {
-                    $consoleLogger->critical($e);
-
-                    $device = clone $defaultDevice;
-                }
-            } catch (NoMatchException $e) {
-                $consoleLogger->info($e);
-
-                $device = clone $defaultDevice;
-            } catch (\Throwable $e) {
-                $consoleLogger->error($e);
-
-                $device = clone $defaultDevice;
-            }
-        }
-
-        $consoleLogger->debug('        clone engine');
-
-        /** @var \UaResult\Engine\EngineInterface $engine */
-        $engine = clone $newResult->getEngine();
-
-        $consoleLogger->debug('        generating result');
-
-        return new Result($request->getHeaders(), $device, $platform, $browser, $engine);
+        return $newResult;
     }
 }
