@@ -66,11 +66,11 @@ final class RewriteTestsCommand extends Command
      * @throws \Localheinz\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *
-     * @return int|null null or 0 if everything went fine, or an error code
+     * @return int 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $consoleLogger = new ConsoleLogger($output);
 

@@ -78,11 +78,11 @@ final class ConvertLogsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
-     * @return int|null null or 0 if everything went fine, or an error code
+     * @return int 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $consoleLogger = new ConsoleLogger($output);
 
