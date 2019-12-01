@@ -101,11 +101,11 @@ final class CreateTestsCommand extends Command
      * @throws \BrowscapPHP\Exception\FetcherException
      * @throws \BrowscapPHP\Exception\ErrorCachedVersionException
      *
-     * @return int|null null or 0 if everything went fine, or an error code
+     * @return int 0 if everything went fine, or an error code
      *
      * @see    setCode()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $consoleLogger = new ConsoleLogger($output);
 
