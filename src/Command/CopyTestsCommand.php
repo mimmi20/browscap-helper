@@ -14,13 +14,13 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
 use BrowscapHelper\Source\DonatjSource;
-use BrowscapHelper\Source\EndorphinSource;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
+use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\UaParserJsSource;
 use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
@@ -110,7 +110,9 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $consoleLogger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -137,7 +139,6 @@ final class CopyTestsCommand extends Command
             new YzalisSource($consoleLogger),
             new CrawlerDetectSource($consoleLogger),
             new DonatjSource($consoleLogger),
-            new EndorphinSource($consoleLogger),
             new SinergiSource($consoleLogger),
             new UaParserJsSource($consoleLogger),
             new ZsxsoftSource($consoleLogger),
@@ -148,7 +149,9 @@ final class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...');
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, $sources) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, $sources) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 

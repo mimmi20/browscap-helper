@@ -45,7 +45,7 @@ final class RewriteTests extends Helper
             $headers = [];
 
             foreach ($folderChunk as $headerString) {
-                $headers[] = UserAgent::fromString($headerString)->getHeader();
+                $headers[] = UserAgent::fromString($headerString)->getHeaders();
             }
 
             $jsonTestWriter->write($logger, $headers, $testSource, $folderId);
