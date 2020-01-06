@@ -29,7 +29,7 @@ final class ExistingTestsLoader extends Helper
      * @throws \LogicException
      * @throws \RuntimeException
      *
-     * @return iterable|string[]
+     * @return array[]|iterable
      */
     public function getHeaders(LoggerInterface $logger, array $sources): iterable
     {
