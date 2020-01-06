@@ -40,6 +40,8 @@ final class BrowscapTestWriter extends Helper
      * @param int   $folderId
      * @param int   $totalCounter
      *
+     * @throws \UnexpectedValueException
+     *
      * @return void
      */
     public function write(array $tests, int $folderId, int &$totalCounter): void

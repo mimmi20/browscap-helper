@@ -139,7 +139,7 @@ final class CreateTestsCommand extends Command
 
             $browscapChecks[$seachHeader] = 1;
 
-            $headers = UserAgent::fromString($seachHeader)->getHeader();
+            $headers = UserAgent::fromString($seachHeader)->getHeaders();
 
             if (1 < count($headers)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" has more than one Header --> skipped');
@@ -212,7 +212,7 @@ final class CreateTestsCommand extends Command
 //                continue;
 //            }
 
-            $headers = UserAgent::fromString($seachHeader)->getHeader();
+            $headers = UserAgent::fromString($seachHeader)->getHeaders();
 
             if (1 < count($headers)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" has more than one Header --> skipped');

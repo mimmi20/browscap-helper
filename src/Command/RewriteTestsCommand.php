@@ -113,7 +113,7 @@ final class RewriteTestsCommand extends Command
 
             $txtChecks[$seachHeader] = 1;
 
-            $headers = UserAgent::fromString($seachHeader)->getHeader();
+            $headers = UserAgent::fromString($seachHeader)->getHeaders();
 
             try {
                 $result = $this->handleTest($consoleLogger, $detector, $headers);
