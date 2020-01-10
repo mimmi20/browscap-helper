@@ -11,15 +11,12 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Command\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\VersionInterface;
-use JsonClass\Json;
-use Localheinz\Json\Normalizer;
-use Localheinz\Json\Normalizer\FixedFormatNormalizer;
-use Localheinz\Json\Normalizer\SchemaNormalizer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -59,11 +56,11 @@ final class RewriteTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Console\Exception\LogicException                     When this abstract method is not implemented
-     * @throws \Localheinz\Json\Normalizer\Exception\InvalidNewLineStringException
-     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentStyleException
-     * @throws \Localheinz\Json\Normalizer\Exception\InvalidIndentSizeException
-     * @throws \Localheinz\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Symfony\Component\Console\Exception\LogicException                   When this abstract method is not implemented
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *
      * @return int 0 if everything went fine, or an error code
@@ -82,11 +79,8 @@ final class RewriteTestsCommand extends Command
         $detectorTargetDirectory = $basePath . 'tests/data/';
         $testSource              = 'tests';
 
-        $output->writeln('remove old test files ...');
+        $this->getHelper('existing-tests-remover')->remove($output, $detectorTargetDirectory);
 
-        $this->getHelper('existing-tests-remover')->remove($detectorTargetDirectory);
-
-        $output->writeln('selecting tests ...');
         $testResults   = [];
         $txtChecks     = [];
         $testCount     = 0;
@@ -95,9 +89,11 @@ final class RewriteTestsCommand extends Command
         $errors        = 0;
         $counter       = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             ++$counter;
-            $message = sprintf('checking Header ... [%7d]', $counter);
+            $message = sprintf('selecting tests, checking Header ... [%7d]', $counter);
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -155,14 +151,10 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln('');
 
-        $jsonParser    = new Json();
         $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
-        $format        = new Normalizer\Format\Format(
-            Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
-            Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
-            Normalizer\Format\NewLine::fromString("\n"),
-            true
-        );
+
+        /** @var JsonNormalizer $jsonNormalizer */
+        $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors));
         $output->writeln('rewrite tests ...');
@@ -191,12 +183,11 @@ final class RewriteTestsCommand extends Command
                 }
 
                 foreach (array_chunk($data, 100) as $number => $parts) {
-                    $path = sprintf($basePath . 'tests/data/%s/%s/%07d.json', $c, $t, $number);
+                    $path       = sprintf($basePath . 'tests/data/%s/%s/%07d.json', $c, $t, $number);
+                    $normalized = $jsonNormalizer->normalize($consoleLogger, $parts, $testSchemaUri);
 
-                    try {
-                        $normalized = (new FixedFormatNormalizer(new SchemaNormalizer($testSchemaUri), $format))->normalize(Normalizer\Json::fromEncoded($jsonParser->encode($parts)));
-                    } catch (\Throwable $e) {
-                        $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path), 0, $e));
+                    if (null === $normalized) {
+                        $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path)));
 
                         return 1;
                     }

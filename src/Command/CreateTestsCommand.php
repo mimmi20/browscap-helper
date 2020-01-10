@@ -130,7 +130,9 @@ final class CreateTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new BrowscapSource($consoleLogger)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new BrowscapSource($consoleLogger)]) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 
@@ -193,7 +195,9 @@ final class CreateTestsCommand extends Command
         $browserLoader = new TypeLoader();
         $deviceLoader  = new \UaDeviceType\TypeLoader();
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, $sources) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, $sources) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             if (array_key_exists($seachHeader, $browscapChecks)) {
                 $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
 

@@ -122,9 +122,7 @@ final class CopyTestsCommand extends Command
             $txtChecks[$seachHeader] = 1;
         }
 
-        $output->writeln('remove existing tests ...');
-
-        $this->getHelper('existing-tests-remover')->remove($testSource);
+        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
         $output->writeln('init sources ...');
 
