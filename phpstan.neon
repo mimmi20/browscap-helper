@@ -26,6 +26,7 @@ parameters:
 #    - '~Language construct isset\(\) should not be used~'
     - '~has a nullable return type declaration~'
     - '~PHPDoc tag @throws with type .* is not subtype of Throwable~'
+    - '~Cannot call method get\(\) on Symfony\\Component\\Console\\Helper\\HelperSet\|null~'
 
 includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon

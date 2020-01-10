@@ -14,6 +14,7 @@ namespace BrowscapHelper;
 use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\ExistingTestsLoader;
 use BrowscapHelper\Command\Helper\ExistingTestsRemover;
+use BrowscapHelper\Command\Helper\JsonNormalizer;
 use BrowscapHelper\Command\Helper\JsonTestWriter;
 use BrowscapHelper\Command\Helper\RewriteTests;
 use Symfony\Component\Console\Application;
@@ -56,5 +57,8 @@ final class BrowscapHelper extends Application
 
         $rewriteTestsHelper = new RewriteTests();
         $this->getHelperSet()->set($rewriteTestsHelper);
+
+        $jsonNormalizer = new JsonNormalizer();
+        $this->getHelperSet()->set($jsonNormalizer);
     }
 }
