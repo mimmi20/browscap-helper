@@ -12,8 +12,8 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class RewriteTests extends Helper
 {
@@ -23,7 +23,7 @@ final class RewriteTests extends Helper
     }
 
     /**
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param OutputInterface $output
      * @param array                    $txtChecks
      * @param string                   $testSource
      *
@@ -35,20 +35,71 @@ final class RewriteTests extends Helper
      *
      * @return void
      */
-    public function rewrite(LoggerInterface $logger, array $txtChecks, string $testSource): void
+    public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
     {
-        /** @var JsonTestWriter $jsonTestWriter */
-        $jsonTestWriter = $this->getHelperSet()->get('json-test-writer');
-        $folderChunks   = array_chunk(array_unique(array_keys($txtChecks)), 1000);
+        /** @var JsonNormalizer $jsonNormalizer */
+        $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
+        $schema         = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
+
+        $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
+        $jsonNormalizer->init($schema);
+
+        $messageLength = 0;
+
+        $message = 'rewriting files';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->writeln("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $headers = [];
+
+            $fileName = $testSource . '/' . sprintf('%1$07d', $folderId) . '.json';
+
+            $baseMessage = sprintf('rewriting file %s', $fileName);
+            $message     = $baseMessage . ' - pre-check';
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             foreach ($folderChunk as $headerString) {
                 $headers[] = UserAgent::fromString($headerString)->getHeaders();
             }
 
-            $jsonTestWriter->write($logger, $headers, $testSource, $folderId);
+            $message     = $baseMessage . ' - normalizing';
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            $normalized = $jsonNormalizer->normalize($output, $headers);
+
+            if (null === $normalized) {
+                $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $output->writeln('<error>' . sprintf('normalisation failed for file %s', $fileName) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                continue;
+            }
+
+            $message     = $baseMessage . ' - writing';
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            file_put_contents($fileName, $normalized);
         }
+
+        $output->writeln("\r" . '<info>' . str_pad('done', $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
     }
 }

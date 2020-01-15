@@ -81,6 +81,8 @@ final class RewriteTestsCommand extends Command
 
         $this->getHelper('existing-tests-remover')->remove($output, $detectorTargetDirectory);
 
+        $output->writeln('reading already existing tests ...');
+
         $testResults   = [];
         $txtChecks     = [];
         $testCount     = 0;
@@ -88,12 +90,21 @@ final class RewriteTestsCommand extends Command
         $messageLength = 0;
         $errors        = 0;
         $counter       = 0;
+        $baseMessage   = 'selecting tests, checking Header ... ';
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new JsonFileSource($consoleLogger, $testSource)]) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
-
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($output, $testSource)]) as $headers) {
             ++$counter;
-            $message = sprintf('selecting tests, checking Header ... [%7d]', $counter);
+            $message = $baseMessage . sprintf('[%7d]', $counter) . ' - get headers';
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write("\r" . str_pad($message, $messageLength, ' '));
+
+            $seachHeader = (string) UserAgent::fromHeaderArray($headers);
+
+            $message = $baseMessage . sprintf('[%7d]', $counter) . ' - check duplicates';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -109,7 +120,13 @@ final class RewriteTestsCommand extends Command
 
             $txtChecks[$seachHeader] = 1;
 
-            $headers = UserAgent::fromString($seachHeader)->getHeaders();
+            $message = $baseMessage . sprintf('[%7d]', $counter) . ' - redetect';
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write("\r" . str_pad($message, $messageLength, ' '));
 
             try {
                 $result = $this->handleTest($consoleLogger, $detector, $headers);
@@ -155,15 +172,18 @@ final class RewriteTestsCommand extends Command
 
         /** @var JsonNormalizer $jsonNormalizer */
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
+        $jsonNormalizer->init($testSchemaUri);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors));
         $output->writeln('rewrite tests ...');
+
         $messageLength = 0;
+        $baseMessage   = 're-write test files in directory ';
 
         ksort($testResults, SORT_STRING | SORT_ASC);
 
         foreach ($testResults as $c => $x) {
-            $message = sprintf('re-write test files in directory tests/data/%s/', $c);
+            $message = $baseMessage . sprintf('tests/data/%s/', $c);
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -183,14 +203,31 @@ final class RewriteTestsCommand extends Command
                 }
 
                 foreach (array_chunk($data, 100) as $number => $parts) {
-                    $path       = sprintf($basePath . 'tests/data/%s/%s/%07d.json', $c, $t, $number);
-                    $normalized = $jsonNormalizer->normalize($consoleLogger, $parts, $testSchemaUri);
+                    $path = $basePath . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number);
+
+                    $message = $baseMessage . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number) . ' - normalizing';
+
+                    if (mb_strlen($message) > $messageLength) {
+                        $messageLength = mb_strlen($message);
+                    }
+
+                    $output->write("\r" . str_pad($message, $messageLength, ' '));
+
+                    $normalized = $jsonNormalizer->normalize($output, $parts);
 
                     if (null === $normalized) {
                         $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path)));
 
                         return 1;
                     }
+
+                    $message = $baseMessage . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number) . ' - writing';
+
+                    if (mb_strlen($message) > $messageLength) {
+                        $messageLength = mb_strlen($message);
+                    }
+
+                    $output->write("\r" . str_pad($message, $messageLength, ' '));
 
                     file_put_contents(
                         $path,
