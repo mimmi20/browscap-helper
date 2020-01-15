@@ -109,8 +109,6 @@ final class CreateTestsCommand extends Command
     {
         $consoleLogger = new ConsoleLogger($output);
 
-        $testSource = 'tests';
-
         $output->writeln('preparing browscap ...');
 
         $browscapChecks = [];
@@ -130,7 +128,7 @@ final class CreateTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...');
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, [new BrowscapSource($consoleLogger)]) as $header) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new BrowscapSource($output)]) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $browscapChecks)) {
@@ -184,9 +182,9 @@ final class CreateTestsCommand extends Command
         $sourcesDirectory      = $input->getOption('resources');
         $genericRequestFactory = new GenericRequestFactory();
         $sources               = [
-            //new JsonFileSource($consoleLogger, $testSource),
-            new TxtFileSource($consoleLogger, $sourcesDirectory),
-            //new TxtCounterFileSource($consoleLogger, $sourcesDirectory),
+            //new JsonFileSource($output, $testSource),
+            new TxtFileSource($output, $sourcesDirectory),
+            //new TxtCounterFileSource($output, $sourcesDirectory),
         ];
 
         $output->writeln('selecting tests from sources ...');
@@ -195,7 +193,7 @@ final class CreateTestsCommand extends Command
         $browserLoader = new TypeLoader();
         $deviceLoader  = new \UaDeviceType\TypeLoader();
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($consoleLogger, $sources) as $header) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $browscapChecks)) {

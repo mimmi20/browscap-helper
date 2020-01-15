@@ -17,20 +17,54 @@ use ExceptionalJSON\EncodeErrorException;
 use JsonClass\Json;
 use JsonSchema\SchemaStorage;
 use JsonSchema\Validator;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class JsonNormalizer extends Helper
 {
+    /**
+     * @var Normalizer\SchemaNormalizer
+     */
+    private $normalizer;
+
+    /**
+     * @var Normalizer\Format\Format
+     */
+    private $format;
+
+    /**
+     * @var Normalizer\Format\Formatter
+     */
+    private $formatter;
+
     public function getName()
     {
         return 'json-normalizer';
     }
 
+    public function init(string $schema): void
+    {
+        $this->normalizer = new Normalizer\SchemaNormalizer(
+            $schema,
+            new SchemaStorage(),
+            new Normalizer\Validator\SchemaValidator(new Validator())
+        );
+
+        $this->format = new Normalizer\Format\Format(
+            Normalizer\Format\JsonEncodeOptions::fromInt(
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
+            ),
+            Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
+            Normalizer\Format\NewLine::fromString("\n"),
+            true
+        );
+
+        $this->formatter = new Normalizer\Format\Formatter(new Printer());
+    }
+
     /**
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param OutputInterface $output
      * @param array                    $headers
-     * @param string                   $schema
      *
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
@@ -39,36 +73,22 @@ final class JsonNormalizer extends Helper
      *
      * @return string|null
      */
-    public function normalize(LoggerInterface $logger, array $headers, string $schema): ?string
+    public function normalize(OutputInterface $output, array $headers): ?string
     {
-        $normalizer = new Normalizer\SchemaNormalizer(
-            $schema,
-            new SchemaStorage(),
-            new Normalizer\Validator\SchemaValidator(new Validator())
-        );
-        $format = new Normalizer\Format\Format(
-            Normalizer\Format\JsonEncodeOptions::fromInt(
-                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION
-            ),
-            Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
-            Normalizer\Format\NewLine::fromString("\n"),
-            true
-        );
-        $printer   = new Printer();
-        $formatter = new Normalizer\Format\Formatter($printer);
-
         try {
             $content = (new Json())->encode($headers);
         } catch (EncodeErrorException $e) {
-            $logger->critical(new \Exception('could not encode content', 0, $e));
+            $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+            $output->writeln('<error>' . (new \Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
             return null;
         }
 
         try {
-            $normalized = (new Normalizer\FixedFormatNormalizer($normalizer, $format, $formatter))->normalize(Normalizer\Json::fromEncoded($content));
+            $normalized = (new Normalizer\FixedFormatNormalizer($this->normalizer, $this->format, $this->formatter))->normalize(Normalizer\Json::fromEncoded($content));
         } catch (\Throwable $e) {
-            $logger->critical(new \Exception(sprintf('content error'), 0, $e));
+            $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+            $output->writeln('<error>' . (new \Exception(sprintf('content error'), 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
             return null;
         }

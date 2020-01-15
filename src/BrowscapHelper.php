@@ -46,9 +46,6 @@ final class BrowscapHelper extends Application
         $browscapTestWriter = new BrowscapTestWriter($targetDirectory);
         $this->getHelperSet()->set($browscapTestWriter);
 
-        $jsonTestWriter = new JsonTestWriter();
-        $this->getHelperSet()->set($jsonTestWriter);
-
         $existingTestsLoader = new ExistingTestsLoader();
         $this->getHelperSet()->set($existingTestsLoader);
 

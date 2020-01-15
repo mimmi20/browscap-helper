@@ -43,21 +43,24 @@ final class ExistingTestsRemover extends Helper
 
         $counter       = 0;
         $messageLength = 0;
+        $baseMessage   = 'remove old files ';
+
+        $output->writeln($baseMessage . '...', OutputInterface::VERBOSITY_NORMAL);
 
         foreach ($finder as $file) {
-            $message = sprintf('remove old files ... [%7d]', $counter);
+            $message = $baseMessage . sprintf('[%7d]', $counter) . ' ...';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
             }
 
-            $output->write("\r" . str_pad($message, $messageLength, ' '));
+            $output->write("\r" . '<fg=yellow>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-            unlink($file->getPathname());
+            //unlink($file->getPathname());
 
             ++$counter;
         }
 
-        $output->writeln('');
+        $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
     }
 }

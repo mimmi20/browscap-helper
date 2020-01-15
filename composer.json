@@ -16,13 +16,13 @@
   "require": {
     "php": "^7.1",
     "ext-json": "*",
+    "ext-simplexml": "*",
     "browscap/browscap": "dev-master",
     "browscap/browscap-php": "^4.2.2",
     "donatj/phpuseragentparser": "dev-master",
     "endorphin-studio/browser-detector": "^5.0.0",
     "ergebnis/json-normalizer": "^0.10.1 || ^0.11.0",
-    "jaybizzle/crawler-detect": "^1.2.90",
-    "mimmi20/browscap-helper-source": "~2.7.1",
+    "jaybizzle/crawler-detect": "dev-master",
     "mimmi20/browser-detector": "~5.0.42",
     "mimmi20/browser-detector-version": "~6.0.9",
     "mimmi20/json-class": "~2.0.8",
@@ -31,6 +31,7 @@
     "piwik/device-detector": "dev-master",
     "psr/cache": "^1.0.0",
     "psr/log": "^1.1.2",
+    "psr/simple-cache": "^1.0.1",
     "sinergi/browser-detector": "dev-master",
     "symfony/cache": "^4.4.2 || ^5.0.2",
     "symfony/console": "^4.4.2 || ^5.0.2",
@@ -44,6 +45,7 @@
     "zsxsoft/php-useragent": "dev-master"
   },
   "require-dev": {
+    "ext-pdo": "*",
     "ergebnis/composer-normalize": "^2.2.2",
     "ergebnis/phpstan-rules": "^0.14.2",
     "friendsofphp/php-cs-fixer": "^2.16.1",
@@ -68,6 +70,7 @@
       "woothee/woothee-testset": "source",
       "yzalis/ua-parser": "source",
       "zsxsoft/php-useragent": "source",
+      "jaybizzle/crawler-detect": "source",
       "*": "dist"
     },
     "sort-packages": true
