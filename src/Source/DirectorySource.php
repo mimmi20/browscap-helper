@@ -1,8 +1,8 @@
 <?php
 /**
- * This file is part of the browscap-helper-source package.
+ * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2016-2019, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2020, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,6 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Helper\FilePath;
 use BrowscapHelper\Source\Ua\UserAgent;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -33,7 +32,7 @@ final class DirectorySource implements SourceInterface
 
     /**
      * @param OutputInterface $output
-     * @param string                   $dir
+     * @param string          $dir
      */
     public function __construct(OutputInterface $output, string $dir)
     {
