@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
 use Ergebnis\Json\Normalizer;
-use Ergebnis\Json\Printer\Printer;
 use ExceptionalJSON\EncodeErrorException;
 use JsonClass\Json;
 use JsonSchema\Constraints\Factory;
@@ -50,11 +49,11 @@ final class JsonNormalizer extends Helper
     public function init(OutputInterface $output, string $schemaUri): void
     {
         $messageLength = 0;
-        $message = 'prepare JsonNormalizer';
-        $message2 = $message . ' - init ...';
+        $message       = 'prepare JsonNormalizer';
+        $message2      = $message . ' - init ...';
 
-        if (strlen($message2) > $messageLength) {
-            $messageLength = strlen($message2);
+        if (mb_strlen($message2) > $messageLength) {
+            $messageLength = mb_strlen($message2);
         }
 
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT));
@@ -69,8 +68,8 @@ final class JsonNormalizer extends Helper
 
         $message2 = $message . ' - define normalizers ...';
 
-        if (strlen($message2) > $messageLength) {
-            $messageLength = strlen($message2);
+        if (mb_strlen($message2) > $messageLength) {
+            $messageLength = mb_strlen($message2);
         }
 
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT));
@@ -82,9 +81,9 @@ final class JsonNormalizer extends Helper
                 new Normalizer\Validator\SchemaValidator($jsonSchemavalidator)
             ),
             'encoding-normalizer' => new Normalizer\JsonEncodeNormalizer(Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)),
-            'indent-normalizer' => new class implements Normalizer\NormalizerInterface {
+            'indent-normalizer' => new class() implements Normalizer\NormalizerInterface {
                 /**
-                 * @inheritDoc
+                 * {@inheritdoc}
                  */
                 public function normalize(Normalizer\Json $json): Normalizer\Json
                 {
@@ -112,28 +111,29 @@ final class JsonNormalizer extends Helper
 
                     return Normalizer\Json::fromEncoded(implode("\n", $formattedLines) . "\n");
                 }
-            }
+            },
         ];
     }
 
     /**
      * @param OutputInterface $output
      * @param array           $headers
-     * @param string $message
-     * @param int $messageLength
+     * @param string          $message
+     * @param int             $messageLength
      *
-     * @return string|null
      *@throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     *
+     * @return string|null
      */
     public function normalize(OutputInterface $output, array $headers, string $message, int &$messageLength = 0): ?string
     {
         $message2 = $message . ' - encode data ...';
 
-        if (strlen($message2) > $messageLength) {
-            $messageLength = strlen($message2);
+        if (mb_strlen($message2) > $messageLength) {
+            $messageLength = mb_strlen($message2);
         }
 
         $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
@@ -151,8 +151,8 @@ final class JsonNormalizer extends Helper
 
         $message2 = $message . ' - normalize ...';
 
-        if (strlen($message2) > $messageLength) {
-            $messageLength = strlen($message2);
+        if (mb_strlen($message2) > $messageLength) {
+            $messageLength = mb_strlen($message2);
         }
 
         $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
@@ -160,8 +160,8 @@ final class JsonNormalizer extends Helper
         foreach ($this->normalizers as $name => $normalizer) {
             $message2 = $message . sprintf(' - normalize with %s ...', $name);
 
-            if (strlen($message2) > $messageLength) {
-                $messageLength = strlen($message2);
+            if (mb_strlen($message2) > $messageLength) {
+                $messageLength = mb_strlen($message2);
             }
 
             $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
@@ -172,8 +172,8 @@ final class JsonNormalizer extends Helper
 
         $message2 = $message . ' - normalizing done';
 
-        if (strlen($message2) > $messageLength) {
-            $messageLength = strlen($message2);
+        if (mb_strlen($message2) > $messageLength) {
+            $messageLength = mb_strlen($message2);
         }
 
         $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
