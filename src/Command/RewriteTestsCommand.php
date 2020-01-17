@@ -172,7 +172,7 @@ final class RewriteTestsCommand extends Command
 
         /** @var JsonNormalizer $jsonNormalizer */
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
-        $jsonNormalizer->init($testSchemaUri);
+        $jsonNormalizer->init($output, $testSchemaUri);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors));
         $output->writeln('rewrite tests ...');
@@ -213,7 +213,7 @@ final class RewriteTestsCommand extends Command
 
                     $output->write("\r" . str_pad($message, $messageLength, ' '));
 
-                    $normalized = $jsonNormalizer->normalize($output, $parts);
+                    $normalized = $jsonNormalizer->normalize($output, $parts, $message, $messageLength);
 
                     if (null === $normalized) {
                         $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path)));
