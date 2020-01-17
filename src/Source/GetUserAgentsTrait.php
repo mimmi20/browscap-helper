@@ -1,8 +1,8 @@
 <?php
 /**
- * This file is part of the browscap-helper-source package.
+ * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2016-2019, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2020, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.

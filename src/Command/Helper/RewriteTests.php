@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2019, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2020, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,8 +24,8 @@ final class RewriteTests extends Helper
 
     /**
      * @param OutputInterface $output
-     * @param array                    $txtChecks
-     * @param string                   $testSource
+     * @param array           $txtChecks
+     * @param string          $testSource
      *
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
@@ -72,7 +72,7 @@ final class RewriteTests extends Helper
                 $headers[] = UserAgent::fromString($headerString)->getHeaders();
             }
 
-            $message     = $baseMessage . ' - normalizing';
+            $message = $baseMessage . ' - normalizing';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -89,7 +89,7 @@ final class RewriteTests extends Helper
                 continue;
             }
 
-            $message     = $baseMessage . ' - writing';
+            $message = $baseMessage . ' - writing';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
