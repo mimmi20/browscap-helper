@@ -42,7 +42,7 @@ final class RewriteTests extends Helper
         $schema         = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
 
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
-        $jsonNormalizer->init($schema);
+        $jsonNormalizer->init($output, $schema);
 
         $messageLength = 0;
 
@@ -80,7 +80,7 @@ final class RewriteTests extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $normalized = $jsonNormalizer->normalize($output, $headers);
+            $normalized = $jsonNormalizer->normalize($output, $headers, $message, $messageLength);
 
             if (null === $normalized) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
