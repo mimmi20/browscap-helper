@@ -216,8 +216,9 @@ final class UaParserJsSource implements SourceInterface
                     true
                 );
             } catch (DecodeErrorException $e) {
-                $this->output->error(
-                    new \Exception(sprintf('file %s contains invalid json.', $file->getPathname()), 0, $e)
+                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->output->writeln(
+                    '<error>' . (new \Exception(sprintf('file %s contains invalid json.', $file->getPathname()), 0, $e)) . '</error>'
                 );
                 continue;
             }

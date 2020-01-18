@@ -45,6 +45,8 @@ final class JsonNormalizer extends Helper
     /**
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param string                                            $schemaUri
+     *
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
      */
     public function init(OutputInterface $output, string $schemaUri): void
     {
@@ -83,7 +85,13 @@ final class JsonNormalizer extends Helper
             'encoding-normalizer' => new Normalizer\JsonEncodeNormalizer(Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)),
             'indent-normalizer' => new class() implements Normalizer\NormalizerInterface {
                 /**
-                 * {@inheritdoc}
+                 * @param \Ergebnis\Json\Normalizer\Json $json
+                 *
+                 * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException
+                 * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
+                 * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
+                 *
+                 * @return \Ergebnis\Json\Normalizer\Json
                  */
                 public function normalize(Normalizer\Json $json): Normalizer\Json
                 {
@@ -96,10 +104,15 @@ final class JsonNormalizer extends Helper
 
                     $newline = (string) Normalizer\Format\NewLine::fromJson($json);
                     $lines = explode($newline, $json->encoded());
+
+                    if (false === $lines) {
+                        return clone $json;
+                    }
+
                     $formattedLines = [];
 
                     foreach ($lines as $line) {
-                        if (!preg_match('/^(\s*)(\S.*)/', $line, $matches)) {
+                        if (1 > preg_match('/^(\s*)(\S.*)/', $line, $matches)) {
                             $formattedLines[] = $line;
                             continue;
                         }
@@ -121,10 +134,13 @@ final class JsonNormalizer extends Helper
      * @param string          $message
      * @param int             $messageLength
      *
-     *@throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException
+     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMediaTypeException
+     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeResolvedException
+     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeReadException
+     * @throws \Ergebnis\Json\Normalizer\Exception\NormalizedInvalidAccordingToSchemaException
+     * @throws \Ergebnis\Json\Normalizer\Exception\OriginalInvalidAccordingToSchemaException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException
      *
      * @return string|null
      */

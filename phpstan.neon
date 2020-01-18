@@ -15,6 +15,7 @@ parameters:
       - Symfony\Component\Console\Command\Command
       - Symfony\Component\Console\Helper\Helper
       - OutOfRangeException
+      - UnexpectedValueException
   checkMissingIterableValueType: false
   excludes_analyse:
     - */tests/*/data/*
@@ -23,10 +24,18 @@ parameters:
 #    - '~is not subtype of Throwable~'
     - '~Useless \@throws~'
     - '~is not compatible with parent~'
-#    - '~Language construct isset\(\) should not be used~'
+    - '~Language construct isset\(\) should not be used~'
+    - '~Construct empty\(\) is not allowed\. Use more strict comparison~'
+    - '~Language construct empty\(\) should not be used~'
     - '~has a nullable return type declaration~'
     - '~PHPDoc tag @throws with type .* is not subtype of Throwable~'
     - '~Cannot call method get\(\) on Symfony\\Component\\Console\\Helper\\HelperSet\|null~'
+    - '~Class http\\Header not found~'
+    - '~Call to static method parse\(\) on an unknown class http\\Header~'
+    - '~Control structures using switch should not be used~'
+    - '~Error suppression via "@" should not be used~'
+    - '~Else branch is unreachable because ternary operator condition is always true~'
+    - '~Strict comparison using !== between null and string will always evaluate to true~'
 
 includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon

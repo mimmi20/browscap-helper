@@ -211,9 +211,16 @@ final class RewriteTestsCommand extends Command
                         $messageLength = mb_strlen($message);
                     }
 
-                    $output->write("\r" . str_pad($message, $messageLength, ' '));
+                    $output->write("\r" . str_pad($message, $messageLength, ' '), false);
 
-                    $normalized = $jsonNormalizer->normalize($output, $parts, $message, $messageLength);
+                    try {
+                        $normalized = $jsonNormalizer->normalize($output, $parts, $message, $messageLength);
+                    } catch (\InvalidArgumentException | \RuntimeException $e) {
+                        $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                        $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                        continue;
+                    }
 
                     if (null === $normalized) {
                         $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path)));

@@ -28,9 +28,6 @@ final class RewriteTests extends Helper
      * @param string          $testSource
      *
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
      * @return void
@@ -80,7 +77,14 @@ final class RewriteTests extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $normalized = $jsonNormalizer->normalize($output, $headers, $message, $messageLength);
+            try {
+                $normalized = $jsonNormalizer->normalize($output, $headers, $message, $messageLength);
+            } catch (\InvalidArgumentException | \RuntimeException $e) {
+                $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                continue;
+            }
 
             if (null === $normalized) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
