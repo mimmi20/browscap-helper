@@ -83,7 +83,10 @@ final class BrowscapSource implements SourceInterface
                 $isMobile = $deviceType->isMobile();
                 $type1    = $deviceType->getType();
             } catch (NotFoundException $e) {
-                $this->output->info($e);
+                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->output->writeln(
+                    '<info>' . $e . '</info>'
+                );
 
                 $isMobile = null;
                 $type1    = null;
@@ -103,7 +106,10 @@ final class BrowscapSource implements SourceInterface
                         $type1    = $class->getType();
                     }
                 } catch (\ReflectionException $e) {
-                    $this->output->error($e);
+                    $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                    $this->output->writeln(
+                        '<error>' . $e . '</error>'
+                    );
                 }
             }
 
@@ -115,7 +121,10 @@ final class BrowscapSource implements SourceInterface
                 $isBot = $browserType->isBot();
                 $type2 = $browserType->getType();
             } catch (NotFoundException $e) {
-                $this->output->info($e);
+                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->output->writeln(
+                    '<info>' . $e . '</info>'
+                );
 
                 $isBot = null;
                 $type2 = null;
@@ -135,7 +144,10 @@ final class BrowscapSource implements SourceInterface
                         $type2 = $class->getType();
                     }
                 } catch (\ReflectionException $e) {
-                    $this->output->error($e);
+                    $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                    $this->output->writeln(
+                        '<error>' . $e . '</error>'
+                    );
                 }
             }
 

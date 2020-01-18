@@ -192,14 +192,16 @@ final class SinergiSource implements SourceInterface
             $content = $file->getContents();
 
             if (empty($content)) {
-                $this->output->error('reading file ' . $filepath . ' failed. The file is empty.');
+                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->output->writeln('<error>reading file ' . $filepath . ' failed. The file is empty.</error>');
                 continue;
             }
 
             $provider = \simplexml_load_string($content);
 
             if (false === $provider) {
-                $this->output->error('reading file ' . $filepath . ' failed.');
+                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->output->writeln('<error>reading file ' . $filepath . ' failed.</error>');
                 continue;
             }
 

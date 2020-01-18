@@ -179,8 +179,8 @@ final class DirectorySource implements SourceInterface
             $fullPath = $fileHelper->getPath($file);
 
             if (null === $fullPath) {
-                $this->output->error('could not detect path for file "' . $filepath . '"');
-
+                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->output->writeln('<error>could not detect path for file "' . $filepath . '"</error>');
                 continue;
             }
 
