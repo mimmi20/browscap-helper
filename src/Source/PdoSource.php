@@ -14,42 +14,43 @@ namespace BrowscapHelper\Source;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class PdoSource implements SourceInterface
+final class PdoSource implements SourceInterface, OutputAwareInterface
 {
-    use GetUserAgentsTrait;
+    use GetNameTrait;
+    use OutputAwareTrait;
 
     /**
      * @var \PDO
      */
     private $pdo;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private const NAME = 'PDO';
 
     /**
-     * @param OutputInterface $output
-     * @param \PDO            $pdo
+     * @param \PDO $pdo
      */
-    public function __construct(OutputInterface $output, \PDO $pdo)
+    public function __construct(\PDO $pdo)
     {
-        $this->output = $output;
-        $this->pdo    = $pdo;
+        $this->pdo = $pdo;
     }
 
     /**
-     * @return string
+     * @param string $parentMessage
+     *
+     * @return bool
      */
-    public function getName(): string
+    public function isReady(string $parentMessage): bool
     {
-        return 'PDO';
+        return extension_loaded('PDO');
     }
 
     /**
+     * @param string $message
+     * @param int    $messageLength
+     *
      * @return array[]|iterable
      */
-    public function getHeaders(): iterable
+    public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
         foreach ($this->getAgents() as $row) {
             $ua    = UserAgent::fromUseragent(trim($row->agent));
@@ -60,68 +61,6 @@ final class PdoSource implements SourceInterface
             }
 
             yield $ua->getHeaders();
-        }
-    }
-
-    /**
-     * @return array[]|iterable
-     */
-    public function getProperties(): iterable
-    {
-        foreach ($this->getAgents() as $row) {
-            $ua    = UserAgent::fromUseragent(trim($row->agent));
-            $agent = (string) $ua;
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            yield $agent => [
-                'device' => [
-                    'deviceName' => null,
-                    'marketingName' => null,
-                    'manufacturer' => null,
-                    'brand' => null,
-                    'display' => [
-                        'width' => null,
-                        'height' => null,
-                        'touch' => null,
-                        'type' => null,
-                        'size' => null,
-                    ],
-                    'dualOrientation' => null,
-                    'type' => null,
-                    'simCount' => null,
-                    'market' => [
-                        'regions' => null,
-                        'countries' => null,
-                        'vendors' => null,
-                    ],
-                    'connections' => null,
-                    'ismobile' => null,
-                ],
-                'browser' => [
-                    'name' => null,
-                    'modus' => null,
-                    'version' => null,
-                    'manufacturer' => null,
-                    'bits' => null,
-                    'type' => null,
-                    'isbot' => null,
-                ],
-                'platform' => [
-                    'name' => null,
-                    'marketingName' => null,
-                    'version' => null,
-                    'manufacturer' => null,
-                    'bits' => null,
-                ],
-                'engine' => [
-                    'name' => null,
-                    'version' => null,
-                    'manufacturer' => null,
-                ],
-            ];
         }
     }
 

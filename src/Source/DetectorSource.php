@@ -17,40 +17,42 @@ use JsonClass\Json;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class DetectorSource implements SourceInterface
+final class DetectorSource implements SourceInterface, OutputAwareInterface
 {
-    use GetUserAgentsTrait;
+    use GetNameTrait;
+    use OutputAwareTrait;
+
+    private const NAME = 'mimmi20/browser-detector';
+    private const PATH = 'vendor/mimmi20/browser-detector/tests/data';
 
     /**
-     * @var OutputInterface
+     * @param string $parentMessage
+     *
+     * @return bool
      */
-    private $output;
-
-    /**
-     * @param OutputInterface $output
-     */
-    public function __construct(OutputInterface $output)
+    public function isReady(string $parentMessage): bool
     {
-        $this->output = $output;
+        if (file_exists(self::PATH)) {
+            return true;
+        }
+
+        $this->writeln("\r" . '<error>' . $parentMessage . sprintf('- path %s not found</error>', self::PATH), OutputInterface::VERBOSITY_NORMAL);
+
+        return false;
     }
 
     /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'mimmi20/browser-detector';
-    }
-
-    /**
+     * @param string $message
+     * @param int    $messageLength
+     *
      * @throws \LogicException
      * @throws \RuntimeException
      *
      * @return array[]|iterable
      */
-    public function getHeaders(): iterable
+    public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
-        foreach ($this->loadFromPath() as $test) {
+        foreach ($this->loadFromPath($message, $messageLength) as $test) {
             $ua    = UserAgent::fromHeaderArray($test['headers']);
             $agent = (string) $ua;
 
@@ -63,96 +65,23 @@ final class DetectorSource implements SourceInterface
     }
 
     /**
+     * @param string $parentMessage
+     * @param int    $messageLength
+     *
      * @throws \LogicException
      * @throws \RuntimeException
      *
      * @return array[]|iterable
      */
-    public function getProperties(): iterable
+    private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
-        foreach ($this->loadFromPath() as $test) {
-            $ua    = UserAgent::fromHeaderArray($test['headers']);
-            $agent = (string) $ua;
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            yield $agent => [
-                'device' => [
-                    'deviceName' => $test['result']['device']['deviceName'],
-                    'marketingName' => $test['result']['device']['marketingName'],
-                    'manufacturer' => $test['result']['device']['manufacturer'],
-                    'brand' => $test['result']['device']['brand'],
-                    'display' => [
-                        'width' => $test['result']['device']['display']['width'],
-                        'height' => $test['result']['device']['display']['height'],
-                        'touch' => $test['result']['device']['display']['touch'],
-                        'type' => $test['result']['device']['display']['type'] ?? null,
-                        'size' => $test['result']['device']['display']['size'],
-                    ],
-                    'dualOrientation' => $test['result']['device']['dualOrientation'] ?? null,
-                    'type' => $test['result']['device']['type'],
-                    'simCount' => $test['result']['device']['simCount'] ?? null,
-                    'market' => [
-                        'regions' => $test['result']['device']['market']['regions'] ?? null,
-                        'countries' => $test['result']['device']['market']['countries'] ?? null,
-                        'vendors' => $test['result']['device']['market']['vendors'] ?? null,
-                    ],
-                    'connections' => $test['result']['device']['connections'] ?? null,
-                    'ismobile' => (new \UaDeviceType\TypeLoader())->load($test['result']['device']['type'])->isMobile(),
-                ],
-                'browser' => [
-                    'name' => $test['result']['browser']['name'],
-                    'modus' => $test['result']['browser']['modus'],
-                    'version' => ('0.0.0' === $test['result']['browser']['version'] ? null : $test['result']['browser']['version']),
-                    'manufacturer' => $test['result']['browser']['manufacturer'],
-                    'bits' => $test['result']['browser']['bits'],
-                    'type' => $test['result']['browser']['type'],
-                    'isbot' => (new \UaBrowserType\TypeLoader())->load($test['result']['browser']['type'])->isBot(),
-                ],
-                'platform' => [
-                    'name' => $test['result']['os']['name'],
-                    'marketingName' => $test['result']['os']['marketingName'],
-                    'version' => ('0.0.0' === $test['result']['os']['version'] ? null : $test['result']['os']['version']),
-                    'manufacturer' => $test['result']['os']['manufacturer'],
-                    'bits' => $test['result']['os']['bits'],
-                ],
-                'engine' => [
-                    'name' => $test['result']['engine']['name'],
-                    'version' => $test['result']['engine']['version'],
-                    'manufacturer' => $test['result']['engine']['manufacturer'],
-                ],
-            ];
-        }
-    }
-
-    /**
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
-     */
-    private function loadFromPath(): iterable
-    {
-        $path = 'vendor/mimmi20/browser-detector/tests/data';
-
-        if (!file_exists($path)) {
-            $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-            $this->output->writeln(sprintf('<error>path %s not found</error>', $path), OutputInterface::VERBOSITY_NORMAL);
-
-            return;
-        }
-
-        $messageLength = 0;
-
-        $message = sprintf('reading path %s', $path);
+        $message = $parentMessage . sprintf('- reading path %s', self::PATH);
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
         }
 
-        $this->output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
+        $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
         $finder = new Finder();
         $finder->files();
@@ -161,19 +90,19 @@ final class DetectorSource implements SourceInterface
         $finder->ignoreVCS(true);
         $finder->sortByName();
         $finder->ignoreUnreadableDirs();
-        $finder->in($path);
+        $finder->in(self::PATH);
 
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             $filepath = $file->getPathname();
 
-            $message = sprintf('reading file %s', $filepath);
+            $message = $parentMessage . sprintf('- reading file %s', $filepath);
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
             }
 
-            $this->output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $content = $file->getContents();
 
@@ -189,8 +118,8 @@ final class DetectorSource implements SourceInterface
                     true
                 );
             } catch (DecodeErrorException $e) {
-                $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-                $this->output->writeln('    <error>parsing file content [' . $filepath . '] failed</error>', OutputInterface::VERBOSITY_NORMAL);
+                $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                $this->writeln('    <error>parsing file content [' . $filepath . '] failed</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -203,8 +132,5 @@ final class DetectorSource implements SourceInterface
                 yield $test;
             }
         }
-
-        $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-        $this->output->writeln("\r" . '<info>' . str_pad('done', $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
     }
 }

@@ -58,7 +58,7 @@ final class JsonNormalizer extends Helper
             $messageLength = mb_strlen($message2);
         }
 
-        $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT));
+        $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
         $schemaStorage       = new SchemaStorage();
         $jsonSchemavalidator = new Validator(
@@ -74,7 +74,7 @@ final class JsonNormalizer extends Helper
             $messageLength = mb_strlen($message2);
         }
 
-        $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT));
+        $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
         $this->normalizers = [
             'schema-normalizer' => new Normalizer\SchemaNormalizer(
@@ -126,6 +126,14 @@ final class JsonNormalizer extends Helper
                 }
             },
         ];
+
+        $message2 = $message . ' - done';
+
+        if (mb_strlen($message2) > $messageLength) {
+            $messageLength = mb_strlen($message2);
+        }
+
+        $output->writeln("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_VERBOSE);
     }
 
     /**
@@ -193,9 +201,6 @@ final class JsonNormalizer extends Helper
         }
 
         $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
-
-        //$output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-        //$output->writeln('<error>' . (new \Exception(sprintf('content error'), 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
         return $json->encoded();
     }

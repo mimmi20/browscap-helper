@@ -18,31 +18,25 @@ interface SourceInterface
     public const DELIMETER_HEADER_ROW = '::==::';
 
     /**
-     * @throws \LogicException
-     * @throws \RuntimeException
+     * @param string $parentMessage
      *
-     * @return iterable|string[]
+     * @return bool
      */
-    public function getUserAgents(): iterable;
+    public function isReady(string $parentMessage): bool;
 
     /**
+     * @param string $parentMessage
+     * @param int    $messageLength
+     *
      * @throws \LogicException
      * @throws \RuntimeException
      *
      * @return array[]|iterable
      */
-    public function getHeaders(): iterable;
+    public function getHeaders(string $parentMessage, int &$messageLength = 0): iterable;
 
     /**
      * @return string
      */
     public function getName(): string;
-
-    /**
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
-     */
-    public function getProperties(): iterable;
 }

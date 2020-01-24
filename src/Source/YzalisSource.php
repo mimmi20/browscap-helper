@@ -16,40 +16,42 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-final class YzalisSource implements SourceInterface
+final class YzalisSource implements SourceInterface, OutputAwareInterface
 {
-    use GetUserAgentsTrait;
+    use GetNameTrait;
+    use OutputAwareTrait;
+
+    private const NAME = 'yzalis/ua-parser';
+    private const PATH = 'vendor/yzalis/ua-parser/tests/UAParser/Tests/Fixtures';
 
     /**
-     * @var OutputInterface
+     * @param string $parentMessage
+     *
+     * @return bool
      */
-    private $output;
-
-    /**
-     * @param OutputInterface $output
-     */
-    public function __construct(OutputInterface $output)
+    public function isReady(string $parentMessage): bool
     {
-        $this->output = $output;
+        if (file_exists(self::PATH)) {
+            return true;
+        }
+
+        $this->writeln("\r" . '<error>' . $parentMessage . sprintf('- path %s not found</error>', self::PATH), OutputInterface::VERBOSITY_NORMAL);
+
+        return false;
     }
 
     /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'yzalis/ua-parser';
-    }
-
-    /**
+     * @param string $message
+     * @param int    $messageLength
+     *
      * @throws \LogicException
      * @throws \RuntimeException
      *
      * @return array[]|iterable
      */
-    public function getHeaders(): iterable
+    public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
-        foreach ($this->loadFromPath() as $providerName => $data) {
+        foreach ($this->loadFromPath($message, $messageLength) as $providerName => $data) {
             $ua    = UserAgent::fromUseragent(trim($data[0]));
             $agent = (string) $ua;
 
@@ -62,135 +64,23 @@ final class YzalisSource implements SourceInterface
     }
 
     /**
-     * @throws \LogicException
-     * @throws \RuntimeException
+     * @param string $parentMessage
+     * @param int    $messageLength
      *
-     * @return array[]|iterable
-     */
-    public function getProperties(): iterable
-    {
-        $tests = [];
-
-        foreach ($this->loadFromPath() as $providerName => $data) {
-            $agent = trim($data[0]);
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            if (!array_key_exists($agent, $tests)) {
-                $tests[$agent] = [
-                    'device' => [
-                        'deviceName' => null,
-                        'marketingName' => null,
-                        'manufacturer' => null,
-                        'brand' => null,
-                        'display' => [
-                            'width' => null,
-                            'height' => null,
-                            'touch' => null,
-                            'type' => null,
-                            'size' => null,
-                        ],
-                        'dualOrientation' => null,
-                        'type' => null,
-                        'simCount' => null,
-                        'market' => [
-                            'regions' => null,
-                            'countries' => null,
-                            'vendors' => null,
-                        ],
-                        'connections' => null,
-                        'ismobile' => null,
-                    ],
-                    'browser' => [
-                        'name' => null,
-                        'modus' => null,
-                        'version' => null,
-                        'manufacturer' => null,
-                        'bits' => null,
-                        'type' => null,
-                        'isbot' => null,
-                    ],
-                    'platform' => [
-                        'name' => null,
-                        'marketingName' => null,
-                        'version' => null,
-                        'manufacturer' => null,
-                        'bits' => null,
-                    ],
-                    'engine' => [
-                        'name' => null,
-                        'version' => null,
-                        'manufacturer' => null,
-                    ],
-                ];
-            }
-
-            switch ($providerName) {
-                case 'browsers.yml':
-                    $tests[$agent]['browser']['name']    = $data[1];
-                    $tests[$agent]['browser']['version'] = $data[2] . '.' . $data[3] . '.' . $data[4];
-
-                    break;
-                case 'devices.yml':
-                    $tests[$agent]['device']['name']  = $data[2];
-                    $tests[$agent]['device']['brand'] = $data[1];
-                    $tests[$agent]['device']['type']  = $data[3];
-
-                    break;
-                case 'operating_systems.yml':
-                    $tests[$agent]['platform']['name']    = $data[1];
-                    $tests[$agent]['platform']['version'] = $data[2] . (null !== $data[3] ? '.' . $data[3] . (null !== $data[4] ? '.' . $data[4] : '') : '');
-
-                    break;
-                case 'rendering_engines.yml':
-                    $tests[$agent]['engine']['name']    = $data[1];
-                    $tests[$agent]['engine']['version'] = $data[2];
-
-                    break;
-                // Skipping other files because we dont test this
-            }
-        }
-
-        foreach ($tests as $agent => $test) {
-            $ua    = UserAgent::fromUseragent($agent);
-            $agent = (string) $ua;
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            yield $agent => $test;
-        }
-    }
-
-    /**
      * @throws \LogicException
      * @throws \RuntimeException
      *
      * @return iterable|string[]
      */
-    private function loadFromPath(): iterable
+    private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
-        $path = 'vendor/yzalis/ua-parser/tests/UAParser/Tests/Fixtures';
-
-        if (!file_exists($path)) {
-            $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-            $this->output->writeln(sprintf('<error>path %s not found</error>', $path), OutputInterface::VERBOSITY_NORMAL);
-
-            return;
-        }
-
-        $messageLength = 0;
-
-        $message = sprintf('reading path %s', $path);
+        $message = $parentMessage . sprintf('- reading path %s', self::PATH);
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
         }
 
-        $this->output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
+        $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
         $finder = new Finder();
         $finder->files();
@@ -203,19 +93,19 @@ final class YzalisSource implements SourceInterface
         $finder->ignoreVCS(true);
         $finder->sortByName();
         $finder->ignoreUnreadableDirs();
-        $finder->in($path);
+        $finder->in(self::PATH);
 
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             $filepath = $file->getPathname();
 
-            $message = sprintf('reading file %s', $filepath);
+            $message = $parentMessage . sprintf('- reading file %s', $filepath);
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
             }
 
-            $this->output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $provider = Yaml::parse($file->getContents());
 
@@ -229,8 +119,5 @@ final class YzalisSource implements SourceInterface
                 yield $providerName => $data;
             }
         }
-
-        $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-        $this->output->writeln("\r" . '<info>' . str_pad('done', $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
     }
 }

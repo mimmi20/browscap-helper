@@ -17,7 +17,6 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\VersionInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
@@ -69,10 +68,10 @@ final class RewriteTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $consoleLogger = new ConsoleLogger($output);
+        $output->writeln('init Detector ...', OutputInterface::VERBOSITY_NORMAL);
 
         $cache    = new Psr16Cache(new NullAdapter());
-        $factory  = new DetectorFactory($cache, $consoleLogger);
+        $factory  = new DetectorFactory($cache, new ConsoleLogger($output));
         $detector = $factory();
 
         $basePath                = 'vendor/mimmi20/browser-detector/';
@@ -81,44 +80,34 @@ final class RewriteTestsCommand extends Command
 
         $this->getHelper('existing-tests-remover')->remove($output, $detectorTargetDirectory);
 
-        $output->writeln('reading already existing tests ...');
+        $sources = [new JsonFileSource($testSource)];
 
-        $testResults   = [];
+        $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
+
         $txtChecks     = [];
-        $testCount     = 0;
-        $duplicates    = 0;
         $messageLength = 0;
-        $errors        = 0;
-        $counter       = 0;
-        $baseMessage   = 'selecting tests, checking Header ... ';
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($output, $testSource)]) as $headers) {
-            ++$counter;
-            $message = $baseMessage . sprintf('[%7d]', $counter) . ' - get headers';
-
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
-
-            $output->write("\r" . str_pad($message, $messageLength, ' '));
-
-            $seachHeader = (string) UserAgent::fromHeaderArray($headers);
-
-            $message = $baseMessage . sprintf('[%7d]', $counter) . ' - check duplicates';
-
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
-
-            $output->write("\r" . str_pad($message, $messageLength, ' '));
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                ++$duplicates;
+                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
 
-            $txtChecks[$seachHeader] = 1;
+            $txtChecks[$seachHeader] = $header;
+        }
+
+        $testResults = [];
+        $counter     = 0;
+        $duplicates  = 0;
+        $errors      = 0;
+        $testCount   = 0;
+        $baseMessage = 'checking Header ';
+
+        foreach ($txtChecks as $seachHeader => $headers) {
+            ++$counter;
 
             $message = $baseMessage . sprintf('[%7d]', $counter) . ' - redetect';
 
@@ -126,14 +115,14 @@ final class RewriteTestsCommand extends Command
                 $messageLength = mb_strlen($message);
             }
 
-            $output->write("\r" . str_pad($message, $messageLength, ' '));
+            $output->write("\r" . str_pad($message, $messageLength, ' '), false);
 
             try {
-                $result = $this->handleTest($consoleLogger, $detector, $headers);
+                $result = $this->handleTest($output, $detector, $headers, $message, $messageLength);
             } catch (\UnexpectedValueException $e) {
                 ++$errors;
-                $output->writeln('');
-                $consoleLogger->error(new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e));
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . (new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -157,8 +146,8 @@ final class RewriteTestsCommand extends Command
                 $testResults[$c][$t][] = $result->toArray();
             } catch (\UnexpectedValueException $e) {
                 ++$errors;
-                $output->writeln('');
-                $consoleLogger->error(new \Exception('An error occured while converting a result to an array', 0, $e));
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . (new \Exception('An error occured while converting a result to an array', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -166,7 +155,7 @@ final class RewriteTestsCommand extends Command
             ++$testCount;
         }
 
-        $output->writeln('');
+        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
 
         $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
 
@@ -174,8 +163,8 @@ final class RewriteTestsCommand extends Command
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
         $jsonNormalizer->init($output, $testSchemaUri);
 
-        $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors));
-        $output->writeln('rewrite tests ...');
+        $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
         $messageLength = 0;
         $baseMessage   = 're-write test files in directory ';
@@ -189,7 +178,7 @@ final class RewriteTestsCommand extends Command
                 $messageLength = mb_strlen($message);
             }
 
-            $output->write("\r" . str_pad($message, $messageLength, ' '));
+            $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             if (!file_exists(sprintf($basePath . 'tests/data/%s', $c))) {
                 mkdir(sprintf($basePath . 'tests/data/%s', $c));
@@ -211,7 +200,7 @@ final class RewriteTestsCommand extends Command
                         $messageLength = mb_strlen($message);
                     }
 
-                    $output->write("\r" . str_pad($message, $messageLength, ' '), false);
+                    $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                     try {
                         $normalized = $jsonNormalizer->normalize($output, $parts, $message, $messageLength);
@@ -223,7 +212,8 @@ final class RewriteTestsCommand extends Command
                     }
 
                     if (null === $normalized) {
-                        $consoleLogger->error(new \Exception(sprintf('file "%s" contains invalid json', $path)));
+                        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                        $output->writeln('<error>' . (new \Exception(sprintf('file "%s" contains invalid json', $path))) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                         return 1;
                     }
@@ -234,7 +224,7 @@ final class RewriteTestsCommand extends Command
                         $messageLength = mb_strlen($message);
                     }
 
-                    $output->write("\r" . str_pad($message, $messageLength, ' '));
+                    $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                     file_put_contents(
                         $path,
@@ -244,29 +234,43 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        $output->writeln('');
-        $output->writeln('done');
+        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('done', OutputInterface::VERBOSITY_NORMAL);
 
         return 0;
     }
 
     /**
-     * @param \Psr\Log\LoggerInterface $consoleLogger
-     * @param Detector                 $detector
-     * @param array                    $headers
+     * @param OutputInterface $output
+     * @param Detector        $detector
+     * @param array           $headers
+     * @param string          $parentMessage
+     * @param int             $messageLength
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \UnexpectedValueException
      *
      * @return \UaResult\Result\ResultInterface|null
      */
-    private function handleTest(LoggerInterface $consoleLogger, Detector $detector, array $headers): ?ResultInterface
+    private function handleTest(OutputInterface $output, Detector $detector, array $headers, string $parentMessage, int &$messageLength = 0): ?ResultInterface
     {
-        $consoleLogger->debug('        detect for new result');
+        $message = $parentMessage . ' - detect for new result ...';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $newResult = $detector->__invoke($headers);
 
-        $consoleLogger->debug('        analyze new result');
+        $message = $parentMessage . ' - analyze new result ...';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         if (in_array($newResult->getDevice()->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'], true)
             || (

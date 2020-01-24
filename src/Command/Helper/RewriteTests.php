@@ -41,41 +41,42 @@ final class RewriteTests extends Helper
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
         $jsonNormalizer->init($output, $schema);
 
+        $baseMessage   = 'rewriting files';
         $messageLength = 0;
 
-        $message = 'rewriting files';
+        $message = $baseMessage . ' ...';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
         }
 
-        $output->writeln("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
+        $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $headers = [];
 
             $fileName = $testSource . '/' . sprintf('%1$07d', $folderId) . '.json';
 
-            $baseMessage = sprintf('rewriting file %s', $fileName);
-            $message     = $baseMessage . ' - pre-check';
+            $message  = $baseMessage . sprintf(' %s', $fileName);
+            $message2 = $message . ' - pre-check';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
+            if (mb_strlen($message2) > $messageLength) {
+                $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             foreach ($folderChunk as $headerString) {
                 $headers[] = UserAgent::fromString($headerString)->getHeaders();
             }
 
-            $message = $baseMessage . ' - normalizing';
+            $message2 = $message . ' - normalizing';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
+            if (mb_strlen($message2) > $messageLength) {
+                $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             try {
                 $normalized = $jsonNormalizer->normalize($output, $headers, $message, $messageLength);
@@ -93,17 +94,23 @@ final class RewriteTests extends Helper
                 continue;
             }
 
-            $message = $baseMessage . ' - writing';
+            $message2 = $message . ' - writing';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
+            if (mb_strlen($message2) > $messageLength) {
+                $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             file_put_contents($fileName, $normalized);
         }
 
-        $output->writeln("\r" . '<info>' . str_pad('done', $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
+        $message = $baseMessage . ' - done';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->writeln("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
     }
 }

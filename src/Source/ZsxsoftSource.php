@@ -15,39 +15,41 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class ZsxsoftSource implements SourceInterface
+final class ZsxsoftSource implements SourceInterface, OutputAwareInterface
 {
-    use GetUserAgentsTrait;
+    use GetNameTrait;
+    use OutputAwareTrait;
+
+    private const NAME = 'zsxsoft/php-useragent';
+    private const PATH = 'vendor/zsxsoft/php-useragent/tests';
 
     /**
-     * @var OutputInterface
+     * @param string $parentMessage
+     *
+     * @return bool
      */
-    private $output;
-
-    /**
-     * @param OutputInterface $output
-     */
-    public function __construct(OutputInterface $output)
+    public function isReady(string $parentMessage): bool
     {
-        $this->output = $output;
+        if (file_exists(self::PATH)) {
+            return true;
+        }
+
+        $this->writeln("\r" . '<error>' . $parentMessage . sprintf('- path %s not found</error>', self::PATH), OutputInterface::VERBOSITY_NORMAL);
+
+        return false;
     }
 
     /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'zsxsoft/php-useragent';
-    }
-
-    /**
+     * @param string $message
+     * @param int    $messageLength
+     *
      * @throws \LogicException
      *
      * @return array[]|iterable
      */
-    public function getHeaders(): iterable
+    public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
-        foreach ($this->loadFromPath() as $data) {
+        foreach ($this->loadFromPath($message, $messageLength) as $data) {
             $agent = trim($data[0][0]);
 
             $ua    = UserAgent::fromUseragent($agent);
@@ -62,111 +64,22 @@ final class ZsxsoftSource implements SourceInterface
     }
 
     /**
-     * @throws \LogicException
-     * @throws \RuntimeException
+     * @param string $parentMessage
+     * @param int    $messageLength
      *
-     * @return array[]|iterable
-     */
-    public function getProperties(): iterable
-    {
-        $brands = $this->getBrands();
-
-        foreach ($this->loadFromPath() as $data) {
-            $agent = trim($data[0][0]);
-
-            $ua    = UserAgent::fromUseragent($agent);
-            $agent = (string) $ua;
-
-            if (empty($agent)) {
-                continue;
-            }
-
-            $model = '';
-
-            foreach ($brands as $brand) {
-                if (false !== mb_strpos($data[1][8], $brand)) {
-                    $model = trim(str_replace($brand, '', $data[1][8]));
-
-                    break;
-                }
-
-                $brand = '';
-            }
-
-            yield $agent => [
-                'device' => [
-                    'deviceName' => $model,
-                    'marketingName' => null,
-                    'manufacturer' => null,
-                    'brand' => $brand ?? '',
-                    'display' => [
-                        'width' => null,
-                        'height' => null,
-                        'touch' => null,
-                        'type' => null,
-                        'size' => null,
-                    ],
-                    'dualOrientation' => null,
-                    'type' => null,
-                    'simCount' => null,
-                    'market' => [
-                        'regions' => null,
-                        'countries' => null,
-                        'vendors' => null,
-                    ],
-                    'connections' => null,
-                    'ismobile' => null,
-                ],
-                'browser' => [
-                    'name' => $data[1][2],
-                    'modus' => null,
-                    'version' => $data[1][3],
-                    'manufacturer' => null,
-                    'bits' => null,
-                    'type' => null,
-                    'isbot' => null,
-                ],
-                'platform' => [
-                    'name' => $data[1][5],
-                    'marketingName' => null,
-                    'version' => $data[1][6],
-                    'manufacturer' => null,
-                    'bits' => null,
-                ],
-                'engine' => [
-                    'name' => null,
-                    'version' => null,
-                    'manufacturer' => null,
-                ],
-            ];
-        }
-    }
-
-    /**
      * @throws \LogicException
      *
      * @return array[]|iterable
      */
-    private function loadFromPath(): iterable
+    private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
-        $path = 'vendor/zsxsoft/php-useragent/tests';
-
-        if (!file_exists($path)) {
-            $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-            $this->output->writeln(sprintf('<error>path %s not found</error>', $path), OutputInterface::VERBOSITY_NORMAL);
-
-            return;
-        }
-
-        $messageLength = 0;
-
-        $message = sprintf('reading path %s', $path);
+        $message = $parentMessage . sprintf('- reading path %s', self::PATH);
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
         }
 
-        $this->output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
+        $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
         $finder = new Finder();
         $finder->files();
@@ -175,19 +88,19 @@ final class ZsxsoftSource implements SourceInterface
         $finder->ignoreVCS(true);
         $finder->sortByName();
         $finder->ignoreUnreadableDirs();
-        $finder->in($path);
+        $finder->in(self::PATH);
 
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             $filepath = $file->getPathname();
 
-            $message = sprintf('reading file %s', $filepath);
+            $message = $parentMessage . sprintf('- reading file %s', $filepath);
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
             }
 
-            $this->output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $provider = require $filepath;
 
@@ -195,39 +108,5 @@ final class ZsxsoftSource implements SourceInterface
                 yield $data;
             }
         }
-
-        $this->output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-        $this->output->writeln("\r" . '<info>' . str_pad('done', $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
-    }
-
-    /**
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return string[]
-     */
-    private function getBrands(): array
-    {
-        $brands = [];
-        $file   = new \SplFileObject('vendor/zsxsoft/php-useragent/lib/useragent_detect_device.php');
-        $file->setFlags(\SplFileObject::DROP_NEW_LINE);
-        while (!$file->eof()) {
-            $line = trim($file->fgets());
-            preg_match('/^\$brand = (["\'])(.*)(["\']);$/', $line, $matches);
-
-            if (0 < count($matches)) {
-                $brand = $matches[2];
-                if (!empty($brand)) {
-                    $brands[] = $brand;
-                }
-            }
-        }
-        $brands = array_unique($brands);
-
-        usort($brands, static function ($a, $b): int {
-            return mb_strlen($b) - mb_strlen($a);
-        });
-
-        return $brands;
     }
 }

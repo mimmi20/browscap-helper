@@ -33,6 +33,17 @@ final class ExistingTestsRemover extends Helper
      */
     public function remove(OutputInterface $output, string $testSource): void
     {
+        $baseMessage   = 'remove old files';
+        $messageLength = 0;
+
+        $message = $baseMessage . ' ...';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
+
         $finder = new Finder();
         $finder->files();
         $finder->ignoreDotFiles(true);
@@ -41,14 +52,10 @@ final class ExistingTestsRemover extends Helper
         $finder->ignoreUnreadableDirs();
         $finder->in($testSource);
 
-        $counter       = 0;
-        $messageLength = 0;
-        $baseMessage   = 'remove old files ';
-
-        $output->writeln($baseMessage . '...', OutputInterface::VERBOSITY_NORMAL);
+        $counter = 0;
 
         foreach ($finder as $file) {
-            $message = $baseMessage . sprintf('[%7d]', $counter) . ' ...';
+            $message = $baseMessage . sprintf(' [%7d] - %s', $counter, $file->getPathname()) . ' ...';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -61,6 +68,13 @@ final class ExistingTestsRemover extends Helper
             ++$counter;
         }
 
+        $message = $baseMessage . ' - done';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
         $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
     }
 }
