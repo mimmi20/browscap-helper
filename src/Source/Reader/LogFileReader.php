@@ -12,27 +12,18 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source\Reader;
 
 use BrowscapHelper\Source\Helper\Regex;
-use Psr\Log\LoggerInterface;
+use BrowscapHelper\Source\OutputAwareInterface;
+use BrowscapHelper\Source\OutputAwareTrait;
+use Symfony\Component\Console\Output\OutputInterface;
 
-final class LogFileReader implements ReaderInterface
+final class LogFileReader implements ReaderInterface, OutputAwareInterface
 {
+    use OutputAwareTrait;
+
     /**
      * @var array
      */
     private $files = [];
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
 
     /**
      * @param string $file
@@ -45,21 +36,28 @@ final class LogFileReader implements ReaderInterface
     }
 
     /**
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param string $parentMessage
+     * @param int    $messageLength
      *
      * @return \Generator
      */
-    public function getAgents(LoggerInterface $logger): iterable
+    public function getAgents(string $parentMessage = '', int &$messageLength = 0): iterable
     {
         $regex = (new Regex())->getRegex();
 
         foreach ($this->files as $file) {
-            $this->logger->info(sprintf('reading file %s', $file));
+            $message = $parentMessage . sprintf('- reading file %s', $file);
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
             $handle = @fopen($file, 'r');
 
             if (false === $handle) {
-                $this->logger->emergency(new \RuntimeException('reading file ' . $file . ' caused an error'));
+                $this->writeln("\r" . '<error>' . $parentMessage . sprintf('- reading file %s caused an error</error>', $file), OutputInterface::VERBOSITY_NORMAL);
                 continue;
             }
 
@@ -80,7 +78,7 @@ final class LogFileReader implements ReaderInterface
                 $lineMatches = [];
 
                 if (!(bool) preg_match($regex, $line, $lineMatches)) {
-                    $logger->error('no useragent found in line "' . $line . '" used regex: "' . $regex . '"');
+                    $this->writeln("\r" . '<error>' . $parentMessage . sprintf('- no useragent found in line "%s" used regex: "%s"</error>', $line, $regex), OutputInterface::VERBOSITY_NORMAL);
 
                     continue;
                 }

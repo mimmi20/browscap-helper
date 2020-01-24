@@ -11,6 +11,7 @@
 declare(strict_types = 1);
 namespace BrowscapHelper\Command\Helper;
 
+use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\SourceInterface;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,12 +34,29 @@ final class ExistingTestsLoader extends Helper
      */
     public function getHeaders(OutputInterface $output, array $sources): iterable
     {
-        $output->writeln('reading sources ...', OutputInterface::VERBOSITY_NORMAL);
-
+        $baseMessage   = 'reading sources';
         $messageLength = 0;
 
+        $message = $baseMessage . ' ...';
+
+        if (mb_strlen($message) > $messageLength) {
+            $messageLength = mb_strlen($message);
+        }
+
+        $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
+
         foreach ($sources as $source) {
-            $message = sprintf('reading from source %s ...', $source->getName());
+            if ($source instanceof OutputAwareInterface) {
+                $source->setOutput($output);
+            }
+
+            $baseMessage = sprintf('reading from source %s ', $source->getName());
+
+            if (!$source->isReady($baseMessage)) {
+                continue;
+            }
+
+            $message = $baseMessage . '...';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -46,7 +64,15 @@ final class ExistingTestsLoader extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-            yield from $source->getHeaders();
+            yield from $source->getHeaders($baseMessage, $messageLength);
+
+            $message = $baseMessage . '- done';
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->writeln("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
         }
     }
 }

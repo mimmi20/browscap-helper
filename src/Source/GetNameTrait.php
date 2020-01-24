@@ -9,19 +9,15 @@
  */
 
 declare(strict_types = 1);
-namespace BrowscapHelper\Source\Reader;
+namespace BrowscapHelper\Source;
 
-interface ReaderInterface
+trait GetNameTrait
 {
     /**
-     * @param string $file
-     *
-     * @return void
+     * @return string
      */
-    public function addLocalFile(string $file): void;
-
-    /**
-     * @return iterable
-     */
-    public function getAgents(): iterable;
+    public function getName(): string
+    {
+        return self::NAME;
+    }
 }

@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\LogFileSource;
+use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -84,18 +85,18 @@ final class ConvertLogsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $consoleLogger = new ConsoleLogger($output);
-
         $sourcesDirectory = $input->getOption('resources');
 
         $testSource = 'tests';
         $txtChecks  = [];
 
-        $output->writeln('reading already existing tests ...');
+        $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($output, $testSource)]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($testSource)]) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $consoleLogger->alert('Header "' . $seachHeader . '" added more than once --> skipped');
+                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -105,16 +106,18 @@ final class ConvertLogsCommand extends Command
 
         $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
-        $output->writeln('init sources ...');
+        $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $source = new LogFileSource($output, $sourcesDirectory, $consoleLogger);
+        $source = new LogFileSource($sourcesDirectory, new ConsoleLogger($output));
 
-        $output->writeln('copy tests from sources ...');
+        $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [$source]) as $seachHeader) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [$source]) as $header) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $output->writeln('<debug>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</debug>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -123,13 +126,13 @@ final class ConvertLogsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $output->writeln('rewrite tests ...');
+        $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
         $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
 
-        $output->writeln('');
-        $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter);
-        $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
+        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('tests available for Browscap helper: ' . count($txtChecks), OutputInterface::VERBOSITY_NORMAL);
 
         return 0;
     }

@@ -109,12 +109,13 @@ final class CreateTestsCommand extends Command
     {
         $consoleLogger = new ConsoleLogger($output);
 
-        $output->writeln('preparing browscap ...');
+        $output->writeln('preparing browscap ...', OutputInterface::VERBOSITY_NORMAL);
 
         $browscapChecks = [];
 
         $cache           = new Psr16Cache(new ArrayAdapter());
         $browscapUpdater = new BrowscapUpdater($cache, $consoleLogger);
+
         try {
             $browscapUpdater->update(IniLoaderInterface::PHP_INI_FULL);
         } catch (\BrowscapPHP\Helper\Exception $e) {
@@ -126,13 +127,13 @@ final class CreateTestsCommand extends Command
         $browscap = new Browscap($cache, $consoleLogger);
         $tests    = [];
 
-        $output->writeln('reading already existing tests ...');
+        $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new BrowscapSource($output)]) as $header) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new BrowscapSource()]) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $browscapChecks)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -177,17 +178,17 @@ final class CreateTestsCommand extends Command
             $tests[$key] = 1;
         }
 
-        $output->writeln('init sources ...');
+        $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $sourcesDirectory      = $input->getOption('resources');
         $genericRequestFactory = new GenericRequestFactory();
         $sources               = [
-            //new JsonFileSource($output, $testSource),
-            new TxtFileSource($output, $sourcesDirectory),
-            //new TxtCounterFileSource($output, $sourcesDirectory),
+            //new JsonFileSource($testSource),
+            new TxtFileSource($sourcesDirectory),
+            //new TxtCounterFileSource($sourcesDirectory),
         ];
 
-        $output->writeln('selecting tests from sources ...');
+        $output->writeln('selecting tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $testResults = [];
 
         $browserLoader = new TypeLoader();
@@ -298,7 +299,7 @@ final class CreateTestsCommand extends Command
             $testResults[]                = $result;
         }
 
-        $output->writeln('write new test files ...');
+        $output->writeln('write new test files ...', OutputInterface::VERBOSITY_NORMAL);
 
         $folderChunks         = array_chunk($testResults, 1000);
         $browscapTotalCounter = 0;
@@ -307,8 +308,8 @@ final class CreateTestsCommand extends Command
             $this->getHelper('browscap-test-writer')->write($folderChunk, $folderId, $browscapTotalCounter);
         }
 
-        $output->writeln('');
-        $output->writeln('tests created for Browscap: ' . $browscapTotalCounter);
+        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('tests created for Browscap: ' . $browscapTotalCounter, OutputInterface::VERBOSITY_NORMAL);
 
         return 0;
     }

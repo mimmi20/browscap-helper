@@ -27,13 +27,13 @@ use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Source\ZsxsoftSource;
+use ExceptionalJSON\EncodeErrorException;
 use JsonClass\Json;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class CopyTestsCommand extends Command
@@ -101,20 +101,18 @@ final class CopyTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $consoleLogger = new ConsoleLogger($output);
-
-        $sourcesDirectory = $input->getOption('resources');
-
         $testSource = 'tests';
         $txtChecks  = [];
 
-        $output->writeln('reading already existing tests ...');
+        $sources = [new JsonFileSource($testSource)];
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($output, $testSource)]) as $header) {
+        $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
+
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $consoleLogger->alert('    Header "' . $seachHeader . '" added more than once --> skipped');
+                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -122,44 +120,44 @@ final class CopyTestsCommand extends Command
             $txtChecks[$seachHeader] = 1;
         }
 
+        $sourcesDirectory = $input->getOption('resources');
+
         $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
-        $output->writeln('init sources ...');
+        $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $cache   = new Psr16Cache(new NullAdapter());
         $sources = [
-            new BrowscapSource($output),
-            new PiwikSource($output),
-            new UapCoreSource($output, $cache),
-            new WhichBrowserSource($output),
-            new WootheeSource($output),
-            new MobileDetectSource($output),
-            new YzalisSource($output),
-            new CrawlerDetectSource($output),
-            new DonatjSource($output),
-            new SinergiSource($output),
-            new UaParserJsSource($output),
-            new ZsxsoftSource($output),
-            new TxtFileSource($output, $sourcesDirectory),
-            new TxtCounterFileSource($output, $sourcesDirectory),
+            new BrowscapSource(),
+            new PiwikSource(),
+            new UapCoreSource($cache),
+            new WhichBrowserSource(),
+            new WootheeSource(),
+            new MobileDetectSource(),
+            new YzalisSource(),
+            new CrawlerDetectSource(),
+            new DonatjSource(),
+            new SinergiSource(),
+            new UaParserJsSource(),
+            new ZsxsoftSource(),
+            new TxtFileSource($sourcesDirectory),
+            new TxtCounterFileSource($sourcesDirectory),
         ];
 
-        $output->writeln('copy tests from sources ...');
+        $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
         foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $consoleLogger->debug('Header "' . $seachHeader . '" added more than once --> skipped');
-
                 continue;
             }
 
             try {
                 (new Json())->encode($seachHeader);
-            } catch (\ExceptionalJSON\EncodeErrorException $e) {
-                $consoleLogger->debug('Header "' . $seachHeader . '" contained illegal characters --> skipped');
+            } catch (EncodeErrorException $e) {
+                $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 continue;
             }
@@ -168,13 +166,13 @@ final class CopyTestsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $output->writeln('rewrite tests ...');
+        $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
         $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
 
-        $output->writeln('');
-        $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter);
-        $output->writeln('tests available for Browscap helper: ' . count($txtChecks));
+        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln('tests available for Browscap helper: ' . count($txtChecks), OutputInterface::VERBOSITY_NORMAL);
 
         return 0;
     }
