@@ -23,6 +23,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use UaResult\Result\ResultInterface;
 
 final class RewriteTestsCommand extends Command
@@ -55,12 +56,17 @@ final class RewriteTestsCommand extends Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Console\Exception\LogicException                   When this abstract method is not implemented
+     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws \Symfony\Component\Finder\Exception\DirectoryNotFoundException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
      * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \ArithmeticError
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
+     * @throws \LogicException
      *
      * @return int 0 if everything went fine, or an error code
      *
@@ -84,41 +90,57 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
+        $this->getHelper('existing-tests-remover')->remove($output, '.build');
+        $this->getHelper('existing-tests-remover')->remove($output, '.build', true);
+
         $txtChecks     = [];
         $messageLength = 0;
+        $counter       = 0;
+        $duplicates    = 0;
+        $errors        = 0;
+        $testCount     = 0;
+        $baseMessage   = 'checking Header ';
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
+        $clonedOutput = clone $output;
+        $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($clonedOutput, $sources) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
-            if (array_key_exists($seachHeader, $txtChecks)) {
-                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
-
-                continue;
-            }
-
-            $txtChecks[$seachHeader] = $header;
-        }
-
-        $testResults = [];
-        $counter     = 0;
-        $duplicates  = 0;
-        $errors      = 0;
-        $testCount   = 0;
-        $baseMessage = 'checking Header ';
-
-        foreach ($txtChecks as $seachHeader => $headers) {
             ++$counter;
 
-            $message = $baseMessage . sprintf('[%7d]', $counter) . ' - redetect';
+            $addMessage = sprintf(
+                '[%7d] - redetect - [%7d tests] - [%7d duplicates] - [%7d errors] <bg=green;fg=white;>%s</><bg=yellow;fg=black;>%s</><bg=red;fg=white;>%s</> <bg=red;fg=white;>%12d byte</>',
+                $counter,
+                $testCount,
+                $duplicates,
+                $errors,
+                str_pad('', (int) ($testCount / $counter * 50)),
+                str_pad('', (int) ($duplicates / $counter * 50)),
+                str_pad('', (int) ($errors / $counter * 50)),
+                memory_get_usage(true)
+            );
+            $message = $baseMessage . $addMessage;
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
             }
 
-            $output->write("\r" . str_pad($message, $messageLength, ' '), false);
+            $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_NORMAL);
+
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                ++$errors;
+
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                continue;
+            }
+
+            $txtChecks[$seachHeader] = 1;
 
             try {
-                $result = $this->handleTest($output, $detector, $headers, $message, $messageLength);
+                $result = $this->handleTest($output, $detector, $header, $message, $messageLength);
             } catch (\UnexpectedValueException $e) {
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
@@ -142,15 +164,43 @@ final class RewriteTestsCommand extends Command
 
             $t = mb_strtolower($result->getDevice()->getType()->getType());
 
+            if (!file_exists(sprintf('.build/%s', $c))) {
+                mkdir(sprintf('.build/%s', $c));
+            }
+
+            $file = sprintf('.build/%s/%s.json', $c, $t);
+
+            if (!file_exists($file)) {
+                $tests = [];
+            } else {
+                $tests = json_decode(file_get_contents($file));
+            }
+
             try {
-                $testResults[$c][$t][] = $result->toArray();
+                $tests[] = $result->toArray();
             } catch (\UnexpectedValueException $e) {
+                unset($tests);
+
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln('<error>' . (new \Exception('An error occured while converting a result to an array', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
+
+            $saved = file_put_contents($file, json_encode($tests));
+
+            unset($tests);
+
+            if (false === $saved) {
+                ++$errors;
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . sprintf('An error occured while saving file %s', $file) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                continue;
+            }
+
+            unset($file);
 
             ++$testCount;
         }
@@ -169,30 +219,41 @@ final class RewriteTestsCommand extends Command
         $messageLength = 0;
         $baseMessage   = 're-write test files in directory ';
 
-        ksort($testResults, SORT_STRING | SORT_ASC);
+        $baseFinder = new Finder();
+        $baseFinder->notName('*.gitkeep');
+        $baseFinder->ignoreDotFiles(true);
+        $baseFinder->ignoreVCS(true);
+        $baseFinder->sortByName();
+        $baseFinder->ignoreUnreadableDirs();
 
-        foreach ($testResults as $c => $x) {
-            $message = $baseMessage . sprintf('tests/data/%s/', $c);
+        $dirFinder = clone $baseFinder;
+        $dirFinder->directories();
+        $dirFinder->in('.build');
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+        foreach ($dirFinder as $dir) {
+            $fileFinder = clone $baseFinder;
+            $fileFinder->files();
+            $fileFinder->in($dir->getPathname());
 
-            $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $c = $dir->getBasename();
 
-            if (!file_exists(sprintf($basePath . 'tests/data/%s', $c))) {
-                mkdir(sprintf($basePath . 'tests/data/%s', $c));
-            }
+            foreach ($fileFinder as $file) {
+                $t = $file->getBasename('.' . $file->getExtension());
 
-            ksort($x, SORT_STRING | SORT_ASC);
-
-            foreach ($x as $t => $data) {
-                if (!file_exists(sprintf($basePath . 'tests/data/%s/%s', $c, $t))) {
-                    mkdir(sprintf($basePath . 'tests/data/%s/%s', $c, $t));
-                }
+                $data = json_decode($file->getContents());
 
                 foreach (array_chunk($data, 100) as $number => $parts) {
                     $path = $basePath . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number);
+
+                    $p1 = $basePath . sprintf('tests/data/%s', $c);
+                    if (!file_exists($p1)) {
+                        mkdir($p1);
+                    }
+
+                    $p2 = $basePath . sprintf('tests/data/%s/%s', $c, $t);
+                    if (!file_exists($p2)) {
+                        mkdir($p2);
+                    }
 
                     $message = $baseMessage . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number) . ' - normalizing';
 
@@ -226,16 +287,24 @@ final class RewriteTestsCommand extends Command
 
                     $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-                    file_put_contents(
+                    $success = @file_put_contents(
                         $path,
                         $normalized
                     );
+
+                    if (false === $success) {
+                        ++$errors;
+                        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                        $output->writeln('<error>' . sprintf('An error occured while writing file %s', $path) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                    }
                 }
             }
         }
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln('done', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(sprintf('tests written: %7d', $testCount), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(sprintf('errors:        %7d', $errors), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(sprintf('duplicates:    %7d', $duplicates), OutputInterface::VERBOSITY_NORMAL);
 
         return 0;
     }

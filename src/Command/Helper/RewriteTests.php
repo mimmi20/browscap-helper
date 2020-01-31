@@ -28,7 +28,11 @@ final class RewriteTests extends Helper
      * @param string          $testSource
      *
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \UnexpectedValueException
      *
      * @return void
      */

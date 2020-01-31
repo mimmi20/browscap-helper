@@ -25,13 +25,14 @@ final class ExistingTestsRemover extends Helper
     /**
      * @param OutputInterface $output
      * @param string          $testSource
+     * @param bool            $dirs
      *
      * @throws \Symfony\Component\Finder\Exception\DirectoryNotFoundException
      * @throws \LogicException
      *
      * @return void
      */
-    public function remove(OutputInterface $output, string $testSource): void
+    public function remove(OutputInterface $output, string $testSource, bool $dirs = false): void
     {
         $baseMessage   = 'remove old files';
         $messageLength = 0;
@@ -45,7 +46,12 @@ final class ExistingTestsRemover extends Helper
         $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
 
         $finder = new Finder();
-        $finder->files();
+        if ($dirs) {
+            $finder->directories();
+        } else {
+            $finder->files();
+        }
+        $finder->notName('*.gitkeep');
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);
         $finder->sortByName();
@@ -63,7 +69,11 @@ final class ExistingTestsRemover extends Helper
 
             $output->write("\r" . '<fg=yellow>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-            //unlink($file->getPathname());
+            if ($dirs) {
+                @rmdir($file->getPathname());
+            } else {
+                @unlink($file->getPathname());
+            }
 
             ++$counter;
         }

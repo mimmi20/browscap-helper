@@ -13,6 +13,7 @@ namespace BrowscapHelper\Command\Helper;
 
 use Ergebnis\Json\Normalizer;
 use ExceptionalJSON\EncodeErrorException;
+use Json\Normalizer\FormatNormalizer;
 use JsonClass\Json;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\SchemaStorage;
@@ -27,16 +28,6 @@ final class JsonNormalizer extends Helper
      */
     private $normalizers;
 
-    /**
-     * @var Normalizer\Format\Format
-     */
-    private $format;
-
-    /**
-     * @var Normalizer\Format\Formatter
-     */
-    private $formatter;
-
     public function getName()
     {
         return 'json-normalizer';
@@ -47,6 +38,10 @@ final class JsonNormalizer extends Helper
      * @param string                                            $schemaUri
      *
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
+     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
+     * @throws \UnexpectedValueException
      */
     public function init(OutputInterface $output, string $schemaUri): void
     {
@@ -82,49 +77,14 @@ final class JsonNormalizer extends Helper
                 $schemaStorage,
                 new Normalizer\Validator\SchemaValidator($jsonSchemavalidator)
             ),
-            'encoding-normalizer' => new Normalizer\JsonEncodeNormalizer(Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)),
-            'indent-normalizer' => new class() implements Normalizer\NormalizerInterface {
-                /**
-                 * @param \Ergebnis\Json\Normalizer\Json $json
-                 *
-                 * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException
-                 * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
-                 * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
-                 *
-                 * @return \Ergebnis\Json\Normalizer\Json
-                 */
-                public function normalize(Normalizer\Json $json): Normalizer\Json
-                {
-                    $oldIndent = Normalizer\Format\Indent::fromJson($json);
-                    $newIndent = Normalizer\Format\Indent::fromSizeAndStyle(2, 'space');
-
-                    if ((string) $oldIndent === (string) $newIndent) {
-                        return clone $json;
-                    }
-
-                    $newline = (string) Normalizer\Format\NewLine::fromJson($json);
-                    $lines = explode($newline, $json->encoded());
-
-                    if (false === $lines) {
-                        return clone $json;
-                    }
-
-                    $formattedLines = [];
-
-                    foreach ($lines as $line) {
-                        if (1 > preg_match('/^(\s*)(\S.*)/', $line, $matches)) {
-                            $formattedLines[] = $line;
-                            continue;
-                        }
-
-                        $x = str_replace([$oldIndent, '$ni$'], ['$ni$', $newIndent], $matches[1]);
-
-                        $formattedLines[] = $x . $matches[2];
-                    }
-
-                    return Normalizer\Json::fromEncoded(implode("\n", $formattedLines) . "\n");
-                }
-            },
+            'format-normalizer' => new FormatNormalizer(
+                new Normalizer\Format\Format(
+                    Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+                    Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
+                    Normalizer\Format\NewLine::fromString("\n"),
+                    true
+                )
+            ),
         ];
 
         $message2 = $message . ' - done';
