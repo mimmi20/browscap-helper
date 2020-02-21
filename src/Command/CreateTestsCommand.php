@@ -114,7 +114,7 @@ final class CreateTestsCommand extends Command
         $browscapChecks = [];
 
         $cache           = new Psr16Cache(new ArrayAdapter());
-        $browscapUpdater = new BrowscapUpdater($cache, $consoleLogger);
+        $browscapUpdater = new BrowscapUpdater($cache, $consoleLogger, null, 10);
 
         try {
             $browscapUpdater->update(IniLoaderInterface::PHP_INI_FULL);
@@ -218,7 +218,7 @@ final class CreateTestsCommand extends Command
             $headers = UserAgent::fromString($seachHeader)->getHeaders();
 
             if (1 < count($headers)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" has more than one Header --> skipped');
+                $consoleLogger->warning('    Header "' . $seachHeader . '" has more than one Header --> skipped');
 
                 continue;
             }
@@ -230,38 +230,38 @@ final class CreateTestsCommand extends Command
                 continue;
             }
 
-            if (in_array($result->device_name, ['general Mobile Phone', 'general Tablet', 'general Mobile Device'], true)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" has unknown device --> skipped');
+//            if (in_array($result->device_name, ['general Mobile Phone', 'general Tablet', 'general Mobile Device'], true)) {
+//                $consoleLogger->debug('    Header "' . $seachHeader . '" has unknown device --> skipped');
+//
+//                continue;
+//            }
+//
+//            if (in_array($result->browser, ['Default Browser'], true)) {
+//                $consoleLogger->debug('    Header "' . $seachHeader . '" has unknown browser --> skipped');
+//
+//                continue;
+//            }
 
-                continue;
-            }
-
-            if (in_array($result->browser, ['Default Browser'], true)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" has unknown browser --> skipped');
-
-                continue;
-            }
-
-            $keys = [
-                (string) $result->browser,
-                (string) $result->version,
-                (string) $result->renderingengine_name,
-                (string) $result->renderingengine_version,
-                (string) $result->platform,
-                (string) $result->platform_version,
-                (string) $result->device_code_name,
-                (string) $result->device_name,
-            ];
-
-            $key = implode('-', $keys);
-
-            if (array_key_exists($key, $tests)) {
-                $consoleLogger->debug('    Header "' . $seachHeader . '" has is similar to already detected result --> skipped');
-
-                continue;
-            }
-
-            $tests[$key] = 1;
+//            $keys = [
+//                (string) $result->browser,
+//                (string) $result->version,
+//                (string) $result->renderingengine_name,
+//                (string) $result->renderingengine_version,
+//                (string) $result->platform,
+//                (string) $result->platform_version,
+//                (string) $result->device_code_name,
+//                (string) $result->device_name,
+//            ];
+//
+//            $key = implode('-', $keys);
+//
+//            if (array_key_exists($key, $tests)) {
+//                $consoleLogger->warning('    Header "' . $seachHeader . '" has is similar to already detected result --> skipped');
+//
+//                continue;
+//            }
+//
+//            $tests[$key] = 1;
 
             $browser = new Browser(
                 $result->browser,
