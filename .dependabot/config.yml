@@ -29,3 +29,5 @@ update_configs:
           dependency_name: "ergebnis/json-normalizer"
       - match:
           dependency_name: "ergebnis/composer-normalize"
+      - match:
+          dependency_name: "ergebnis/phpstan-rules"
