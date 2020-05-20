@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<ruleset name="PHP_CodeSniffer">
+<ruleset name="browscap-helper"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd"
+>
     <description>browscap-helper</description>
 
-    <arg name="report" value="full" />
-    <arg value="np" />
+    <arg name="report" value="full"/>
+    <arg value="wps"/>
+    <arg name="encoding" value="utf-8"/>
 
     <!-- inherit rules from: -->
-    <rule ref="PSR2" />
-
-    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
-    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
-        <properties>
-            <property name="ignoreBlankLines" value="false"/>
-        </properties>
+    <rule ref="mimmi20-cs">
+        <exclude name="SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedConstant"/>
+        <exclude name="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>
     </rule>
 
     <!-- Paths to check -->

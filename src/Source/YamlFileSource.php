@@ -16,14 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-final class YamlFileSource implements SourceInterface, OutputAwareInterface
+final class YamlFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $dir;
 
     private const NAME = 'yaml-files';

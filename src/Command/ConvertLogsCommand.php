@@ -22,26 +22,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class ConvertLogsCommand extends Command
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $sourcesDirectory = '';
 
     /**
-     * @var string
-     */
-    private $targetDirectory = '';
-
-    /**
      * @param string $sourcesDirectory
-     * @param string $targetDirectory
      *
      * @throws \Symfony\Component\Console\Exception\LogicException
      */
-    public function __construct(string $sourcesDirectory, string $targetDirectory)
+    public function __construct(string $sourcesDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
-        $this->targetDirectory  = $targetDirectory;
 
         parent::__construct();
     }
@@ -50,6 +41,8 @@ final class ConvertLogsCommand extends Command
      * Configures the current command.
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
+     * @return void
      */
     protected function configure(): void
     {
@@ -73,6 +66,8 @@ final class ConvertLogsCommand extends Command
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
+     * @see    setCode()
+     *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
@@ -80,8 +75,6 @@ final class ConvertLogsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

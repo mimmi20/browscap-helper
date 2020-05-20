@@ -17,7 +17,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class RewriteTests extends Helper
 {
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return 'rewrite-tests';
     }
@@ -38,9 +41,9 @@ final class RewriteTests extends Helper
      */
     public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
     {
-        /** @var JsonNormalizer $jsonNormalizer */
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
-        $schema         = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
+        \assert($jsonNormalizer instanceof JsonNormalizer);
+        $schema = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
 
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
         $jsonNormalizer->init($output, $schema);
