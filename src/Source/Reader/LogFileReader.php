@@ -16,13 +16,11 @@ use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\OutputAwareTrait;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class LogFileReader implements ReaderInterface, OutputAwareInterface
+final class LogFileReader implements OutputAwareInterface, ReaderInterface
 {
     use OutputAwareTrait;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $files = [];
 
     /**
@@ -69,6 +67,7 @@ final class LogFileReader implements ReaderInterface, OutputAwareInterface
                 if (false === $line) {
                     continue;
                 }
+
                 ++$i;
 
                 if (empty($line)) {

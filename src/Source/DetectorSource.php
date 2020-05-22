@@ -17,7 +17,7 @@ use JsonClass\Json;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class DetectorSource implements SourceInterface, OutputAwareInterface
+final class DetectorSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;

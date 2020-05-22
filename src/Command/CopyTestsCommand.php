@@ -29,8 +29,6 @@ use BrowscapHelper\Source\YzalisSource;
 use BrowscapHelper\Source\ZsxsoftSource;
 use ExceptionalJSON\EncodeErrorException;
 use JsonClass\Json;
-use Symfony\Component\Cache\Adapter\NullAdapter;
-use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,26 +36,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CopyTestsCommand extends Command
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $sourcesDirectory = '';
 
     /**
-     * @var string
-     */
-    private $targetDirectory = '';
-
-    /**
      * @param string $sourcesDirectory
-     * @param string $targetDirectory
      *
      * @throws \Symfony\Component\Console\Exception\LogicException
      */
-    public function __construct(string $sourcesDirectory, string $targetDirectory)
+    public function __construct(string $sourcesDirectory)
     {
         $this->sourcesDirectory = $sourcesDirectory;
-        $this->targetDirectory  = $targetDirectory;
 
         parent::__construct();
     }
@@ -66,6 +55,8 @@ final class CopyTestsCommand extends Command
      * Configures the current command.
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
+     * @return void
      */
     protected function configure(): void
     {
@@ -89,6 +80,8 @@ final class CopyTestsCommand extends Command
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
+     * @see    setCode()
+     *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
@@ -96,8 +89,6 @@ final class CopyTestsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -126,11 +117,10 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $cache   = new Psr16Cache(new NullAdapter());
         $sources = [
             new BrowscapSource(),
             new PiwikSource(),
-            new UapCoreSource($cache),
+            new UapCoreSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
             new MobileDetectSource(),

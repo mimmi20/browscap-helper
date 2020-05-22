@@ -15,13 +15,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait OutputAwareTrait
 {
-    /**
-     * @var OutputInterface|null
-     */
+    /** @var OutputInterface|null */
     private $output;
 
     /**
      * @param OutputInterface $output
+     *
+     * @return void
      */
     public function setOutput(OutputInterface $output): void
     {
@@ -34,8 +34,10 @@ trait OutputAwareTrait
      * @param iterable|string $messages The message as an iterable of strings or a single string
      * @param bool            $newline  Whether to add a newline
      * @param int             $options  A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
+     *
+     * @return void
      */
-    public function write($messages, $newline = false, $options = 0): void
+    public function write($messages, bool $newline = false, int $options = 0): void
     {
         if (null === $this->output) {
             return;
@@ -49,8 +51,10 @@ trait OutputAwareTrait
      *
      * @param iterable|string $messages The message as an iterable of strings or a single string
      * @param int             $options  A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
+     *
+     * @return void
      */
-    public function writeln($messages, $options = 0): void
+    public function writeln($messages, int $options = 0): void
     {
         if (null === $this->output) {
             return;

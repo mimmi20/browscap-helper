@@ -13,14 +13,12 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 
-final class PdoSource implements SourceInterface, OutputAwareInterface
+final class PdoSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var \PDO
-     */
+    /** @var \PDO */
     private $pdo;
 
     private const NAME = 'PDO';
@@ -72,8 +70,8 @@ final class PdoSource implements SourceInterface, OutputAwareInterface
 
         $driverOptions = [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY];
 
-        /** @var \PDOStatement $stmt */
         $stmt = $this->pdo->prepare($sql, $driverOptions);
+        \assert($stmt instanceof \PDOStatement);
         $stmt->execute();
 
         while ($row = $stmt->fetch(\PDO::FETCH_OBJ)) {

@@ -17,14 +17,12 @@ use JsonClass\Json;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class JsonFileSource implements SourceInterface, OutputAwareInterface
+final class JsonFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $dir;
 
     private const NAME = 'json-files';

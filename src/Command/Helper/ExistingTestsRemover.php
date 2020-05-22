@@ -17,7 +17,10 @@ use Symfony\Component\Finder\Finder;
 
 final class ExistingTestsRemover extends Helper
 {
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return 'existing-tests-remover';
     }
@@ -51,6 +54,7 @@ final class ExistingTestsRemover extends Helper
         } else {
             $finder->files();
         }
+
         $finder->notName('*.gitkeep');
         $finder->ignoreDotFiles(true);
         $finder->ignoreVCS(true);

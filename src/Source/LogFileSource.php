@@ -14,35 +14,25 @@ namespace BrowscapHelper\Source;
 use BrowscapHelper\Source\Helper\FilePath;
 use BrowscapHelper\Source\Reader\LogFileReader;
 use BrowscapHelper\Source\Ua\UserAgent;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class LogFileSource implements SourceInterface, OutputAwareInterface
+final class LogFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $dir;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     private const NAME = 'log-files';
 
     /**
-     * @param string          $sourcesDirectory
-     * @param LoggerInterface $logger
+     * @param string $sourcesDirectory
      */
-    public function __construct(string $sourcesDirectory, LoggerInterface $logger)
+    public function __construct(string $sourcesDirectory)
     {
-        $this->dir    = $sourcesDirectory;
-        $this->logger = $logger;
+        $this->dir = $sourcesDirectory;
     }
 
     /**

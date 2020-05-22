@@ -36,6 +36,8 @@ parameters:
     - '~Error suppression via "@" should not be used~'
 #    - '~Else branch is unreachable because ternary operator condition is always true~'
 #    - '~Strict comparison using !== between null and string will always evaluate to true~'
+    - '~Call to function assert\(\) with true will always evaluate to true~'
+    - '~Instanceof between PDOStatement and PDOStatement will always evaluate to true~'
 
 includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon

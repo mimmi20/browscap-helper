@@ -23,12 +23,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class JsonNormalizer extends Helper
 {
-    /**
-     * @var \Ergebnis\Json\Normalizer\NormalizerInterface[]
-     */
+    /** @var \Ergebnis\Json\Normalizer\NormalizerInterface[] */
     private $normalizers;
 
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return 'json-normalizer';
     }
@@ -42,6 +43,8 @@ final class JsonNormalizer extends Helper
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
      * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
      * @throws \UnexpectedValueException
+     *
+     * @return void
      */
     public function init(OutputInterface $output, string $schemaUri): void
     {
