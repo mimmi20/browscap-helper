@@ -15,7 +15,7 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class ZsxsoftSource implements SourceInterface, OutputAwareInterface
+final class ZsxsoftSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;

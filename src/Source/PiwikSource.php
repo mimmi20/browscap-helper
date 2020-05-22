@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-final class PiwikSource implements SourceInterface, OutputAwareInterface
+final class PiwikSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;

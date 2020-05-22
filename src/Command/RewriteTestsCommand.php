@@ -28,15 +28,15 @@ use UaResult\Result\ResultInterface;
 
 final class RewriteTestsCommand extends Command
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $tests = [];
 
     /**
      * Configures the current command.
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
+     * @return void
      */
     protected function configure(): void
     {
@@ -51,6 +51,8 @@ final class RewriteTestsCommand extends Command
      * as a concrete class. In this case, instead of defining the
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
+     *
+     * @see    setCode()
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
@@ -69,8 +71,6 @@ final class RewriteTestsCommand extends Command
      * @throws \LogicException
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -209,8 +209,8 @@ final class RewriteTestsCommand extends Command
 
         $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
 
-        /** @var JsonNormalizer $jsonNormalizer */
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
+        \assert($jsonNormalizer instanceof JsonNormalizer);
         $jsonNormalizer->init($output, $testSchemaUri);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors), OutputInterface::VERBOSITY_NORMAL);
@@ -292,11 +292,13 @@ final class RewriteTestsCommand extends Command
                         $normalized
                     );
 
-                    if (false === $success) {
-                        ++$errors;
-                        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                        $output->writeln('<error>' . sprintf('An error occured while writing file %s', $path) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                    if (false !== $success) {
+                        continue;
                     }
+
+                    ++$errors;
+                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln('<error>' . sprintf('An error occured while writing file %s', $path) . '</error>', OutputInterface::VERBOSITY_NORMAL);
                 }
             }
         }
@@ -341,7 +343,8 @@ final class RewriteTestsCommand extends Command
 
         $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        if (in_array($newResult->getDevice()->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'], true)
+        if (
+            in_array($newResult->getDevice()->getDeviceName(), ['general Desktop', 'general Apple Device', 'general Philips TV'], true)
             || (
                 !$newResult->getDevice()->getType()->isMobile()
                 && !$newResult->getDevice()->getType()->isTablet()
@@ -367,7 +370,8 @@ final class RewriteTestsCommand extends Command
             }
 
             $this->tests[$key] = 1;
-        } elseif (($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet() || $newResult->getDevice()->getType()->isTv())
+        } elseif (
+            ($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet() || $newResult->getDevice()->getType()->isTv())
             && false === mb_strpos((string) $newResult->getBrowser()->getName(), 'general')
             && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'], true)
             && false === mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general')

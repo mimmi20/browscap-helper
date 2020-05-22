@@ -15,14 +15,12 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class TxtCounterFileSource implements SourceInterface, OutputAwareInterface
+final class TxtCounterFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $dir;
 
     private const NAME = 'ctxt-files';
@@ -68,6 +66,7 @@ final class TxtCounterFileSource implements SourceInterface, OutputAwareInterfac
             if (empty($agent)) {
                 continue;
             }
+
             yield $ua->getHeaders();
         }
     }

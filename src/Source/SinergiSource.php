@@ -15,7 +15,7 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class SinergiSource implements SourceInterface, OutputAwareInterface
+final class SinergiSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;

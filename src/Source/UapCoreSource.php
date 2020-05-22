@@ -12,31 +12,17 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-final class UapCoreSource implements SourceInterface, OutputAwareInterface
+final class UapCoreSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var \Psr\SimpleCache\CacheInterface
-     */
-    private $cache;
-
     private const NAME = 'ua-parser/uap-core';
     private const PATH = 'vendor/ua-parser/uap-core/tests';
-
-    /**
-     * @param \Psr\SimpleCache\CacheInterface $cache
-     */
-    public function __construct(CacheInterface $cache)
-    {
-        $this->cache = $cache;
-    }
 
     /**
      * @param string $parentMessage

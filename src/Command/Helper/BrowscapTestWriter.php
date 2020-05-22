@@ -17,9 +17,7 @@ use UaResult\Result\ResultInterface;
 
 final class BrowscapTestWriter extends Helper
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $dir;
 
     /**
@@ -30,7 +28,10 @@ final class BrowscapTestWriter extends Helper
         $this->dir = $dir;
     }
 
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return 'browscap-test-writer';
     }

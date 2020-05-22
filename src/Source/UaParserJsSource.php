@@ -17,7 +17,7 @@ use JsonClass\Json;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-final class UaParserJsSource implements SourceInterface, OutputAwareInterface
+final class UaParserJsSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;

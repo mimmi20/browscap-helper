@@ -15,14 +15,10 @@ use BrowscapHelper\Source\SourceInterface;
 
 final class UserAgent
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $header = [];
 
     /**
-     * UserAgent constructor.
-     *
      * @param array $header
      */
     public function __construct(array $header)

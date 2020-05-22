@@ -20,14 +20,9 @@ use Symfony\Component\Console\Application;
 
 final class BrowscapHelper extends Application
 {
-    /**
-     * @var string
-     */
     public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
     /**
-     * BrowscapHelper constructor.
-     *
      * @throws \Exception
      */
     public function __construct()
@@ -37,9 +32,9 @@ final class BrowscapHelper extends Application
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
         $targetDirectory  = (string) realpath(__DIR__ . '/../results/');
 
-        $this->add(new Command\ConvertLogsCommand($sourcesDirectory, $targetDirectory));
-        $this->add(new Command\CopyTestsCommand($sourcesDirectory, $targetDirectory));
-        $this->add(new Command\CreateTestsCommand($sourcesDirectory, $targetDirectory));
+        $this->add(new Command\ConvertLogsCommand($sourcesDirectory));
+        $this->add(new Command\CopyTestsCommand($sourcesDirectory));
+        $this->add(new Command\CreateTestsCommand($sourcesDirectory));
         $this->add(new Command\RewriteTestsCommand());
 
         $browscapTestWriter = new BrowscapTestWriter($targetDirectory);

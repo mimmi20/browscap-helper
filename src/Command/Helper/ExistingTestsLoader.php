@@ -18,13 +18,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class ExistingTestsLoader extends Helper
 {
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return 'existing-tests-loader';
     }
 
     /**
-     * @param OutputInterface   $output,
+     * @param OutputInterface   $output
      * @param SourceInterface[] $sources
      *
      * @throws \LogicException
