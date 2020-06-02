@@ -36,6 +36,9 @@ updates:
   - dependency-name: symfony/yaml
     versions:
     - ">= 0"
+  - dependency-name: pepakriz/phpstan-exception-rules
+    versions:
+    - ">= 0"
   commit-message:
     prefix: Build
     include: scope
