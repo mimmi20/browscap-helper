@@ -39,6 +39,9 @@ updates:
   - dependency-name: pepakriz/phpstan-exception-rules
     versions:
     - ">= 0"
+  - dependency-name: endorphin-studio/browser-detector
+    versions:
+    - ">= 0"
   commit-message:
     prefix: Build
     include: scope
