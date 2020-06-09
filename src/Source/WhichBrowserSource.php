@@ -129,28 +129,16 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
      */
     private function getHeadersFromRow(array $row): array
     {
-        $headers = [];
-
         if (array_key_exists('headers', $row)) {
             if (is_array($row['headers'])) {
                 return $row['headers'];
             }
 
-            if (class_exists(Header::class)) {
-                // pecl_http versions 2.x/3.x
-                $headers = Header::parse($row['headers']);
-            } elseif (function_exists('\http_parse_headers')) {
-                // pecl_http version 1.x
-                $headers = \http_parse_headers($row['headers']);
-            } elseif (0 === mb_strpos($row['headers'], 'User-Agent: ')) {
-                $headers = ['user-agent' => str_replace('User-Agent: ', '', $row['headers'])];
-            } else {
-                return [];
+            if (is_string($row['headers']) && 0 === mb_strpos($row['headers'], 'User-Agent: ')) {
+                return ['user-agent' => str_replace('User-Agent: ', '', $row['headers'])];
             }
-        }
 
-        if (is_array($headers)) {
-            return $headers;
+            return [];
         }
 
         return [];

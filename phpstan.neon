@@ -2,7 +2,7 @@ parameters:
   level: max
   paths:
     - src
-  autoload_files:
+  scanFiles:
     - %currentWorkingDirectory%/vendor/autoload.php
     - %currentWorkingDirectory%/vendor/squizlabs/php_codesniffer/autoload.php
     - %currentWorkingDirectory%/vendor/squizlabs/php_codesniffer/src/Util/Tokens.php
@@ -31,16 +31,10 @@ parameters:
     - '~PHPDoc tag @throws with type .* is not subtype of Throwable~'
     - '~Cannot call method get\(\) on Symfony\\Component\\Console\\Helper\\HelperSet\|null~'
 #    - '~Class http\\Header not found~'
-#    - '~Call to static method parse\(\) on an unknown class http\\Header~'
+#    - '~Static call to instance method http\\Header::parse\(\)~'
     - '~Control structures using switch should not be used~'
     - '~Error suppression via "@" should not be used~'
 #    - '~Else branch is unreachable because ternary operator condition is always true~'
 #    - '~Strict comparison using !== between null and string will always evaluate to true~'
     - '~Call to function assert\(\) with true will always evaluate to true~'
     - '~Instanceof between PDOStatement and PDOStatement will always evaluate to true~'
-
-includes:
-  - vendor/phpstan/phpstan-strict-rules/rules.neon
-  - vendor/pepakriz/phpstan-exception-rules/extension.neon
-  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
-  - vendor/ergebnis/phpstan-rules/rules.neon
