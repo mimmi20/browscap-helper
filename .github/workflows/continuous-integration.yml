@@ -8,7 +8,7 @@ name: "Continuous Integration"
 
 jobs:
   validate:
-    name: "Validate"
+    name: "Validate composer"
 
     runs-on: "ubuntu-latest"
 
@@ -104,7 +104,7 @@ jobs:
         run: "composer outdated --direct"
 
   coding-standards:
-    name: "Coding Standards"
+    name: "Check Coding Standards"
 
     needs: "install"
 

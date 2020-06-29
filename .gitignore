@@ -6,6 +6,13 @@
 vendor/
 composer.phar
 composer.lock
+build/build*/
+error.log
+ergebnis.txt
+result.txt
+phpunit.txt
+resources/browscap-*/
+tests/create-tests.php
 cache/*
 !cache/.gitkeep
 log/*
@@ -17,3 +24,7 @@ sources/*
 .build/*
 !.build/.gitkeep
 .php_cs.cache
+.phplint-cache
+.phpunit.result.cache
+infection-*.log
+rewrite*.php
