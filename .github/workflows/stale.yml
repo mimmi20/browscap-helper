@@ -1,4 +1,4 @@
-name: Close stale issues and pull requests
+name: "Close stale issues and pull requests"
 
 on:
   schedule:
@@ -7,12 +7,12 @@ on:
 jobs:
   stale:
 
-    runs-on: ubuntu-latest
-    
+    runs-on: "ubuntu-latest"
+
     steps:
-    - uses: actions/stale@v1
+    - uses: "actions/stale@v3"
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
         days-before-stale: 60
         days-before-close: 7
         stale-issue-message: >
@@ -23,5 +23,5 @@ jobs:
             This PR has been automatically marked as stale because it has not had
             recent activity. It will be closed if no further activity occurs. Thank you
             for your contributions.
-        stale-issue-label: 'no-issue-activity'
-        stale-pr-label: 'no-pr-activity'
+        stale-issue-label: "stale"
+        stale-pr-label: "stale"
