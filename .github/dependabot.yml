@@ -47,6 +47,9 @@ updates:
       - dependency-name: endorphin-studio/browser-detector
         versions:
           - ">= 0"
+      - dependency-name: browscap/browscap
+        versions:
+          - ">= 0"
     commit-message:
       include: "scope"
       prefix: "Build"
