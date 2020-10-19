@@ -12,32 +12,12 @@ parameters:
   exceptionRules:
     reportUnusedCatchesOfUncheckedExceptions: true
     uncheckedExceptions: []
-  ergebnis:
-    classesAllowedToBeExtended:
-      - Symfony\Component\Console\Application
-      - Symfony\Component\Console\Command\Command
-      - Symfony\Component\Console\Helper\Helper
-      - OutOfRangeException
-      - UnexpectedValueException
   checkMissingIterableValueType: false
   excludes_analyse:
     - */tests/*/data/*
   ignoreErrors:
     - '~expects string,~'
-#    - '~is not subtype of Throwable~'
     - '~Useless \@throws~'
     - '~is not compatible with parent~'
-#    - '~Language construct isset\(\) should not be used~'
-    - '~Construct empty\(\) is not allowed\. Use more strict comparison~'
-    - '~Language construct empty\(\) should not be used~'
-    - '~has a nullable return type declaration~'
     - '~PHPDoc tag @throws with type .* is not subtype of Throwable~'
     - '~Cannot call method get\(\) on Symfony\\Component\\Console\\Helper\\HelperSet\|null~'
-#    - '~Class http\\Header not found~'
-#    - '~Static call to instance method http\\Header::parse\(\)~'
-    - '~Control structures using switch should not be used~'
-    - '~Error suppression via "@" should not be used~'
-#    - '~Else branch is unreachable because ternary operator condition is always true~'
-#    - '~Strict comparison using !== between null and string will always evaluate to true~'
-    - '~Call to function assert\(\) with true will always evaluate to true~'
-    - '~Instanceof between PDOStatement and PDOStatement will always evaluate to true~'
