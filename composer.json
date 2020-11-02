@@ -14,7 +14,7 @@
     }
   ],
   "require": {
-    "php": "^7.1.3 || ^8.0.0",
+    "php": "^7.2.0 || ^8.0.0",
     "ext-json": "*",
     "ext-simplexml": "*",
     "browscap/browscap": "~6.0.40",
@@ -47,7 +47,6 @@
   },
   "require-dev": {
     "ext-pdo": "*",
-    "ergebnis/composer-normalize": "~2.6.0 || ~2.7.1",
     "mimmi20/coding-standard": "~1.0.4",
     "pepakriz/phpstan-exception-rules": "~0.11.1",
     "phpstan/extension-installer": "~1.0.5",
@@ -56,7 +55,7 @@
   },
   "config": {
     "platform": {
-      "php": "7.1.3"
+      "php": "7.2.0"
     },
     "preferred-install": {
       "browscap/browscap": "source",
