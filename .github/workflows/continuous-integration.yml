@@ -36,22 +36,10 @@ jobs:
       - name: "Validate composer.json"
         run: "composer validate"
 
-      - name: "Determine composer cache directory"
-        id: "determine-composer-cache-directory"
-        run: "echo \"::set-output name=directory::$(composer config cache-dir)\""
-
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v2.1.2"
-        with:
-          path: "${{ steps.determine-composer-cache-directory.outputs.directory }}"
-          key: "php-${{ matrix.php-versions }}-composer-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}"
-          restore-keys: "php-${{ matrix.php-versions }}-composer-${{ matrix.dependencies }}-"
-
-      - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction --no-suggest -vv ${{ matrix.dependencies }}"
-
       - name: "Run composer-normalize"
-        run: "composer normalize --dry-run"
+        uses: "docker://ergebnis/composer-normalize-action:latest"
+        with:
+          args: "--dry-run"
 
   install:
     name: "Check dependencies"
@@ -148,7 +136,10 @@ jobs:
         run: "vendor/bin/php-cs-fixer fix --dry-run -vv"
 
       - name: "Run squizlabs/php_codesniffer"
-        run: "vendor/bin/phpcs --colors"
+        uses: "chekalsky/phpcs-action@v1.2.0"
+        with:
+          phpcs_bin_path: "./vendor/bin/phpcs"
+          enable_warnings: true
 
   static-code-analysis:
     name: "Static Code Analysis"
