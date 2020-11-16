@@ -21,8 +21,8 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
     use GetNameTrait;
     use OutputAwareTrait;
 
-    private const NAME = 'piwik/device-detector';
-    private const PATH = 'vendor/piwik/device-detector/Tests/fixtures';
+    private const NAME = 'matomo/device-detector';
+    private const PATH = 'vendor/matomo/device-detector/regexes';
 
     /**
      * @param string $parentMessage
