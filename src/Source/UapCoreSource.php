@@ -14,6 +14,7 @@ namespace BrowscapHelper\Source;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 final class UapCoreSource implements OutputAwareInterface, SourceInterface
@@ -107,7 +108,13 @@ final class UapCoreSource implements OutputAwareInterface, SourceInterface
 
             $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $provider     = Yaml::parse($file->getContents());
+            try {
+                $provider = Yaml::parse($file->getContents());
+            } catch (ParseException $e) {
+                $this->writeln("\r" . '<error>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . sprintf('- file %s contains invalid chars</error>', $file->getFilename()), OutputInterface::VERBOSITY_NORMAL);
+                continue;
+            }
+
             $providerName = $file->getFilename();
 
             foreach ($provider['test_cases'] as $data) {
