@@ -34,7 +34,7 @@ jobs:
           coverage: "none"
 
       - name: "Validate composer.json"
-        run: "composer validate"
+        run: "composer validate --strict"
 
       - name: "Run composer-normalize"
         uses: "docker://ergebnis/composer-normalize-action:latest"
@@ -56,6 +56,7 @@ jobs:
           - "7.3"
           - "7.4"
           - "8.0"
+          - "8.1"
 
         dependencies:
           - "--prefer-lowest"
@@ -85,7 +86,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-versions }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
 
       - name: "Check dependencies with composer"
         run: "composer outdated --direct"
@@ -130,7 +131,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-versions }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
 
       - name: "Run friendsofphp/php-cs-fixer"
         run: "vendor/bin/php-cs-fixer fix --dry-run -vv"
@@ -181,7 +182,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-versions }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
 
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress"
