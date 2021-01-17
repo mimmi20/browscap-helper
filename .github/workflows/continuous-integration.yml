@@ -40,7 +40,7 @@ jobs:
         uses: "docker://ergebnis/composer-normalize-action:latest"
         with:
           args: "--dry-run"
-  
+
   lint:
     name: "Lint Code Base"
 
@@ -63,13 +63,13 @@ jobs:
 
       - name: "Lint Code Base"
         uses: "github/super-linter@v3"
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   install:
     name: "Check dependencies"
 
-    needs: 
+    needs:
       - "validate"
       - "lint"
 
