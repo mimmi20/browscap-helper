@@ -32,6 +32,7 @@ jobs:
           extensions: "mbstring, dom, xmlwriter, opcache, bcmath, curl, intl, json"
           ini-values: "opcache.enable=1, opcache.enable_cli=1, zend.assertions=1, assert.exception=On"
           coverage: "none"
+          tools: "composer:v2"
 
       - name: "Validate composer.json"
         run: "composer validate --strict"
@@ -73,6 +74,7 @@ jobs:
           extensions: "mbstring, dom, xmlwriter, opcache, bcmath, curl, intl, json"
           ini-values: "opcache.enable=1, opcache.enable_cli=1, zend.assertions=1, assert.exception=On"
           coverage: "none"
+          tools: "composer:v2"
 
       - name: "Determine composer cache directory"
         id: "determine-composer-cache-directory"
@@ -118,6 +120,7 @@ jobs:
           extensions: "mbstring, dom, xmlwriter, opcache, bcmath, curl, intl, json"
           ini-values: "opcache.enable=1, opcache.enable_cli=1, zend.assertions=1, assert.exception=On"
           coverage: "none"
+          tools: "composer:v2"
 
       - name: "Determine composer cache directory"
         id: "determine-composer-cache-directory"
@@ -169,6 +172,7 @@ jobs:
           extensions: "mbstring, dom, xmlwriter, opcache, bcmath, curl, intl, json"
           ini-values: "opcache.enable=1, opcache.enable_cli=1, zend.assertions=1, assert.exception=On"
           coverage: "none"
+          tools: "composer:v2"
 
       - name: "Determine composer cache directory"
         id: "determine-composer-cache-directory"
