@@ -10,28 +10,29 @@ exclude-labels:
 categories:
   - title: '**💥Breaking:**'
     labels:
-      - breaking
-      - 'backwards-incompatible'
+      - 'BC Break'
   - title: '**🍰Enhancements:**'
     labels:
-      - enhancement
-      - Enhancement
+      - 'enhancement'
   - title: '**🐞Bugs:**'
     labels:
-      - bug
-      - Bug
+      - 'bug'
   - title: '**💀Deprecated:**'
     labels:
-      - deprecated
-      - Deprecated
+      - 'deprecated'
   - title: '**🗑Removed:**'
     labels:
-      - removed
-      - Removed
+      - 'removed'
   - title: '**🛡Security:**'
     labels:
-      - security
-      - Security
+      - 'security'
   - title: '**🕸Dependencies:**'
     labels:
-      - dependencies
+      - 'dependencies'
+  - title: '**🧹 Maintenance:**'
+    labels:
+      - 'maintenance'
+  # other Labels to mimmi20/browscap-helper
+  - title: '**📦 new Useragents:**'
+    labels:
+      - 'new useragents'
