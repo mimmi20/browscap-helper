@@ -45,6 +45,8 @@ final class PdoSource implements OutputAwareInterface, SourceInterface
      * @param string $message
      * @param int    $messageLength
      *
+     * @throws \PDOException
+     *
      * @return array[]|iterable
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
@@ -62,6 +64,8 @@ final class PdoSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
+     * @throws \PDOException
+     *
      * @return iterable|\stdClass[]
      */
     private function getAgents(): iterable
