@@ -2,3 +2,36 @@ template: |
   ## What’s Changed
 
   $CHANGES
+exclude-labels:
+  - duplicate
+  - question
+  - invalid
+  - wontfix
+categories:
+  - title: '**💥Breaking:**'
+    labels:
+      - breaking
+      - 'backwards-incompatible'
+  - title: '**🍰Enhancements:**'
+    labels:
+      - enhancement
+      - Enhancement
+  - title: '**🐞Bugs:**'
+    labels:
+      - bug
+      - Bug
+  - title: '**💀Deprecated:**'
+    labels:
+      - deprecated
+      - Deprecated
+  - title: '**🗑Removed:**'
+    labels:
+      - removed
+      - Removed
+  - title: '**🛡Security:**'
+    labels:
+      - security
+      - Security
+  - title: '**🕸Dependencies:**'
+    labels:
+      - dependencies
