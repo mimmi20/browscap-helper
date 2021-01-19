@@ -11,39 +11,13 @@ on:
       - '*'
 
 jobs:
-  update_release_draft:
+  update-release-draft:
+
     runs-on: ubuntu-latest
+
     steps:
       # Drafts your next Release notes as Pull Requests are merged into "master"
-      - name: Release Drafter
-        uses: release-drafter/release-drafter@v5.13.0
+      - name: "Release Drafter"
+        uses: "release-drafter/release-drafter@v5.13.0"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Changelog Generator
-        uses: heinrichreimer/github-changelog-generator-action@v2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          output: CHANGELOG.md
-          releaseBranch: master
-          issues: true
-          issuesWoLabels: true
-          pullRequests: true
-          prWoLabels: true
-          unreleased: true
-          breakingLabel: "**💥Breaking:**"
-          breakingLabels: 'BC Break'
-          enhancementLabel: "**🍰Enhancements:**"
-          bugsLabel: "**🐞Bugs:**"
-          deprecatedLabel: "**💀Deprecated:**"
-          removedLabel: "**🗑Removed:**"
-          securityLabel: "**🛡Security:**"
-          addSections: '{"dependencies":{"prefix":"**🕸Dependencies:**","labels":["dependencies"]}, "maintenance":{"prefix":"**🧹 Maintenance:**","labels":["maintenance"]}, "new useragents": {"prefix":"**📦 new Useragents:**","labels":["new useragents"]}}'
-          stripGeneratorNotice: true
-          author: true
-          usernamesAsGithubLogins: true
-          httpCache: false
-          filterByMilestone: false
-          verbose: true
-          compareLink: true
-          exclude-labels: 'duplicate,question,invalid,wontfix'
