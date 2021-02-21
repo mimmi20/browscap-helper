@@ -12,21 +12,13 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\CrawlerDetectSource;
-use BrowscapHelper\Source\DonatjSource;
 use BrowscapHelper\Source\JsonFileSource;
-use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PiwikSource;
-use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
-use BrowscapHelper\Source\UaParserJsSource;
-use BrowscapHelper\Source\UapCoreSource;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use BrowscapHelper\Source\YzalisSource;
-use BrowscapHelper\Source\ZsxsoftSource;
 use ExceptionalJSON\EncodeErrorException;
 use JsonClass\Json;
 use Symfony\Component\Console\Command\Command;
@@ -120,16 +112,8 @@ final class CopyTestsCommand extends Command
         $sources = [
             new BrowscapSource(),
             new PiwikSource(),
-            new UapCoreSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
-            new MobileDetectSource(),
-            new YzalisSource(),
-            new CrawlerDetectSource(),
-            new DonatjSource(),
-            new SinergiSource(),
-            new UaParserJsSource(),
-            new ZsxsoftSource(),
             new TxtFileSource($sourcesDirectory),
             new TxtCounterFileSource($sourcesDirectory),
         ];
