@@ -1,7 +1,5 @@
 # https://help.github.com/en/categories/automating-your-workflow-with-github-actions
 
-name: "Release Drafter"
-
 on:
   push:
     # branches to consider in the event; optional, defaults to all
@@ -9,6 +7,8 @@ on:
       - master
     tags:
       - '*'
+
+name: "Release Drafter"
 
 jobs:
   update-release-draft:

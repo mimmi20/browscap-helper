@@ -69,9 +69,6 @@ jobs:
           - "macos-latest"
 
         php-version:
-          - "7.1"
-          - "7.2"
-          - "7.3"
           - "7.4"
           - "8.0"
 
@@ -155,7 +152,7 @@ jobs:
           - "ubuntu-latest"
 
         php-version:
-          - "7.1"
+          - "7.4"
 
         dependencies:
           - ""
@@ -207,7 +204,7 @@ jobs:
           - "ubuntu-latest"
 
         php-version:
-          - "7.1"
+          - "7.4"
 
         dependencies:
           - ""
@@ -260,7 +257,7 @@ jobs:
           - "ubuntu-latest"
 
         php-version:
-          - "7.1"
+          - "7.4"
 
         dependencies:
           - ""
