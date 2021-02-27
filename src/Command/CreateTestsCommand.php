@@ -268,7 +268,7 @@ final class CreateTestsCommand extends Command
                 new Company('Unknown', $result->device_maker, null),
                 new Company('Unknown', null, $result->device_brand_name),
                 $deviceLoader->load($result->device_type),
-                new Display(null, new \UaDisplaySize\Unknown(), null)
+                new Display(null, null, null, null)
             );
             $platform = new Os(
                 $result->platform,
