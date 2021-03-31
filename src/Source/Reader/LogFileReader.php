@@ -9,6 +9,7 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source\Reader;
 
 use BrowscapHelper\Source\Helper\Regex;
@@ -16,28 +17,35 @@ use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\OutputAwareTrait;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function array_key_exists;
+use function array_pop;
+use function explode;
+use function fclose;
+use function feof;
+use function fgets;
+use function fopen;
+use function mb_strlen;
+use function preg_match;
+use function sprintf;
+use function str_pad;
+use function trim;
+
+use const STR_PAD_RIGHT;
+
 final class LogFileReader implements OutputAwareInterface, ReaderInterface
 {
     use OutputAwareTrait;
 
-    /** @var array */
-    private $files = [];
+    /** @var array<string> */
+    private array $files = [];
 
-    /**
-     * @param string $file
-     *
-     * @return void
-     */
     public function addLocalFile(string $file): void
     {
         $this->files[] = $file;
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
-     *
-     * @return \Generator
+     * @return array<string>|iterable
      */
     public function getAgents(string $parentMessage = '', int &$messageLength = 0): iterable
     {
@@ -99,11 +107,6 @@ final class LogFileReader implements OutputAwareInterface, ReaderInterface
         }
     }
 
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
     private function extractAgent(string $text): string
     {
         $parts = explode('"', $text);

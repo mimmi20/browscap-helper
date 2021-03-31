@@ -9,40 +9,53 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Command\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
+use UnexpectedValueException;
+
+use function array_chunk;
+use function array_keys;
+use function array_unique;
+use function assert;
+use function file_put_contents;
+use function mb_strlen;
+use function realpath;
+use function sprintf;
+use function str_pad;
+
+use const STR_PAD_RIGHT;
 
 final class RewriteTests extends Helper
 {
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'rewrite-tests';
     }
 
     /**
-     * @param OutputInterface $output
-     * @param array           $txtChecks
-     * @param string          $testSource
+     * @param array<string, int> $txtChecks
      *
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
+     * @throws InvalidJsonEncodeOptionsException
+     * @throws InvalidNewLineStringException
+     * @throws InvalidIndentStyleException
+     * @throws InvalidIndentSizeException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \UnexpectedValueException
-     *
-     * @return void
+     * @throws UnexpectedValueException
      */
     public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
     {
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
-        \assert($jsonNormalizer instanceof JsonNormalizer);
+        assert($jsonNormalizer instanceof JsonNormalizer);
         $schema = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
 
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
@@ -87,7 +100,7 @@ final class RewriteTests extends Helper
 
             try {
                 $normalized = $jsonNormalizer->normalize($output, $headers, $message, $messageLength);
-            } catch (\InvalidArgumentException | \RuntimeException $e) {
+            } catch (InvalidArgumentException | RuntimeException $e) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
 

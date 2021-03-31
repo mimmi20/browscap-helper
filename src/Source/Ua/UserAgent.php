@@ -9,34 +9,28 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source\Ua;
 
 use BrowscapHelper\Source\SourceInterface;
 
+use function explode;
+use function implode;
+use function sprintf;
+
 final class UserAgent
 {
-    /** @var array */
-    private $header = [];
+    /** @var array<string, string> */
+    private array $header = [];
 
     /**
-     * @param array $header
+     * @param array<string, string> $header
      */
     public function __construct(array $header)
     {
         $this->header = $header;
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders(): array
-    {
-        return $this->header;
-    }
-
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         $stringHeaders = [];
@@ -49,9 +43,15 @@ final class UserAgent
     }
 
     /**
-     * @param string $useragent
-     *
-     * @return \BrowscapHelper\Source\Ua\UserAgent
+     * @return array<string, string>
+     */
+    public function getHeaders(): array
+    {
+        return $this->header;
+    }
+
+    /**
+     * @return UserAgent
      */
     public static function fromUseragent(string $useragent): self
     {
@@ -59,9 +59,7 @@ final class UserAgent
     }
 
     /**
-     * @param string $string
-     *
-     * @return \BrowscapHelper\Source\Ua\UserAgent
+     * @return UserAgent
      */
     public static function fromString(string $string): self
     {
@@ -78,9 +76,9 @@ final class UserAgent
     }
 
     /**
-     * @param array $headers
+     * @param array<string, string> $headers
      *
-     * @return \BrowscapHelper\Source\Ua\UserAgent
+     * @return UserAgent
      */
     public static function fromHeaderArray(array $headers): self
     {

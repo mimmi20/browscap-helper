@@ -9,31 +9,36 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Command\Helper;
 
 use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\SourceInterface;
+use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+
+use const STR_PAD_RIGHT;
+
 final class ExistingTestsLoader extends Helper
 {
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'existing-tests-loader';
     }
 
     /**
-     * @param OutputInterface   $output
-     * @param SourceInterface[] $sources
+     * @param array<SourceInterface> $sources
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
+     * @return array<array<string, string>>|iterable
      *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     public function getHeaders(OutputInterface $output, array $sources): iterable
     {

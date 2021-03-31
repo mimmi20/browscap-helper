@@ -9,21 +9,24 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper;
 
-use BrowscapHelper\Command\Helper\BrowscapTestWriter;
 use BrowscapHelper\Command\Helper\ExistingTestsLoader;
 use BrowscapHelper\Command\Helper\ExistingTestsRemover;
 use BrowscapHelper\Command\Helper\JsonNormalizer;
 use BrowscapHelper\Command\Helper\RewriteTests;
+use Exception;
 use Symfony\Component\Console\Application;
+
+use function realpath;
 
 final class BrowscapHelper extends Application
 {
     public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
@@ -34,11 +37,7 @@ final class BrowscapHelper extends Application
 
         $this->add(new Command\ConvertLogsCommand($sourcesDirectory));
         $this->add(new Command\CopyTestsCommand($sourcesDirectory));
-        $this->add(new Command\CreateTestsCommand($sourcesDirectory));
         $this->add(new Command\RewriteTestsCommand());
-
-        $browscapTestWriter = new BrowscapTestWriter($targetDirectory);
-        $this->getHelperSet()->set($browscapTestWriter);
 
         $existingTestsLoader = new ExistingTestsLoader();
         $this->getHelperSet()->set($existingTestsLoader);

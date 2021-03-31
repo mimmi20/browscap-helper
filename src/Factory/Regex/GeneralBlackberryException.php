@@ -9,9 +9,12 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Factory\Regex;
 
-final class GeneralBlackberryException extends \OutOfRangeException
+use OutOfRangeException;
+
+final class GeneralBlackberryException extends OutOfRangeException
 {
     // nothing to do here
 }

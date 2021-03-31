@@ -9,9 +9,9 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Command;
 
-use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\PiwikSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
@@ -22,19 +22,22 @@ use BrowscapHelper\Source\WootheeSource;
 use ExceptionalJSON\EncodeErrorException;
 use JsonClass\Json;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function array_key_exists;
+use function count;
+use function sprintf;
+
 final class CopyTestsCommand extends Command
 {
-    /** @var string */
-    private $sourcesDirectory = '';
+    private string $sourcesDirectory = '';
 
     /**
-     * @param string $sourcesDirectory
-     *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(string $sourcesDirectory)
     {
@@ -46,9 +49,7 @@ final class CopyTestsCommand extends Command
     /**
      * Configures the current command.
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     *
-     * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure(): void
     {
@@ -77,10 +78,10 @@ final class CopyTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     *
      * @return int 0 if everything went fine, or an error code
+     *
+     * @throws LogicException           When this abstract method is not implemented
+     * @throws InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -110,7 +111,6 @@ final class CopyTestsCommand extends Command
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $sources = [
-            new BrowscapSource(),
             new PiwikSource(),
             new WhichBrowserSource(),
             new WootheeSource(),

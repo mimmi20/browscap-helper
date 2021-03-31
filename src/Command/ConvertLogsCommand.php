@@ -9,25 +9,29 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Command;
 
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\LogFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function array_key_exists;
+use function count;
+use function sprintf;
+
 final class ConvertLogsCommand extends Command
 {
-    /** @var string */
-    private $sourcesDirectory = '';
+    private string $sourcesDirectory = '';
 
     /**
-     * @param string $sourcesDirectory
-     *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(string $sourcesDirectory)
     {
@@ -39,9 +43,7 @@ final class ConvertLogsCommand extends Command
     /**
      * Configures the current command.
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     *
-     * @return void
+     * @throws InvalidArgumentException
      */
     protected function configure(): void
     {
@@ -70,10 +72,10 @@ final class ConvertLogsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException           When this abstract method is not implemented
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     *
      * @return int 0 if everything went fine, or an error code
+     *
+     * @throws LogicException           When this abstract method is not implemented
+     * @throws InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

@@ -9,12 +9,26 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
+
+use function array_key_exists;
+use function file_exists;
+use function is_array;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+use function trim;
+
+use const STR_PAD_RIGHT;
 
 final class WootheeSource implements OutputAwareInterface, SourceInterface
 {
@@ -24,11 +38,6 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
     private const NAME = 'woothee/woothee-testset';
     private const PATH = 'vendor/woothee/woothee-testset/testsets';
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists(self::PATH)) {
@@ -41,13 +50,10 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $message
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -64,13 +70,10 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<string>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return iterable|string[]
+     * @throws LogicException
+     * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -92,7 +95,7 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
         $finder->in(self::PATH);
 
         foreach ($finder as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+            /** @var SplFileInfo $file */
             $filepath = $file->getPathname();
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);

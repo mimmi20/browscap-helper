@@ -9,34 +9,67 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Command;
 
+use ArithmeticError;
 use BrowscapHelper\Command\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\VersionInterface;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
+use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use UaResult\Result\ResultInterface;
+use UnexpectedValueException;
+
+use function array_chunk;
+use function array_key_exists;
+use function assert;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function implode;
+use function in_array;
+use function json_decode;
+use function json_encode;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_strtolower;
+use function memory_get_usage;
+use function mkdir;
+use function realpath;
+use function sprintf;
+use function str_pad;
+use function str_replace;
+use function utf8_decode;
+
+use const STR_PAD_RIGHT;
 
 final class RewriteTestsCommand extends Command
 {
-    /** @var array */
-    private $tests = [];
+    /** @var array<string, int> */
+    private array $tests = [];
 
     /**
      * Configures the current command.
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     *
-     * @return void
      */
     protected function configure(): void
     {
@@ -57,20 +90,22 @@ final class RewriteTestsCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
+     * @return int 0 if everything went fine, or an error code
+     *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Console\Exception\LogicException
-     * @throws \Symfony\Component\Finder\Exception\DirectoryNotFoundException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
+     * @throws LogicException
+     * @throws DirectoryNotFoundException
+     * @throws InvalidNewLineStringException
+     * @throws InvalidIndentStyleException
+     * @throws InvalidIndentSizeException
+     * @throws InvalidJsonEncodeOptionsException
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \ArithmeticError
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
+     * @throws ArithmeticError
+     * @throws UnexpectedValueException
+     * @throws RuntimeException
      * @throws \LogicException
      *
-     * @return int 0 if everything went fine, or an error code
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -120,7 +155,7 @@ final class RewriteTestsCommand extends Command
                 str_pad('', (int) ($errors / $counter * 50)),
                 memory_get_usage(true)
             );
-            $message = $baseMessage . $addMessage;
+            $message    = $baseMessage . $addMessage;
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -141,10 +176,10 @@ final class RewriteTestsCommand extends Command
 
             try {
                 $result = $this->handleTest($output, $detector, $header, $message, $messageLength);
-            } catch (\UnexpectedValueException $e) {
+            } catch (UnexpectedValueException $e) {
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln('<error>' . (new \Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . (new Exception(sprintf('An error occured while checking Headers "%s"', $seachHeader), 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -178,12 +213,12 @@ final class RewriteTestsCommand extends Command
 
             try {
                 $tests[] = $result->toArray();
-            } catch (\UnexpectedValueException $e) {
+            } catch (UnexpectedValueException $e) {
                 unset($tests);
 
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln('<error>' . (new \Exception('An error occured while converting a result to an array', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . (new Exception('An error occured while converting a result to an array', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                 continue;
             }
@@ -210,7 +245,7 @@ final class RewriteTestsCommand extends Command
         $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
 
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
-        \assert($jsonNormalizer instanceof JsonNormalizer);
+        assert($jsonNormalizer instanceof JsonNormalizer);
         $jsonNormalizer->init($output, $testSchemaUri);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors), OutputInterface::VERBOSITY_NORMAL);
@@ -265,7 +300,7 @@ final class RewriteTestsCommand extends Command
 
                     try {
                         $normalized = $jsonNormalizer->normalize($output, $parts, $message, $messageLength);
-                    } catch (\InvalidArgumentException | \RuntimeException $e) {
+                    } catch (InvalidArgumentException | RuntimeException $e) {
                         $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                         $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
@@ -274,7 +309,7 @@ final class RewriteTestsCommand extends Command
 
                     if (null === $normalized) {
                         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                        $output->writeln('<error>' . (new \Exception(sprintf('file "%s" contains invalid json', $path))) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                        $output->writeln('<error>' . (new Exception(sprintf('file "%s" contains invalid json', $path))) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                         return 1;
                     }
@@ -312,16 +347,10 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @param Detector        $detector
-     * @param array           $headers
-     * @param string          $parentMessage
-     * @param int             $messageLength
+     * @param array<string, string> $headers
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \UnexpectedValueException
-     *
-     * @return \UaResult\Result\ResultInterface|null
+     * @throws UnexpectedValueException
      */
     private function handleTest(OutputInterface $output, Detector $detector, array $headers, string $parentMessage, int &$messageLength = 0): ?ResultInterface
     {

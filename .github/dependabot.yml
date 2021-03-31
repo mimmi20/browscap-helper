@@ -21,10 +21,10 @@ updates:
     commit-message:
       include: "scope"
       prefix: "composer"
-    ignore:
-      - dependency-name: ergebnis/json-normalizer
-        versions:
-          - ">= 0"
+#    ignore:
+#      - dependency-name: ergebnis/json-normalizer
+#        versions:
+#          - ">= 0"
 #      - dependency-name: symfony/cache
 #        versions:
 #          - ">= 0"
@@ -37,9 +37,9 @@ updates:
 #      - dependency-name: symfony/yaml
 #        versions:
 #          - ">= 0"
-      - dependency-name: browscap/browscap
-        versions:
-          - ">= 0"
+#      - dependency-name: browscap/browscap
+#        versions:
+#          - ">= 0"
 
   - package-ecosystem: "github-actions"
     directory: "/"

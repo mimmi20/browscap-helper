@@ -9,9 +9,12 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Factory\Regex;
 
-final class GeneralPhoneException extends \OutOfRangeException
+use OutOfRangeException;
+
+final class GeneralPhoneException extends OutOfRangeException
 {
     // nothing to do here
 }
