@@ -9,19 +9,15 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source\Reader;
 
 interface ReaderInterface
 {
-    /**
-     * @param string $file
-     *
-     * @return void
-     */
     public function addLocalFile(string $file): void;
 
     /**
-     * @return iterable
+     * @return array<string>|iterable
      */
     public function getAgents(): iterable;
 }

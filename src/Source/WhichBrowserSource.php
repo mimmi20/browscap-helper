@@ -9,12 +9,29 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
+
+use function array_key_exists;
+use function file_exists;
+use function is_array;
+use function is_string;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_strtolower;
+use function sprintf;
+use function str_pad;
+use function str_replace;
+
+use const STR_PAD_RIGHT;
 
 final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
 {
@@ -24,11 +41,6 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
     private const NAME = 'whichbrowser/parser';
     private const PATH = 'vendor/whichbrowser/parser/tests/data';
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists(self::PATH)) {
@@ -41,13 +53,10 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $message
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -70,13 +79,10 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<string, array<string, string>|string>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -98,7 +104,7 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
         $finder->in(self::PATH);
 
         foreach ($finder as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+            /** @var SplFileInfo $file */
             $filepath = $file->getPathname();
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
@@ -122,9 +128,9 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param array $row
+     * @param array<string, array<string, string>|string> $row
      *
-     * @return array
+     * @return array<string, string>
      */
     private function getHeadersFromRow(array $row): array
     {

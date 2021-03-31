@@ -9,7 +9,11 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
+
+use LogicException;
+use RuntimeException;
 
 interface SourceInterface
 {
@@ -17,26 +21,15 @@ interface SourceInterface
 
     public const DELIMETER_HEADER_ROW = '::==::';
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool;
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     public function getHeaders(string $parentMessage, int &$messageLength = 0): iterable;
 
-    /**
-     * @return string
-     */
     public function getName(): string;
 }

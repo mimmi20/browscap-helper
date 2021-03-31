@@ -9,9 +9,23 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Command\Helper;
 
 use Ergebnis\Json\Normalizer;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
+use Ergebnis\Json\Normalizer\Exception\NormalizedInvalidAccordingToSchemaException;
+use Ergebnis\Json\Normalizer\Exception\OriginalInvalidAccordingToSchemaException;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeReadException;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeResolvedException;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMediaTypeException;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException;
+use Ergebnis\Json\Normalizer\NormalizerInterface;
+use Exception;
 use ExceptionalJSON\EncodeErrorException;
 use Json\Normalizer\FormatNormalizer;
 use JsonClass\Json;
@@ -20,31 +34,34 @@ use JsonSchema\SchemaStorage;
 use JsonSchema\Validator;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
+use UnexpectedValueException;
+
+use function assert;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
+use const STR_PAD_RIGHT;
 
 final class JsonNormalizer extends Helper
 {
-    /** @var \Ergebnis\Json\Normalizer\NormalizerInterface[] */
-    private $normalizers;
+    /** @var NormalizerInterface[] */
+    private array $normalizers;
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'json-normalizer';
     }
 
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param string                                            $schemaUri
-     *
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException
-     * @throws \UnexpectedValueException
-     *
-     * @return void
+     * @throws InvalidJsonEncodeOptionsException
+     * @throws InvalidNewLineStringException
+     * @throws InvalidIndentStyleException
+     * @throws InvalidIndentSizeException
+     * @throws UnexpectedValueException
      */
     public function init(OutputInterface $output, string $schemaUri): void
     {
@@ -100,20 +117,15 @@ final class JsonNormalizer extends Helper
     }
 
     /**
-     * @param OutputInterface $output
-     * @param array           $headers
-     * @param string          $message
-     * @param int             $messageLength
+     * @param array<int, array<string, string>> $headers
      *
-     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException
-     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMediaTypeException
-     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeResolvedException
-     * @throws \Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeReadException
-     * @throws \Ergebnis\Json\Normalizer\Exception\NormalizedInvalidAccordingToSchemaException
-     * @throws \Ergebnis\Json\Normalizer\Exception\OriginalInvalidAccordingToSchemaException
-     * @throws \Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException
-     *
-     * @return string|null
+     * @throws SchemaUriReferencesInvalidJsonDocumentException
+     * @throws SchemaUriReferencesDocumentWithInvalidMediaTypeException
+     * @throws SchemaUriCouldNotBeResolvedException
+     * @throws SchemaUriCouldNotBeReadException
+     * @throws NormalizedInvalidAccordingToSchemaException
+     * @throws OriginalInvalidAccordingToSchemaException
+     * @throws InvalidJsonEncodedException
      */
     public function normalize(OutputInterface $output, array $headers, string $message, int &$messageLength = 0): ?string
     {
@@ -129,7 +141,7 @@ final class JsonNormalizer extends Helper
             $content = (new Json())->encode($headers);
         } catch (EncodeErrorException $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-            $output->writeln('<error>' . (new \Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln('<error>' . (new Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
             return null;
         }
@@ -153,7 +165,7 @@ final class JsonNormalizer extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            /** @var \Ergebnis\Json\Normalizer\NormalizerInterface $normalizer */
+            assert($normalizer instanceof NormalizerInterface);
             $json = $normalizer->normalize($json);
         }
 

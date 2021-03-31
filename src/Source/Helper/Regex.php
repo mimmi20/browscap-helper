@@ -9,13 +9,11 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source\Helper;
 
 final class Regex
 {
-    /**
-     * @return string
-     */
     public function getRegex(): string
     {
         return '/^'

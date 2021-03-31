@@ -9,37 +9,38 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Helper\FilePath;
 use BrowscapHelper\Source\Reader\LogFileReader;
 use BrowscapHelper\Source\Ua\UserAgent;
+use LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
+use function file_exists;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+
+use const STR_PAD_RIGHT;
 
 final class LogFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /** @var string */
-    private $dir;
-
     private const NAME = 'log-files';
 
-    /**
-     * @param string $sourcesDirectory
-     */
+    private string $dir;
+
     public function __construct(string $sourcesDirectory)
     {
         $this->dir = $sourcesDirectory;
     }
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists($this->dir)) {
@@ -52,12 +53,9 @@ final class LogFileSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $message
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -74,12 +72,9 @@ final class LogFileSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<string>|iterable
      *
-     * @throws \LogicException
-     *
-     * @return iterable|string[]
+     * @throws LogicException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -116,7 +111,7 @@ final class LogFileSource implements OutputAwareInterface, SourceInterface
         }
 
         foreach ($finder as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+            /** @var SplFileInfo $file */
             $filepath = $filepathHelper->getPath($file);
 
             if (null === $filepath) {

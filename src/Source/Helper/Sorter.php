@@ -9,14 +9,20 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source\Helper;
+
+use function array_multisort;
+
+use const SORT_ASC;
+use const SORT_DESC;
 
 final class Sorter
 {
     /**
-     * @param array $agents
+     * @param array<string, int> $agents
      *
-     * @return array
+     * @return array<string, int>
      */
     public function sortAgents(array $agents): array
     {

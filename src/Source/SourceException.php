@@ -9,9 +9,12 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
-final class SourceException extends \UnexpectedValueException
+use UnexpectedValueException;
+
+final class SourceException extends UnexpectedValueException
 {
     // nothing to do here
 }

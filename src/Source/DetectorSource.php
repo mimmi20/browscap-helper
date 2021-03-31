@@ -9,13 +9,27 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 use ExceptionalJSON\DecodeErrorException;
 use JsonClass\Json;
+use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
+use function file_exists;
+use function is_array;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+use function unlink;
+
+use const PHP_EOL;
+use const STR_PAD_RIGHT;
 
 final class DetectorSource implements OutputAwareInterface, SourceInterface
 {
@@ -25,11 +39,6 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
     private const NAME = 'mimmi20/browser-detector';
     private const PATH = 'vendor/mimmi20/browser-detector/tests/data';
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists(self::PATH)) {
@@ -42,13 +51,10 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $message
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -65,13 +71,10 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -93,7 +96,7 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
         $finder->in(self::PATH);
 
         foreach ($finder as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+            /** @var SplFileInfo $file */
             $filepath = $file->getPathname();
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);

@@ -9,37 +9,41 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use Exception;
 use ExceptionalJSON\DecodeErrorException;
 use JsonClass\Json;
+use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
+use function file_exists;
+use function is_array;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+
+use const STR_PAD_RIGHT;
 
 final class JsonFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /** @var string */
-    private $dir;
-
     private const NAME = 'json-files';
 
-    /**
-     * @param string $dir
-     */
+    private string $dir;
+
     public function __construct(string $dir)
     {
         $this->dir = $dir;
     }
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists($this->dir)) {
@@ -52,13 +56,10 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $message
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -75,13 +76,10 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
+     * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -103,7 +101,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
         $finder->in($this->dir);
 
         foreach ($finder as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+            /** @var SplFileInfo $file */
             $filepath = $file->getPathname();
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
@@ -122,7 +120,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
             } catch (DecodeErrorException $e) {
                 $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $this->writeln(
-                    '<error>' . (new \Exception(sprintf('file %s contains invalid json.', $file->getPathname()), 0, $e)) . '</error>'
+                    '<error>' . (new Exception(sprintf('file %s contains invalid json.', $file->getPathname()), 0, $e)) . '</error>'
                 );
                 continue;
             }

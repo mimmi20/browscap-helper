@@ -9,16 +9,16 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source\Helper;
+
+use SplFileInfo;
+
+use function realpath;
 
 final class FilePath
 {
-    /**
-     * @param \SplFileInfo $file
-     *
-     * @return string|null
-     */
-    public function getPath(\SplFileInfo $file): ?string
+    public function getPath(SplFileInfo $file): ?string
     {
         $realpath = realpath($file->getPathname());
 

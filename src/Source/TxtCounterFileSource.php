@@ -9,35 +9,41 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+
+use function explode;
+use function fclose;
+use function feof;
+use function fgets;
+use function file_exists;
+use function fopen;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+use function trim;
+
+use const STR_PAD_RIGHT;
 
 final class TxtCounterFileSource implements OutputAwareInterface, SourceInterface
 {
     use GetNameTrait;
     use OutputAwareTrait;
 
-    /** @var string */
-    private $dir;
-
     private const NAME = 'ctxt-files';
 
-    /**
-     * @param string $dir
-     */
+    private string $dir;
+
     public function __construct(string $dir)
     {
         $this->dir = $dir;
     }
 
-    /**
-     * @param string $parentMessage
-     *
-     * @return bool
-     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists($this->dir)) {
@@ -50,12 +56,9 @@ final class TxtCounterFileSource implements OutputAwareInterface, SourceInterfac
     }
 
     /**
-     * @param string $message
-     * @param int    $messageLength
+     * @return array<array<string, string>>|iterable
      *
-     * @throws \LogicException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -72,12 +75,9 @@ final class TxtCounterFileSource implements OutputAwareInterface, SourceInterfac
     }
 
     /**
-     * @param string $parentMessage
-     * @param int    $messageLength
+     * @return array<array<string>>|iterable
      *
-     * @throws \LogicException
-     *
-     * @return array[]|iterable
+     * @throws LogicException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {

@@ -9,9 +9,12 @@
  */
 
 declare(strict_types = 1);
+
 namespace BrowscapHelper\Factory\Regex;
 
-final class GeneralTabletException extends \OutOfRangeException
+use OutOfRangeException;
+
+final class GeneralTabletException extends OutOfRangeException
 {
     // nothing to do here
 }
