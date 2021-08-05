@@ -51,7 +51,7 @@ jobs:
         run: "composer-normalize --dry-run"
 
   install:
-    name: "Check dependencies"
+    name: "Install dependencies"
 
     needs: "validate"
 
@@ -100,7 +100,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -v --ansi ${{ matrix.dependencies }}"
 
       - name: "Check dependencies with composer"
         run: "composer outdated --direct"
@@ -138,7 +138,7 @@ jobs:
           extensions: "${{ env.PHP_EXTENSIONS }}"
           ini-values: "${{ env.PHP_INI_VALUES }}"
           coverage: "none"
-          tools: "composer:v2"
+          tools: "composer:v2, cs2pr"
 
       - name: "Determine composer cache directory"
         id: "determine-composer-cache-directory"
@@ -152,10 +152,10 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -v --ansi ${{ matrix.dependencies }}"
 
       - name: "Run friendsofphp/php-cs-fixer"
-        run: "vendor/bin/php-cs-fixer fix --dry-run -vv"
+        run: "vendor/bin/php-cs-fixer fix --dry-run --format=checkstyle | cs2pr"
 
   phpcs:
     name: "Check Coding Standards with PHPCS"
@@ -190,7 +190,7 @@ jobs:
           extensions: "${{ env.PHP_EXTENSIONS }}"
           ini-values: "${{ env.PHP_INI_VALUES }}"
           coverage: "none"
-          tools: "composer:v2"
+          tools: "composer:v2, cs2pr"
 
       - name: "Determine composer cache directory"
         id: "determine-composer-cache-directory"
@@ -204,13 +204,10 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -v --ansi ${{ matrix.dependencies }}"
 
       - name: "Run squizlabs/php_codesniffer"
-        uses: "chekalsky/phpcs-action@v1.2.0"
-        with:
-          phpcs_bin_path: "./vendor/bin/phpcs"
-          enable_warnings: true
+        run: "vendor/bin/phpcs --report=checkstyle -q | cs2pr"
 
   static-code-analysis:
     name: "Static Code Analysis with PHPStan"
@@ -257,7 +254,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
 
       - name: "Update dependencies with composer"
-        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -vv --ansi ${{ matrix.dependencies }}"
+        run: "composer update --optimize-autoloader --prefer-dist --prefer-stable --no-progress --no-interaction -v --ansi ${{ matrix.dependencies }}"
 
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress"
