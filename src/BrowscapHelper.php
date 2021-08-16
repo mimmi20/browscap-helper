@@ -33,7 +33,6 @@ final class BrowscapHelper extends Application
         parent::__construct('Browscap Helper Project', 'dev-master');
 
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
-        $targetDirectory  = (string) realpath(__DIR__ . '/../results/');
 
         $this->add(new Command\ConvertLogsCommand($sourcesDirectory));
         $this->add(new Command\CopyTestsCommand($sourcesDirectory));
