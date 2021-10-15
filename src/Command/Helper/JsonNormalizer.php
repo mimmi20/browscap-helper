@@ -139,7 +139,7 @@ final class JsonNormalizer extends Helper
 
         try {
             $content = (new Json())->encode($headers);
-        } catch (EncodeErrorException $e) {
+        } catch (EncodeErrorException | \ExceptionalJSON\Exception $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
             $output->writeln('<error>' . (new Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
