@@ -20,6 +20,7 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use ExceptionalJSON\EncodeErrorException;
+use ExceptionalJSON\Exception;
 use JsonClass\Json;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -130,7 +131,7 @@ final class CopyTestsCommand extends Command
 
             try {
                 (new Json())->encode($seachHeader);
-            } catch (EncodeErrorException $e) {
+            } catch (EncodeErrorException | Exception $e) {
                 $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 continue;
