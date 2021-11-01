@@ -12,8 +12,8 @@ parameters:
   checkGenericClassInNonGenericObjectType: false
   checkMissingIterableValueType: false
   treatPhpDocTypesAsCertain: false
-  implicitThrows: false
   exceptions:
+    implicitThrows: false
     checkedExceptionRegexes:
       - '#Exception#'
       - '#Throwable#'
@@ -24,3 +24,5 @@ parameters:
     - '~expects string,~'
     - '~PHPDoc tag @throws with type .* is not subtype of Throwable~'
     - '~Cannot call method get\(\) on Symfony\\Component\\Console\\Helper\\HelperSet\|null~'
+    - '~on mixed~'
+    - '~mixed given~'

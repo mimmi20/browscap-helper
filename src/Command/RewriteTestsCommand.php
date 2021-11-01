@@ -351,6 +351,7 @@ final class RewriteTestsCommand extends Command
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws UnexpectedValueException
+     * @throws \BrowserDetector\Version\NotNumericException
      */
     private function handleTest(OutputInterface $output, Detector $detector, array $headers, string $parentMessage, int &$messageLength = 0): ?ResultInterface
     {
