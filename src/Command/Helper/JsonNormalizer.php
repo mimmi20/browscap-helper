@@ -26,8 +26,8 @@ use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMed
 use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException;
 use Ergebnis\Json\Normalizer\NormalizerInterface;
 use Exception;
-use ExceptionalJSON\EncodeErrorException;
 use Json\Normalizer\FormatNormalizer;
+use JsonClass\EncodeErrorException;
 use JsonClass\Json;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\SchemaStorage;
@@ -139,7 +139,7 @@ final class JsonNormalizer extends Helper
 
         try {
             $content = (new Json())->encode($headers);
-        } catch (EncodeErrorException | \ExceptionalJSON\Exception $e) {
+        } catch (EncodeErrorException $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
             $output->writeln('<error>' . (new Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 

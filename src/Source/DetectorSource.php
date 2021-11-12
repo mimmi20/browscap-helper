@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use ExceptionalJSON\DecodeErrorException;
+use JsonClass\DecodeErrorException;
 use JsonClass\Json;
 use LogicException;
 use RuntimeException;

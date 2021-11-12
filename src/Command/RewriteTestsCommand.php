@@ -18,6 +18,7 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
+use BrowserDetector\Version\NotNumericException;
 use BrowserDetector\Version\VersionInterface;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
@@ -362,7 +363,13 @@ final class RewriteTestsCommand extends Command
 
         $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        $newResult = $detector->__invoke($headers);
+        try {
+            $newResult = $detector->__invoke($headers);
+        } catch (\Psr\SimpleCache\InvalidArgumentException | NotNumericException $e) {
+            $output->writeln((string) $e, OutputInterface::VERBOSITY_NORMAL);
+
+            return null;
+        }
 
         $message = $parentMessage . ' - analyze new result ...';
 
