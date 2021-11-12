@@ -14,7 +14,7 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 use Exception;
-use ExceptionalJSON\DecodeErrorException;
+use JsonClass\DecodeErrorException;
 use JsonClass\Json;
 use LogicException;
 use RuntimeException;
