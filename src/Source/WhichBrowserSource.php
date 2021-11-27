@@ -38,8 +38,9 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
     use GetNameTrait;
     use OutputAwareTrait;
 
-    private const NAME = 'whichbrowser/parser';
-    private const PATH = 'vendor/whichbrowser/parser/tests/data';
+    private const NAME    = 'whichbrowser/parser';
+    private const PATH    = 'vendor/whichbrowser/parser/tests/data';
+    private const HEADERS = 'headers';
 
     public function isReady(string $parentMessage): bool
     {
@@ -65,6 +66,7 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
 
             foreach ($this->getHeadersFromRow($row) as $header => $value) {
                 $lowerHeaders[mb_strtolower((string) $header)] = $value;
+                $lowerHeaders[mb_strtolower($header)] = $value;
             }
 
             $ua    = UserAgent::fromHeaderArray($lowerHeaders);
@@ -134,13 +136,13 @@ final class WhichBrowserSource implements OutputAwareInterface, SourceInterface
      */
     private function getHeadersFromRow(array $row): array
     {
-        if (array_key_exists('headers', $row)) {
-            if (is_array($row['headers'])) {
-                return $row['headers'];
+        if (array_key_exists(self::HEADERS, $row)) {
+            if (is_array($row[self::HEADERS])) {
+                return $row[self::HEADERS];
             }
 
-            if (is_string($row['headers']) && 0 === mb_strpos($row['headers'], 'User-Agent: ')) {
-                return ['user-agent' => str_replace('User-Agent: ', '', $row['headers'])];
+            if (is_string($row[self::HEADERS]) && 0 === mb_strpos($row[self::HEADERS], 'User-Agent: ')) {
+                return ['user-agent' => str_replace('User-Agent: ', '', $row[self::HEADERS])];
             }
 
             return [];

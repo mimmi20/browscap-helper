@@ -35,8 +35,9 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
     use GetNameTrait;
     use OutputAwareTrait;
 
-    private const NAME = 'woothee/woothee-testset';
-    private const PATH = 'vendor/woothee/woothee-testset/testsets';
+    private const NAME   = 'woothee/woothee-testset';
+    private const PATH   = 'vendor/woothee/woothee-testset/testsets';
+    private const TARGET = 'target';
 
     public function isReady(string $parentMessage): bool
     {
@@ -113,11 +114,11 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
             }
 
             foreach ($data as $row) {
-                if (!array_key_exists('target', $row) || empty($row['target'])) {
+                if (!array_key_exists(self::TARGET, $row) || empty($row[self::TARGET])) {
                     continue;
                 }
 
-                $agent = trim($row['target']);
+                $agent = trim($row[self::TARGET]);
 
                 if (empty($agent)) {
                     continue;

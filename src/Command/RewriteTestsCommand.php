@@ -64,6 +64,8 @@ use const STR_PAD_RIGHT;
 
 final class RewriteTestsCommand extends Command
 {
+    private const EXISTING_TESTS_REMOVER = 'existing-tests-remover';
+    private const UNKNOWN                = 'unknown';
     /** @var array<string, int> */
     private array $tests = [];
 
@@ -120,14 +122,14 @@ final class RewriteTestsCommand extends Command
         $detectorTargetDirectory = $basePath . 'tests/data/';
         $testSource              = 'tests';
 
-        $this->getHelper('existing-tests-remover')->remove($output, $detectorTargetDirectory);
+        $this->getHelper(self::EXISTING_TESTS_REMOVER)->remove($output, $detectorTargetDirectory);
 
         $sources = [new JsonFileSource($testSource)];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $this->getHelper('existing-tests-remover')->remove($output, '.build');
-        $this->getHelper('existing-tests-remover')->remove($output, '.build', true);
+        $this->getHelper(self::EXISTING_TESTS_REMOVER)->remove($output, '.build');
+        $this->getHelper(self::EXISTING_TESTS_REMOVER)->remove($output, '.build', true);
 
         $txtChecks     = [];
         $messageLength = 0;
@@ -185,18 +187,14 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            if (null === $result) {
+            if (!$result instanceof ResultInterface) {
                 ++$duplicates;
                 continue;
             }
 
             $c = mb_strtolower(utf8_decode($result->getDevice()->getManufacturer()->getType()));
 
-            if ('' === $c) {
-                $c = 'unknown';
-            } else {
-                $c = str_replace(['.', ' '], ['', '-'], $c);
-            }
+            $c = '' === $c ? self::UNKNOWN : str_replace(['.', ' '], ['', '-'], $c);
 
             $t = mb_strtolower($result->getDevice()->getType()->getType());
 
@@ -206,11 +204,7 @@ final class RewriteTestsCommand extends Command
 
             $file = sprintf('.build/%s/%s.json', $c, $t);
 
-            if (!file_exists($file)) {
-                $tests = [];
-            } else {
-                $tests = json_decode(file_get_contents($file));
-            }
+            $tests = file_exists($file) ? json_decode(file_get_contents($file)) : [];
 
             try {
                 $tests[] = $result->toArray();
@@ -389,11 +383,11 @@ final class RewriteTestsCommand extends Command
         ) {
             $keys = [
                 (string) $newResult->getBrowser()->getName(),
-                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getEngine()->getName(),
-                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getOs()->getName(),
-                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getDevice()->getDeviceName(),
                 (string) $newResult->getDevice()->getMarketingName(),
                 (string) $newResult->getDevice()->getManufacturer()->getName(),
@@ -409,17 +403,17 @@ final class RewriteTestsCommand extends Command
         } elseif (
             ($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet() || $newResult->getDevice()->getType()->isTv())
             && false === mb_strpos((string) $newResult->getBrowser()->getName(), 'general')
-            && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'], true)
+            && !in_array($newResult->getBrowser()->getName(), [null, self::UNKNOWN], true)
             && false === mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general')
-            && !in_array($newResult->getDevice()->getDeviceName(), [null, 'unknown'], true)
+            && !in_array($newResult->getDevice()->getDeviceName(), [null, self::UNKNOWN], true)
         ) {
             $keys = [
                 $newResult->getBrowser()->getName(),
-                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getEngine()->getName(),
-                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getOs()->getName(),
-                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 $newResult->getDevice()->getDeviceName(),
                 (string) $newResult->getDevice()->getMarketingName(),
                 (string) $newResult->getDevice()->getManufacturer()->getName(),

@@ -37,6 +37,8 @@ use const STR_PAD_RIGHT;
 
 final class RewriteTests extends Helper
 {
+    private const BASE_MESSAGE = 'rewriting files';
+
     public function getName(): string
     {
         return 'rewrite-tests';
@@ -60,11 +62,9 @@ final class RewriteTests extends Helper
 
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
         $jsonNormalizer->init($output, $schema);
-
-        $baseMessage   = 'rewriting files';
         $messageLength = 0;
 
-        $message = $baseMessage . ' ...';
+        $message = self::BASE_MESSAGE . ' ...';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
@@ -77,7 +77,7 @@ final class RewriteTests extends Helper
 
             $fileName = $testSource . '/' . sprintf('%1$07d', $folderId) . '.json';
 
-            $message  = $baseMessage . sprintf(' %s', $fileName);
+            $message  = self::BASE_MESSAGE . sprintf(' %s', $fileName);
             $message2 = $message . ' - pre-check';
 
             if (mb_strlen($message2) > $messageLength) {
@@ -125,7 +125,7 @@ final class RewriteTests extends Helper
             file_put_contents($fileName, $normalized);
         }
 
-        $message = $baseMessage . ' - done';
+        $message = self::BASE_MESSAGE . ' - done';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);

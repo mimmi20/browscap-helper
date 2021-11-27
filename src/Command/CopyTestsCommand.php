@@ -34,6 +34,7 @@ use function sprintf;
 
 final class CopyTestsCommand extends Command
 {
+    private const TEST_SOURCE        = 'tests';
     private string $sourcesDirectory = '';
 
     /**
@@ -85,10 +86,9 @@ final class CopyTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $testSource = 'tests';
-        $txtChecks  = [];
+        $txtChecks = [];
 
-        $sources = [new JsonFileSource($testSource)];
+        $sources = [new JsonFileSource(self::TEST_SOURCE)];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
@@ -106,7 +106,7 @@ final class CopyTestsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
+        $this->getHelper('existing-tests-remover')->remove($output, self::TEST_SOURCE);
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
@@ -142,7 +142,7 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
+        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, self::TEST_SOURCE);
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);

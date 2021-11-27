@@ -28,6 +28,7 @@ use function sprintf;
 
 final class ConvertLogsCommand extends Command
 {
+    private const TEST_SOURCE        = 'tests';
     private string $sourcesDirectory = '';
 
     /**
@@ -80,13 +81,11 @@ final class ConvertLogsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sourcesDirectory = $input->getOption('resources');
-
-        $testSource = 'tests';
-        $txtChecks  = [];
+        $txtChecks        = [];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($testSource)]) as $header) {
+        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource(self::TEST_SOURCE)]) as $header) {
             $seachHeader = (string) UserAgent::fromHeaderArray($header);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
@@ -98,7 +97,7 @@ final class ConvertLogsCommand extends Command
             $txtChecks[$seachHeader] = 1;
         }
 
-        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
+        $this->getHelper('existing-tests-remover')->remove($output, self::TEST_SOURCE);
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
@@ -122,7 +121,7 @@ final class ConvertLogsCommand extends Command
 
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
+        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, self::TEST_SOURCE);
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);

@@ -28,6 +28,8 @@ use const STR_PAD_RIGHT;
 
 final class ExistingTestsRemover extends Helper
 {
+    private const BASE_MESSAGE = 'remove old files';
+
     public function getName(): string
     {
         return 'existing-tests-remover';
@@ -39,10 +41,9 @@ final class ExistingTestsRemover extends Helper
      */
     public function remove(OutputInterface $output, string $testSource, bool $dirs = false): void
     {
-        $baseMessage   = 'remove old files';
         $messageLength = 0;
 
-        $message = $baseMessage . ' ...';
+        $message = self::BASE_MESSAGE . ' ...';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
@@ -67,7 +68,7 @@ final class ExistingTestsRemover extends Helper
         $counter = 0;
 
         foreach ($finder as $file) {
-            $message = $baseMessage . sprintf(' [%7d] - %s', $counter, $file->getPathname()) . ' ...';
+            $message = self::BASE_MESSAGE . sprintf(' [%7d] - %s', $counter, $file->getPathname()) . ' ...';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -84,7 +85,7 @@ final class ExistingTestsRemover extends Helper
             ++$counter;
         }
 
-        $message = $baseMessage . ' - done';
+        $message = self::BASE_MESSAGE . ' - done';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);

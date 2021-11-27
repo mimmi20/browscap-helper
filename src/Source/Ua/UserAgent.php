@@ -50,17 +50,11 @@ final class UserAgent
         return $this->header;
     }
 
-    /**
-     * @return UserAgent
-     */
     public static function fromUseragent(string $useragent): self
     {
         return new self(['user-agent' => $useragent]);
     }
 
-    /**
-     * @return UserAgent
-     */
     public static function fromString(string $string): self
     {
         $stringHeaders = explode(SourceInterface::DELIMETER_HEADER, $string);
@@ -77,8 +71,6 @@ final class UserAgent
 
     /**
      * @param array<string, string> $headers
-     *
-     * @return UserAgent
      */
     public static function fromHeaderArray(array $headers): self
     {
