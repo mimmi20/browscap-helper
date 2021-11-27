@@ -185,7 +185,7 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            if (!$result instanceof \UaResult\Result\ResultInterface) {
+            if (!$result instanceof ResultInterface) {
                 ++$duplicates;
                 continue;
             }
