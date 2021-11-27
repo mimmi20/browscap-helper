@@ -389,11 +389,11 @@ final class RewriteTestsCommand extends Command
         ) {
             $keys = [
                 (string) $newResult->getBrowser()->getName(),
-                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getEngine()->getName(),
-                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getOs()->getName(),
-                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getDevice()->getDeviceName(),
                 (string) $newResult->getDevice()->getMarketingName(),
                 (string) $newResult->getDevice()->getManufacturer()->getName(),
@@ -415,11 +415,11 @@ final class RewriteTestsCommand extends Command
         ) {
             $keys = [
                 $newResult->getBrowser()->getName(),
-                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getEngine()->getName(),
-                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 (string) $newResult->getOs()->getName(),
-                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MICRO),
+                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
                 $newResult->getDevice()->getDeviceName(),
                 (string) $newResult->getDevice()->getMarketingName(),
                 (string) $newResult->getDevice()->getManufacturer()->getName(),
