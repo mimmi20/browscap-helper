@@ -27,6 +27,9 @@ use const STR_PAD_RIGHT;
 
 final class ExistingTestsLoader extends Helper
 {
+    /**
+     * @throws void
+     */
     public function getName(): string
     {
         return 'existing-tests-loader';

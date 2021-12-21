@@ -24,6 +24,8 @@ interface OutputAwareInterface
      * @param iterable<string|null>|string $messages The message as an iterable of strings or a single string
      * @param bool                         $newline  Whether to add a newline
      * @param int                          $options  A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
+     *
+     * @throws void
      */
     public function write($messages, bool $newline = false, int $options = 0): void;
 
@@ -32,6 +34,8 @@ interface OutputAwareInterface
      *
      * @param iterable<string|null>|string $messages The message as an iterable of strings or a single string
      * @param int                          $options  A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
+     *
+     * @throws void
      */
     public function writeln($messages, int $options = 0): void;
 }

@@ -26,6 +26,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
 use Exception;
 use InvalidArgumentException;
+use JsonException;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -52,14 +53,13 @@ use function json_encode;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strtolower;
-use function memory_get_usage;
 use function mkdir;
-use function realpath;
 use function sprintf;
 use function str_pad;
 use function str_replace;
 use function utf8_decode;
 
+use const JSON_THROW_ON_ERROR;
 use const STR_PAD_RIGHT;
 
 final class RewriteTestsCommand extends Command
@@ -145,17 +145,7 @@ final class RewriteTestsCommand extends Command
 
             ++$counter;
 
-            $addMessage = sprintf(
-                '[%7d] - redetect - [%7d tests] - [%7d duplicates] - [%7d errors] <bg=green;fg=white;>%s</><bg=yellow;fg=black;>%s</><bg=red;fg=white;>%s</> <bg=red;fg=white;>%12d byte</>',
-                $counter,
-                $testCount,
-                $duplicates,
-                $errors,
-                str_pad('', (int) ($testCount / $counter * 50)),
-                str_pad('', (int) ($duplicates / $counter * 50)),
-                str_pad('', (int) ($errors / $counter * 50)),
-                memory_get_usage(true)
-            );
+            $addMessage = sprintf('[%8d] - redetect', $counter);
             $message    = $baseMessage . $addMessage;
 
             if (mb_strlen($message) > $messageLength) {
@@ -209,7 +199,15 @@ final class RewriteTestsCommand extends Command
             if (!file_exists($file)) {
                 $tests = [];
             } else {
-                $tests = json_decode(file_get_contents($file));
+                try {
+                    $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
+                } catch (JsonException $e) {
+                    ++$errors;
+                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln('<error>' . (new Exception('An error occured while decoding a result', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                    continue;
+                }
             }
 
             try {
@@ -224,7 +222,15 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $saved = file_put_contents($file, json_encode($tests));
+            try {
+                $saved = file_put_contents($file, json_encode($tests, JSON_THROW_ON_ERROR));
+            } catch (JsonException $e) {
+                ++$errors;
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . sprintf('An error occured while encoding file %s', $file) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                continue;
+            }
 
             unset($tests);
 
@@ -243,11 +249,9 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
 
-        $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
-
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
         assert($jsonNormalizer instanceof JsonNormalizer);
-        $jsonNormalizer->init($output, $testSchemaUri);
+        $jsonNormalizer->init($output);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors), OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
@@ -276,7 +280,15 @@ final class RewriteTestsCommand extends Command
             foreach ($fileFinder as $file) {
                 $t = $file->getBasename('.' . $file->getExtension());
 
-                $data = json_decode($file->getContents());
+                try {
+                    $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
+                } catch (JsonException $e) {
+                    ++$errors;
+                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln('<error>' . (new Exception('An error occured while encoding a resultset', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                    continue;
+                }
 
                 foreach (array_chunk($data, 100) as $number => $parts) {
                     $path = $basePath . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number);
@@ -344,7 +356,7 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf('errors:        %7d', $errors), OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(sprintf('duplicates:    %7d', $duplicates), OutputInterface::VERBOSITY_NORMAL);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

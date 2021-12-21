@@ -31,5 +31,8 @@ interface SourceInterface
      */
     public function getHeaders(string $parentMessage, int &$messageLength = 0): iterable;
 
+    /**
+     * @throws void
+     */
     public function getName(): string;
 }

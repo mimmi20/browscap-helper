@@ -23,6 +23,8 @@ final class Sorter
      * @param array<string, int> $agents
      *
      * @return array<string, int>
+     *
+     * @throws void
      */
     public function sortAgents(array $agents): array
     {

@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command\Helper;
 
+use BrowscapHelper\Normalizer\FormatNormalizer;
 use Ergebnis\Json\Normalizer;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
@@ -26,22 +27,19 @@ use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMed
 use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException;
 use Ergebnis\Json\Normalizer\NormalizerInterface;
 use Exception;
-use Json\Normalizer\FormatNormalizer;
-use JsonClass\EncodeErrorException;
-use JsonClass\Json;
-use JsonSchema\Constraints\Factory;
-use JsonSchema\SchemaStorage;
-use JsonSchema\Validator;
+use JsonException;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function assert;
+use function json_encode;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const STR_PAD_RIGHT;
@@ -51,6 +49,9 @@ final class JsonNormalizer extends Helper
     /** @var NormalizerInterface[] */
     private array $normalizers;
 
+    /**
+     * @throws void
+     */
     public function getName(): string
     {
         return 'json-normalizer';
@@ -63,7 +64,7 @@ final class JsonNormalizer extends Helper
      * @throws InvalidIndentSizeException
      * @throws UnexpectedValueException
      */
-    public function init(OutputInterface $output, string $schemaUri): void
+    public function init(OutputInterface $output): void
     {
         $messageLength = 0;
         $message       = 'prepare JsonNormalizer';
@@ -75,14 +76,6 @@ final class JsonNormalizer extends Helper
 
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $schemaStorage       = new SchemaStorage();
-        $jsonSchemavalidator = new Validator(
-            new Factory(
-                $schemaStorage,
-                $schemaStorage->getUriRetriever()
-            )
-        );
-
         $message2 = $message . ' - define normalizers ...';
 
         if (mb_strlen($message2) > $messageLength) {
@@ -92,14 +85,9 @@ final class JsonNormalizer extends Helper
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
         $this->normalizers = [
-            'schema-normalizer' => new Normalizer\SchemaNormalizer(
-                $schemaUri,
-                $schemaStorage,
-                new Normalizer\Validator\SchemaValidator($jsonSchemavalidator)
-            ),
             'format-normalizer' => new FormatNormalizer(
                 new Normalizer\Format\Format(
-                    Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+                    Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
                     Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
                     Normalizer\Format\NewLine::fromString("\n"),
                     true
@@ -138,8 +126,8 @@ final class JsonNormalizer extends Helper
         $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         try {
-            $content = (new Json())->encode($headers);
-        } catch (EncodeErrorException $e) {
+            $content = json_encode($headers, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
             $output->writeln('<error>' . (new Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 

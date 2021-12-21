@@ -13,16 +13,21 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use LogicException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
+use UnexpectedValueException;
 
+use function assert;
 use function explode;
 use function fclose;
 use function feof;
 use function fgets;
 use function file_exists;
 use function fopen;
+use function is_array;
+use function is_string;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
@@ -39,11 +44,17 @@ final class TxtCounterFileSource implements OutputAwareInterface, SourceInterfac
 
     private string $dir;
 
+    /**
+     * @throws void
+     */
     public function __construct(string $dir)
     {
         $this->dir = $dir;
     }
 
+    /**
+     * @throws void
+     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists($this->dir)) {
@@ -58,7 +69,7 @@ final class TxtCounterFileSource implements OutputAwareInterface, SourceInterfac
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws LogicException
+     * @throws UnexpectedValueException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -77,7 +88,7 @@ final class TxtCounterFileSource implements OutputAwareInterface, SourceInterfac
     /**
      * @return array<array<string>>|iterable
      *
-     * @throws LogicException
+     * @throws UnexpectedValueException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -89,17 +100,14 @@ final class TxtCounterFileSource implements OutputAwareInterface, SourceInterfac
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->name('*.ctxt');
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->sortByName();
-        $finder->ignoreUnreadableDirs();
-        $finder->in($this->dir);
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->dir));
+        $files    = new RegexIterator($iterator, '/^.+\.ctxt$/i', RegexIterator::GET_MATCH);
 
-        foreach ($finder as $file) {
-            $filepath = $file->getPathname();
+        foreach ($files as $file) {
+            assert(is_array($file));
+
+            $filepath = $file[0];
+            assert(is_string($filepath));
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
 

@@ -14,10 +14,15 @@ namespace BrowscapHelper\Source\Reader;
 
 interface ReaderInterface
 {
+    /**
+     * @throws void
+     */
     public function addLocalFile(string $file): void;
 
     /**
      * @return array<string>|iterable
+     *
+     * @throws void
      */
     public function getAgents(): iterable;
 }

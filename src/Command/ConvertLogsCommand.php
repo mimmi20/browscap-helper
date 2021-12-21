@@ -128,6 +128,6 @@ final class ConvertLogsCommand extends Command
         $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('tests available for Browscap helper: ' . count($txtChecks), OutputInterface::VERBOSITY_NORMAL);
 
-        return 0;
+        return self::SUCCESS;
     }
 }
