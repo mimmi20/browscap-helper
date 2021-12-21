@@ -368,7 +368,7 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf('errors:        %7d', $errors), OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(sprintf('duplicates:    %7d', $duplicates), OutputInterface::VERBOSITY_NORMAL);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

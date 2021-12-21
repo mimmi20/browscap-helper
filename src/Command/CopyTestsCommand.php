@@ -130,7 +130,7 @@ final class CopyTestsCommand extends Command
                 json_encode($seachHeader, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
                 $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
-
+return 1;
                 continue;
             }
 
@@ -146,6 +146,6 @@ final class CopyTestsCommand extends Command
         $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('tests available for Browscap helper: ' . count($txtChecks), OutputInterface::VERBOSITY_NORMAL);
 
-        return 0;
+        return self::SUCCESS;
     }
 }

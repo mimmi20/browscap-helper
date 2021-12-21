@@ -106,7 +106,7 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
 
             $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $data = Yaml::parse($file->getContents());
+            $data = Yaml::parseFile($filepath);
 
             if (!is_array($data)) {
                 continue;

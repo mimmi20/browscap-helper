@@ -104,12 +104,20 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
             $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
+            $content = file_get_contents($filepath);
+
+            if ('' === $content || PHP_EOL === $content) {
+                unlink($filepath);
+
+                continue;
+            }
+
             try {
-                $data = json_decode($file->getContents(), true, 512, JSON_THROW_ON_ERROR);
+                $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
                 $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $this->writeln(
-                    '<error>' . (new Exception(sprintf('file %s contains invalid json.', $file->getPathname()), 0, $e)) . '</error>'
+                    '<error>' . (new Exception(sprintf('file %s contains invalid json.', $filepath), 0, $e)) . '</error>'
                 );
                 continue;
             }

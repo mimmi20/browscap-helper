@@ -61,7 +61,7 @@ final class JsonNormalizer extends Helper
      * @throws InvalidIndentSizeException
      * @throws UnexpectedValueException
      */
-    public function init(OutputInterface $output, string $schemaUri): void
+    public function init(OutputInterface $output): void
     {
         $messageLength = 0;
         $message       = 'prepare JsonNormalizer';
@@ -73,13 +73,13 @@ final class JsonNormalizer extends Helper
 
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $schemaStorage       = new SchemaStorage();
-        $jsonSchemavalidator = new Validator(
-            new Factory(
-                $schemaStorage,
-                $schemaStorage->getUriRetriever()
-            )
-        );
+//        $schemaStorage       = new SchemaStorage();
+//        $jsonSchemavalidator = new Validator(
+//            new Factory(
+//                $schemaStorage,
+//                $schemaStorage->getUriRetriever()
+//            )
+//        );
 
         $message2 = $message . ' - define normalizers ...';
 

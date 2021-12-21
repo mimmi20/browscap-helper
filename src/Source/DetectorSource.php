@@ -99,7 +99,7 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
 
             $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $content = $file->getContents();
+            $content = file_get_contents($filepath);
 
             if ('' === $content || PHP_EOL === $content) {
                 unlink($filepath);

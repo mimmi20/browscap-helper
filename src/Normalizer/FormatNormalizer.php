@@ -18,9 +18,6 @@ use Ergebnis\Json\Normalizer\Format\Indent;
 use Ergebnis\Json\Normalizer\Format\NewLine;
 use Ergebnis\Json\Normalizer\Json;
 use Ergebnis\Json\Normalizer\NormalizerInterface;
-use JsonClass\EncodeErrorException;
-use JsonClass\Json as JsonClass;
-use JsonClass\JsonInterface;
 use UnexpectedValueException;
 
 use function array_key_exists;
@@ -46,8 +43,6 @@ final class FormatNormalizer implements NormalizerInterface
 
     private Format $format;
 
-    private JsonInterface $jsonClass;
-
     /**
      * @throws UnexpectedValueException
      */
@@ -56,17 +51,15 @@ final class FormatNormalizer implements NormalizerInterface
         $this->format = $format;
 
         $this->checkPrettyPrint();
-
-        $this->jsonClass = new JsonClass();
     }
 
     /**
-     * @throws EncodeErrorException        When the encode operation fails
+     * @throws \JsonException        When the encode operation fails
      * @throws InvalidJsonEncodedException
      */
     public function normalize(Json $json): Json
     {
-        $encodedWithJsonEncodeOptions = $this->jsonClass->encode(
+        $encodedWithJsonEncodeOptions = json_encode(
             $json->decoded(),
             $this->format->jsonEncodeOptions()->value()
         );
