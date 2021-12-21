@@ -14,13 +14,9 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 use Exception;
-use JsonClass\DecodeErrorException;
-use JsonClass\Json;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 use function file_exists;
 use function is_array;
@@ -91,18 +87,14 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->name('*.json');
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->sortByName();
-        $finder->ignoreUnreadableDirs();
-        $finder->in($this->dir);
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir));
+        $files = new \RegexIterator($iterator, '/^.+\.json$/i', \RegexIterator::GET_MATCH);
 
-        foreach ($finder as $file) {
-            /** @var SplFileInfo $file */
-            $filepath = $file->getPathname();
+        foreach ($files as $file) {
+            assert(is_array($file));
+
+            $filepath = $file[0];
+            assert(is_string($filepath));
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
 
@@ -113,11 +105,8 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
             $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             try {
-                $data = (new Json())->decode(
-                    $file->getContents(),
-                    true
-                );
-            } catch (DecodeErrorException $e) {
+                $data = json_decode($file->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
                 $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $this->writeln(
                     '<error>' . (new Exception(sprintf('file %s contains invalid json.', $file->getPathname()), 0, $e)) . '</error>'

@@ -16,8 +16,6 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
 use function array_map;
@@ -91,18 +89,14 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->name('*.yml');
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->sortByName();
-        $finder->ignoreUnreadableDirs();
-        $finder->in(self::PATH);
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::PATH));
+        $files = new \RegexIterator($iterator, '/^.+\.yml$/i', \RegexIterator::GET_MATCH);
 
-        foreach ($finder as $file) {
-            /** @var SplFileInfo $file */
-            $filepath = $file->getPathname();
+        foreach ($files as $file) {
+            assert(is_array($file));
+
+            $filepath = $file[0];
+            assert(is_string($filepath));
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
 

@@ -26,9 +26,7 @@ use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMed
 use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException;
 use Ergebnis\Json\Normalizer\NormalizerInterface;
 use Exception;
-use Json\Normalizer\FormatNormalizer;
-use JsonClass\EncodeErrorException;
-use JsonClass\Json;
+use BrowscapHelper\Normalizer\FormatNormalizer;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\SchemaStorage;
 use JsonSchema\Validator;
@@ -92,14 +90,14 @@ final class JsonNormalizer extends Helper
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
         $this->normalizers = [
-            'schema-normalizer' => new Normalizer\SchemaNormalizer(
-                $schemaUri,
-                $schemaStorage,
-                new Normalizer\Validator\SchemaValidator($jsonSchemavalidator)
-            ),
+//            'schema-normalizer' => new Normalizer\SchemaNormalizer(
+//                $schemaUri,
+//                $schemaStorage,
+//                new Normalizer\Validator\SchemaValidator($jsonSchemavalidator)
+//            ),
             'format-normalizer' => new FormatNormalizer(
                 new Normalizer\Format\Format(
-                    Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+                    Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
                     Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
                     Normalizer\Format\NewLine::fromString("\n"),
                     true
@@ -138,8 +136,8 @@ final class JsonNormalizer extends Helper
         $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         try {
-            $content = (new Json())->encode($headers);
-        } catch (EncodeErrorException $e) {
+            $content = json_encode($headers, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
             $output->writeln('<error>' . (new Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
 

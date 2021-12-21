@@ -209,7 +209,15 @@ final class RewriteTestsCommand extends Command
             if (!file_exists($file)) {
                 $tests = [];
             } else {
-                $tests = json_decode(file_get_contents($file));
+                try {
+                    $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    ++$errors;
+                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln('<error>' . (new Exception('An error occured while decoding a result', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                    continue;
+                }
             }
 
             try {
@@ -224,7 +232,15 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $saved = file_put_contents($file, json_encode($tests));
+            try {
+                $saved = file_put_contents($file, json_encode($tests, JSON_THROW_ON_ERROR));
+            } catch (\JsonException $e) {
+                ++$errors;
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln('<error>' . sprintf('An error occured while encoding file %s', $file) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                continue;
+            }
 
             unset($tests);
 
@@ -276,7 +292,15 @@ final class RewriteTestsCommand extends Command
             foreach ($fileFinder as $file) {
                 $t = $file->getBasename('.' . $file->getExtension());
 
-                $data = json_decode($file->getContents());
+                try {
+                    $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    ++$errors;
+                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln('<error>' . (new Exception('An error occured while encoding a resultset', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+
+                    continue;
+                }
 
                 foreach (array_chunk($data, 100) as $number => $parts) {
                     $path = $basePath . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number);

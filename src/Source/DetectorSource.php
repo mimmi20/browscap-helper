@@ -13,13 +13,9 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use JsonClass\DecodeErrorException;
-use JsonClass\Json;
 use LogicException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 use function file_exists;
 use function is_array;
@@ -86,18 +82,14 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->name('*.json');
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
-        $finder->sortByName();
-        $finder->ignoreUnreadableDirs();
-        $finder->in(self::PATH);
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::PATH));
+        $files = new \RegexIterator($iterator, '/^.+\.json$/i', \RegexIterator::GET_MATCH);
 
-        foreach ($finder as $file) {
-            /** @var SplFileInfo $file */
-            $filepath = $file->getPathname();
+        foreach ($files as $file) {
+            assert(is_array($file));
+
+            $filepath = $file[0];
+            assert(is_string($filepath));
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
 
@@ -116,11 +108,8 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
             }
 
             try {
-                $data = (new Json())->decode(
-                    $content,
-                    true
-                );
-            } catch (DecodeErrorException $e) {
+                $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
                 $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $this->writeln('    <error>parsing file content [' . $filepath . '] failed</error>', OutputInterface::VERBOSITY_NORMAL);
 
