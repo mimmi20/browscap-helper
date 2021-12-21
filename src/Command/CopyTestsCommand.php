@@ -19,6 +19,7 @@ use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use JsonException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -28,7 +29,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function array_key_exists;
 use function count;
+use function json_encode;
 use function sprintf;
+
+use const JSON_THROW_ON_ERROR;
 
 final class CopyTestsCommand extends Command
 {
@@ -128,7 +132,7 @@ final class CopyTestsCommand extends Command
 
             try {
                 json_encode($seachHeader, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 continue;

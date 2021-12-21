@@ -29,7 +29,6 @@ use function array_unique;
 use function assert;
 use function file_put_contents;
 use function mb_strlen;
-use function realpath;
 use function sprintf;
 use function str_pad;
 
@@ -37,6 +36,9 @@ use const STR_PAD_RIGHT;
 
 final class RewriteTests extends Helper
 {
+    /**
+     * @throws void
+     */
     public function getName(): string
     {
         return 'rewrite-tests';
@@ -56,10 +58,9 @@ final class RewriteTests extends Helper
     {
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
         assert($jsonNormalizer instanceof JsonNormalizer);
-        $schema = 'file://' . realpath(__DIR__ . '/../../../schema/tests.json');
 
         $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
-        $jsonNormalizer->init($output, $schema);
+        $jsonNormalizer->init($output);
 
         $baseMessage   = 'rewriting files';
         $messageLength = 0;

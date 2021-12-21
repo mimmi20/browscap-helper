@@ -26,6 +26,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
 use Exception;
 use InvalidArgumentException;
+use JsonException;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -52,14 +53,13 @@ use function json_encode;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strtolower;
-use function memory_get_usage;
 use function mkdir;
-use function realpath;
 use function sprintf;
 use function str_pad;
 use function str_replace;
 use function utf8_decode;
 
+use const JSON_THROW_ON_ERROR;
 use const STR_PAD_RIGHT;
 
 final class RewriteTestsCommand extends Command
@@ -201,7 +201,7 @@ final class RewriteTestsCommand extends Command
             } else {
                 try {
                     $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
+                } catch (JsonException $e) {
                     ++$errors;
                     $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
                     $output->writeln('<error>' . (new Exception('An error occured while decoding a result', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -224,7 +224,7 @@ final class RewriteTestsCommand extends Command
 
             try {
                 $saved = file_put_contents($file, json_encode($tests, JSON_THROW_ON_ERROR));
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln('<error>' . sprintf('An error occured while encoding file %s', $file) . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -249,11 +249,9 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
 
-        $testSchemaUri = 'file://' . realpath($basePath . 'schema/tests.json');
-
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
         assert($jsonNormalizer instanceof JsonNormalizer);
-        $jsonNormalizer->init($output, $testSchemaUri);
+        $jsonNormalizer->init($output);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors), OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
@@ -284,7 +282,7 @@ final class RewriteTestsCommand extends Command
 
                 try {
                     $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
+                } catch (JsonException $e) {
                     ++$errors;
                     $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
                     $output->writeln('<error>' . (new Exception('An error occured while encoding a resultset', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);

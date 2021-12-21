@@ -14,6 +14,9 @@ namespace BrowscapHelper\Source;
 
 trait GetNameTrait
 {
+    /**
+     * @throws void
+     */
     public function getName(): string
     {
         return self::NAME;

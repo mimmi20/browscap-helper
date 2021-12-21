@@ -25,12 +25,17 @@ final class UserAgent
 
     /**
      * @param array<string, string> $header
+     *
+     * @throws void
      */
     public function __construct(array $header)
     {
         $this->header = $header;
     }
 
+    /**
+     * @throws void
+     */
     public function __toString(): string
     {
         $stringHeaders = [];
@@ -44,17 +49,25 @@ final class UserAgent
 
     /**
      * @return array<string, string>
+     *
+     * @throws void
      */
     public function getHeaders(): array
     {
         return $this->header;
     }
 
+    /**
+     * @throws void
+     */
     public static function fromUseragent(string $useragent): self
     {
         return new self(['user-agent' => $useragent]);
     }
 
+    /**
+     * @throws void
+     */
     public static function fromString(string $string): self
     {
         $stringHeaders = explode(SourceInterface::DELIMETER_HEADER, $string);
@@ -71,6 +84,8 @@ final class UserAgent
 
     /**
      * @param array<string, string> $headers
+     *
+     * @throws void
      */
     public static function fromHeaderArray(array $headers): self
     {

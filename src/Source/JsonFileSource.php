@@ -14,16 +14,26 @@ namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 use Exception;
-use LogicException;
+use JsonException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function assert;
 use function file_exists;
+use function file_get_contents;
 use function is_array;
+use function is_string;
+use function json_decode;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
+use function unlink;
 
+use const JSON_THROW_ON_ERROR;
+use const PHP_EOL;
 use const STR_PAD_RIGHT;
 
 final class JsonFileSource implements OutputAwareInterface, SourceInterface
@@ -35,11 +45,17 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
     private string $dir;
 
+    /**
+     * @throws void
+     */
     public function __construct(string $dir)
     {
         $this->dir = $dir;
     }
 
+    /**
+     * @throws void
+     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists($this->dir)) {
@@ -54,7 +70,6 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws LogicException
      * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
@@ -74,7 +89,6 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws LogicException
      * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
@@ -87,8 +101,8 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir));
-        $files = new \RegexIterator($iterator, '/^.+\.json$/i', \RegexIterator::GET_MATCH);
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->dir));
+        $files    = new RegexIterator($iterator, '/^.+\.json$/i', RegexIterator::GET_MATCH);
 
         foreach ($files as $file) {
             assert(is_array($file));
@@ -114,7 +128,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
             try {
                 $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $this->writeln(
                     '<error>' . (new Exception(sprintf('file %s contains invalid json.', $filepath), 0, $e)) . '</error>'

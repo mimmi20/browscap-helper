@@ -13,16 +13,20 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use LogicException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use function array_map;
+use function assert;
 use function explode;
 use function file_exists;
 use function implode;
 use function is_array;
+use function is_string;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
@@ -38,6 +42,9 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
     private const NAME = 'matomo/device-detector';
     private const PATH = 'vendor/matomo/device-detector/regexes';
 
+    /**
+     * @throws void
+     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists(self::PATH)) {
@@ -52,7 +59,6 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws LogicException
      * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
@@ -76,7 +82,6 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<string, string>|iterable
      *
-     * @throws LogicException
      * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
@@ -89,8 +94,8 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::PATH));
-        $files = new \RegexIterator($iterator, '/^.+\.yml$/i', \RegexIterator::GET_MATCH);
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::PATH));
+        $files    = new RegexIterator($iterator, '/^.+\.yml$/i', RegexIterator::GET_MATCH);
 
         foreach ($files as $file) {
             assert(is_array($file));

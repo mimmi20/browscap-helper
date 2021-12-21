@@ -13,17 +13,25 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use LogicException;
+use JsonException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function assert;
 use function file_exists;
+use function file_get_contents;
 use function is_array;
+use function is_string;
+use function json_decode;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
 use function unlink;
 
+use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use const STR_PAD_RIGHT;
 
@@ -35,6 +43,9 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
     private const NAME = 'mimmi20/browser-detector';
     private const PATH = 'vendor/mimmi20/browser-detector/tests/data';
 
+    /**
+     * @throws void
+     */
     public function isReady(string $parentMessage): bool
     {
         if (file_exists(self::PATH)) {
@@ -49,7 +60,6 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws LogicException
      * @throws RuntimeException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
@@ -69,7 +79,6 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws LogicException
      * @throws RuntimeException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
@@ -82,8 +91,8 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::PATH));
-        $files = new \RegexIterator($iterator, '/^.+\.json$/i', \RegexIterator::GET_MATCH);
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::PATH));
+        $files    = new RegexIterator($iterator, '/^.+\.json$/i', RegexIterator::GET_MATCH);
 
         foreach ($files as $file) {
             assert(is_array($file));
@@ -109,7 +118,7 @@ final class DetectorSource implements OutputAwareInterface, SourceInterface
 
             try {
                 $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 $this->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $this->writeln('    <error>parsing file content [' . $filepath . '] failed</error>', OutputInterface::VERBOSITY_NORMAL);
 

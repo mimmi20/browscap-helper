@@ -1,8 +1,8 @@
 <?php
 /**
- * This file is part of the json-normalizer package.
+ * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2020-2021, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2021, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,6 +18,7 @@ use Ergebnis\Json\Normalizer\Format\Indent;
 use Ergebnis\Json\Normalizer\Format\NewLine;
 use Ergebnis\Json\Normalizer\Json;
 use Ergebnis\Json\Normalizer\NormalizerInterface;
+use JsonException;
 use UnexpectedValueException;
 
 use function array_key_exists;
@@ -27,12 +28,14 @@ use function implode;
 use function is_array;
 use function is_bool;
 use function is_string;
+use function json_encode;
 use function mb_strpos;
 use function preg_match;
 use function rtrim;
 use function str_replace;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -54,14 +57,14 @@ final class FormatNormalizer implements NormalizerInterface
     }
 
     /**
-     * @throws \JsonException        When the encode operation fails
+     * @throws JsonException When the encode operation fails
      * @throws InvalidJsonEncodedException
      */
     public function normalize(Json $json): Json
     {
         $encodedWithJsonEncodeOptions = json_encode(
             $json->decoded(),
-            $this->format->jsonEncodeOptions()->value()
+            $this->format->jsonEncodeOptions()->value() | JSON_THROW_ON_ERROR
         );
 
         $json       = Json::fromEncoded($encodedWithJsonEncodeOptions);
