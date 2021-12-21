@@ -145,17 +145,7 @@ final class RewriteTestsCommand extends Command
 
             ++$counter;
 
-            $addMessage = sprintf(
-                '[%7d] - redetect - [%7d tests] - [%7d duplicates] - [%7d errors] <bg=green;fg=white;>%s</><bg=yellow;fg=black;>%s</><bg=red;fg=white;>%s</> <bg=red;fg=white;>%12d byte</>',
-                $counter,
-                $testCount,
-                $duplicates,
-                $errors,
-                str_pad('', (int) ($testCount / $counter * 50)),
-                str_pad('', (int) ($duplicates / $counter * 50)),
-                str_pad('', (int) ($errors / $counter * 50)),
-                memory_get_usage(true)
-            );
+            $addMessage = sprintf('[%8d] - redetect', $counter);
             $message    = $baseMessage . $addMessage;
 
             if (mb_strlen($message) > $messageLength) {

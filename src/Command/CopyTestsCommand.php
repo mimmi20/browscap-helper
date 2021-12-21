@@ -130,7 +130,7 @@ final class CopyTestsCommand extends Command
                 json_encode($seachHeader, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
                 $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
-return 1;
+
                 continue;
             }
 
