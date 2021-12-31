@@ -64,11 +64,11 @@ final class FormatNormalizer implements NormalizerInterface
     {
         $encodedWithJsonEncodeOptions = json_encode(
             $json->decoded(),
-            $this->format->jsonEncodeOptions()->value() | JSON_THROW_ON_ERROR
+            $this->format->jsonEncodeOptions()->toInt() | JSON_THROW_ON_ERROR
         );
 
         $json       = Json::fromEncoded($encodedWithJsonEncodeOptions);
-        $oldNewline = (string) NewLine::fromJson($json);
+        $oldNewline = NewLine::fromJson($json)->toString();
 
         assert(is_string($oldNewline));
         assert('' !== $oldNewline);
@@ -80,13 +80,13 @@ final class FormatNormalizer implements NormalizerInterface
 
         assert(is_array($lines));
 
-        $newNewline = (string) $this->format->newLine();
+        $newNewline = $this->format->newLine()->toString();
         assert(is_string($newNewline));
 
-        $oldIndent = (string) Indent::fromJson($json);
+        $oldIndent = Indent::fromJson($json)->toString();
         assert(is_string($oldIndent));
 
-        $newIndent = (string) $this->format->indent();
+        $newIndent = $this->format->indent()->toString();
         assert(is_string($newIndent));
 
         $formattedLines = [];
@@ -128,7 +128,7 @@ final class FormatNormalizer implements NormalizerInterface
      */
     private function checkPrettyPrint(): void
     {
-        $jsonOptions = $this->format->jsonEncodeOptions()->value();
+        $jsonOptions = $this->format->jsonEncodeOptions()->toInt();
         $prettyPrint = (bool) ($jsonOptions & JSON_PRETTY_PRINT);
         assert(is_bool($prettyPrint));
 

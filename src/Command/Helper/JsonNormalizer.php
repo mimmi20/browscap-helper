@@ -86,7 +86,7 @@ final class JsonNormalizer extends Helper
 
         $this->normalizers = [
             'format-normalizer' => new FormatNormalizer(
-                new Normalizer\Format\Format(
+                Normalizer\Format\Format::create(
                     Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
                     Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
                     Normalizer\Format\NewLine::fromString("\n"),
