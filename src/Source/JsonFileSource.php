@@ -20,6 +20,7 @@ use RecursiveIteratorIterator;
 use RegexIterator;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 use function assert;
 use function file_exists;
@@ -101,27 +102,16 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->dir));
-        $files = new class($iterator, 'json') extends \FilterIterator {
-            private string $extension;
+        $finder = new Finder();
+        $finder->files();
+        $finder->name('*.json');
+        $finder->ignoreDotFiles(true);
+        $finder->ignoreVCS(true);
+        $finder->sortByName();
+        $finder->ignoreUnreadableDirs();
+        $finder->in($this->dir);
 
-            public function __construct(\Iterator $iterator , string $extension)
-            {
-                parent::__construct($iterator);
-                $this->extension = $extension;
-            }
-
-            public function accept(): bool
-            {
-                $file = $this->getInnerIterator()->current();
-
-                assert($file instanceof \SplFileInfo);
-
-                return $file->isFile() && $file->getExtension() === $this->extension;
-            }
-        };
-
-        foreach ($files as $file) {
+        foreach ($finder as $file) {
             $pathName = $file->getPathname();
             $filepath = str_replace('\\', '/', $pathName);
             assert(is_string($filepath));
