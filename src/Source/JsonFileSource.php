@@ -112,6 +112,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
         $finder->in($this->dir);
 
         foreach ($finder as $file) {
+            /** @var \SplFileInfo $file */
             $pathName = $file->getPathname();
             $filepath = str_replace('\\', '/', $pathName);
             assert(is_string($filepath));
