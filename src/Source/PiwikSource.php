@@ -95,12 +95,28 @@ final class PiwikSource implements OutputAwareInterface, SourceInterface
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::PATH));
-        $files    = new RegexIterator($iterator, '/^.+\.yml$/i', RegexIterator::GET_MATCH);
+        $files = new class($iterator, 'yml') extends \FilterIterator {
+            private string $extension;
+
+            public function __construct(\Iterator $iterator , string $extension)
+            {
+                parent::__construct($iterator);
+                $this->extension = $extension;
+            }
+
+            public function accept(): bool
+            {
+                $file = $this->getInnerIterator()->current();
+
+                assert($file instanceof \SplFileInfo);
+
+                return $file->isFile() && $file->getExtension() === $this->extension;
+            }
+        };
 
         foreach ($files as $file) {
-            assert(is_array($file));
-
-            $filepath = $file[0];
+            $pathName = $file->getPathname();
+            $filepath = str_replace('\\', '/', $pathName);
             assert(is_string($filepath));
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
