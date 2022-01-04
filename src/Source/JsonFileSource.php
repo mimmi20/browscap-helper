@@ -15,11 +15,10 @@ namespace BrowscapHelper\Source;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Exception;
 use JsonException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
-use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
+use Symfony\Component\Finder\Finder;
 
 use function assert;
 use function file_exists;
@@ -30,6 +29,7 @@ use function json_decode;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
+use function str_replace;
 use function unlink;
 
 use const JSON_THROW_ON_ERROR;
@@ -70,7 +70,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws RuntimeException
+     * @throws DirectoryNotFoundException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -89,7 +89,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws RuntimeException
+     * @throws DirectoryNotFoundException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -101,13 +101,19 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
 
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->dir));
-        $files    = new RegexIterator($iterator, '/^.+\.json$/i', RegexIterator::GET_MATCH);
+        $finder = new Finder();
+        $finder->files();
+        $finder->name('*.json');
+        $finder->ignoreDotFiles(true);
+        $finder->ignoreVCS(true);
+        $finder->sortByName();
+        $finder->ignoreUnreadableDirs();
+        $finder->in($this->dir);
 
-        foreach ($files as $file) {
-            assert(is_array($file));
-
-            $filepath = $file[0];
+        foreach ($finder as $file) {
+            /** @var SplFileInfo $file */
+            $pathName = $file->getPathname();
+            $filepath = str_replace('\\', '/', $pathName);
             assert(is_string($filepath));
 
             $message = $parentMessage . sprintf('- reading file %s', $filepath);
