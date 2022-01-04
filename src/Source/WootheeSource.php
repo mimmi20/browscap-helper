@@ -13,10 +13,12 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Source;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use FilterIterator;
+use Iterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use RegexIterator;
 use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -28,6 +30,7 @@ use function is_string;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
+use function str_replace;
 use function trim;
 
 use const STR_PAD_RIGHT;
@@ -89,10 +92,13 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
         $this->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::PATH));
-        $files = new class($iterator, 'yaml') extends \FilterIterator {
+        $files    = new class ($iterator, 'yaml') extends FilterIterator {
             private string $extension;
 
-            public function __construct(\Iterator $iterator , string $extension)
+            /**
+             * @param Iterator<SplFileInfo> $iterator
+             */
+            public function __construct(Iterator $iterator, string $extension)
             {
                 parent::__construct($iterator);
                 $this->extension = $extension;
@@ -102,13 +108,14 @@ final class WootheeSource implements OutputAwareInterface, SourceInterface
             {
                 $file = $this->getInnerIterator()->current();
 
-                assert($file instanceof \SplFileInfo);
+                assert($file instanceof SplFileInfo);
 
                 return $file->isFile() && $file->getExtension() === $this->extension;
             }
         };
 
         foreach ($files as $file) {
+            /** @var SplFileInfo $file */
             $pathName = $file->getPathname();
             $filepath = str_replace('\\', '/', $pathName);
             assert(is_string($filepath));

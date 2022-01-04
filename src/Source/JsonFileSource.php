@@ -15,11 +15,9 @@ namespace BrowscapHelper\Source;
 use BrowscapHelper\Source\Ua\UserAgent;
 use Exception;
 use JsonException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
-use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 
 use function assert;
@@ -31,6 +29,7 @@ use function json_decode;
 use function mb_strlen;
 use function sprintf;
 use function str_pad;
+use function str_replace;
 use function unlink;
 
 use const JSON_THROW_ON_ERROR;
@@ -71,7 +70,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws RuntimeException
+     * @throws DirectoryNotFoundException
      */
     public function getHeaders(string $message, int &$messageLength = 0): iterable
     {
@@ -90,7 +89,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
     /**
      * @return array<array<string, string>>|iterable
      *
-     * @throws RuntimeException
+     * @throws DirectoryNotFoundException
      */
     private function loadFromPath(string $parentMessage, int &$messageLength = 0): iterable
     {
@@ -112,7 +111,7 @@ final class JsonFileSource implements OutputAwareInterface, SourceInterface
         $finder->in($this->dir);
 
         foreach ($finder as $file) {
-            /** @var \SplFileInfo $file */
+            /** @var SplFileInfo $file */
             $pathName = $file->getPathname();
             $filepath = str_replace('\\', '/', $pathName);
             assert(is_string($filepath));
