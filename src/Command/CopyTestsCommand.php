@@ -12,13 +12,21 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Source\BrowscapSource;
+use BrowscapHelper\Source\CbschuldSource;
+use BrowscapHelper\Source\CrawlerDetectSource;
+use BrowscapHelper\Source\DonatjSource;
+use BrowscapHelper\Source\EndorphinSource;
 use BrowscapHelper\Source\JsonFileSource;
-use BrowscapHelper\Source\PiwikSource;
+use BrowscapHelper\Source\MatomoSource;
+use BrowscapHelper\Source\MobileDetectSource;
+use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowscapHelper\Source\ZsxsoftSource;
 use JsonException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -113,9 +121,17 @@ final class CopyTestsCommand extends Command
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $sources = [
-            new PiwikSource(),
+            new BrowscapSource(),
+            new CbschuldSource(),
+            new CrawlerDetectSource(),
+            new DonatjSource(),
+            new EndorphinSource(),
+            new MatomoSource(),
+            new MobileDetectSource(),
+            new SinergiSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
+            new ZsxsoftSource(),
             new TxtFileSource($sourcesDirectory),
             new TxtCounterFileSource($sourcesDirectory),
         ];
