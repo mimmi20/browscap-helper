@@ -140,8 +140,8 @@ final class RewriteTestsCommand extends Command
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($clonedOutput, $sources) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($clonedOutput, $sources) as $test) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             ++$counter;
 
@@ -163,10 +163,10 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $txtChecks[$seachHeader] = 1;
+            $txtChecks[$seachHeader] = $test;
 
             try {
-                $result = $this->handleTest($output, $detector, $header, $message, $messageLength);
+                $result = $this->handleTest($output, $detector, $test['headers'], $message, $messageLength);
             } catch (UnexpectedValueException $e) {
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);

@@ -102,8 +102,8 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, $sources) as $row) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -139,8 +139,8 @@ final class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, $sources) as $test) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 continue;
@@ -154,7 +154,7 @@ final class CopyTestsCommand extends Command
                 continue;
             }
 
-            $txtChecks[$seachHeader] = 1;
+            $txtChecks[$seachHeader] = $test;
             ++$txtTotalCounter;
         }
 

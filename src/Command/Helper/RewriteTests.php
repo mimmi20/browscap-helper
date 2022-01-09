@@ -59,7 +59,7 @@ final class RewriteTests extends Helper
         $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
         assert($jsonNormalizer instanceof JsonNormalizer);
 
-        $folderChunks = array_chunk(array_unique(array_keys($txtChecks)), 1000);
+        $folderChunks = array_chunk($txtChecks, 1000, true);
         $jsonNormalizer->init($output);
 
         $baseMessage   = 'rewriting files';
@@ -87,7 +87,7 @@ final class RewriteTests extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            foreach ($folderChunk as $headerString) {
+            foreach ($folderChunk as $headerString => $test) {
                 $headers[] = UserAgent::fromString($headerString)->getHeaders();
             }
 
