@@ -24,6 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_chunk;
+use function array_keys;
 use function assert;
 use function file_put_contents;
 use function mb_strlen;
@@ -85,7 +86,7 @@ final class RewriteTests extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            foreach ($folderChunk as $headerString => $test) {
+            foreach (array_keys($folderChunk) as $headerString) {
                 $headers[] = UserAgent::fromString($headerString)->getHeaders();
             }
 
