@@ -21,19 +21,22 @@ updates:
     commit-message:
       include: "scope"
       prefix: "composer"
-#    ignore:
-#      - dependency-name: ergebnis/json-normalizer
-#        versions:
-#          - ">= 0"
-#      - dependency-name: symfony/cache
-#        versions:
-#          - ">= 0"
-#      - dependency-name: symfony/console
-#        versions:
-#          - ">= 0"
-#      - dependency-name: symfony/finder
-#        versions:
-#          - ">= 0"
+    ignore:
+      - dependency-name: "psr/log"
+        versions:
+          - ">= 0"
+      - dependency-name: "psr/simple-cache"
+        versions:
+          - ">= 0"
+      - dependency-name: "psr/cache"
+        versions:
+          - ">= 0"
+      - dependency-name: "symfony/cache"
+        versions:
+          - ">= 0"
+      - dependency-name: "endorphin-studio/browser-detector-tests"
+        versions:
+          - ">= 0"
 #      - dependency-name: symfony/yaml
 #        versions:
 #          - ">= 0"
