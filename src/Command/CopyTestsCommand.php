@@ -12,13 +12,21 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Source\BrowscapSource;
+use BrowscapHelper\Source\CbschuldSource;
+use BrowscapHelper\Source\CrawlerDetectSource;
+use BrowscapHelper\Source\DonatjSource;
+use BrowscapHelper\Source\EndorphinSource;
 use BrowscapHelper\Source\JsonFileSource;
-use BrowscapHelper\Source\PiwikSource;
+use BrowscapHelper\Source\MatomoSource;
+use BrowscapHelper\Source\MobileDetectSource;
+use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowscapHelper\Source\ZsxsoftSource;
 use JsonException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -94,8 +102,8 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, $sources) as $row) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -113,9 +121,17 @@ final class CopyTestsCommand extends Command
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $sources = [
-            new PiwikSource(),
+            new BrowscapSource(),
+            new CbschuldSource(),
+            new CrawlerDetectSource(),
+            new DonatjSource(),
+            new EndorphinSource(),
+            new MatomoSource(),
+            new MobileDetectSource(),
+            new SinergiSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
+            new ZsxsoftSource(),
             new TxtFileSource($sourcesDirectory),
             new TxtCounterFileSource($sourcesDirectory),
         ];
@@ -123,8 +139,8 @@ final class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, $sources) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, $sources) as $test) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 continue;
@@ -138,7 +154,7 @@ final class CopyTestsCommand extends Command
                 continue;
             }
 
-            $txtChecks[$seachHeader] = 1;
+            $txtChecks[$seachHeader] = $test;
             ++$txtTotalCounter;
         }
 

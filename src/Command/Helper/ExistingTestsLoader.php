@@ -43,7 +43,7 @@ final class ExistingTestsLoader extends Helper
      * @throws LogicException
      * @throws RuntimeException
      */
-    public function getHeaders(OutputInterface $output, array $sources): iterable
+    public function getProperties(OutputInterface $output, array $sources): iterable
     {
         $baseMessage   = 'reading sources';
         $messageLength = 0;
@@ -75,7 +75,7 @@ final class ExistingTestsLoader extends Helper
 
             $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
 
-            yield from $source->getHeaders($baseMessage, $messageLength);
+            yield from $source->getProperties($baseMessage, $messageLength);
 
             $message = $baseMessage . '- done';
 

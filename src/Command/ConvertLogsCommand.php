@@ -86,8 +86,8 @@ final class ConvertLogsCommand extends Command
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [new JsonFileSource($testSource)]) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, [new JsonFileSource($testSource)]) as $row) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -107,8 +107,8 @@ final class ConvertLogsCommand extends Command
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getHeaders($output, [$source]) as $header) {
-            $seachHeader = (string) UserAgent::fromHeaderArray($header);
+        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, [$source]) as $test) {
+            $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 $output->writeln('<debug>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</debug>', OutputInterface::VERBOSITY_NORMAL);
@@ -116,7 +116,7 @@ final class ConvertLogsCommand extends Command
                 continue;
             }
 
-            $txtChecks[$seachHeader] = 1;
+            $txtChecks[$seachHeader] = $test;
             ++$txtTotalCounter;
         }
 
