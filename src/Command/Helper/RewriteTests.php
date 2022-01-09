@@ -24,8 +24,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_chunk;
-use function array_keys;
-use function array_unique;
 use function assert;
 use function file_put_contents;
 use function mb_strlen;
