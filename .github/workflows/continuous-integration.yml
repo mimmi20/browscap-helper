@@ -8,7 +8,7 @@ name: "Continuous Integration"
 
 env:
   PHP_EXTENSIONS: "mbstring, dom, xmlwriter, opcache, bcmath, curl, intl, json"
-  PHP_INI_VALUES: "opcache.enable=1, opcache.enable_cli=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
+  PHP_INI_VALUES: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
   COMPOSER_OPTIONS: "--optimize-autoloader --prefer-dist --prefer-stable -v"
   TOOLS: "composer:v2"
 
@@ -122,6 +122,10 @@ jobs:
           - operating-system: "ubuntu-20.04"
             php-version: "8.2"
             dependencies: "highest"
+            experimental: true
+          - operating-system: "ubuntu-20.04"
+            php-version: "8.2"
+            dependencies: "lowest"
             experimental: true
 
     steps:
@@ -335,52 +339,52 @@ jobs:
       - name: "Run phpmd/phpmd"
         run: "phpmd src github phpmd.ruleset.xml"
 
-#  roave-backwards-compatibility-check:
-#    name: "Check for Backward Compatibility breaks"
-#
-#    needs: "lint"
-#
-#    runs-on: "${{ matrix.operating-system }}"
-#
-#    continue-on-error: false
-#
-#    strategy:
-#      fail-fast: false
-#
-#      matrix:
-#        operating-system:
-#          - "ubuntu-20.04"
-#
-#        php-version:
-#          - "8.1"
-#
-#        dependencies:
-#          - "highest"
-#
-#    steps:
-#      - name: "Checkout"
-#        uses: "actions/checkout@v2.4.0"
-#        with:
-#          # Disabling shallow clone is recommended for improving relevancy of reporting
-#          fetch-depth: 0
-#
-#      - name: "Install PHP"
-#        uses: "shivammathur/setup-php@2.16.0"
-#        with:
-#          php-version: "${{ matrix.php-version }}"
-#          extensions: "${{ env.PHP_EXTENSIONS }}"
-#          ini-values: "${{ env.PHP_INI_VALUES }}"
-#          coverage: "none"
-#          tools: "${{ env.TOOLS }}"
-#
-#      - name: "Require Roave/BackwardCompatibilityCheck"
-#        run: "composer require --no-update --no-interaction --prefer-dist --prefer-stable --dev \"roave/backward-compatibility-check:6.0.x-dev\" \"roave/better-reflection:5.0.x-dev\""
-#
-#      - name: "Update dependencies with composer"
-#        uses: "ramsey/composer-install@v1"
-#        with:
-#          dependency-versions: "${{ matrix.dependencies }}"
-#          composer-options: "${{ env.COMPOSER_OPTIONS }}"
-#
-#      - name: "Check for BC breaks"
-#        run: "vendor/bin/roave-backward-compatibility-check --format=markdown"
+  roave-backwards-compatibility-check:
+    name: "Check for Backward Compatibility breaks"
+
+    needs: "lint"
+
+    runs-on: "${{ matrix.operating-system }}"
+
+    continue-on-error: false
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        operating-system:
+          - "ubuntu-20.04"
+
+        php-version:
+          - "8.1"
+
+        dependencies:
+          - "highest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.4.0"
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@2.16.0"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          extensions: "${{ env.PHP_EXTENSIONS }}, sodium, intl"
+          ini-values: "${{ env.PHP_INI_VALUES }}"
+          coverage: "none"
+          tools: "${{ env.TOOLS }}"
+
+      - name: "Require Roave/BackwardCompatibilityCheck"
+        run: "composer require --no-update --no-interaction --prefer-dist --prefer-stable --dev \"roave/backward-compatibility-check:^6.1\" \"mimmi20/coding-standard:^2.6\" \"friendsofphp/php-cs-fixer:^3.4\""
+
+      - name: "Update dependencies with composer"
+        uses: "ramsey/composer-install@v1"
+        with:
+          dependency-versions: "${{ matrix.dependencies }}"
+          composer-options: "${{ env.COMPOSER_OPTIONS }}"
+
+      - name: "Check for BC breaks"
+        run: "vendor/bin/roave-backward-compatibility-check --format=github-actions"
