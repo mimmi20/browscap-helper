@@ -116,7 +116,7 @@ final class CopyTestsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        //$this->getHelper('existing-tests-remover')->remove($output, $testSource);
+        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
