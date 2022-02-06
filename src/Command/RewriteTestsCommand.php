@@ -124,7 +124,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function get($key, $default = null)
+            public function get(string $key, mixed $default = null): mixed
             {
                 return null;
             }
@@ -143,7 +143,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function set($key, $value, $ttl = null): bool
+            public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
             {
                 return false;
             }
@@ -158,7 +158,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function delete($key): bool
+            public function delete(string $key): bool
             {
                 return false;
             }
@@ -184,7 +184,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function getMultiple($keys, $default = null): iterable
+            public function getMultiple(iterable $keys, mixed $default = null): iterable
             {
                 return [];
             }
@@ -202,7 +202,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function setMultiple($values, $ttl = null): bool
+            public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
             {
                 return false;
             }
@@ -217,7 +217,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function deleteMultiple($keys): bool
+            public function deleteMultiple(iterable $keys): bool
             {
                 return false;
             }
@@ -235,7 +235,7 @@ final class RewriteTestsCommand extends Command
              * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function has($key): bool
+            public function has(string $key): bool
             {
                 return false;
             }
