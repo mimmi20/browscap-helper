@@ -121,10 +121,9 @@ final class RewriteTestsCommand extends Command
              *
              * @return mixed the value of the item from the cache, or $default in case of cache miss
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function get($key, $default = null)
+            public function get(string $key, mixed $default = null): mixed
             {
                 return null;
             }
@@ -140,10 +139,9 @@ final class RewriteTestsCommand extends Command
              *
              * @return bool true on success and false on failure
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function set($key, $value, $ttl = null): bool
+            public function set(string $key, mixed $value, int | DateInterval | null $ttl = null): bool
             {
                 return false;
             }
@@ -155,10 +153,9 @@ final class RewriteTestsCommand extends Command
              *
              * @return bool True if the item was successfully removed. False if there was an error.
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function delete($key): bool
+            public function delete(string $key): bool
             {
                 return false;
             }
@@ -181,10 +178,9 @@ final class RewriteTestsCommand extends Command
              *
              * @return iterable<string, mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function getMultiple($keys, $default = null): iterable
+            public function getMultiple(iterable $keys, mixed $default = null): iterable
             {
                 return [];
             }
@@ -199,10 +195,9 @@ final class RewriteTestsCommand extends Command
              *
              * @return bool true on success and false on failure
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function setMultiple($values, $ttl = null): bool
+            public function setMultiple(iterable $values, int | DateInterval | null $ttl = null): bool
             {
                 return false;
             }
@@ -214,10 +209,9 @@ final class RewriteTestsCommand extends Command
              *
              * @return bool True if the items were successfully removed. False if there was an error.
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function deleteMultiple($keys): bool
+            public function deleteMultiple(iterable $keys): bool
             {
                 return false;
             }
@@ -232,10 +226,9 @@ final class RewriteTestsCommand extends Command
              *
              * @param string $key the cache item key
              *
-             * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function has($key): bool
+            public function has(string $key): bool
             {
                 return false;
             }
