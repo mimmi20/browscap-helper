@@ -20,6 +20,7 @@ use BrowscapHelper\Source\EndorphinSource;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MatomoSource;
 use BrowscapHelper\Source\MobileDetectSource;
+use BrowscapHelper\Source\PdoSource;
 use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
@@ -28,6 +29,8 @@ use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\ZsxsoftSource;
 use JsonException;
+use PDO;
+use PDOException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -135,6 +138,34 @@ final class CopyTestsCommand extends Command
             new TxtFileSource($sourcesDirectory),
             new TxtCounterFileSource($sourcesDirectory),
         ];
+
+        try {
+            $dbname   = 'ua';
+            $host     = 'localhost';
+            $port     = 3306;
+            $charset  = 'utf8mb4';
+            $user     = 'root';
+            $password = '';
+
+            $driverOptions = [
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_PERSISTENT => true,
+            ];
+
+            $pdo = new PDO(
+                sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
+                $user,
+                $password,
+                $driverOptions
+            );
+
+            $sources[] = new PdoSource($pdo);
+        } catch (PDOException $e) {
+            $output->writeln('<error>An error occured while initializing the database</error>', OutputInterface::VERBOSITY_NORMAL);
+        }
 
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
