@@ -121,7 +121,7 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $dbname = 'ua2';
+        $dbname = 'ua';
         $host = 'localhost';
         $port = 3306;
         $charset = 'utf8mb4';
