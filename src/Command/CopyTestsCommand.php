@@ -20,6 +20,7 @@ use BrowscapHelper\Source\EndorphinSource;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MatomoSource;
 use BrowscapHelper\Source\MobileDetectSource;
+use BrowscapHelper\Source\PdoSource;
 use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
@@ -120,6 +121,28 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
+        $dbname = 'ua2';
+        $host = 'localhost';
+        $port = 3306;
+        $charset = 'utf8mb4';
+        $user = 'root';
+        $password = '';
+
+        $driverOptions = [
+            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+            \PDO::ATTR_EMULATE_PREPARES => false,
+            \PDO::ATTR_PERSISTENT => true,
+        ];
+
+        $pdo = new \PDO(
+            sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
+            $user,
+            $password,
+            $driverOptions
+        );
+
         $sources = [
             new BrowscapSource(),
             new CbschuldSource(),
@@ -132,6 +155,7 @@ final class CopyTestsCommand extends Command
             new WhichBrowserSource(),
             new WootheeSource(),
             new ZsxsoftSource(),
+            new PdoSource($pdo),
             new TxtFileSource($sourcesDirectory),
             new TxtCounterFileSource($sourcesDirectory),
         ];
