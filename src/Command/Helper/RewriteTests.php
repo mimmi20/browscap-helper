@@ -62,13 +62,8 @@ final class RewriteTests extends Helper
         $jsonNormalizer->init($output);
 
         $baseMessage   = 'rewriting files';
-        $messageLength = 0;
-
-        $message = $baseMessage . ' ...';
-
-        if (mb_strlen($message) > $messageLength) {
-            $messageLength = mb_strlen($message);
-        }
+        $message       = $baseMessage . ' ...';
+        $messageLength = mb_strlen($message);
 
         $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
 
