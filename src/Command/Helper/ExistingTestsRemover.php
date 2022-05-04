@@ -43,13 +43,8 @@ final class ExistingTestsRemover extends Helper
     public function remove(OutputInterface $output, string $testSource, bool $dirs = false): void
     {
         $baseMessage   = 'remove old files';
-        $messageLength = 0;
-
-        $message = $baseMessage . ' ...';
-
-        if (mb_strlen($message) > $messageLength) {
-            $messageLength = mb_strlen($message);
-        }
+        $message       = $baseMessage . ' ...';
+        $messageLength = mb_strlen($message);
 
         $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
 

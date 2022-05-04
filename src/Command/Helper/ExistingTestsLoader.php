@@ -46,13 +46,8 @@ final class ExistingTestsLoader extends Helper
     public function getProperties(OutputInterface $output, array $sources): iterable
     {
         $baseMessage   = 'reading sources';
-        $messageLength = 0;
-
-        $message = $baseMessage . ' ...';
-
-        if (mb_strlen($message) > $messageLength) {
-            $messageLength = mb_strlen($message);
-        }
+        $message       = $baseMessage . ' ...';
+        $messageLength = mb_strlen($message);
 
         $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
 

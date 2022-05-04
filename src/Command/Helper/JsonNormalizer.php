@@ -66,21 +66,14 @@ final class JsonNormalizer extends Helper
      */
     public function init(OutputInterface $output): void
     {
-        $messageLength = 0;
         $message       = 'prepare JsonNormalizer';
         $message2      = $message . ' - init ...';
-
-        if (mb_strlen($message2) > $messageLength) {
-            $messageLength = mb_strlen($message2);
-        }
+        $messageLength = mb_strlen($message2);
 
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
-        $message2 = $message . ' - define normalizers ...';
-
-        if (mb_strlen($message2) > $messageLength) {
-            $messageLength = mb_strlen($message2);
-        }
+        $message2      = $message . ' - define normalizers ...';
+        $messageLength = mb_strlen($message2);
 
         $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
 
@@ -96,10 +89,6 @@ final class JsonNormalizer extends Helper
         ];
 
         $message2 = $message . ' - done';
-
-        if (mb_strlen($message2) > $messageLength) {
-            $messageLength = mb_strlen($message2);
-        }
 
         $output->writeln("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_VERBOSE);
     }
