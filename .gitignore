@@ -23,8 +23,11 @@ sources/*
 !sources/.gitkeep
 .build/*
 !.build/.gitkeep
+tests/temp/*.php
+tests/temp/*.ini
 .php-cs-fixer.cache
 .phplint-cache
 .phpunit.result.cache
 infection-*.log
 rewrite*.php
+.reports/
