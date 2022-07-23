@@ -27,7 +27,7 @@
     "ergebnis/json-normalizer": "^2.2.0",
     "jaybizzle/crawler-detect": "^v1.2.111",
     "matomo/device-detector": "dev-master",
-    "mimmi20/browscap-helper-source": "^3.0.12",
+    "mimmi20/browscap-helper-source": "^3.0.13",
     "mimmi20/browser-detector": "^7.0.2",
     "mimmi20/browser-detector-version": "^7.0.8",
     "mimmi20/ua-result": "^8.0.7",
@@ -44,9 +44,9 @@
     "zsxsoft/php-useragent": "^1.5.0"
   },
   "require-dev": {
-    "mimmi20/coding-standard": "^3.0.0",
+    "mimmi20/coding-standard": "^3.0.2",
     "phpstan/extension-installer": "^1.1.0",
-    "phpstan/phpstan": "^1.8.1",
+    "phpstan/phpstan": "^1.8.2",
     "phpstan/phpstan-deprecation-rules": "^1.0.0"
   },
   "minimum-stability": "stable",
@@ -81,6 +81,7 @@
       "zsxsoft/php-useragent": "source",
       "*": "dist"
     },
+    "lock": false,
     "sort-packages": true,
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
