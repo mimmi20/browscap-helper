@@ -6,10 +6,7 @@ updates:
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "04:00"
-      timezone: "Europe/Berlin"
+      interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
       - "mimmi20"
@@ -17,7 +14,7 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       include: "scope"
       prefix: "composer"
@@ -44,10 +41,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "04:00"
-      timezone: "Europe/Berlin"
+      interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
       - "mimmi20"

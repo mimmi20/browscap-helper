@@ -82,7 +82,13 @@ final class RewriteTests extends Helper
             $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             foreach (array_keys($folderChunk) as $headerString) {
-                $headers[] = UserAgent::fromString($headerString)->getHeaders();
+                $headerArray = UserAgent::fromString($headerString)->getHeaders();
+
+                if ([] === $headerArray) {
+                    continue;
+                }
+
+                $headers[] = $headerArray;
             }
 
             $message2 = $message . ' - normalizing';
