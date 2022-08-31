@@ -47,15 +47,9 @@ use const JSON_THROW_ON_ERROR;
 
 final class CopyTestsCommand extends Command
 {
-    private string $sourcesDirectory = '';
-
-    /**
-     * @throws LogicException
-     */
-    public function __construct(string $sourcesDirectory)
+    /** @throws LogicException */
+    public function __construct(private string $sourcesDirectory = '')
     {
-        $this->sourcesDirectory = $sourcesDirectory;
-
         parent::__construct();
     }
 
@@ -74,7 +68,7 @@ final class CopyTestsCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Where the resource files are located',
-                $this->sourcesDirectory
+                $this->sourcesDirectory,
             );
     }
 
@@ -159,11 +153,11 @@ final class CopyTestsCommand extends Command
                 sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
                 $user,
                 $password,
-                $driverOptions
+                $driverOptions,
             );
 
             $sources[] = new PdoSource($pdo);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             $output->writeln('<error>An error occured while initializing the database</error>', OutputInterface::VERBOSITY_NORMAL);
         }
 
@@ -179,7 +173,7 @@ final class CopyTestsCommand extends Command
 
             try {
                 json_encode($seachHeader, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
+            } catch (JsonException) {
                 $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 continue;

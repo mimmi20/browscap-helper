@@ -28,15 +28,9 @@ use function sprintf;
 
 final class ConvertLogsCommand extends Command
 {
-    private string $sourcesDirectory = '';
-
-    /**
-     * @throws LogicException
-     */
-    public function __construct(string $sourcesDirectory)
+    /** @throws LogicException */
+    public function __construct(private string $sourcesDirectory = '')
     {
-        $this->sourcesDirectory = $sourcesDirectory;
-
         parent::__construct();
     }
 
@@ -55,7 +49,7 @@ final class ConvertLogsCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Where the resource files are located',
-                $this->sourcesDirectory
+                $this->sourcesDirectory,
             );
     }
 

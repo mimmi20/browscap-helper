@@ -37,22 +37,14 @@ use function str_replace;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
+/** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
 final class FormatNormalizer implements NormalizerInterface
 {
     private const PLACE_HOLDER = '$ni$';
 
-    private Format $format;
-
-    /**
-     * @throws UnexpectedValueException
-     */
-    public function __construct(Format $format)
+    /** @throws UnexpectedValueException */
+    public function __construct(private Format $format)
     {
-        $this->format = $format;
-
         $this->checkPrettyPrint();
     }
 
@@ -64,7 +56,7 @@ final class FormatNormalizer implements NormalizerInterface
     {
         $encodedWithJsonEncodeOptions = json_encode(
             $json->decoded(),
-            $this->format->jsonEncodeOptions()->toInt() | JSON_THROW_ON_ERROR
+            $this->format->jsonEncodeOptions()->toInt() | JSON_THROW_ON_ERROR,
         );
 
         $json       = Json::fromEncoded($encodedWithJsonEncodeOptions);
@@ -75,7 +67,7 @@ final class FormatNormalizer implements NormalizerInterface
 
         $lines = explode(
             $oldNewline,
-            rtrim($json->encoded())
+            rtrim($json->encoded()),
         );
 
         assert(is_array($lines));
@@ -124,9 +116,7 @@ final class FormatNormalizer implements NormalizerInterface
         return Json::fromEncoded($content);
     }
 
-    /**
-     * @throws UnexpectedValueException
-     */
+    /** @throws UnexpectedValueException */
     private function checkPrettyPrint(): void
     {
         $jsonOptions = $this->format->jsonEncodeOptions()->toInt();

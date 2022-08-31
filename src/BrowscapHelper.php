@@ -25,9 +25,7 @@ final class BrowscapHelper extends Application
 {
     public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
-    /**
-     * @throws Exception
-     */
+    /** @throws Exception */
     public function __construct()
     {
         parent::__construct('Browscap Helper Project', 'dev-master');
