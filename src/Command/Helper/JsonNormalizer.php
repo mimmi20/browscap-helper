@@ -49,9 +49,7 @@ final class JsonNormalizer extends Helper
     /** @var NormalizerInterface[] */
     private array $normalizers;
 
-    /**
-     * @throws void
-     */
+    /** @throws void */
     public function getName(): string
     {
         return 'json-normalizer';
@@ -83,8 +81,8 @@ final class JsonNormalizer extends Helper
                     Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
                     Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
                     Normalizer\Format\NewLine::fromString("\n"),
-                    true
-                )
+                    true,
+                ),
             ),
         ];
 
@@ -104,7 +102,7 @@ final class JsonNormalizer extends Helper
      * @throws OriginalInvalidAccordingToSchemaException
      * @throws InvalidJsonEncodedException
      */
-    public function normalize(OutputInterface $output, array $headers, string $message, int &$messageLength = 0): ?string
+    public function normalize(OutputInterface $output, array $headers, string $message, int &$messageLength = 0): string | null
     {
         $message2 = $message . ' - encode data ...';
 

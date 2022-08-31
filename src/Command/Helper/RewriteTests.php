@@ -35,9 +35,7 @@ use const STR_PAD_RIGHT;
 
 final class RewriteTests extends Helper
 {
-    /**
-     * @throws void
-     */
+    /** @throws void */
     public function getName(): string
     {
         return 'rewrite-tests';

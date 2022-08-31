@@ -345,7 +345,7 @@ final class RewriteTestsCommand extends Command
 
             try {
                 $saved = file_put_contents($file, json_encode($tests, JSON_THROW_ON_ERROR));
-            } catch (JsonException $e) {
+            } catch (JsonException) {
                 ++$errors;
                 $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln('<error>' . sprintf('An error occured while encoding file %s', $file) . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -458,7 +458,7 @@ final class RewriteTestsCommand extends Command
 
                     $success = @file_put_contents(
                         $path,
-                        $normalized
+                        $normalized,
                     );
 
                     if (false !== $success) {
@@ -486,7 +486,7 @@ final class RewriteTestsCommand extends Command
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    private function handleTest(OutputInterface $output, Detector $detector, array $headers, string $parentMessage, int &$messageLength = 0): ?ResultInterface
+    private function handleTest(OutputInterface $output, Detector $detector, array $headers, string $parentMessage, int &$messageLength = 0): ResultInterface | null
     {
         $message = $parentMessage . ' - detect for new result ...';
 

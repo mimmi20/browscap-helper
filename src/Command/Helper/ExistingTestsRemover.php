@@ -28,9 +28,7 @@ use const STR_PAD_RIGHT;
 
 final class ExistingTestsRemover extends Helper
 {
-    /**
-     * @throws void
-     */
+    /** @throws void */
     public function getName(): string
     {
         return 'existing-tests-remover';
