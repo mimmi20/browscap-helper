@@ -22,6 +22,7 @@
 
 # files/folders to ignore
 /.*                       export-ignore
+.github/CODEOWNERS        export-ignore text eol=lf
 .editorconfig             export-ignore text eol=lf
 .gitattributes            export-ignore text eol=lf
 .gitignore                export-ignore text eol=lf
@@ -34,6 +35,7 @@ infection.json            export-ignore text eol=lf
 phpcs.xml                 export-ignore text eol=lf
 phpstan.neon              export-ignore text eol=lf
 phpunit.xml               export-ignore text eol=lf
+renovate.json             export-ignore text eol=lf
 /cache                    export-ignore
 /log                      export-ignore
 /results                  export-ignore
