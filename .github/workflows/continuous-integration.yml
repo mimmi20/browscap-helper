@@ -174,7 +174,7 @@ jobs:
       - name: "Linter"
         # You can override Mega-Linter flavor used to have faster performances
         # More info at https://nvuillam.github.io/mega-linter/flavors/
-        uses: "nvuillam/mega-linter/flavors/php@v6.9.1"
+        uses: "nvuillam/mega-linter/flavors/php@v6.10.0"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
