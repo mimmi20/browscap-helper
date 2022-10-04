@@ -13,7 +13,7 @@ jobs:
   ci:
     name: "Run CI"
 
-    uses: "mimmi20/template/.github/workflows/ci.yml@updates"
+    uses: "mimmi20/template/.github/workflows/ci.yml@master"
     with:
       extensions: ""
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
