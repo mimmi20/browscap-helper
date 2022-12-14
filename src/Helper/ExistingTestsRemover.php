@@ -10,10 +10,9 @@
 
 declare(strict_types = 1);
 
-namespace BrowscapHelper\Command\Helper;
+namespace BrowscapHelper\Helper;
 
 use LogicException;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
@@ -26,14 +25,8 @@ use function unlink;
 
 use const STR_PAD_RIGHT;
 
-final class ExistingTestsRemover extends Helper
+final class ExistingTestsRemover
 {
-    /** @throws void */
-    public function getName(): string
-    {
-        return 'existing-tests-remover';
-    }
-
     /**
      * @throws DirectoryNotFoundException
      * @throws LogicException

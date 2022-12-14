@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace BrowscapHelper\Command\Helper;
+namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
@@ -19,13 +19,11 @@ use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
 use InvalidArgumentException;
 use RuntimeException;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_chunk;
 use function array_keys;
-use function assert;
 use function file_put_contents;
 use function mb_strlen;
 use function sprintf;
@@ -33,12 +31,12 @@ use function str_pad;
 
 use const STR_PAD_RIGHT;
 
-final class RewriteTests extends Helper
+final class RewriteTests
 {
     /** @throws void */
-    public function getName(): string
+    public function __construct(private readonly JsonNormalizer $jsonNormalizer)
     {
-        return 'rewrite-tests';
+        // nothing to do
     }
 
     /**
@@ -48,16 +46,12 @@ final class RewriteTests extends Helper
      * @throws InvalidNewLineStringException
      * @throws InvalidIndentStyleException
      * @throws InvalidIndentSizeException
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws UnexpectedValueException
      */
     public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
     {
-        $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
-        assert($jsonNormalizer instanceof JsonNormalizer);
-
         $folderChunks = array_chunk($txtChecks, 1000, true);
-        $jsonNormalizer->init($output);
+        $this->jsonNormalizer->init($output);
 
         $baseMessage   = 'rewriting files';
         $message       = $baseMessage . ' ...';
@@ -98,7 +92,7 @@ final class RewriteTests extends Helper
             $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             try {
-                $normalized = $jsonNormalizer->normalize($output, $headers, $message, $messageLength);
+                $normalized = $this->jsonNormalizer->normalize($output, $headers, $message, $messageLength);
             } catch (InvalidArgumentException | RuntimeException $e) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
