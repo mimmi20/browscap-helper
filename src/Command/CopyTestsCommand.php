@@ -12,6 +12,9 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Helper\ExistingTestsLoader;
+use BrowscapHelper\Helper\ExistingTestsRemover;
+use BrowscapHelper\Helper\RewriteTests;
 use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CbschuldSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
@@ -28,15 +31,21 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\ZsxsoftSource;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
 use JsonException;
 use PDO;
 use PDOException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UnexpectedValueException;
 
 use function array_key_exists;
 use function count;
@@ -48,8 +57,12 @@ use const JSON_THROW_ON_ERROR;
 final class CopyTestsCommand extends Command
 {
     /** @throws LogicException */
-    public function __construct(private string $sourcesDirectory = '')
-    {
+    public function __construct(
+        private readonly ExistingTestsLoader $testsLoader,
+        private readonly ExistingTestsRemover $testsRemover,
+        private readonly RewriteTests $rewriteTests,
+        private readonly string $sourcesDirectory = '',
+    ) {
         parent::__construct();
     }
 
@@ -89,6 +102,13 @@ final class CopyTestsCommand extends Command
      *
      * @throws LogicException           When this abstract method is not implemented
      * @throws InvalidArgumentException
+     * @throws InvalidJsonEncodeOptionsException
+     * @throws InvalidNewLineStringException
+     * @throws InvalidIndentStyleException
+     * @throws InvalidIndentSizeException
+     * @throws UnexpectedValueException
+     * @throws \LogicException
+     * @throws RuntimeException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -99,7 +119,7 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, $sources) as $row) {
+        foreach ($this->testsLoader->getProperties($output, $sources) as $row) {
             $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
@@ -113,7 +133,7 @@ final class CopyTestsCommand extends Command
 
         $sourcesDirectory = $input->getOption('resources');
 
-        $this->getHelper('existing-tests-remover')->remove($output, $testSource);
+        $this->testsRemover->remove($output, $testSource);
 
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
@@ -164,7 +184,7 @@ final class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
-        foreach ($this->getHelper('existing-tests-loader')->getProperties($output, $sources) as $test) {
+        foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
@@ -185,7 +205,7 @@ final class CopyTestsCommand extends Command
 
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $this->getHelper('rewrite-tests')->rewrite($output, $txtChecks, $testSource);
+        $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);

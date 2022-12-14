@@ -13,7 +13,9 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Command;
 
 use ArithmeticError;
-use BrowscapHelper\Command\Helper\JsonNormalizer;
+use BrowscapHelper\Helper\ExistingTestsLoader;
+use BrowscapHelper\Helper\ExistingTestsRemover;
+use BrowscapHelper\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
@@ -42,7 +44,6 @@ use UnexpectedValueException;
 
 use function array_chunk;
 use function array_key_exists;
-use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -66,6 +67,15 @@ final class RewriteTestsCommand extends Command
 {
     /** @var array<string, int> */
     private array $tests = [];
+
+    /** @throws LogicException */
+    public function __construct(
+        private readonly ExistingTestsLoader $testsLoader,
+        private readonly ExistingTestsRemover $testsRemover,
+        private readonly JsonNormalizer $jsonNormalizer,
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Configures the current command.
@@ -240,14 +250,14 @@ final class RewriteTestsCommand extends Command
         $detectorTargetDirectory = $basePath . 'tests/data/';
         $testSource              = 'tests';
 
-        $this->getHelper('existing-tests-remover')->remove($output, $detectorTargetDirectory);
+        $this->testsRemover->remove($output, $detectorTargetDirectory);
 
         $sources = [new JsonFileSource($testSource)];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $this->getHelper('existing-tests-remover')->remove($output, '.build');
-        $this->getHelper('existing-tests-remover')->remove($output, '.build', true);
+        $this->testsRemover->remove($output, '.build');
+        $this->testsRemover->remove($output, '.build', true);
 
         $txtChecks     = [];
         $messageLength = 0;
@@ -260,7 +270,7 @@ final class RewriteTestsCommand extends Command
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
-        foreach ($this->getHelper('existing-tests-loader')->getProperties($clonedOutput, $sources) as $test) {
+        foreach ($this->testsLoader->getProperties($clonedOutput, $sources) as $test) {
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             ++$counter;
@@ -370,9 +380,7 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
 
-        $jsonNormalizer = $this->getHelperSet()->get('json-normalizer');
-        assert($jsonNormalizer instanceof JsonNormalizer);
-        $jsonNormalizer->init($output);
+        $this->jsonNormalizer->init($output);
 
         $output->writeln(sprintf('check result: %7d test(s), %7d duplicate(s), %7d error(s)', $testCount, $duplicates, $errors), OutputInterface::VERBOSITY_NORMAL);
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
@@ -433,7 +441,7 @@ final class RewriteTestsCommand extends Command
                     $output->write("\r" . str_pad($message, $messageLength, ' '), false, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                     try {
-                        $normalized = $jsonNormalizer->normalize($output, $parts, $message, $messageLength);
+                        $normalized = $this->jsonNormalizer->normalize($output, $parts, $message, $messageLength);
                     } catch (InvalidArgumentException | RuntimeException $e) {
                         $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                         $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);

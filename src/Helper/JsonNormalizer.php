@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace BrowscapHelper\Command\Helper;
+namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Normalizer\FormatNormalizer;
 use Ergebnis\Json\Normalizer;
@@ -28,7 +28,6 @@ use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentExc
 use Ergebnis\Json\Normalizer\NormalizerInterface;
 use Exception;
 use JsonException;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
@@ -44,16 +43,10 @@ use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const STR_PAD_RIGHT;
 
-final class JsonNormalizer extends Helper
+final class JsonNormalizer
 {
     /** @var NormalizerInterface[] */
     private array $normalizers;
-
-    /** @throws void */
-    public function getName(): string
-    {
-        return 'json-normalizer';
-    }
 
     /**
      * @throws InvalidJsonEncodeOptionsException

@@ -22,6 +22,5 @@ parameters:
       tooWideThrowType: true
   ignoreErrors:
     - '~expects string,~'
-    - '~Cannot call method get\(\) on Symfony\\Component\\Console\\Helper\\HelperSet\|null~'
     - '~on mixed~'
     - '~mixed given~'
