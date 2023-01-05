@@ -14,18 +14,18 @@ namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Normalizer\FormatNormalizer;
 use Ergebnis\Json\Normalizer;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
-use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
-use Ergebnis\Json\Normalizer\Exception\NormalizedInvalidAccordingToSchemaException;
-use Ergebnis\Json\Normalizer\Exception\OriginalInvalidAccordingToSchemaException;
-use Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeReadException;
-use Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeResolvedException;
-use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMediaTypeException;
-use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocumentException;
-use Ergebnis\Json\Normalizer\NormalizerInterface;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncoded;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
+use Ergebnis\Json\Normalizer\Exception\NormalizedInvalidAccordingToSchema;
+use Ergebnis\Json\Normalizer\Exception\OriginalInvalidAccordingToSchema;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeRead;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriCouldNotBeResolved;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesDocumentWithInvalidMediaType;
+use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocument;
+use Ergebnis\Json\Normalizer\Normalizer as NormalizerInterface;
 use Exception;
 use JsonException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,10 +49,10 @@ final class JsonNormalizer
     private array $normalizers;
 
     /**
-     * @throws InvalidJsonEncodeOptionsException
-     * @throws InvalidNewLineStringException
-     * @throws InvalidIndentStyleException
-     * @throws InvalidIndentSizeException
+     * @throws InvalidJsonEncodeOptions
+     * @throws InvalidNewLineString
+     * @throws InvalidIndentStyle
+     * @throws InvalidIndentSize
      * @throws UnexpectedValueException
      */
     public function init(OutputInterface $output): void
@@ -87,13 +87,13 @@ final class JsonNormalizer
     /**
      * @param array<int, array<string, string>> $headers
      *
-     * @throws SchemaUriReferencesInvalidJsonDocumentException
-     * @throws SchemaUriReferencesDocumentWithInvalidMediaTypeException
-     * @throws SchemaUriCouldNotBeResolvedException
-     * @throws SchemaUriCouldNotBeReadException
-     * @throws NormalizedInvalidAccordingToSchemaException
-     * @throws OriginalInvalidAccordingToSchemaException
-     * @throws InvalidJsonEncodedException
+     * @throws SchemaUriReferencesInvalidJsonDocument
+     * @throws SchemaUriReferencesDocumentWithInvalidMediaType
+     * @throws SchemaUriCouldNotBeResolved
+     * @throws SchemaUriCouldNotBeRead
+     * @throws NormalizedInvalidAccordingToSchema
+     * @throws OriginalInvalidAccordingToSchema
+     * @throws InvalidJsonEncoded
      */
     public function normalize(OutputInterface $output, array $headers, string $message, int &$messageLength = 0): string | null
     {
