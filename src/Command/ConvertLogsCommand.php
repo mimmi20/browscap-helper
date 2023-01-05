@@ -18,10 +18,10 @@ use BrowscapHelper\Helper\RewriteTests;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\LogFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
-use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -83,10 +83,10 @@ final class ConvertLogsCommand extends Command
      *
      * @throws LogicException           When this abstract method is not implemented
      * @throws InvalidArgumentException
-     * @throws InvalidJsonEncodeOptionsException
-     * @throws InvalidNewLineStringException
-     * @throws InvalidIndentStyleException
-     * @throws InvalidIndentSizeException
+     * @throws InvalidJsonEncodeOptions
+     * @throws InvalidNewLineString
+     * @throws InvalidIndentStyle
+     * @throws InvalidIndentSize
      * @throws UnexpectedValueException
      * @throws \LogicException
      * @throws RuntimeException

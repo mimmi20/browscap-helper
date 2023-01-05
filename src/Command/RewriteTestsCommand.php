@@ -23,10 +23,10 @@ use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\NotNumericException;
 use BrowserDetector\Version\VersionInterface;
 use DateInterval;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
-use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use InvalidArgumentException;
 use JsonException;
@@ -106,10 +106,10 @@ final class RewriteTestsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws LogicException
      * @throws DirectoryNotFoundException
-     * @throws InvalidNewLineStringException
-     * @throws InvalidIndentStyleException
-     * @throws InvalidIndentSizeException
-     * @throws InvalidJsonEncodeOptionsException
+     * @throws InvalidNewLineString
+     * @throws InvalidIndentStyle
+     * @throws InvalidIndentSize
+     * @throws InvalidJsonEncodeOptions
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws ArithmeticError
      * @throws UnexpectedValueException
@@ -122,7 +122,7 @@ final class RewriteTestsCommand extends Command
     {
         $output->writeln('init Detector ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $cache    = new class () implements CacheInterface {
+        $cache = new class () implements CacheInterface {
             /**
              * Fetches a value from the cache.
              *
@@ -243,6 +243,7 @@ final class RewriteTestsCommand extends Command
                 return false;
             }
         };
+
         $factory  = new DetectorFactory($cache, new ConsoleLogger($output));
         $detector = $factory();
 

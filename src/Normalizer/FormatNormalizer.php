@@ -12,12 +12,12 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Normalizer;
 
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodedException;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncoded;
 use Ergebnis\Json\Normalizer\Format\Format;
 use Ergebnis\Json\Normalizer\Format\Indent;
 use Ergebnis\Json\Normalizer\Format\NewLine;
 use Ergebnis\Json\Normalizer\Json;
-use Ergebnis\Json\Normalizer\NormalizerInterface;
+use Ergebnis\Json\Normalizer\Normalizer;
 use JsonException;
 use UnexpectedValueException;
 
@@ -38,7 +38,7 @@ use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
 /** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
-final class FormatNormalizer implements NormalizerInterface
+final class FormatNormalizer implements Normalizer
 {
     private const PLACE_HOLDER = '$ni$';
 
@@ -50,7 +50,7 @@ final class FormatNormalizer implements NormalizerInterface
 
     /**
      * @throws JsonException When the encode operation fails
-     * @throws InvalidJsonEncodedException
+     * @throws InvalidJsonEncoded
      */
     public function normalize(Json $json): Json
     {

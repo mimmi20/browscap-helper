@@ -13,10 +13,10 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentSizeException;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyleException;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptionsException;
-use Ergebnis\Json\Normalizer\Exception\InvalidNewLineStringException;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,10 +42,10 @@ final class RewriteTests
     /**
      * @param array<string, int> $txtChecks
      *
-     * @throws InvalidJsonEncodeOptionsException
-     * @throws InvalidNewLineStringException
-     * @throws InvalidIndentStyleException
-     * @throws InvalidIndentSizeException
+     * @throws InvalidJsonEncodeOptions
+     * @throws InvalidNewLineString
+     * @throws InvalidIndentStyle
+     * @throws InvalidIndentSize
      * @throws UnexpectedValueException
      */
     public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
