@@ -243,6 +243,7 @@ final class RewriteTestsCommand extends Command
                 return false;
             }
         };
+
         $factory  = new DetectorFactory($cache, new ConsoleLogger($output));
         $detector = $factory();
 
