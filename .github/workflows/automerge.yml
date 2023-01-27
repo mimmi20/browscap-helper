@@ -26,7 +26,6 @@ jobs:
 
     with:
       pullRequestUrl: "${{ github.event.pull_request.html_url }}"
-      pullRequestEmail: "mimmi20@live.de"
 
     secrets:
       envPAT: "${{ secrets.GITHUB_TOKEN }}"
