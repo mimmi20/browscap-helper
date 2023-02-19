@@ -7,7 +7,7 @@
     <arg name="encoding" value="utf-8"/>
 
     <!-- inherit rules from: -->
-    <rule ref="mimmi20-cs">
+    <rule ref="Mimmi20CodingStandard">
         <exclude name="SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedConstant"/>
         <exclude name="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>
     </rule>
