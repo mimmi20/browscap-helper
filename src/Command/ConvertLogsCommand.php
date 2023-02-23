@@ -91,8 +91,10 @@ final class ConvertLogsCommand extends Command
      * @throws \LogicException
      * @throws RuntimeException
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $sourcesDirectory = $input->getOption('resources');
 
         $testSource = 'tests';

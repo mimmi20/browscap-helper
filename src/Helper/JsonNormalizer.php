@@ -45,8 +45,8 @@ use const STR_PAD_RIGHT;
 
 final class JsonNormalizer
 {
-    /** @var NormalizerInterface[] */
-    private array $normalizers;
+    /** @var array<NormalizerInterface> */
+    private array $normalizers = [];
 
     /**
      * @throws InvalidJsonEncodeOptions
@@ -95,8 +95,12 @@ final class JsonNormalizer
      * @throws OriginalInvalidAccordingToSchema
      * @throws InvalidJsonEncoded
      */
-    public function normalize(OutputInterface $output, array $headers, string $message, int &$messageLength = 0): string | null
-    {
+    public function normalize(
+        OutputInterface $output,
+        array $headers,
+        string $message,
+        int &$messageLength = 0,
+    ): string | null {
         $message2 = $message . ' - encode data ...';
 
         if (mb_strlen($message2) > $messageLength) {
