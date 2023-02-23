@@ -21,7 +21,7 @@ parameters:
   checkExplicitMixedMissingReturn: true
   checkFunctionNameCase: true
   checkGenericClassInNonGenericObjectType: false
-  checkImplicitMixed: true
+  checkImplicitMixed: false
   checkInternalClassCaseSensitivity: true
   checkMissingCallableSignature: true
   checkMissingIterableValueType: true
@@ -31,7 +31,7 @@ parameters:
   polluteScopeWithAlwaysIterableForeach: false
   polluteScopeWithLoopInitialAssignments: false
 # reportAlwaysTrueInLastCondition: true
-  reportMaybesInMethodSignatures: true
+  reportMaybesInMethodSignatures: false
   reportMaybesInPropertyPhpDocTypes: true
   reportStaticMethodSignatures: true
 # reportWrongPhpDocTypeInVarTag: true

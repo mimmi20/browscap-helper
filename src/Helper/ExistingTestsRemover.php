@@ -31,8 +31,11 @@ final class ExistingTestsRemover
      * @throws DirectoryNotFoundException
      * @throws LogicException
      */
-    public function remove(OutputInterface $output, string $testSource, bool $dirs = false): void
-    {
+    public function remove(
+        OutputInterface $output,
+        string $testSource,
+        bool $dirs = false,
+    ): void {
         $baseMessage   = 'remove old files';
         $message       = $baseMessage . ' ...';
         $messageLength = mb_strlen($message);
@@ -40,6 +43,7 @@ final class ExistingTestsRemover
         $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
 
         $finder = new Finder();
+
         if ($dirs) {
             $finder->directories();
         } else {

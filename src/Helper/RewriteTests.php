@@ -34,13 +34,14 @@ use const STR_PAD_RIGHT;
 final class RewriteTests
 {
     /** @throws void */
-    public function __construct(private readonly JsonNormalizer $jsonNormalizer)
-    {
+    public function __construct(
+        private readonly JsonNormalizer $jsonNormalizer,
+    ) {
         // nothing to do
     }
 
     /**
-     * @param array<string, int> $txtChecks
+     * @param array<string, array<string, array<string, array<string, bool|float|int|string|null>|bool|int|string|null>>|int> $txtChecks
      *
      * @throws InvalidJsonEncodeOptions
      * @throws InvalidNewLineString
@@ -48,8 +49,11 @@ final class RewriteTests
      * @throws InvalidIndentSize
      * @throws UnexpectedValueException
      */
-    public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
-    {
+    public function rewrite(
+        OutputInterface $output,
+        array $txtChecks,
+        string $testSource,
+    ): void {
         $folderChunks = array_chunk($txtChecks, 1000, true);
         $this->jsonNormalizer->init($output);
 

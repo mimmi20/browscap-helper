@@ -29,13 +29,16 @@ final class ExistingTestsLoader
     /**
      * @param array<SourceInterface> $sources
      *
-     * @return array<array<string, string>>|iterable
+     * @return iterable<array<string, string>>
+     * @phpstan-return iterable<non-empty-string, array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}>
      *
      * @throws LogicException
      * @throws RuntimeException
      */
-    public function getProperties(OutputInterface $output, array $sources): iterable
-    {
+    public function getProperties(
+        OutputInterface $output,
+        array $sources,
+    ): iterable {
         $baseMessage   = 'reading sources';
         $message       = $baseMessage . ' ...';
         $messageLength = mb_strlen($message);

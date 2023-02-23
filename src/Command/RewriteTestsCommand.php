@@ -118,8 +118,10 @@ final class RewriteTestsCommand extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $output->writeln('init Detector ...', OutputInterface::VERBOSITY_NORMAL);
 
         $cache = new class () implements CacheInterface {
@@ -130,6 +132,8 @@ final class RewriteTestsCommand extends Command
              * @param mixed  $default default value to return if the key does not exist
              *
              * @return mixed the value of the item from the cache, or $default in case of cache miss
+             *
+             * @throws void
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
@@ -149,10 +153,15 @@ final class RewriteTestsCommand extends Command
              *
              * @return bool true on success and false on failure
              *
+             * @throws void
+             *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function set(string $key, mixed $value, int | DateInterval | null $ttl = null): bool
-            {
+            public function set(
+                string $key,
+                mixed $value,
+                int | DateInterval | null $ttl = null,
+            ): bool {
                 return false;
             }
 
@@ -162,6 +171,8 @@ final class RewriteTestsCommand extends Command
              * @param string $key the unique cache key of the item to delete
              *
              * @return bool True if the item was successfully removed. False if there was an error.
+             *
+             * @throws void
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
@@ -174,6 +185,8 @@ final class RewriteTestsCommand extends Command
              * Wipes clean the entire cache's keys.
              *
              * @return bool true on success and false on failure
+             *
+             * @throws void
              */
             public function clear(): bool
             {
@@ -188,10 +201,14 @@ final class RewriteTestsCommand extends Command
              *
              * @return iterable<string, mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
              *
+             * @throws void
+             *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function getMultiple(iterable $keys, mixed $default = null): iterable
-            {
+            public function getMultiple(
+                iterable $keys,
+                mixed $default = null,
+            ): iterable {
                 return [];
             }
 
@@ -205,10 +222,14 @@ final class RewriteTestsCommand extends Command
              *
              * @return bool true on success and false on failure
              *
+             * @throws void
+             *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function setMultiple(iterable $values, int | DateInterval | null $ttl = null): bool
-            {
+            public function setMultiple(
+                iterable $values,
+                int | DateInterval | null $ttl = null,
+            ): bool {
                 return false;
             }
 
@@ -218,6 +239,8 @@ final class RewriteTestsCommand extends Command
              * @param iterable<string> $keys a list of string-based keys to be deleted
              *
              * @return bool True if the items were successfully removed. False if there was an error.
+             *
+             * @throws void
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
@@ -235,6 +258,8 @@ final class RewriteTestsCommand extends Command
              * another script can remove it making the state of your app out of date.
              *
              * @param string $key the cache item key
+             *
+             * @throws void
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
@@ -424,11 +449,13 @@ final class RewriteTestsCommand extends Command
                     $path = $basePath . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number);
 
                     $p1 = $basePath . sprintf('tests/data/%s', $c);
+
                     if (!file_exists($p1)) {
                         mkdir($p1);
                     }
 
                     $p2 = $basePath . sprintf('tests/data/%s/%s', $c, $t);
+
                     if (!file_exists($p2)) {
                         mkdir($p2);
                     }
@@ -495,8 +522,13 @@ final class RewriteTestsCommand extends Command
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    private function handleTest(OutputInterface $output, Detector $detector, array $headers, string $parentMessage, int &$messageLength = 0): ResultInterface | null
-    {
+    private function handleTest(
+        OutputInterface $output,
+        Detector $detector,
+        array $headers,
+        string $parentMessage,
+        int &$messageLength = 0,
+    ): ResultInterface | null {
         $message = $parentMessage . ' - detect for new result ...';
 
         if (mb_strlen($message) > $messageLength) {

@@ -25,8 +25,6 @@ use function array_key_exists;
 use function assert;
 use function explode;
 use function implode;
-use function is_array;
-use function is_bool;
 use function is_string;
 use function json_encode;
 use function mb_strpos;
@@ -62,7 +60,6 @@ final class FormatNormalizer implements Normalizer
         $json       = Json::fromEncoded($encodedWithJsonEncodeOptions);
         $oldNewline = NewLine::fromJson($json)->toString();
 
-        assert(is_string($oldNewline));
         assert('' !== $oldNewline);
 
         $lines = explode(
@@ -70,16 +67,9 @@ final class FormatNormalizer implements Normalizer
             rtrim($json->encoded()),
         );
 
-        assert(is_array($lines));
-
         $newNewline = $this->format->newLine()->toString();
-        assert(is_string($newNewline));
-
-        $oldIndent = Indent::fromJson($json)->toString();
-        assert(is_string($oldIndent));
-
-        $newIndent = $this->format->indent()->toString();
-        assert(is_string($newIndent));
+        $oldIndent  = Indent::fromJson($json)->toString();
+        $newIndent  = $this->format->indent()->toString();
 
         $formattedLines = [];
         $matches        = [];
@@ -121,7 +111,6 @@ final class FormatNormalizer implements Normalizer
     {
         $jsonOptions = $this->format->jsonEncodeOptions()->toInt();
         $prettyPrint = (bool) ($jsonOptions & JSON_PRETTY_PRINT);
-        assert(is_bool($prettyPrint));
 
         if (!$prettyPrint) {
             throw new UnexpectedValueException('This Normalizer requires the JSON_PRETTY_PRINT option to be set.');
