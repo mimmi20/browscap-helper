@@ -41,7 +41,7 @@ final class FormatNormalizer implements Normalizer
     private const PLACE_HOLDER = '$ni$';
 
     /** @throws UnexpectedValueException */
-    public function __construct(private Format $format)
+    public function __construct(private readonly Format $format)
     {
         $this->checkPrettyPrint();
     }
