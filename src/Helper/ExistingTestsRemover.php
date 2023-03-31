@@ -31,11 +31,8 @@ final class ExistingTestsRemover
      * @throws DirectoryNotFoundException
      * @throws LogicException
      */
-    public function remove(
-        OutputInterface $output,
-        string $testSource,
-        bool $dirs = false,
-    ): void {
+    public function remove(OutputInterface $output, string $testSource, bool $dirs = false): void
+    {
         $baseMessage   = 'remove old files';
         $message       = $baseMessage . ' ...';
         $messageLength = mb_strlen($message);

@@ -110,10 +110,8 @@ final class CopyTestsCommand extends Command
      * @throws \LogicException
      * @throws RuntimeException
      */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $testSource = 'tests';
         $txtChecks  = [];
 

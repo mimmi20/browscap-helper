@@ -118,10 +118,8 @@ final class RewriteTestsCommand extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $output->writeln('init Detector ...', OutputInterface::VERBOSITY_NORMAL);
 
         $cache = new class () implements CacheInterface {
@@ -157,11 +155,8 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function set(
-                string $key,
-                mixed $value,
-                int | DateInterval | null $ttl = null,
-            ): bool {
+            public function set(string $key, mixed $value, int | DateInterval | null $ttl = null): bool
+            {
                 return false;
             }
 
@@ -205,10 +200,8 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function getMultiple(
-                iterable $keys,
-                mixed $default = null,
-            ): iterable {
+            public function getMultiple(iterable $keys, mixed $default = null): iterable
+            {
                 return [];
             }
 
@@ -226,10 +219,8 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            public function setMultiple(
-                iterable $values,
-                int | DateInterval | null $ttl = null,
-            ): bool {
+            public function setMultiple(iterable $values, int | DateInterval | null $ttl = null): bool
+            {
                 return false;
             }
 
