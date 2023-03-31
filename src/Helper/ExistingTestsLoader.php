@@ -35,10 +35,8 @@ final class ExistingTestsLoader
      * @throws LogicException
      * @throws RuntimeException
      */
-    public function getProperties(
-        OutputInterface $output,
-        array $sources,
-    ): iterable {
+    public function getProperties(OutputInterface $output, array $sources): iterable
+    {
         $baseMessage   = 'reading sources';
         $message       = $baseMessage . ' ...';
         $messageLength = mb_strlen($message);
