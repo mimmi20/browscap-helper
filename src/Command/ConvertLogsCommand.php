@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2022, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2023, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -56,7 +56,9 @@ final class ConvertLogsCommand extends Command
     {
         $this
             ->setName('convert-logs')
-            ->setDescription('Reads the server logs, extracts the useragents and writes them into a file')
+            ->setDescription(
+                'Reads the server logs, extracts the useragents and writes them into a file',
+            )
             ->addOption(
                 'resources',
                 null,
@@ -100,11 +102,22 @@ final class ConvertLogsCommand extends Command
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        foreach ($this->testsLoader->getProperties($output, [new JsonFileSource($testSource)]) as $row) {
+        foreach (
+            $this->testsLoader->getProperties(
+                $output,
+                [new JsonFileSource($testSource)],
+            ) as $row
+        ) {
             $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    '<error>' . sprintf(
+                        'Header "%s" added more than once --> skipped',
+                        $seachHeader,
+                    ) . '</error>',
+                    OutputInterface::VERBOSITY_NORMAL,
+                );
 
                 continue;
             }
@@ -125,7 +138,13 @@ final class ConvertLogsCommand extends Command
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $output->writeln('<debug>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</debug>', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    '<debug>' . sprintf(
+                        'Header "%s" added more than once --> skipped',
+                        $seachHeader,
+                    ) . '</debug>',
+                    OutputInterface::VERBOSITY_NORMAL,
+                );
 
                 continue;
             }
@@ -139,8 +158,14 @@ final class ConvertLogsCommand extends Command
         $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln('tests converted for Browscap helper: ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln('tests available for Browscap helper: ' . count($txtChecks), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            'tests converted for Browscap helper: ' . $txtTotalCounter,
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            'tests available for Browscap helper: ' . count($txtChecks),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
 
         return self::SUCCESS;
     }

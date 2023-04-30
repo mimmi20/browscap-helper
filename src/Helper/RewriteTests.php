@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2022, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2023, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -57,7 +57,10 @@ final class RewriteTests
         $message       = $baseMessage . ' ...';
         $messageLength = mb_strlen($message);
 
-        $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            str_pad($message, $messageLength, ' ', STR_PAD_RIGHT),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
 
         foreach ($folderChunks as $folderId => $folderChunk) {
             $headers = [];
@@ -71,12 +74,16 @@ final class RewriteTests
                 $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write(
+                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                false,
+                OutputInterface::VERBOSITY_VERY_VERBOSE,
+            );
 
             foreach (array_keys($folderChunk) as $headerString) {
                 $headerArray = UserAgent::fromString($headerString)->getHeaders();
 
-                if ([] === $headerArray) {
+                if ($headerArray === []) {
                     continue;
                 }
 
@@ -89,10 +96,19 @@ final class RewriteTests
                 $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write(
+                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                false,
+                OutputInterface::VERBOSITY_VERY_VERBOSE,
+            );
 
             try {
-                $normalized = $this->jsonNormalizer->normalize($output, $headers, $message, $messageLength);
+                $normalized = $this->jsonNormalizer->normalize(
+                    $output,
+                    $headers,
+                    $message,
+                    $messageLength,
+                );
             } catch (InvalidArgumentException | RuntimeException $e) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
@@ -100,9 +116,12 @@ final class RewriteTests
                 continue;
             }
 
-            if (null === $normalized) {
+            if ($normalized === null) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-                $output->writeln('<error>' . sprintf('normalisation failed for file %s', $fileName) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    '<error>' . sprintf('normalisation failed for file %s', $fileName) . '</error>',
+                    OutputInterface::VERBOSITY_NORMAL,
+                );
 
                 continue;
             }
@@ -113,7 +132,11 @@ final class RewriteTests
                 $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write(
+                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                false,
+                OutputInterface::VERBOSITY_VERY_VERBOSE,
+            );
 
             file_put_contents($fileName, $normalized);
         }
@@ -124,6 +147,9 @@ final class RewriteTests
             $messageLength = mb_strlen($message);
         }
 
-        $output->writeln("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', OutputInterface::VERBOSITY_VERBOSE);
+        $output->writeln(
+            "\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
     }
 }
