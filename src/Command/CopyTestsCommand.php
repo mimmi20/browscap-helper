@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2022, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2023, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -123,7 +123,13 @@ final class CopyTestsCommand extends Command
             $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $output->writeln('<error>' . sprintf('Header "%s" added more than once --> skipped', $seachHeader) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    '<error>' . sprintf(
+                        'Header "%s" added more than once --> skipped',
+                        $seachHeader,
+                    ) . '</error>',
+                    OutputInterface::VERBOSITY_NORMAL,
+                );
 
                 continue;
             }
@@ -162,11 +168,11 @@ final class CopyTestsCommand extends Command
             $password = '';
 
             $driverOptions = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_DIRECT_QUERY => false,
                 PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT => true,
+                PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
             ];
 
             $pdo = new PDO(
@@ -178,7 +184,10 @@ final class CopyTestsCommand extends Command
 
             $sources[] = new PdoSource($pdo);
         } catch (PDOException) {
-            $output->writeln('<error>An error occured while initializing the database</error>', OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln(
+                '<error>An error occured while initializing the database</error>',
+                OutputInterface::VERBOSITY_NORMAL,
+            );
         }
 
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
@@ -194,7 +203,13 @@ final class CopyTestsCommand extends Command
             try {
                 json_encode($seachHeader, JSON_THROW_ON_ERROR);
             } catch (JsonException) {
-                $output->writeln('<comment>' . sprintf('Header "%s" contained illegal characters --> skipped', $seachHeader) . '</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
+                $output->writeln(
+                    '<comment>' . sprintf(
+                        'Header "%s" contained illegal characters --> skipped',
+                        $seachHeader,
+                    ) . '</comment>',
+                    OutputInterface::VERBOSITY_VERY_VERBOSE,
+                );
 
                 continue;
             }
@@ -208,8 +223,14 @@ final class CopyTestsCommand extends Command
         $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln('tests copied for Browscap helper:    ' . $txtTotalCounter, OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln('tests available for Browscap helper: ' . count($txtChecks), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            'tests copied for Browscap helper:    ' . $txtTotalCounter,
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            'tests available for Browscap helper: ' . count($txtChecks),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
 
         return self::SUCCESS;
     }

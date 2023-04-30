@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2022, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2023, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -37,7 +37,10 @@ final class ExistingTestsRemover
         $message       = $baseMessage . ' ...';
         $messageLength = mb_strlen($message);
 
-        $output->writeln(str_pad($message, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            str_pad($message, $messageLength, ' ', STR_PAD_RIGHT),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
 
         $finder = new Finder();
 
@@ -63,7 +66,11 @@ final class ExistingTestsRemover
                 $messageLength = mb_strlen($message);
             }
 
-            $output->write("\r" . '<fg=yellow>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</>', false, OutputInterface::VERBOSITY_VERBOSE);
+            $output->write(
+                "\r" . '<fg=yellow>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</>',
+                false,
+                OutputInterface::VERBOSITY_VERBOSE,
+            );
 
             if ($dirs) {
                 @rmdir($file->getPathname());
@@ -80,7 +87,11 @@ final class ExistingTestsRemover
             $messageLength = mb_strlen($message);
         }
 
-        $output->write("\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERBOSE);
+        $output->write(
+            "\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            false,
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
         $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
     }
 }

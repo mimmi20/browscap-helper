@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2022, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2023, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -60,7 +60,7 @@ final class FormatNormalizer implements Normalizer
         $json       = Json::fromEncoded($encodedWithJsonEncodeOptions);
         $oldNewline = NewLine::fromJson($json)->toString();
 
-        assert('' !== $oldNewline);
+        assert($oldNewline !== '');
 
         $lines = explode(
             $oldNewline,
@@ -87,12 +87,12 @@ final class FormatNormalizer implements Normalizer
             $tempLine = str_replace($oldIndent, self::PLACE_HOLDER, $matches['ident']);
 
             assert(is_string($tempLine));
-            assert(false === mb_strpos($tempLine, $oldIndent));
-            assert(false !== mb_strpos($tempLine, self::PLACE_HOLDER));
+            assert(mb_strpos($tempLine, $oldIndent) === false);
+            assert(mb_strpos($tempLine, self::PLACE_HOLDER) !== false);
 
             $tempLine = str_replace(self::PLACE_HOLDER, $newIndent, $tempLine);
 
-            assert(false === mb_strpos($tempLine, self::PLACE_HOLDER));
+            assert(mb_strpos($tempLine, self::PLACE_HOLDER) === false);
 
             $formattedLines[] = $tempLine . $matches[2];
         }
@@ -113,7 +113,9 @@ final class FormatNormalizer implements Normalizer
         $prettyPrint = (bool) ($jsonOptions & JSON_PRETTY_PRINT);
 
         if (!$prettyPrint) {
-            throw new UnexpectedValueException('This Normalizer requires the JSON_PRETTY_PRINT option to be set.');
+            throw new UnexpectedValueException(
+                'This Normalizer requires the JSON_PRETTY_PRINT option to be set.',
+            );
         }
     }
 }

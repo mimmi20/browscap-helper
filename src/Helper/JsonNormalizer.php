@@ -2,7 +2,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2022, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2023, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -61,17 +61,27 @@ final class JsonNormalizer
         $message2      = $message . ' - init ...';
         $messageLength = mb_strlen($message2);
 
-        $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
+        $output->write(
+            "\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT),
+            false,
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
 
         $message2      = $message . ' - define normalizers ...';
         $messageLength = mb_strlen($message2);
 
-        $output->write("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), false, OutputInterface::VERBOSITY_VERBOSE);
+        $output->write(
+            "\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT),
+            false,
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
 
         $this->normalizers = [
             'format-normalizer' => new FormatNormalizer(
                 Normalizer\Format\Format::create(
-                    Normalizer\Format\JsonEncodeOptions::fromInt(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
+                    Normalizer\Format\JsonEncodeOptions::fromInt(
+                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR,
+                    ),
                     Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
                     Normalizer\Format\NewLine::fromString("\n"),
                     true,
@@ -81,7 +91,10 @@ final class JsonNormalizer
 
         $message2 = $message . ' - done';
 
-        $output->writeln("\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT), OutputInterface::VERBOSITY_VERBOSE);
+        $output->writeln(
+            "\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT),
+            OutputInterface::VERBOSITY_VERBOSE,
+        );
     }
 
     /**
@@ -107,13 +120,20 @@ final class JsonNormalizer
             $messageLength = mb_strlen($message2);
         }
 
-        $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $output->write(
+            "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            false,
+            OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
 
         try {
             $content = json_encode($headers, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-            $output->writeln('<error>' . (new Exception('could not encode content', 0, $e)) . '</error>', OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln(
+                '<error>' . (new Exception('could not encode content', 0, $e)) . '</error>',
+                OutputInterface::VERBOSITY_NORMAL,
+            );
 
             return null;
         }
@@ -126,7 +146,11 @@ final class JsonNormalizer
             $messageLength = mb_strlen($message2);
         }
 
-        $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $output->write(
+            "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            false,
+            OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
 
         foreach ($this->normalizers as $name => $normalizer) {
             $message2 = $message . sprintf(' - normalize with %s ...', $name);
@@ -135,7 +159,11 @@ final class JsonNormalizer
                 $messageLength = mb_strlen($message2);
             }
 
-            $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->write(
+                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                false,
+                OutputInterface::VERBOSITY_VERY_VERBOSE,
+            );
 
             assert($normalizer instanceof NormalizerInterface);
             $json = $normalizer->normalize($json);
@@ -147,7 +175,11 @@ final class JsonNormalizer
             $messageLength = mb_strlen($message2);
         }
 
-        $output->write("\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>', false, OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $output->write(
+            "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            false,
+            OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
 
         return $json->encoded();
     }
