@@ -9,12 +9,14 @@
     <rule ref="rulesets/cleancode.xml">
         <exclude name="BooleanArgumentFlag"/>
         <exclude name="ElseExpression"/>
+        <!-- checked with coding standard -->
         <exclude name="MissingImport"/>
         <exclude name="StaticAccess"/>
         <exclude name="ErrorControlOperator"/>
     </rule>
 
     <rule ref="rulesets/codesize.xml">
+        <!-- checked with coding standard -->
         <exclude name="CyclomaticComplexity"/>
         <exclude name="NPathComplexity"/>
         <exclude name="ExcessiveMethodLength"/>
@@ -23,14 +25,14 @@
     </rule>
 
     <rule ref="rulesets/controversial.xml"/>
+    <rule ref="rulesets/naming.xml/ConstantNamingConventions"/>
 
     <rule ref="rulesets/design.xml">
         <exclude name="CouplingBetweenObjects"/>
     </rule>
 
-    <rule ref="rulesets/naming.xml/ConstantNamingConventions"/>
-
     <rule ref="rulesets/unusedcode.xml">
+        <!-- checked with coding standard -->
         <exclude name="UnusedFormalParameter"/>
     </rule>
 </ruleset>
