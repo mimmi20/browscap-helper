@@ -9,7 +9,7 @@ updates:
       interval: "weekly"
       day: "tuesday"
       time: "03:00"
-      timezone: "UTC"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
       - "mimmi20"
@@ -17,6 +17,7 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
+      - "patch"
     versioning-strategy: "increase"
     target-branch: "master"
     commit-message:
@@ -48,7 +49,7 @@ updates:
       interval: "weekly"
       day: "tuesday"
       time: "03:00"
-      timezone: "UTC"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
       - "mimmi20"
@@ -56,7 +57,7 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
+      - "patch"
     target-branch: "master"
     commit-message:
-      include: "scope"
       prefix: "github-actions"
