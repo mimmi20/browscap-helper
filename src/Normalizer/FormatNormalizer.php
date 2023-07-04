@@ -12,11 +12,11 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Normalizer;
 
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncoded;
+use Ergebnis\Json\Exception\NotJson;
+use Ergebnis\Json\Json;
 use Ergebnis\Json\Normalizer\Format\Format;
 use Ergebnis\Json\Normalizer\Format\Indent;
 use Ergebnis\Json\Normalizer\Format\NewLine;
-use Ergebnis\Json\Normalizer\Json;
 use Ergebnis\Json\Normalizer\Normalizer;
 use JsonException;
 use UnexpectedValueException;
@@ -46,18 +46,19 @@ final class FormatNormalizer implements Normalizer
         $this->checkPrettyPrint();
     }
 
-    /**
-     * @throws JsonException When the encode operation fails
-     * @throws InvalidJsonEncoded
-     */
+    /** @throws NotJson */
     public function normalize(Json $json): Json
     {
-        $encodedWithJsonEncodeOptions = json_encode(
-            $json->decoded(),
-            $this->format->jsonEncodeOptions()->toInt() | JSON_THROW_ON_ERROR,
-        );
+        try {
+            $encodedWithJsonEncodeOptions = json_encode(
+                $json->decoded(),
+                $this->format->jsonEncodeOptions()->toInt() | JSON_THROW_ON_ERROR,
+            );
+        } catch (JsonException $e) {
+            throw new NotJson($e->getMessage(), 0, $e);
+        }
 
-        $json       = Json::fromEncoded($encodedWithJsonEncodeOptions);
+        $json       = Json::fromString($encodedWithJsonEncodeOptions);
         $oldNewline = NewLine::fromJson($json)->toString();
 
         assert($oldNewline !== '');
@@ -103,7 +104,7 @@ final class FormatNormalizer implements Normalizer
             $content .= $newNewline;
         }
 
-        return Json::fromEncoded($content);
+        return Json::fromString($content);
     }
 
     /** @throws UnexpectedValueException */

@@ -13,10 +13,11 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Normalizer\FormatNormalizer;
+use Ergebnis\Json\Exception\NotJson;
+use Ergebnis\Json\Json;
 use Ergebnis\Json\Normalizer;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncoded;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Ergebnis\Json\Normalizer\Exception\NormalizedInvalidAccordingToSchema;
@@ -106,7 +107,6 @@ final class JsonNormalizer
      * @throws SchemaUriCouldNotBeRead
      * @throws NormalizedInvalidAccordingToSchema
      * @throws OriginalInvalidAccordingToSchema
-     * @throws InvalidJsonEncoded
      */
     public function normalize(
         OutputInterface $output,
@@ -138,7 +138,17 @@ final class JsonNormalizer
             return null;
         }
 
-        $json = Normalizer\Json::fromEncoded($content);
+        try {
+            $json = Json::fromString($content);
+        } catch (NotJson $e) {
+            $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+            $output->writeln(
+                '<error>' . (new Exception('could not encode content', 0, $e)) . '</error>',
+                OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return null;
+        }
 
         $message2 = $message . ' - normalize ...';
 
