@@ -24,7 +24,6 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MatomoSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PdoSource;
-use BrowscapHelper\Source\SinergiSource;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
@@ -151,7 +150,6 @@ final class CopyTestsCommand extends Command
             new EndorphinSource(),
             new MatomoSource(),
             new MobileDetectSource(),
-            new SinergiSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
             new ZsxsoftSource(),
