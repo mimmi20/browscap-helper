@@ -44,6 +44,7 @@ use UnexpectedValueException;
 
 use function array_chunk;
 use function array_key_exists;
+use function array_map;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -58,6 +59,7 @@ use function mkdir;
 use function sprintf;
 use function str_pad;
 use function str_replace;
+use function trim;
 use function utf8_decode;
 
 use const JSON_THROW_ON_ERROR;
@@ -267,6 +269,11 @@ final class RewriteTestsCommand extends Command
         $detectorTargetDirectory = $basePath . 'tests/data/';
         $testSource              = 'tests';
 
+        $output->writeln(
+            'reading old existing tests from vendor ...',
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+
         $this->testsRemover->remove($output, $detectorTargetDirectory);
 
         $sources = [new JsonFileSource($testSource)];
@@ -288,6 +295,11 @@ final class RewriteTestsCommand extends Command
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
         foreach ($this->testsLoader->getProperties($clonedOutput, $sources) as $test) {
+            $test['headers'] = array_map(
+                static fn (string $header) => trim($header),
+                $test['headers'],
+            );
+
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             ++$counter;
@@ -621,7 +633,7 @@ final class RewriteTestsCommand extends Command
         );
 
         try {
-            $newResult = $detector($headers);
+            $newResult = $detector->getBrowser($headers);
         } catch (\Psr\SimpleCache\InvalidArgumentException | NotNumericException $e) {
             $output->writeln((string) $e, OutputInterface::VERBOSITY_NORMAL);
 
