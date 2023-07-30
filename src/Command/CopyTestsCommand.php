@@ -47,9 +47,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_key_exists;
+use function array_map;
 use function count;
 use function json_encode;
 use function sprintf;
+use function trim;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -192,6 +194,11 @@ final class CopyTestsCommand extends Command
         $txtTotalCounter = 0;
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
+            $test['headers'] = array_map(
+                static fn (string $header) => trim($header),
+                $test['headers'],
+            );
+
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
