@@ -65,7 +65,6 @@ use function utf8_decode;
 
 use const JSON_THROW_ON_ERROR;
 use const STR_PAD_LEFT;
-use const STR_PAD_RIGHT;
 
 final class RewriteTestsCommand extends Command
 {
@@ -326,7 +325,7 @@ final class RewriteTestsCommand extends Command
             }
 
             $output->write(
-                "\r" . str_pad($message, $messageLength, ' '),
+                "\r" . str_pad(string: $message, length: $messageLength),
                 false,
                 OutputInterface::VERBOSITY_NORMAL,
             );
@@ -543,7 +542,7 @@ final class RewriteTestsCommand extends Command
                     }
 
                     $output->write(
-                        "\r" . str_pad($message, $messageLength, ' '),
+                        "\r" . str_pad(string: $message, length: $messageLength),
                         false,
                         OutputInterface::VERBOSITY_VERY_VERBOSE,
                     );
@@ -589,7 +588,7 @@ final class RewriteTestsCommand extends Command
                     }
 
                     $output->write(
-                        "\r" . str_pad($message, $messageLength, ' '),
+                        "\r" . str_pad(string: $message, length: $messageLength),
                         false,
                         OutputInterface::VERBOSITY_VERY_VERBOSE,
                     );
@@ -614,9 +613,40 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(sprintf('tests written: %7d', $testCount), OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(sprintf('errors:        %7d', $errors), OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(sprintf('duplicates:    %7d', $duplicates), OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            sprintf(
+                'tests written: %s',
+                str_pad(
+                    string: number_format(num: $testCount, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            ),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            sprintf(
+                'errors:        %s',
+                str_pad(
+                    string: number_format(num: $errors, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            ),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $output->writeln(
+            sprintf(
+                'duplicates:    %s',
+                str_pad(
+                    string: number_format(num: $duplicates, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            ),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
 
         return self::SUCCESS;
     }
@@ -641,7 +671,7 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
@@ -661,7 +691,7 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
