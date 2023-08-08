@@ -38,7 +38,7 @@ final class ExistingTestsRemover
         $messageLength = mb_strlen($message);
 
         $output->writeln(
-            str_pad($message, $messageLength, ' ', STR_PAD_RIGHT),
+            str_pad(string: $message, length: $messageLength),
             OutputInterface::VERBOSITY_NORMAL,
         );
 
@@ -67,7 +67,7 @@ final class ExistingTestsRemover
             }
 
             $output->write(
-                "\r" . '<fg=yellow>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</>',
+                "\r" . '<fg=yellow>' . str_pad(string: $message, length: $messageLength) . '</>',
                 false,
                 OutputInterface::VERBOSITY_VERBOSE,
             );
@@ -88,7 +88,7 @@ final class ExistingTestsRemover
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
             false,
             OutputInterface::VERBOSITY_VERBOSE,
         );

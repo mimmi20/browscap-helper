@@ -63,7 +63,7 @@ final class JsonNormalizer
         $messageLength = mb_strlen($message2);
 
         $output->write(
-            "\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT),
+            "\r" . str_pad(string: $message2, length: $messageLength),
             false,
             OutputInterface::VERBOSITY_VERBOSE,
         );
@@ -72,7 +72,7 @@ final class JsonNormalizer
         $messageLength = mb_strlen($message2);
 
         $output->write(
-            "\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT),
+            "\r" . str_pad(string: $message2, length: $messageLength),
             false,
             OutputInterface::VERBOSITY_VERBOSE,
         );
@@ -93,7 +93,7 @@ final class JsonNormalizer
         $message2 = $message . ' - done';
 
         $output->writeln(
-            "\r" . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT),
+            "\r" . str_pad(string: $message2, length: $messageLength),
             OutputInterface::VERBOSITY_VERBOSE,
         );
     }
@@ -121,7 +121,7 @@ final class JsonNormalizer
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
@@ -157,7 +157,7 @@ final class JsonNormalizer
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
@@ -170,7 +170,7 @@ final class JsonNormalizer
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -186,7 +186,7 @@ final class JsonNormalizer
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );

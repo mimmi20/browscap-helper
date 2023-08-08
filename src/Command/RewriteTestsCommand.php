@@ -613,40 +613,30 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(
-            sprintf(
-                'tests written: %s',
-                str_pad(
-                    string: number_format(num: $testCount, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-            ),
-            OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            sprintf(
-                'errors:        %s',
-                str_pad(
-                    string: number_format(num: $errors, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-            ),
-            OutputInterface::VERBOSITY_NORMAL,
-        );
+        $dataToOutput = [
+            'useragents processed' => $counter,
+            'tests written' => $testCount,
+            'errors' => $errors,
+            'duplicates' => $duplicates,
+        ];
 
-        $output->writeln(
-            sprintf(
-                'duplicates:    %s',
-                str_pad(
-                    string: number_format(num: $duplicates, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
+        foreach ($dataToOutput as $title => $number) {
+            $output->writeln(
+                sprintf(
+                    '%s%s',
+                    str_pad(
+                        string: $title . ':',
+                        length: 21,
+                    ),
+                    str_pad(
+                        string: number_format(num: $number, thousands_separator: '.'),
+                        length: 14,
+                        pad_type: STR_PAD_LEFT,
+                    ),
                 ),
-            ),
-            OutputInterface::VERBOSITY_NORMAL,
-        );
+                OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
 
         return self::SUCCESS;
     }
