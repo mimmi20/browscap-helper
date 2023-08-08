@@ -23,8 +23,6 @@ use function sprintf;
 use function str_pad;
 use function unlink;
 
-use const STR_PAD_RIGHT;
-
 final class ExistingTestsRemover
 {
     /**

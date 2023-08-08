@@ -21,8 +21,6 @@ use function mb_strlen;
 use function sprintf;
 use function str_pad;
 
-use const STR_PAD_RIGHT;
-
 final class ExistingTestsLoader
 {
     /**
