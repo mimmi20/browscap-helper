@@ -29,8 +29,6 @@ use function mb_strlen;
 use function sprintf;
 use function str_pad;
 
-use const STR_PAD_RIGHT;
-
 final class RewriteTests
 {
     /** @throws void */
@@ -58,7 +56,7 @@ final class RewriteTests
         $messageLength = mb_strlen($message);
 
         $output->writeln(
-            str_pad($message, $messageLength, ' ', STR_PAD_RIGHT),
+            str_pad(string: $message, length: $messageLength),
             OutputInterface::VERBOSITY_NORMAL,
         );
 
@@ -75,7 +73,7 @@ final class RewriteTests
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -97,7 +95,7 @@ final class RewriteTests
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -133,7 +131,7 @@ final class RewriteTests
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad($message2, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -148,7 +146,7 @@ final class RewriteTests
         }
 
         $output->writeln(
-            "\r" . '<info>' . str_pad($message, $messageLength, ' ', STR_PAD_RIGHT) . '</info>',
+            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
             OutputInterface::VERBOSITY_VERBOSE,
         );
     }
