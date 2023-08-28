@@ -1,3 +1,6 @@
+---
+# file-version: 1.0
+
 template: |
   ## What’s Changed
 
@@ -39,7 +42,7 @@ version-resolver:
       - "maintenance"
       - "documentation"
       - "patch"
-      # other Labels to mimmi20/browscap-helper
+      # other Labels
       - "new useragents"
   default: patch
 
@@ -76,7 +79,7 @@ categories:
   - title: "**📦 Documentation:**"
     labels:
       - "documentation"
-  # other Labels to mimmi20/browscap-helper
+  # other Labels
   - title: "**📦 new Useragents:**"
     labels:
       - "new useragents"
