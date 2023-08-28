@@ -1,5 +1,7 @@
 # https://help.github.com/en/categories/automating-your-workflow-with-github-actions
 
+# file-version: 1.0
+
 name: "Continuous Integration"
 
 on:
@@ -34,7 +36,9 @@ jobs:
     name: "Check composer dependencies"
 
     runs-on: "${{ matrix.operating-system }}"
+
     timeout-minutes: 10
+
     continue-on-error: false
 
     needs: "ci"
