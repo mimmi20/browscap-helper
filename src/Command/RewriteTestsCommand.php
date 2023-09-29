@@ -21,6 +21,7 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\NotNumericException;
+use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
 use DateInterval;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
@@ -30,6 +31,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use InvalidArgumentException;
 use JsonException;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -39,10 +41,12 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
-use UaResult\Result\ResultInterface;
+use Throwable;
+use UaDeviceType\TypeLoader;
 use UnexpectedValueException;
 
 use function array_chunk;
+use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function file_exists;
@@ -50,6 +54,7 @@ use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
+use function is_array;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
@@ -57,12 +62,14 @@ use function mb_strpos;
 use function mb_strtolower;
 use function mkdir;
 use function number_format;
+use function preg_match;
 use function sprintf;
 use function str_pad;
 use function str_replace;
 use function trim;
 use function utf8_decode;
 
+use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const STR_PAD_LEFT;
 
@@ -123,7 +130,7 @@ final class RewriteTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('init Detector ...', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: 'init Detector ...', options: OutputInterface::VERBOSITY_NORMAL);
 
         $cache = new class () implements CacheInterface {
             /**
@@ -263,7 +270,8 @@ final class RewriteTestsCommand extends Command
             }
         };
 
-        $factory  = new DetectorFactory($cache, new ConsoleLogger($output));
+        $logger   = new ConsoleLogger($output);
+        $factory  = new DetectorFactory($cache, $logger);
         $detector = $factory();
 
         $basePath                = 'vendor/mimmi20/browser-detector/';
@@ -271,29 +279,35 @@ final class RewriteTestsCommand extends Command
         $testSource              = 'tests';
 
         $output->writeln(
-            'removing old existing files from vendor ...',
-            OutputInterface::VERBOSITY_NORMAL,
+            messages: 'removing old existing files from vendor ...',
+            options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $this->testsRemover->remove($output, $detectorTargetDirectory);
+        $this->testsRemover->remove(output: $output, testSource: $detectorTargetDirectory);
+        $this->testsRemover->remove(output: $output, testSource: $detectorTargetDirectory, dirs: true);
 
         $sources = [new JsonFileSource($testSource)];
 
         $output->writeln(
-            'removing old existing files from .build ...',
-            OutputInterface::VERBOSITY_NORMAL,
+            messages: 'removing old existing files from .build ...',
+            options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $this->testsRemover->remove($output, '.build');
-        $this->testsRemover->remove($output, '.build', true);
+        $this->testsRemover->remove(output: $output, testSource: '.build');
+        $this->testsRemover->remove(output: $output, testSource: '.build', dirs: true);
 
-        $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            messages: 'reading already existing tests ...',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
 
-        $txtChecks     = [];
+        $txtChecks = [];
+        // $headerChecks  = [];
         $messageLength = 0;
         $counter       = 0;
         $duplicates    = 0;
         $errors        = 0;
+        $skipped       = 0;
         $testCount     = 0;
         $baseMessage   = 'checking Header ';
 
@@ -306,9 +320,77 @@ final class RewriteTestsCommand extends Command
                 $test['headers'],
             );
 
+            $test['headers'] = array_filter(
+                $test['headers'],
+                static fn (string $header): bool => $header !== '',
+            );
+
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             ++$counter;
+
+            $addMessage = sprintf(
+                '[%s] - check',
+                str_pad(
+                    string: number_format(num: $counter, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            );
+            $message    = $baseMessage . $addMessage;
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write(
+                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                ++$skipped;
+
+                continue;
+            }
+
+            $txtChecks[$seachHeader] = $test;
+
+//            if (
+//                !array_key_exists('x-requested-with', $test['headers'])
+//                && !array_key_exists('http-x-requested-with', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
+            if (
+                array_key_exists('x-requested-with', $test['headers'])
+                && array_key_exists('http-x-requested-with', $test['headers'])
+            ) {
+                $output->write(
+                    messages: "\r" . str_pad(
+                        string: '<error>"x-requested-with" header is available twice</error>',
+                        length: $messageLength,
+                    ),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+            }
+
+//            $header = null;
+//
+//            if (array_key_exists('x-requested-with', $test['headers'])) {
+//                $header = $test['headers']['x-requested-with'];
+//            } elseif (array_key_exists('http-x-requested-with', $test['headers'])) {
+//                $header = $test['headers']['http-x-requested-with'];
+//            }
+//
+//            if ($header === null || $header === 'XMLHttpRequest') {
+//                ++$skipped;
+//
+//                continue;
+//            }
 
             $addMessage = sprintf(
                 '[%s] - redetect',
@@ -325,117 +407,191 @@ final class RewriteTestsCommand extends Command
             }
 
             $output->write(
-                "\r" . str_pad(string: $message, length: $messageLength),
-                false,
-                OutputInterface::VERBOSITY_NORMAL,
+                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
-
-            if (array_key_exists($seachHeader, $txtChecks)) {
-                ++$errors;
-
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    '<error>' . sprintf(
-                        'Header "%s" added more than once --> skipped',
-                        $seachHeader,
-                    ) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            }
-
-            $txtChecks[$seachHeader] = $test;
 
             try {
                 $result = $this->handleTest(
-                    $output,
-                    $detector,
-                    $test['headers'],
-                    $message,
-                    $messageLength,
+                    output: $output,
+                    detector: $detector,
+                    logger: $logger,
+                    headers: $test['headers'],
+                    parentMessage: $message,
+                    messageLength: $messageLength,
                 );
-            } catch (UnexpectedValueException $e) {
+            } catch (UnexpectedValueException | Throwable $e) {
                 ++$errors;
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln(
-                    '<error>' . (new Exception(
+                    messages: '<error>' . (new Exception(
                         sprintf('An error occured while checking Headers "%s"', $seachHeader),
                         0,
                         $e,
                     )) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
+                    options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
                 continue;
             }
 
-            if (!$result instanceof ResultInterface) {
+            if (!is_array($result)) {
                 ++$duplicates;
 
                 continue;
             }
 
-            $c = mb_strtolower(utf8_decode($result->getDevice()->getManufacturer()->getType()));
+//            if ($result['client']['name'] === null) {
+//                if (!array_key_exists($header, $headerChecks)) {
+//                    $output->writeln(
+//                        messages: "\r" . str_pad(
+//                            string: sprintf(
+//                                'konnte den Client nicht bestimmen für Header "%s"',
+//                                $header,
+//                            ),
+//                            length: $messageLength,
+//                        ),
+//                        options: OutputInterface::VERBOSITY_NORMAL,
+//                    );
+//
+//                    $headerChecks[$header] = true;
+//                }
+//            }
 
-            $c = $c === '' ? 'unknown' : str_replace(['.', ' '], ['', '-'], $c);
+            $addMessage = sprintf(
+                '[%s] - read temporary file',
+                str_pad(
+                    string: number_format(num: $counter, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            );
+            $message    = $baseMessage . $addMessage;
 
-            $t = mb_strtolower($result->getDevice()->getType()->getType());
-
-            if (!file_exists(sprintf('.build/%s', $c))) {
-                mkdir(sprintf('.build/%s', $c));
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
             }
 
-            $file = sprintf('.build/%s/%s.json', $c, $t);
+            $output->write(
+                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
 
-            if (!file_exists($file)) {
-                $tests = [];
-            } else {
+            $deviceManufaturer = mb_strtolower(utf8_decode($result['device']['manufacturer'] ?? ''));
+            $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
+                ['.', ' '],
+                ['', '-'],
+                $deviceManufaturer,
+            );
+
+            $clientManufaturer = mb_strtolower(utf8_decode($result['client']['manufacturer'] ?? ''));
+            $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
+                ['.', ' '],
+                ['', '-'],
+                $clientManufaturer,
+            );
+
+            $deviceType = mb_strtolower($result['device']['type'] ?? 'unknown');
+            $clientType = mb_strtolower($result['client']['type'] ?? 'unknown');
+
+            if (!file_exists(sprintf('.build/%s', $deviceManufaturer))) {
+                mkdir(sprintf('.build/%s', $deviceManufaturer));
+            }
+
+            if (!file_exists(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType))) {
+                mkdir(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType));
+            }
+
+            if (
+                !file_exists(
+                    sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer),
+                )
+            ) {
+                mkdir(sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer));
+            }
+
+            $file = sprintf(
+                '.build/%s/%s/%s/%s.json',
+                $deviceManufaturer,
+                $deviceType,
+                $clientManufaturer,
+                $clientType,
+            );
+
+            $tests = [];
+
+            if (file_exists($file)) {
                 try {
                     $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
                 } catch (JsonException $e) {
                     ++$errors;
-                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                     $output->writeln(
-                        '<error>' . (new Exception(
+                        messages: '<error>' . (new Exception(
                             'An error occured while decoding a result',
                             0,
                             $e,
                         )) . '</error>',
-                        OutputInterface::VERBOSITY_NORMAL,
+                        options: OutputInterface::VERBOSITY_NORMAL,
                     );
 
                     continue;
                 }
             }
 
-            try {
-                $tests[] = $result->toArray();
-            } catch (UnexpectedValueException $e) {
-                unset($tests);
+            $addMessage = sprintf(
+                '[%s] - write to temporary file',
+                str_pad(
+                    string: number_format(num: $counter, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            );
+            $message    = $baseMessage . $addMessage;
 
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write(
+                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            try {
+                $tests[] = $result;
+            } catch (UnexpectedValueException $e) {
                 ++$errors;
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln(
-                    '<error>' . (new Exception(
+                    messages: '<error>' . (new Exception(
                         'An error occured while converting a result to an array',
                         0,
                         $e,
                     )) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
+                    options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
                 continue;
             }
 
             try {
-                $saved = file_put_contents($file, json_encode($tests, JSON_THROW_ON_ERROR));
+                $saved = file_put_contents(
+                    filename: $file,
+                    data: json_encode($tests, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
+                );
             } catch (JsonException) {
                 ++$errors;
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln(
-                    '<error>' . sprintf('An error occured while encoding file %s', $file) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
+                    messages: '<error>' . sprintf(
+                        'An error occured while encoding file %s',
+                        $file,
+                    ) . '</error>',
+                    options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
                 continue;
@@ -445,10 +601,14 @@ final class RewriteTestsCommand extends Command
 
             if ($saved === false) {
                 ++$errors;
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln(
-                    '<error>' . sprintf('An error occured while saving file %s', $file) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
+                    messages: '<error>' . sprintf(
+                        'An error occured while saving file %s',
+                        $file,
+                    ) . '</error>',
+                    options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
                 continue;
@@ -459,156 +619,206 @@ final class RewriteTestsCommand extends Command
             ++$testCount;
         }
 
-        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
         $this->jsonNormalizer->init($output);
 
         $output->writeln(
-            sprintf(
+            messages: sprintf(
                 'check result: %7d test(s), %7d duplicate(s), %7d error(s)',
                 $testCount,
                 $duplicates,
                 $errors,
             ),
-            OutputInterface::VERBOSITY_NORMAL,
+            options: OutputInterface::VERBOSITY_NORMAL,
         );
-        $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
 
         $messageLength = 0;
         $baseMessage   = 're-write test files in directory ';
 
-        $baseFinder = new Finder();
-        $baseFinder->notName('*.gitkeep');
-        $baseFinder->ignoreDotFiles(true);
-        $baseFinder->ignoreVCS(true);
-        $baseFinder->sortByName();
-        $baseFinder->ignoreUnreadableDirs();
+        $fileFinder = new Finder();
+        $fileFinder->notName('*.gitkeep');
+        $fileFinder->ignoreDotFiles(true);
+        $fileFinder->ignoreVCS(true);
+        $fileFinder->sortByName();
+        $fileFinder->ignoreUnreadableDirs();
+        $fileFinder->files();
+        $fileFinder->in('.build');
 
-        $dirFinder = clone $baseFinder;
-        $dirFinder->directories();
-        $dirFinder->in('.build');
+        foreach ($fileFinder as $file) {
+            if (
+                !preg_match(
+                    '/\\.build\\\\(?P<deviceManufaturer>[^\\\\]+)\\\\(?P<deviceType>[^\\\\]+)\\\\(?P<clientManufaturer>[^\\\\]+)\\\\(?P<clientType>[^\\\\]+)\\.json/',
+                    $file->getPathname(),
+                    $matches,
+                )
+            ) {
+                ++$errors;
 
-        foreach ($dirFinder as $dir) {
-            $fileFinder = clone $baseFinder;
-            $fileFinder->files();
-            $fileFinder->in($dir->getPathname());
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    messages: sprintf(
+                        '<error>the path "%s" does not match required structure</error>',
+                        $file->getPathname(),
+                    ),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
 
-            $c = $dir->getBasename();
+                continue;
+            }
 
-            foreach ($fileFinder as $file) {
-                $t = $file->getBasename('.' . $file->getExtension());
+            try {
+                $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                ++$errors;
+
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    '<error>' . (new Exception(
+                        'An error occured while encoding a resultset',
+                        0,
+                        $e,
+                    )) . '</error>',
+                    OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                continue;
+            }
+
+            foreach (array_chunk($data, 100) as $number => $parts) {
+                $path  = $basePath;
+                $path .= sprintf(
+                    'tests/data/%s/%s/%s/%s/%07d.json',
+                    $matches['deviceManufaturer'],
+                    $matches['deviceType'],
+                    $matches['clientManufaturer'],
+                    $matches['clientType'],
+                    $number,
+                );
+
+                $p1 = sprintf('tests/data/%s', $matches['deviceManufaturer']);
+
+                if (!file_exists($basePath . $p1)) {
+                    mkdir($basePath . $p1);
+                }
+
+                $p2 = sprintf(
+                    'tests/data/%s/%s',
+                    $matches['deviceManufaturer'],
+                    $matches['deviceType'],
+                );
+
+                if (!file_exists($basePath . $p2)) {
+                    mkdir($basePath . $p2);
+                }
+
+                $p3 = sprintf(
+                    'tests/data/%s/%s/%s',
+                    $matches['deviceManufaturer'],
+                    $matches['deviceType'],
+                    $matches['clientManufaturer'],
+                );
+
+                if (!file_exists($basePath . $p3)) {
+                    mkdir($basePath . $p3);
+                }
+
+                $p4 = sprintf(
+                    'tests/data/%s/%s/%s/%s',
+                    $matches['deviceManufaturer'],
+                    $matches['deviceType'],
+                    $matches['clientManufaturer'],
+                    $matches['clientType'],
+                );
+
+                if (!file_exists($basePath . $p4)) {
+                    mkdir($basePath . $p4);
+                }
+
+                $message  = $baseMessage;
+                $message .= sprintf(
+                    'tests/data/%s/%s/%s/%s/%07d.json',
+                    $matches['deviceManufaturer'],
+                    $matches['deviceType'],
+                    $matches['clientManufaturer'],
+                    $matches['clientType'],
+                    $number,
+                );
+                $message .= ' - normalizing';
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
+                $output->write(
+                    "\r" . str_pad(string: $message, length: $messageLength),
+                    false,
+                    OutputInterface::VERBOSITY_VERY_VERBOSE,
+                );
 
                 try {
-                    $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
-                } catch (JsonException $e) {
-                    ++$errors;
-                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                    $output->writeln(
-                        '<error>' . (new Exception(
-                            'An error occured while encoding a resultset',
-                            0,
-                            $e,
-                        )) . '</error>',
-                        OutputInterface::VERBOSITY_NORMAL,
+                    $normalized = $this->jsonNormalizer->normalize(
+                        $output,
+                        $parts,
+                        $message,
+                        $messageLength,
                     );
+                } catch (InvalidArgumentException | RuntimeException $e) {
+                    $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
                     continue;
                 }
 
-                foreach (array_chunk($data, 100) as $number => $parts) {
-                    $path = $basePath . sprintf('tests/data/%s/%s/%07d.json', $c, $t, $number);
-
-                    $p1 = $basePath . sprintf('tests/data/%s', $c);
-
-                    if (!file_exists($p1)) {
-                        mkdir($p1);
-                    }
-
-                    $p2 = $basePath . sprintf('tests/data/%s/%s', $c, $t);
-
-                    if (!file_exists($p2)) {
-                        mkdir($p2);
-                    }
-
-                    $message = $baseMessage . sprintf(
-                        'tests/data/%s/%s/%07d.json',
-                        $c,
-                        $t,
-                        $number,
-                    ) . ' - normalizing';
-
-                    if (mb_strlen($message) > $messageLength) {
-                        $messageLength = mb_strlen($message);
-                    }
-
-                    $output->write(
-                        "\r" . str_pad(string: $message, length: $messageLength),
-                        false,
-                        OutputInterface::VERBOSITY_VERY_VERBOSE,
-                    );
-
-                    try {
-                        $normalized = $this->jsonNormalizer->normalize(
-                            $output,
-                            $parts,
-                            $message,
-                            $messageLength,
-                        );
-                    } catch (InvalidArgumentException | RuntimeException $e) {
-                        $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-                        $output->writeln(
-                            '<error>' . $e . '</error>',
-                            OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        continue;
-                    }
-
-                    if ($normalized === null) {
-                        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                        $output->writeln(
-                            '<error>' . (new Exception(
-                                sprintf('file "%s" contains invalid json', $path),
-                            )) . '</error>',
-                            OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        return 1;
-                    }
-
-                    $message = $baseMessage . sprintf(
-                        'tests/data/%s/%s/%07d.json',
-                        $c,
-                        $t,
-                        $number,
-                    ) . ' - writing';
-
-                    if (mb_strlen($message) > $messageLength) {
-                        $messageLength = mb_strlen($message);
-                    }
-
-                    $output->write(
-                        "\r" . str_pad(string: $message, length: $messageLength),
-                        false,
-                        OutputInterface::VERBOSITY_VERY_VERBOSE,
-                    );
-
-                    $success = @file_put_contents($path, $normalized);
-
-                    if ($success !== false) {
-                        continue;
-                    }
-
-                    ++$errors;
+                if ($normalized === null) {
                     $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
                     $output->writeln(
-                        '<error>' . sprintf(
-                            'An error occured while writing file %s',
-                            $path,
-                        ) . '</error>',
+                        '<error>' . (new Exception(
+                            sprintf('file "%s" contains invalid json', $path),
+                        )) . '</error>',
                         OutputInterface::VERBOSITY_NORMAL,
                     );
+
+                    return 1;
                 }
+
+                $message  = $baseMessage;
+                $message .= sprintf(
+                    'tests/data/%s/%s/%s/%s/%07d.json',
+                    $matches['deviceManufaturer'],
+                    $matches['deviceType'],
+                    $matches['clientManufaturer'],
+                    $matches['clientType'],
+                    $number,
+                );
+                $message .= ' - writing';
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
+                $output->write(
+                    "\r" . str_pad(string: $message, length: $messageLength),
+                    false,
+                    OutputInterface::VERBOSITY_VERY_VERBOSE,
+                );
+
+                $success = @file_put_contents($path, $normalized);
+
+                if ($success !== false) {
+                    continue;
+                }
+
+                ++$errors;
+                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    '<error>' . sprintf(
+                        'An error occured while writing file %s',
+                        $path,
+                    ) . '</error>',
+                    OutputInterface::VERBOSITY_NORMAL,
+                );
             }
         }
 
@@ -616,6 +826,7 @@ final class RewriteTestsCommand extends Command
         $dataToOutput = [
             'useragents processed' => $counter,
             'tests written' => $testCount,
+            'skipped' => $skipped,
             'errors' => $errors,
             'duplicates' => $duplicates,
         ];
@@ -642,7 +853,9 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<string, string> $headers
+     * @param array<non-empty-string, string> $headers
+     *
+     * @return array<mixed>
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws UnexpectedValueException
@@ -650,64 +863,76 @@ final class RewriteTestsCommand extends Command
     private function handleTest(
         OutputInterface $output,
         Detector $detector,
+        LoggerInterface $logger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
-    ): ResultInterface | null {
-        $message = $parentMessage . ' - detect for new result ...';
+    ): array | null {
+        $message = $parentMessage . ' - <info>detect for new result ...</info>';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
-            false,
-            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            messages: "\r" . str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
         try {
             $newResult = $detector->getBrowser($headers);
-        } catch (\Psr\SimpleCache\InvalidArgumentException | NotNumericException $e) {
-            $output->writeln((string) $e, OutputInterface::VERBOSITY_NORMAL);
+        } catch (\Psr\SimpleCache\InvalidArgumentException | NotNumericException | UnexpectedValueException | Throwable $e) {
+            $output->writeln(
+                messages: sprintf('<error>%s</error>', $e),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
 
             return null;
         }
 
-        $message = $parentMessage . ' - analyze new result ...';
+        $message = $parentMessage . ' - <info>analyze new result ...</info>';
 
         if (mb_strlen($message) > $messageLength) {
             $messageLength = mb_strlen($message);
         }
 
         $output->write(
-            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
-            false,
-            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            messages: "\r" . str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
+
+        $versionBuilder   = new VersionBuilder($logger);
+        $deviceTypeLoader = new TypeLoader();
+        $deviceType       = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
 
         if (
             in_array(
-                $newResult->getDevice()->getDeviceName(),
+                $newResult['device']['deviceName'],
                 ['general Desktop', 'general Apple Device', 'general Philips TV'],
                 true,
             )
             || (
-                !$newResult->getDevice()->getType()->isMobile()
-                && !$newResult->getDevice()->getType()->isTablet()
-                && !$newResult->getDevice()->getType()->isTv()
+                !$deviceType->isMobile()
+                && !$deviceType->isTablet()
+                && !$deviceType->isTv()
             )
         ) {
             $keys = [
-                (string) $newResult->getBrowser()->getName(),
-                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
-                (string) $newResult->getEngine()->getName(),
-                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
-                (string) $newResult->getOs()->getName(),
-                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
-                (string) $newResult->getDevice()->getDeviceName(),
-                (string) $newResult->getDevice()->getMarketingName(),
-                (string) $newResult->getDevice()->getManufacturer()->getName(),
+                (string) $newResult['client']['name'],
+                (string) $versionBuilder->set($newResult['client']['version'] ?? '')->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ),
+                (string) $newResult['engine']['name'],
+                (string) $versionBuilder->set($newResult['engine']['version'] ?? '')->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ),
+                (string) $newResult['os']['name'],
+                (string) $versionBuilder->set($newResult['os']['version'] ?? '')->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ),
+                (string) $newResult['device']['deviceName'],
+                (string) $newResult['device']['marketingName'],
+                (string) $newResult['device']['manufacturer'],
             ];
 
             $key = implode('-', $keys);
@@ -718,22 +943,28 @@ final class RewriteTestsCommand extends Command
 
             $this->tests[$key] = 1;
         } elseif (
-            ($newResult->getDevice()->getType()->isMobile() || $newResult->getDevice()->getType()->isTablet() || $newResult->getDevice()->getType()->isTv())
-            && mb_strpos((string) $newResult->getBrowser()->getName(), 'general') === false
-            && !in_array($newResult->getBrowser()->getName(), [null, 'unknown'], true)
-            && mb_strpos((string) $newResult->getDevice()->getDeviceName(), 'general') === false
-            && !in_array($newResult->getDevice()->getDeviceName(), [null, 'unknown'], true)
+            ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv())
+            && mb_strpos((string) $newResult['client']['name'], 'general') === false
+            && !in_array($newResult['client']['name'], [null, 'unknown'], true)
+            && mb_strpos((string) $newResult['device']['deviceName'], 'general') === false
+            && !in_array($newResult['device']['deviceName'], [null, 'unknown'], true)
         ) {
             $keys = [
-                $newResult->getBrowser()->getName(),
-                $newResult->getBrowser()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
-                (string) $newResult->getEngine()->getName(),
-                $newResult->getEngine()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
-                (string) $newResult->getOs()->getName(),
-                $newResult->getOs()->getVersion()->getVersion(VersionInterface::IGNORE_MINOR),
-                $newResult->getDevice()->getDeviceName(),
-                (string) $newResult->getDevice()->getMarketingName(),
-                (string) $newResult->getDevice()->getManufacturer()->getName(),
+                (string) $newResult['client']['name'],
+                (string) $versionBuilder->set($newResult['client']['version'] ?? '')->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ),
+                (string) $newResult['engine']['name'],
+                (string) $versionBuilder->set($newResult['engine']['version'] ?? '')->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ),
+                (string) $newResult['os']['name'],
+                (string) $versionBuilder->set($newResult['os']['version'] ?? '')->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ),
+                (string) $newResult['device']['deviceName'],
+                (string) $newResult['device']['marketingName'],
+                (string) $newResult['device']['manufacturer'],
             ];
 
             $key = implode('-', $keys);
