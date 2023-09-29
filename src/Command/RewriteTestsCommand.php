@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
-use ArithmeticError;
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
 use BrowscapHelper\Helper\JsonNormalizer;
@@ -121,7 +120,6 @@ final class RewriteTestsCommand extends Command
      * @throws InvalidIndentSize
      * @throws InvalidJsonEncodeOptions
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws ArithmeticError
      * @throws UnexpectedValueException
      * @throws RuntimeException
      * @throws \LogicException
@@ -559,23 +557,7 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            try {
-                $tests[] = $result;
-            } catch (UnexpectedValueException $e) {
-                ++$errors;
-
-                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    messages: '<error>' . (new Exception(
-                        'An error occured while converting a result to an array',
-                        0,
-                        $e,
-                    )) . '</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            }
+            $tests[] = $result;
 
             try {
                 $saved = file_put_contents(
@@ -853,12 +835,13 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<non-empty-string, string> $headers
+     * @param array<non-empty-string, non-empty-string> $headers
      *
      * @return array<mixed>
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws UnexpectedValueException
+     * @throws NotNumericException
      */
     private function handleTest(
         OutputInterface $output,
