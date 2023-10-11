@@ -146,10 +146,8 @@ final class CopyTestsCommand extends Command
 
         $sources = [
             new BrowscapSource(),
-            new CbschuldSource(),
             new CrawlerDetectSource(),
             new DonatjSource(),
-            new EndorphinSource(),
             new MatomoSource(),
             new MobileDetectSource(),
             new WhichBrowserSource(),
