@@ -402,6 +402,18 @@ final class RewriteTestsCommand extends Command
 //                continue;
 //            }
 
+//            $header = null;
+//
+//            if (array_key_exists('sec-ch-ua', $test['headers'])) {
+//                $header = $test['headers']['sec-ch-ua'];
+//            }
+//
+//            if ($header === null || $header === '' || $header === '""') {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
             $addMessage = sprintf(
                 '[%s] - redetect',
                 str_pad(
