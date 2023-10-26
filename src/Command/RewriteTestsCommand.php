@@ -465,7 +465,7 @@ final class RewriteTestsCommand extends Command
 //                        options: OutputInterface::VERBOSITY_NORMAL,
 //                    );
 //
-//                    $headerChecks[$header] = true;
+//                    $headerChecks[$header] = true;//exit;
 //                }
 //            }
 
