@@ -42,6 +42,7 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Throwable;
 use UaDeviceType\TypeLoader;
+use UConverter;
 use UnexpectedValueException;
 
 use function array_chunk;
@@ -66,7 +67,6 @@ use function sprintf;
 use function str_pad;
 use function str_replace;
 use function trim;
-use function utf8_decode;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -500,14 +500,18 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            $deviceManufaturer = mb_strtolower(utf8_decode($result['device']['manufacturer'] ?? ''));
+            $deviceManufaturer = mb_strtolower(
+                UConverter::transcode($result['device']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
+            );
             $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
                 ['.', ' '],
                 ['', '-'],
                 $deviceManufaturer,
             );
 
-            $clientManufaturer = mb_strtolower(utf8_decode($result['client']['manufacturer'] ?? ''));
+            $clientManufaturer = mb_strtolower(
+                UConverter::transcode($result['client']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
+            );
             $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
                 ['.', ' '],
                 ['', '-'],
