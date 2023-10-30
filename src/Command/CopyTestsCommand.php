@@ -16,10 +16,8 @@ use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
 use BrowscapHelper\Helper\RewriteTests;
 use BrowscapHelper\Source\BrowscapSource;
-use BrowscapHelper\Source\CbschuldSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
 use BrowscapHelper\Source\DonatjSource;
-use BrowscapHelper\Source\EndorphinSource;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MatomoSource;
 use BrowscapHelper\Source\MobileDetectSource;
@@ -146,10 +144,8 @@ final class CopyTestsCommand extends Command
 
         $sources = [
             new BrowscapSource(),
-            new CbschuldSource(),
             new CrawlerDetectSource(),
             new DonatjSource(),
-            new EndorphinSource(),
             new MatomoSource(),
             new MobileDetectSource(),
             new WhichBrowserSource(),
