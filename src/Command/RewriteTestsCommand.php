@@ -299,8 +299,9 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $txtChecks = [];
-        // $headerChecks  = [];
+        $txtChecks     = [];
+        $headerChecks1 = [];
+        $headerChecks2 = [];
         $messageLength = 0;
         $counter       = 0;
         $duplicates    = 0;
@@ -376,43 +377,19 @@ final class RewriteTestsCommand extends Command
                 );
             }
 
-//            $header = null;
-//
-//            if (array_key_exists('x-requested-with', $test['headers'])) {
-//                $header = $test['headers']['x-requested-with'];
-//            } elseif (array_key_exists('http-x-requested-with', $test['headers'])) {
-//                $header = $test['headers']['http-x-requested-with'];
-//            }
-//
-//            if ($header === null || $header === 'XMLHttpRequest') {
-//                ++$skipped;
-//
-//                continue;
-//            }
+            $xRequestHeader = null;
 
-//            $header = null;
-//
-//            if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
-//                $header = $test['headers']['sec-ch-ua-model'];
-//            }
-//
-//            if ($header === null || $header === '' || $header === '""') {
-//                ++$skipped;
-//
-//                continue;
-//            }
+            if (array_key_exists('x-requested-with', $test['headers'])) {
+                $xRequestHeader = $test['headers']['x-requested-with'];
+            } elseif (array_key_exists('http-x-requested-with', $test['headers'])) {
+                $xRequestHeader = $test['headers']['http-x-requested-with'];
+            }
 
-//            $header = null;
-//
-//            if (array_key_exists('sec-ch-ua', $test['headers'])) {
-//                $header = $test['headers']['sec-ch-ua'];
-//            }
-//
-//            if ($header === null || $header === '' || $header === '""') {
-//                ++$skipped;
-//
-//                continue;
-//            }
+            $secChUaHeader = null;
+
+            if (array_key_exists('sec-ch-ua', $test['headers'])) {
+                $secChUaHeader = $test['headers']['sec-ch-ua'];
+            }
 
             $addMessage = sprintf(
                 '[%s] - redetect',
@@ -464,22 +441,41 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-//            if ($result['client']['name'] === null) {
-//                if (!array_key_exists($header, $headerChecks)) {
-//                    $output->writeln(
-//                        messages: "\r" . str_pad(
-//                            string: sprintf(
-//                                'konnte den Client nicht bestimmen für Header "%s"',
-//                                $header,
-//                            ),
-//                            length: $messageLength,
-//                        ),
-//                        options: OutputInterface::VERBOSITY_NORMAL,
-//                    );
-//
-//                    $headerChecks[$header] = true;//exit;
-//                }
-//            }
+            if ($result['client']['name'] === null) {
+                if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
+                    if (!array_key_exists($xRequestHeader, $headerChecks1)) {
+                        $output->writeln(
+                            messages: "\r" . str_pad(
+                                string: sprintf(
+                                    'Count not detect the Client for the x-requested-with Header "%s"',
+                                    $xRequestHeader,
+                                ),
+                                length: $messageLength,
+                            ),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks1[$xRequestHeader] = true;
+                    }
+                }
+
+                if ($secChUaHeader !== null) {
+                    if (!array_key_exists($secChUaHeader, $headerChecks2)) {
+                        $output->writeln(
+                            messages: "\r" . str_pad(
+                                string: sprintf(
+                                    'Count not detect the Client for the sec-ch-ua Header "%s"',
+                                    $secChUaHeader,
+                                ),
+                                length: $messageLength,
+                            ),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks2[$secChUaHeader] = true;
+                    }
+                }
+            }
 
             $addMessage = sprintf(
                 '[%s] - read temporary file',
