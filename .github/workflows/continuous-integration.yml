@@ -84,7 +84,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.26.0"
+        uses: "shivammathur/setup-php@2.27.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, curl, iconv, mbstring, ctype, dom, intl, simplexml, tokenizer, xml, xmlwriter, pdo, bcmath"
