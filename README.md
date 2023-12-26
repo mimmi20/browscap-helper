@@ -1,2 +1,1 @@
-BrowserDetector & Browscap helper
-=================================
+# BrowserDetector & Browscap helper
