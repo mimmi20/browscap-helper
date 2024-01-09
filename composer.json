@@ -20,7 +20,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "ext-simplexml": "*",
-        "browscap/browscap": "6.1.6 as 6.1.7",
+        "browscap/browscap": "6.1.x-dev as 6.1.7",
         "donatj/phpuseragentparser": "^v1.8.0",
         "ergebnis/json-normalizer": "^4.4.1",
         "jaybizzle/crawler-detect": "^v1.2.116",
@@ -69,17 +69,13 @@
     "config": {
         "preferred-install": {
             "browscap/browscap": "source",
-            "cbschuld/browser.php": "source",
             "donatj/phpuseragentparser": "source",
-            "endorphin-studio/browser-detector-tests": "source",
             "mimmi20/browser-detector": "source",
             "mobiledetect/mobiledetectlib": "source",
             "matomo/device-detector": "source",
             "jaybizzle/crawler-detect": "source",
-            "sinergi/browser-detector": "source",
             "whichbrowser/parser": "source",
             "woothee/woothee-testset": "source",
-            "yzalis/ua-parser": "source",
             "zsxsoft/php-useragent": "source",
             "*": "dist"
         },
