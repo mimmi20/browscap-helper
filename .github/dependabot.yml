@@ -55,18 +55,9 @@ updates:
       - dependency-name: "psr/simple-cache"
         versions:
           - ">= 0"
-      - dependency-name: "psr/cache"
+      - dependency-name: "browscap/browscap"
         versions:
           - ">= 0"
-      - dependency-name: "symfony/cache"
-        versions:
-          - ">= 0"
-      - dependency-name: "endorphin-studio/browser-detector-tests"
-        versions:
-          - ">= 0"
-#      - dependency-name: symfony/yaml
-#        versions:
-#          - ">= 0"
 
   - package-ecosystem: "github-actions"
 
