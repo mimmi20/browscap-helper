@@ -655,7 +655,7 @@ final class RewriteTestsCommand extends Command
         foreach ($fileFinder as $file) {
             if (
                 !preg_match(
-                    '/\\.build\\\\(?P<deviceManufaturer>[^\\\\]+)\\\\(?P<deviceType>[^\\\\]+)\\\\(?P<clientManufaturer>[^\\\\]+)\\\\(?P<clientType>[^\\\\]+)\\.json/',
+                    '/\.build\\\(?P<deviceManufaturer>[^\\\]+)\\\(?P<deviceType>[^\\\]+)\\\(?P<clientManufaturer>[^\\\]+)\\\(?P<clientType>[^\\\]+)\.json/',
                     $file->getPathname(),
                     $matches,
                 )
