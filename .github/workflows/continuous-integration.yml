@@ -27,7 +27,7 @@ jobs:
       skip-validate-composer: false
       skip-phplint: false
       skip-check-composer: false
-      dependency-analyser-options: ""
+      dependency-analyser-options: "--ignore-unused-deps"
 
   install:
     name: "Install Project"
