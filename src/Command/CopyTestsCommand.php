@@ -191,7 +191,13 @@ final class CopyTestsCommand extends Command
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
             $test['headers'] = array_map(
-                static fn (string $header) => trim($header),
+                static function (string | array $header): string | array {
+                    if (is_string($header)) {
+                        return trim($header);
+                    }
+
+                    return array_map('trim', $header);
+                },
                 $test['headers'],
             );
 
