@@ -47,6 +47,7 @@ use UnexpectedValueException;
 use function array_key_exists;
 use function array_map;
 use function count;
+use function is_string;
 use function json_encode;
 use function sprintf;
 use function trim;
@@ -191,12 +192,12 @@ final class CopyTestsCommand extends Command
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
             $test['headers'] = array_map(
-                static function (string | array $header): string | array {
+                static function (string | array $header): string {
                     if (is_string($header)) {
                         return trim($header);
                     }
 
-                    return $header;
+                    return '';
                 },
                 $test['headers'],
             );
