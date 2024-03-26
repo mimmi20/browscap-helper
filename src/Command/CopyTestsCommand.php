@@ -196,7 +196,7 @@ final class CopyTestsCommand extends Command
                         return trim($header);
                     }
 
-                    return array_map('trim', $header);
+                    return $header;
                 },
                 $test['headers'],
             );
