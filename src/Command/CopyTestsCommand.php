@@ -27,7 +27,6 @@ use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
-use BrowscapHelper\Source\ZsxsoftSource;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -151,7 +150,6 @@ final class CopyTestsCommand extends Command
             new MobileDetectSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
-            new ZsxsoftSource(),
             new TxtFileSource($sourcesDirectory),
             new TxtCounterFileSource($sourcesDirectory),
         ];
