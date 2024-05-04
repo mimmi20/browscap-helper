@@ -60,6 +60,7 @@ use function json_encode;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strtolower;
+use function microtime;
 use function mkdir;
 use function number_format;
 use function preg_match;
@@ -309,6 +310,10 @@ final class RewriteTestsCommand extends Command
         $skipped       = 0;
         $testCount     = 0;
         $baseMessage   = 'checking Header ';
+        $timeCheck     = 0.0;
+        $timeDetect    = 0.0;
+        $timeRead      = 0.0;
+        $timeWrite     = 0.0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -323,6 +328,8 @@ final class RewriteTestsCommand extends Command
                 $test['headers'],
                 static fn (string $header): bool => $header !== '',
             );
+
+            $startTime = microtime(true);
 
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
@@ -346,6 +353,8 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . str_pad(string: $message, length: $messageLength),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
+
+            $timeCheck += microtime(true) - $startTime;
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 ++$skipped;
@@ -411,6 +420,8 @@ final class RewriteTestsCommand extends Command
             );
 
             try {
+                $startTime = microtime(true);
+
                 $result = $this->handleTest(
                     output: $output,
                     detector: $detector,
@@ -433,6 +444,8 @@ final class RewriteTestsCommand extends Command
                 );
 
                 continue;
+            } finally {
+                $timeDetect += microtime(true) - $startTime;
             }
 
             if (!is_array($result)) {
@@ -447,7 +460,7 @@ final class RewriteTestsCommand extends Command
                         $output->writeln(
                             messages: "\r" . str_pad(
                                 string: sprintf(
-                                    'Count not detect the Client for the x-requested-with Header "%s"',
+                                    'Could not detect the Client for the x-requested-with Header "%s"',
                                     $xRequestHeader,
                                 ),
                                 length: $messageLength,
@@ -464,7 +477,7 @@ final class RewriteTestsCommand extends Command
                         $output->writeln(
                             messages: "\r" . str_pad(
                                 string: sprintf(
-                                    'Count not detect the Client for the sec-ch-ua Header "%s"',
+                                    'Could not detect the Client for the sec-ch-ua Header "%s"',
                                     $secChUaHeader,
                                 ),
                                 length: $messageLength,
@@ -476,25 +489,6 @@ final class RewriteTestsCommand extends Command
                     }
                 }
             }
-
-            $addMessage = sprintf(
-                '[%s] - read temporary file',
-                str_pad(
-                    string: number_format(num: $counter, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-            );
-            $message    = $baseMessage . $addMessage;
-
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
-
-            $output->write(
-                messages: "\r" . str_pad(string: $message, length: $messageLength),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
 
             $deviceManufaturer = mb_strtolower(
                 UConverter::transcode($result['device']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
@@ -544,8 +538,50 @@ final class RewriteTestsCommand extends Command
             $tests = [];
 
             if (file_exists($file)) {
+                $addMessage = sprintf(
+                    '[%s] - read temporary file %s',
+                    str_pad(
+                        string: number_format(num: $counter, thousands_separator: '.'),
+                        length: 14,
+                        pad_type: STR_PAD_LEFT,
+                    ),
+                    $file,
+                );
+                $message    = $baseMessage . $addMessage;
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
+                $output->write(
+                    messages: "\r" . str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
                 try {
+                    $startTime = microtime(true);
+
                     $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
+
+                    $addMessage = sprintf(
+                        '[%s] - read temporary file %s - done',
+                        str_pad(
+                            string: number_format(num: $counter, thousands_separator: '.'),
+                            length: 14,
+                            pad_type: STR_PAD_LEFT,
+                        ),
+                        $file,
+                    );
+                    $message    = $baseMessage . $addMessage;
+
+                    if (mb_strlen($message) > $messageLength) {
+                        $messageLength = mb_strlen($message);
+                    }
+
+                    $output->write(
+                        messages: "\r" . str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
                 } catch (JsonException $e) {
                     ++$errors;
                     $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -559,16 +595,39 @@ final class RewriteTestsCommand extends Command
                     );
 
                     continue;
+                } finally {
+                    $timeRead += microtime(true) - $startTime;
                 }
+            } else {
+                $addMessage = sprintf(
+                    '[%s] - temporary file %s not found',
+                    str_pad(
+                        string: number_format(num: $counter, thousands_separator: '.'),
+                        length: 14,
+                        pad_type: STR_PAD_LEFT,
+                    ),
+                    $file,
+                );
+                $message    = $baseMessage . $addMessage;
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
+                $output->write(
+                    messages: "\r" . str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
             }
 
             $addMessage = sprintf(
-                '[%s] - write to temporary file',
+                '[%s] - write to temporary file %s',
                 str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
                 ),
+                $file,
             );
             $message    = $baseMessage . $addMessage;
 
@@ -584,6 +643,8 @@ final class RewriteTestsCommand extends Command
             $tests[] = $result;
 
             try {
+                $startTime = microtime(true);
+
                 $saved = file_put_contents(
                     filename: $file,
                     data: json_encode($tests, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
@@ -601,6 +662,8 @@ final class RewriteTestsCommand extends Command
                 );
 
                 continue;
+            } finally {
+                $timeWrite += microtime(true) - $startTime;
             }
 
             unset($tests);
@@ -620,7 +683,28 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
+            $addMessage = sprintf(
+                '[%s] - write to temporary file %s - done',
+                str_pad(
+                    string: number_format(num: $counter, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+                $file,
+            );
+
             unset($file);
+
+            $message = $baseMessage . $addMessage;
+
+            if (mb_strlen($message) > $messageLength) {
+                $messageLength = mb_strlen($message);
+            }
+
+            $output->write(
+                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
 
             ++$testCount;
         }
@@ -631,10 +715,38 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln(
             messages: sprintf(
-                'check result: %7d test(s), %7d duplicate(s), %7d error(s)',
+                'check result:       %7d test(s), %7d duplicate(s), %7d error(s)',
                 $testCount,
                 $duplicates,
                 $errors,
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: sprintf(
+                'time checking:      %f sec',
+                $timeCheck,
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: sprintf(
+                'time detecting:     %f sec',
+                $timeDetect,
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: sprintf(
+                'time reading cache: %f sec',
+                $timeRead,
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: sprintf(
+                'time writing cache: %f sec',
+                $timeWrite,
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
