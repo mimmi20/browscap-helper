@@ -58,6 +58,12 @@ updates:
       - dependency-name: "browscap/browscap"
         versions:
           - ">= 0"
+      - dependency-name: "nikic/php-parser"
+        versions:
+          - ">= 0"
+      - dependency-name: "infection/infection"
+        versions:
+          - ">= 0"
 
   - package-ecosystem: "github-actions"
 

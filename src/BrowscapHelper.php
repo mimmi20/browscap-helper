@@ -23,6 +23,7 @@ use function realpath;
 
 final class BrowscapHelper extends Application
 {
+    /** @api */
     public const DEFAULT_RESOURCES_FOLDER = '../sources';
 
     /** @throws Exception */

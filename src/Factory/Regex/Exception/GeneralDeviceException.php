@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace BrowscapHelper\Factory\Regex;
+namespace BrowscapHelper\Factory\Regex\Exception;
 
 use OutOfRangeException;
 
-final class GeneralTabletException extends OutOfRangeException
+final class GeneralDeviceException extends OutOfRangeException
 {
     // nothing to do here
 }
