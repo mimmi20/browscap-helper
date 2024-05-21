@@ -19,7 +19,7 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
-use BrowserDetector\Version\NotNumericException;
+use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
 use DateInterval;
