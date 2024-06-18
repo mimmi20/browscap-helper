@@ -35,7 +35,7 @@ parameters:
   checkFunctionNameCase: true
 
   # be strict about values with an unspecified (implicit mixed) type
-  checkImplicitMixed: false
+  checkImplicitMixed: false # todo: fix
 
   # reports references to built-in classes with incorrect name case
   checkInternalClassCaseSensitivity: true
@@ -68,7 +68,7 @@ parameters:
   reportAlwaysTrueInLastCondition: true
 
   # reports violations of parameter type contravariance and return type covariance
-  reportMaybesInMethodSignatures: false
+  reportMaybesInMethodSignatures: false # todo: fix
 
   # reports violations of property type invariance
   reportMaybesInPropertyPhpDocTypes: true
@@ -110,6 +110,11 @@ parameters:
     constants: true
     local_methods: true
 
+  type_perfect:
+    null_over_false: true
+    no_mixed: true
+    narrow_param: true
+
   ignoreErrors:
     - '~expects string,~'
     - '~on mixed~'
@@ -118,8 +123,6 @@ parameters:
 
 rules:
   # code complexity
-  - Symplify\PHPStanRules\Rules\Explicit\NoMixedPropertyFetcherRule
-  - Symplify\PHPStanRules\Rules\Explicit\NoMixedMethodCallerRule
   - Symplify\PHPStanRules\Rules\NoDynamicNameRule
   # - Symplify\PHPStanRules\Rules\NoReturnArrayVariableListRule # todo: fix
 
@@ -129,24 +132,13 @@ rules:
   - Symplify\PHPStanRules\Rules\Domain\RequireExceptionNamespaceRule
   - Symplify\PHPStanRules\Rules\Domain\RequireAttributeNamespaceRule
   - Symplify\PHPStanRules\Rules\Enum\RequireUniqueEnumConstantRule
-  - Symplify\PHPStanRules\Rules\ForbiddenParamTypeRemovalRule
   - Symplify\PHPStanRules\Rules\PreventParentMethodVisibilityOverrideRule
 
   # paths
-  - Symplify\PHPStanRules\Rules\NoMissingDirPathRule
   # - Symplify\PHPStanRules\Rules\NoReferenceRule # References are required
-  - Symplify\PHPStanRules\Rules\NoArrayAccessOnObjectRule
-
-  - Symplify\PHPStanRules\Rules\NoNullableArrayPropertyRule
-
-  # dead-code
-  - Symplify\PHPStanRules\Rules\NoIssetOnObjectRule
 
   # explicit naming
   - Symplify\PHPStanRules\Rules\ForbiddenMultipleClassLikeInOneFileRule
-
-  # comlexity
-  - Symplify\PHPStanRules\Rules\NarrowType\NoReturnFalseInNonBoolClassMethodRule
 
   - Symplify\PHPStanRules\Rules\Complexity\ForbiddenArrayMethodCallRule
   # - Symplify\PHPStanRules\Rules\CheckRequiredInterfaceInContractNamespaceRule
@@ -156,7 +148,7 @@ rules:
 
   # regexes
   - Symplify\PHPStanRules\Rules\AnnotateRegexClassConstWithRegexLinkRule
-  # - Symplify\PHPStanRules\Rules\NoInlineStringRegexRule
+  # - Symplify\PHPStanRules\Rules\NoInlineStringRegexRule # todo fix
   - Symplify\PHPStanRules\Rules\RegexSuffixInRegexConstantRule
 
   # naming
@@ -164,8 +156,4 @@ rules:
   # - Symplify\PHPStanRules\Rules\NoReturnSetterMethodRule
   - Symplify\PHPStanRules\Rules\UppercaseConstantRule
   - Symplify\PHPStanRules\Rules\ClassNameRespectsParentSuffixRule
-  # - Symplify\PHPStanRules\Rules\CheckTypehintCallerTypeRule
   - Symplify\PHPStanRules\Rules\CheckClassNamespaceFollowPsr4Rule
-
-includes:
-  - vendor/symplify/phpstan-rules/config/collector-rules.neon
