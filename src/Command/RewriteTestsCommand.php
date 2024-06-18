@@ -30,7 +30,6 @@ use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use InvalidArgumentException;
 use JsonException;
-use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -982,7 +981,7 @@ final class RewriteTestsCommand extends Command
     private function handleTest(
         OutputInterface $output,
         Detector $detector,
-        LoggerInterface $logger,
+        ConsoleLogger $logger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
