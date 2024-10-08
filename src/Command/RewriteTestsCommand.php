@@ -1019,14 +1019,18 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
-        $versionBuilder   = new VersionBuilder($logger);
         $deviceTypeLoader = new TypeLoader();
         $deviceType       = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
 
         if (
             in_array(
                 $newResult['device']['deviceName'],
-                ['general Desktop', 'general Apple Device', 'general Philips TV'],
+                ['general Desktop', 'general Apple Device', 'general Philips TV', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
+                true,
+            )
+            || in_array(
+                $newResult['client']['type'],
+                ['bot'],
                 true,
             )
             || (
@@ -1037,17 +1041,8 @@ final class RewriteTestsCommand extends Command
         ) {
             $keys = [
                 (string) $newResult['client']['name'],
-                (string) $versionBuilder->set($newResult['client']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['engine']['name'],
-                (string) $versionBuilder->set($newResult['engine']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['os']['name'],
-                (string) $versionBuilder->set($newResult['os']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['device']['deviceName'],
                 (string) $newResult['device']['marketingName'],
                 (string) $newResult['device']['manufacturer'],
@@ -1069,17 +1064,8 @@ final class RewriteTestsCommand extends Command
         ) {
             $keys = [
                 (string) $newResult['client']['name'],
-                (string) $versionBuilder->set($newResult['client']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['engine']['name'],
-                (string) $versionBuilder->set($newResult['engine']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['os']['name'],
-                (string) $versionBuilder->set($newResult['os']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['device']['deviceName'],
                 (string) $newResult['device']['marketingName'],
                 (string) $newResult['device']['manufacturer'],
