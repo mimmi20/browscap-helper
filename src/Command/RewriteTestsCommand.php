@@ -48,12 +48,14 @@ use function array_chunk;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
+use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
 use function is_array;
+use function is_string;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
@@ -1040,6 +1042,13 @@ final class RewriteTestsCommand extends Command
                 && !$deviceType->isTv()
             )
         ) {
+            assert(is_string($newResult['client']['name']));
+            assert(is_string($newResult['engine']['name']));
+            assert(is_string($newResult['os']['name']));
+            assert(is_string($newResult['device']['deviceName']));
+            assert(is_string($newResult['device']['marketingName']));
+            assert(is_string($newResult['device']['manufacturer']));
+
             $keys = [
                 (string) $newResult['client']['name'],
                 (string) $newResult['engine']['name'],
