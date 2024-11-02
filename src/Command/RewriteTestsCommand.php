@@ -20,8 +20,6 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
-use BrowserDetector\Version\VersionBuilder;
-use BrowserDetector\Version\VersionInterface;
 use DateInterval;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
@@ -40,7 +38,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Throwable;
+use UaDeviceType\Exception\NotFoundException;
 use UaDeviceType\TypeLoader;
+use UaDeviceType\Unknown;
 use UConverter;
 use UnexpectedValueException;
 
@@ -48,12 +48,14 @@ use function array_chunk;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
+use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
 use function is_array;
+use function is_scalar;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
@@ -418,34 +420,17 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            try {
-                $startTime = microtime(true);
+            $startTime = microtime(true);
 
-                $result = $this->handleTest(
-                    output: $output,
-                    detector: $detector,
-                    logger: $logger,
-                    headers: $test['headers'],
-                    parentMessage: $message,
-                    messageLength: $messageLength,
-                );
-            } catch (UnexpectedValueException | Throwable $e) {
-                ++$errors;
+            $result = $this->handleTest(
+                output: $output,
+                detector: $detector,
+                headers: $test['headers'],
+                parentMessage: $message,
+                messageLength: $messageLength,
+            );
 
-                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    messages: '<error>' . (new Exception(
-                        sprintf('An error occured while checking Headers "%s"', $seachHeader),
-                        0,
-                        $e,
-                    )) . '</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            } finally {
-                $timeDetect += microtime(true) - $startTime;
-            }
+            $timeDetect += microtime(true) - $startTime;
 
             if (!is_array($result)) {
                 ++$duplicates;
@@ -974,14 +959,11 @@ final class RewriteTestsCommand extends Command
      *
      * @return array<mixed>
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws NotNumericException
+     * @throws void
      */
     private function handleTest(
         OutputInterface $output,
         Detector $detector,
-        ConsoleLogger $logger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
@@ -1019,14 +1001,23 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
-        $versionBuilder   = new VersionBuilder($logger);
         $deviceTypeLoader = new TypeLoader();
-        $deviceType       = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
+
+        try {
+            $deviceType = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
+        } catch (NotFoundException) {
+            $deviceType = new Unknown();
+        }
 
         if (
             in_array(
                 $newResult['device']['deviceName'],
-                ['general Desktop', 'general Apple Device', 'general Philips TV'],
+                ['general Desktop', 'general Apple Device', 'general Philips TV', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
+                true,
+            )
+            || in_array(
+                $newResult['client']['type'],
+                ['bot'],
                 true,
             )
             || (
@@ -1035,19 +1026,17 @@ final class RewriteTestsCommand extends Command
                 && !$deviceType->isTv()
             )
         ) {
+            assert(is_scalar($newResult['client']['name']));
+            assert(is_scalar($newResult['engine']['name']));
+            assert(is_scalar($newResult['os']['name']));
+            assert(is_scalar($newResult['device']['deviceName']));
+            assert(is_scalar($newResult['device']['marketingName']));
+            assert(is_scalar($newResult['device']['manufacturer']));
+
             $keys = [
                 (string) $newResult['client']['name'],
-                (string) $versionBuilder->set($newResult['client']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['engine']['name'],
-                (string) $versionBuilder->set($newResult['engine']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['os']['name'],
-                (string) $versionBuilder->set($newResult['os']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['device']['deviceName'],
                 (string) $newResult['device']['marketingName'],
                 (string) $newResult['device']['manufacturer'],
@@ -1062,24 +1051,22 @@ final class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         } elseif (
             ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv())
+            && is_scalar($newResult['client']['name'])
             && mb_strpos((string) $newResult['client']['name'], 'general') === false
             && !in_array($newResult['client']['name'], [null, 'unknown'], true)
+            && is_scalar($newResult['device']['deviceName'])
             && mb_strpos((string) $newResult['device']['deviceName'], 'general') === false
             && !in_array($newResult['device']['deviceName'], [null, 'unknown'], true)
         ) {
+            assert(is_scalar($newResult['engine']['name']));
+            assert(is_scalar($newResult['os']['name']));
+            assert(is_scalar($newResult['device']['marketingName']));
+            assert(is_scalar($newResult['device']['manufacturer']));
+
             $keys = [
                 (string) $newResult['client']['name'],
-                (string) $versionBuilder->set($newResult['client']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['engine']['name'],
-                (string) $versionBuilder->set($newResult['engine']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['os']['name'],
-                (string) $versionBuilder->set($newResult['os']['version'] ?? '')->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ),
                 (string) $newResult['device']['deviceName'],
                 (string) $newResult['device']['marketingName'],
                 (string) $newResult['device']['manufacturer'],
