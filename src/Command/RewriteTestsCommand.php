@@ -38,7 +38,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Throwable;
+use UaDeviceType\Exception\NotFoundException;
 use UaDeviceType\TypeLoader;
+use UaDeviceType\Unknown;
 use UConverter;
 use UnexpectedValueException;
 
@@ -1014,7 +1016,12 @@ final class RewriteTestsCommand extends Command
         );
 
         $deviceTypeLoader = new TypeLoader();
-        $deviceType       = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
+
+        try {
+            $deviceType = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
+        } catch (NotFoundException) {
+            $deviceType = new Unknown();
+        }
 
         if (
             in_array(
