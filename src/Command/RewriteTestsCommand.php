@@ -1072,6 +1072,13 @@ final class RewriteTestsCommand extends Command
             && mb_strpos((string) $newResult['device']['deviceName'], 'general') === false
             && !in_array($newResult['device']['deviceName'], [null, 'unknown'], true)
         ) {
+            assert(is_string($newResult['client']['name']));
+            assert(is_string($newResult['engine']['name']));
+            assert(is_string($newResult['os']['name']));
+            assert(is_string($newResult['device']['deviceName']));
+            assert(is_string($newResult['device']['marketingName']));
+            assert(is_string($newResult['device']['manufacturer']));
+
             $keys = [
                 (string) $newResult['client']['name'],
                 (string) $newResult['engine']['name'],
