@@ -20,8 +20,6 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
-use BrowserDetector\Version\VersionBuilder;
-use BrowserDetector\Version\VersionInterface;
 use DateInterval;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
@@ -424,7 +422,6 @@ final class RewriteTestsCommand extends Command
                 $result = $this->handleTest(
                     output: $output,
                     detector: $detector,
-                    logger: $logger,
                     headers: $test['headers'],
                     parentMessage: $message,
                     messageLength: $messageLength,
@@ -981,7 +978,6 @@ final class RewriteTestsCommand extends Command
     private function handleTest(
         OutputInterface $output,
         Detector $detector,
-        ConsoleLogger $logger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
