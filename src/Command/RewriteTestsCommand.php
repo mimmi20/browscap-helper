@@ -972,8 +972,6 @@ final class RewriteTestsCommand extends Command
      * @return array<mixed>
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws NotNumericException
      */
     private function handleTest(
         OutputInterface $output,
