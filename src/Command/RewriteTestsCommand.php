@@ -55,7 +55,7 @@ use function file_put_contents;
 use function implode;
 use function in_array;
 use function is_array;
-use function is_string;
+use function is_scalar;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
@@ -975,7 +975,7 @@ final class RewriteTestsCommand extends Command
      *
      * @return array<mixed>
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws void
      */
     private function handleTest(
         OutputInterface $output,
@@ -1042,12 +1042,12 @@ final class RewriteTestsCommand extends Command
                 && !$deviceType->isTv()
             )
         ) {
-            assert(is_string($newResult['client']['name']));
-            assert(is_string($newResult['engine']['name']));
-            assert(is_string($newResult['os']['name']));
-            assert(is_string($newResult['device']['deviceName']));
-            assert(is_string($newResult['device']['marketingName']));
-            assert(is_string($newResult['device']['manufacturer']));
+            assert(is_scalar($newResult['client']['name']));
+            assert(is_scalar($newResult['engine']['name']));
+            assert(is_scalar($newResult['os']['name']));
+            assert(is_scalar($newResult['device']['deviceName']));
+            assert(is_scalar($newResult['device']['marketingName']));
+            assert(is_scalar($newResult['device']['manufacturer']));
 
             $keys = [
                 (string) $newResult['client']['name'],
@@ -1067,17 +1067,17 @@ final class RewriteTestsCommand extends Command
             $this->tests[$key] = 1;
         } elseif (
             ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv())
+            && is_scalar($newResult['client']['name'])
             && mb_strpos((string) $newResult['client']['name'], 'general') === false
             && !in_array($newResult['client']['name'], [null, 'unknown'], true)
+            && is_scalar($newResult['device']['deviceName'])
             && mb_strpos((string) $newResult['device']['deviceName'], 'general') === false
             && !in_array($newResult['device']['deviceName'], [null, 'unknown'], true)
         ) {
-            assert(is_string($newResult['client']['name']));
-            assert(is_string($newResult['engine']['name']));
-            assert(is_string($newResult['os']['name']));
-            assert(is_string($newResult['device']['deviceName']));
-            assert(is_string($newResult['device']['marketingName']));
-            assert(is_string($newResult['device']['manufacturer']));
+            assert(is_scalar($newResult['engine']['name']));
+            assert(is_scalar($newResult['os']['name']));
+            assert(is_scalar($newResult['device']['marketingName']));
+            assert(is_scalar($newResult['device']['manufacturer']));
 
             $keys = [
                 (string) $newResult['client']['name'],
