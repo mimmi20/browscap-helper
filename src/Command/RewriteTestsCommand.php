@@ -420,33 +420,17 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            try {
-                $startTime = microtime(true);
+            $startTime = microtime(true);
 
-                $result = $this->handleTest(
-                    output: $output,
-                    detector: $detector,
-                    headers: $test['headers'],
-                    parentMessage: $message,
-                    messageLength: $messageLength,
-                );
-            } catch (UnexpectedValueException | Throwable $e) {
-                ++$errors;
+            $result = $this->handleTest(
+                output: $output,
+                detector: $detector,
+                headers: $test['headers'],
+                parentMessage: $message,
+                messageLength: $messageLength,
+            );
 
-                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    messages: '<error>' . (new Exception(
-                        sprintf('An error occured while checking Headers "%s"', $seachHeader),
-                        0,
-                        $e,
-                    )) . '</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            } finally {
-                $timeDetect += microtime(true) - $startTime;
-            }
+            $timeDetect += microtime(true) - $startTime;
 
             if (!is_array($result)) {
                 ++$duplicates;
