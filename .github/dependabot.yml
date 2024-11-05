@@ -185,5 +185,8 @@ updates:
     commit-message:
       prefix: "github-actions"
 
+    ignore:
+      - dependency-name: "mimmi20/ci"
+
     # Disable rebasing for all pull requests
     rebase-strategy: "disabled"
