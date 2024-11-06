@@ -19,6 +19,7 @@ use Ergebnis\Json\Normalizer\Format\Indent;
 use Ergebnis\Json\Normalizer\Format\NewLine;
 use Ergebnis\Json\Normalizer\Normalizer;
 use JsonException;
+use Override;
 use UnexpectedValueException;
 
 use function array_key_exists;
@@ -36,17 +37,18 @@ use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
 /** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
-final class FormatNormalizer implements Normalizer
+final readonly class FormatNormalizer implements Normalizer
 {
-    private const PLACE_HOLDER = '$ni$';
+    private const string PLACE_HOLDER = '$ni$';
 
     /** @throws UnexpectedValueException */
-    public function __construct(private readonly Format $format)
+    public function __construct(private Format $format)
     {
         $this->checkPrettyPrint();
     }
 
     /** @throws NotJson */
+    #[Override]
     public function normalize(Json $json): Json
     {
         try {
