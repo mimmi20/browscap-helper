@@ -22,6 +22,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
+use Override;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -52,6 +53,7 @@ final class ConvertLogsCommand extends Command
      *
      * @throws InvalidArgumentException
      */
+    #[Override]
     protected function configure(): void
     {
         $this
@@ -93,6 +95,7 @@ final class ConvertLogsCommand extends Command
      * @throws \LogicException
      * @throws RuntimeException
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sourcesDirectory = $input->getOption('resources');

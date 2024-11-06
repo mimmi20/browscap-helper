@@ -17,9 +17,9 @@ use BrowscapHelper\Source\SourceInterface;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function mb_str_pad;
 use function mb_strlen;
 use function sprintf;
-use function str_pad;
 
 final class ExistingTestsLoader
 {
@@ -38,7 +38,7 @@ final class ExistingTestsLoader
         $messageLength = mb_strlen($message);
 
         $output->writeln(
-            str_pad(string: $message, length: $messageLength),
+            mb_str_pad(string: $message, length: $messageLength),
             OutputInterface::VERBOSITY_NORMAL,
         );
 
@@ -60,7 +60,7 @@ final class ExistingTestsLoader
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
+                "\r" . '<info>' . mb_str_pad(string: $message, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERBOSE,
             );
@@ -74,7 +74,7 @@ final class ExistingTestsLoader
             }
 
             $output->writeln(
-                "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
+                "\r" . '<info>' . mb_str_pad(string: $message, length: $messageLength) . '</info>',
                 OutputInterface::VERBOSITY_VERBOSE,
             );
         }

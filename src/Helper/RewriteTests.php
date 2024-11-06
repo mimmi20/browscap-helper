@@ -25,14 +25,14 @@ use UnexpectedValueException;
 use function array_chunk;
 use function array_keys;
 use function file_put_contents;
+use function mb_str_pad;
 use function mb_strlen;
 use function sprintf;
-use function str_pad;
 
-final class RewriteTests
+final readonly class RewriteTests
 {
     /** @throws void */
-    public function __construct(private readonly JsonNormalizer $jsonNormalizer)
+    public function __construct(private JsonNormalizer $jsonNormalizer)
     {
         // nothing to do
     }
@@ -56,7 +56,7 @@ final class RewriteTests
         $messageLength = mb_strlen($message);
 
         $output->writeln(
-            str_pad(string: $message, length: $messageLength),
+            mb_str_pad(string: $message, length: $messageLength),
             OutputInterface::VERBOSITY_NORMAL,
         );
 
@@ -73,7 +73,7 @@ final class RewriteTests
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
+                "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -95,7 +95,7 @@ final class RewriteTests
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
+                "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -131,7 +131,7 @@ final class RewriteTests
             }
 
             $output->write(
-                "\r" . '<info>' . str_pad(string: $message2, length: $messageLength) . '</info>',
+                "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
@@ -146,7 +146,7 @@ final class RewriteTests
         }
 
         $output->writeln(
-            "\r" . '<info>' . str_pad(string: $message, length: $messageLength) . '</info>',
+            "\r" . '<info>' . mb_str_pad(string: $message, length: $messageLength) . '</info>',
             OutputInterface::VERBOSITY_VERBOSE,
         );
     }

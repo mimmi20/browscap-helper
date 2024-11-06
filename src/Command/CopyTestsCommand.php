@@ -32,6 +32,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use JsonException;
+use Override;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -70,6 +71,7 @@ final class CopyTestsCommand extends Command
      *
      * @throws InvalidArgumentException
      */
+    #[Override]
     protected function configure(): void
     {
         $this
@@ -109,6 +111,7 @@ final class CopyTestsCommand extends Command
      * @throws \LogicException
      * @throws RuntimeException
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $testSource = 'tests';

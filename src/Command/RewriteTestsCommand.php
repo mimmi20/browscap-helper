@@ -28,6 +28,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use InvalidArgumentException;
 use JsonException;
+use Override;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -58,6 +59,7 @@ use function is_array;
 use function is_scalar;
 use function json_decode;
 use function json_encode;
+use function mb_str_pad;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strtolower;
@@ -66,7 +68,6 @@ use function mkdir;
 use function number_format;
 use function preg_match;
 use function sprintf;
-use function str_pad;
 use function str_replace;
 use function trim;
 
@@ -93,6 +94,7 @@ final class RewriteTestsCommand extends Command
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
+    #[Override]
     protected function configure(): void
     {
         $this
@@ -128,6 +130,7 @@ final class RewriteTestsCommand extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(messages: 'init Detector ...', options: OutputInterface::VERBOSITY_NORMAL);
@@ -145,6 +148,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function get(string $key, mixed $default = null): mixed
             {
                 return null;
@@ -165,6 +169,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function set(string $key, mixed $value, int | DateInterval | null $ttl = null): bool
             {
                 return false;
@@ -181,6 +186,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function delete(string $key): bool
             {
                 return false;
@@ -193,6 +199,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              */
+            #[Override]
             public function clear(): bool
             {
                 return false;
@@ -210,6 +217,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function getMultiple(iterable $keys, mixed $default = null): iterable
             {
                 return [];
@@ -229,6 +237,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function setMultiple(iterable $values, int | DateInterval | null $ttl = null): bool
             {
                 return false;
@@ -245,6 +254,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function deleteMultiple(iterable $keys): bool
             {
                 return false;
@@ -264,6 +274,7 @@ final class RewriteTestsCommand extends Command
              *
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[Override]
             public function has(string $key): bool
             {
                 return false;
@@ -338,7 +349,7 @@ final class RewriteTestsCommand extends Command
 
             $addMessage = sprintf(
                 '[%s] - check',
-                str_pad(
+                mb_str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
@@ -351,7 +362,7 @@ final class RewriteTestsCommand extends Command
             }
 
             $output->write(
-                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
@@ -379,7 +390,7 @@ final class RewriteTestsCommand extends Command
                 && array_key_exists('http-x-requested-with', $test['headers'])
             ) {
                 $output->write(
-                    messages: "\r" . str_pad(
+                    messages: "\r" . mb_str_pad(
                         string: '<error>"x-requested-with" header is available twice</error>',
                         length: $messageLength,
                     ),
@@ -403,7 +414,7 @@ final class RewriteTestsCommand extends Command
 
             $addMessage = sprintf(
                 '[%s] - redetect',
-                str_pad(
+                mb_str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
@@ -416,7 +427,7 @@ final class RewriteTestsCommand extends Command
             }
 
             $output->write(
-                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
@@ -442,7 +453,7 @@ final class RewriteTestsCommand extends Command
                 if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
                     if (!array_key_exists($xRequestHeader, $headerChecks1)) {
                         $output->writeln(
-                            messages: "\r" . str_pad(
+                            messages: "\r" . mb_str_pad(
                                 string: sprintf(
                                     'Could not detect the Client for the x-requested-with Header "%s"',
                                     $xRequestHeader,
@@ -459,7 +470,7 @@ final class RewriteTestsCommand extends Command
                 if ($secChUaHeader !== null) {
                     if (!array_key_exists($secChUaHeader, $headerChecks2)) {
                         $output->writeln(
-                            messages: "\r" . str_pad(
+                            messages: "\r" . mb_str_pad(
                                 string: sprintf(
                                     'Could not detect the Client for the sec-ch-ua Header "%s"',
                                     $secChUaHeader,
@@ -524,7 +535,7 @@ final class RewriteTestsCommand extends Command
             if (file_exists($file)) {
                 $addMessage = sprintf(
                     '[%s] - read temporary file %s',
-                    str_pad(
+                    mb_str_pad(
                         string: number_format(num: $counter, thousands_separator: '.'),
                         length: 14,
                         pad_type: STR_PAD_LEFT,
@@ -538,7 +549,7 @@ final class RewriteTestsCommand extends Command
                 }
 
                 $output->write(
-                    messages: "\r" . str_pad(string: $message, length: $messageLength),
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
@@ -549,7 +560,7 @@ final class RewriteTestsCommand extends Command
 
                     $addMessage = sprintf(
                         '[%s] - read temporary file %s - done',
-                        str_pad(
+                        mb_str_pad(
                             string: number_format(num: $counter, thousands_separator: '.'),
                             length: 14,
                             pad_type: STR_PAD_LEFT,
@@ -563,7 +574,7 @@ final class RewriteTestsCommand extends Command
                     }
 
                     $output->write(
-                        messages: "\r" . str_pad(string: $message, length: $messageLength),
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
                 } catch (JsonException $e) {
@@ -585,7 +596,7 @@ final class RewriteTestsCommand extends Command
             } else {
                 $addMessage = sprintf(
                     '[%s] - temporary file %s not found',
-                    str_pad(
+                    mb_str_pad(
                         string: number_format(num: $counter, thousands_separator: '.'),
                         length: 14,
                         pad_type: STR_PAD_LEFT,
@@ -599,14 +610,14 @@ final class RewriteTestsCommand extends Command
                 }
 
                 $output->write(
-                    messages: "\r" . str_pad(string: $message, length: $messageLength),
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
             }
 
             $addMessage = sprintf(
                 '[%s] - write to temporary file %s',
-                str_pad(
+                mb_str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
@@ -620,7 +631,7 @@ final class RewriteTestsCommand extends Command
             }
 
             $output->write(
-                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
@@ -669,7 +680,7 @@ final class RewriteTestsCommand extends Command
 
             $addMessage = sprintf(
                 '[%s] - write to temporary file %s - done',
-                str_pad(
+                mb_str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
@@ -686,7 +697,7 @@ final class RewriteTestsCommand extends Command
             }
 
             $output->write(
-                messages: "\r" . str_pad(string: $message, length: $messageLength),
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
@@ -854,7 +865,7 @@ final class RewriteTestsCommand extends Command
                 }
 
                 $output->write(
-                    "\r" . str_pad(string: $message, length: $messageLength),
+                    "\r" . mb_str_pad(string: $message, length: $messageLength),
                     false,
                     OutputInterface::VERBOSITY_VERY_VERBOSE,
                 );
@@ -901,7 +912,7 @@ final class RewriteTestsCommand extends Command
                 }
 
                 $output->write(
-                    "\r" . str_pad(string: $message, length: $messageLength),
+                    "\r" . mb_str_pad(string: $message, length: $messageLength),
                     false,
                     OutputInterface::VERBOSITY_VERY_VERBOSE,
                 );
@@ -937,11 +948,11 @@ final class RewriteTestsCommand extends Command
             $output->writeln(
                 sprintf(
                     '%s%s',
-                    str_pad(
+                    mb_str_pad(
                         string: $title . ':',
                         length: 21,
                     ),
-                    str_pad(
+                    mb_str_pad(
                         string: number_format(num: $number, thousands_separator: '.'),
                         length: 14,
                         pad_type: STR_PAD_LEFT,
@@ -975,7 +986,7 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->write(
-            messages: "\r" . str_pad(string: $message, length: $messageLength),
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
@@ -997,7 +1008,7 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->write(
-            messages: "\r" . str_pad(string: $message, length: $messageLength),
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
