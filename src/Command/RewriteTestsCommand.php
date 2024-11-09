@@ -315,6 +315,8 @@ final class RewriteTestsCommand extends Command
         $txtChecks     = [];
         $headerChecks1 = [];
         $headerChecks2 = [];
+        $headerChecks3 = [];
+        $headerChecks4 = [];
         $messageLength = 0;
         $counter       = 0;
         $duplicates    = 0;
@@ -347,15 +349,17 @@ final class RewriteTestsCommand extends Command
 
             ++$counter;
 
-            $addMessage = sprintf(
-                '[%s] - check',
+            $loopMessage = sprintf(
+                '%s[%s] - ',
+                $baseMessage,
                 mb_str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
                 ),
             );
-            $message    = $baseMessage . $addMessage;
+
+            $message = $loopMessage . 'check';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -385,15 +389,34 @@ final class RewriteTestsCommand extends Command
 //                continue;
 //            }
 
+//            if (
+//                !array_key_exists('sec-ch-ua-platform', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
+//            if (
+//                !array_key_exists('sec-ch-ua-model', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
             if (
                 array_key_exists('x-requested-with', $test['headers'])
                 && array_key_exists('http-x-requested-with', $test['headers'])
             ) {
-                $output->write(
-                    messages: "\r" . mb_str_pad(
-                        string: '<error>"x-requested-with" header is available twice</error>',
-                        length: $messageLength,
-                    ),
+                $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
             }
@@ -412,15 +435,19 @@ final class RewriteTestsCommand extends Command
                 $secChUaHeader = $test['headers']['sec-ch-ua'];
             }
 
-            $addMessage = sprintf(
-                '[%s] - redetect',
-                mb_str_pad(
-                    string: number_format(num: $counter, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-            );
-            $message    = $baseMessage . $addMessage;
+            $secChPlatformHeader = null;
+
+            if (array_key_exists('sec-ch-ua-platform', $test['headers'])) {
+                $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
+            }
+
+            $secChModelHeader = null;
+
+            if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
+                $secChModelHeader = $test['headers']['sec-ch-ua-model'];
+            }
+
+            $message = $loopMessage . 'redetect';
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -452,14 +479,18 @@ final class RewriteTestsCommand extends Command
             if ($result['client']['name'] === null) {
                 if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
                     if (!array_key_exists($xRequestHeader, $headerChecks1)) {
+                        $addMessage = sprintf(
+                            'Could not detect the Client for the x-requested-with Header "%s"',
+                            $xRequestHeader,
+                        );
+                        $message    = $loopMessage . $addMessage;
+
+                        if (mb_strlen($message) > $messageLength) {
+                            $messageLength = mb_strlen($message);
+                        }
+
                         $output->writeln(
-                            messages: "\r" . mb_str_pad(
-                                string: sprintf(
-                                    'Could not detect the Client for the x-requested-with Header "%s"',
-                                    $xRequestHeader,
-                                ),
-                                length: $messageLength,
-                            ),
+                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                             options: OutputInterface::VERBOSITY_NORMAL,
                         );
 
@@ -469,18 +500,68 @@ final class RewriteTestsCommand extends Command
 
                 if ($secChUaHeader !== null) {
                     if (!array_key_exists($secChUaHeader, $headerChecks2)) {
+                        $addMessage = sprintf(
+                            'Could not detect the Client for the sec-ch-ua Header "%s"',
+                            $secChUaHeader,
+                        );
+                        $message    = $loopMessage . $addMessage;
+
+                        if (mb_strlen($message) > $messageLength) {
+                            $messageLength = mb_strlen($message);
+                        }
+
                         $output->writeln(
-                            messages: "\r" . mb_str_pad(
-                                string: sprintf(
-                                    'Could not detect the Client for the sec-ch-ua Header "%s"',
-                                    $secChUaHeader,
-                                ),
-                                length: $messageLength,
-                            ),
+                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                             options: OutputInterface::VERBOSITY_NORMAL,
                         );
 
                         $headerChecks2[$secChUaHeader] = true;
+                    }
+                }
+            }
+
+            if ($result['os']['name'] === null) {
+                if ($secChPlatformHeader !== null) {
+                    if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
+                        $addMessage = sprintf(
+                            'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
+                            $secChPlatformHeader,
+                        );
+                        $message    = $loopMessage . $addMessage;
+
+                        if (mb_strlen($message) > $messageLength) {
+                            $messageLength = mb_strlen($message);
+                        }
+
+                        $output->writeln(
+                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks3[$secChPlatformHeader] = true;
+                    }
+                }
+            }
+
+            if ($result['device']['deviceName'] === null) {
+                if ($secChModelHeader !== null) {
+                    if (!array_key_exists($secChModelHeader, $headerChecks4)) {
+                        $addMessage = sprintf(
+                            'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                            $secChModelHeader,
+                        );
+                        $message    = $loopMessage . $addMessage;
+
+                        if (mb_strlen($message) > $messageLength) {
+                            $messageLength = mb_strlen($message);
+                        }
+
+                        $output->writeln(
+                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks4[$secChModelHeader] = true;
                     }
                 }
             }
@@ -533,16 +614,8 @@ final class RewriteTestsCommand extends Command
             $tests = [];
 
             if (file_exists($file)) {
-                $addMessage = sprintf(
-                    '[%s] - read temporary file %s',
-                    mb_str_pad(
-                        string: number_format(num: $counter, thousands_separator: '.'),
-                        length: 14,
-                        pad_type: STR_PAD_LEFT,
-                    ),
-                    $file,
-                );
-                $message    = $baseMessage . $addMessage;
+                $addMessage = sprintf('read temporary file %s', $file);
+                $message    = $loopMessage . $addMessage;
 
                 if (mb_strlen($message) > $messageLength) {
                     $messageLength = mb_strlen($message);
@@ -558,16 +631,8 @@ final class RewriteTestsCommand extends Command
 
                     $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
 
-                    $addMessage = sprintf(
-                        '[%s] - read temporary file %s - done',
-                        mb_str_pad(
-                            string: number_format(num: $counter, thousands_separator: '.'),
-                            length: 14,
-                            pad_type: STR_PAD_LEFT,
-                        ),
-                        $file,
-                    );
-                    $message    = $baseMessage . $addMessage;
+                    $addMessage = sprintf('read temporary file %s - done', $file);
+                    $message    = $loopMessage . $addMessage;
 
                     if (mb_strlen($message) > $messageLength) {
                         $messageLength = mb_strlen($message);
@@ -579,13 +644,15 @@ final class RewriteTestsCommand extends Command
                     );
                 } catch (JsonException $e) {
                     ++$errors;
-                    $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+
+                    $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                    $message = $loopMessage . $addMessage;
+
                     $output->writeln(
-                        messages: '<error>' . (new Exception(
-                            'An error occured while decoding a result',
-                            0,
-                            $e,
-                        )) . '</error>',
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
 
@@ -594,37 +661,21 @@ final class RewriteTestsCommand extends Command
                     $timeRead += microtime(true) - $startTime;
                 }
             } else {
-                $addMessage = sprintf(
-                    '[%s] - temporary file %s not found',
-                    mb_str_pad(
-                        string: number_format(num: $counter, thousands_separator: '.'),
-                        length: 14,
-                        pad_type: STR_PAD_LEFT,
-                    ),
-                    $file,
-                );
-                $message    = $baseMessage . $addMessage;
+                $addMessage = sprintf('<error>temporary file %s not found</error>', $file);
+                $message    = $loopMessage . $addMessage;
 
                 if (mb_strlen($message) > $messageLength) {
                     $messageLength = mb_strlen($message);
                 }
 
-                $output->write(
+                $output->writeln(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
             }
 
-            $addMessage = sprintf(
-                '[%s] - write to temporary file %s',
-                mb_str_pad(
-                    string: number_format(num: $counter, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-                $file,
-            );
-            $message    = $baseMessage . $addMessage;
+            $addMessage = sprintf('write to temporary file %s', $file);
+            $message    = $loopMessage . $addMessage;
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
@@ -647,12 +698,15 @@ final class RewriteTestsCommand extends Command
             } catch (JsonException) {
                 ++$errors;
 
-                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+                $addMessage = sprintf('<error>An error occured while encoding file %s</error>', $file);
+                $message    = $loopMessage . $addMessage;
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
                 $output->writeln(
-                    messages: '<error>' . sprintf(
-                        'An error occured while encoding file %s',
-                        $file,
-                    ) . '</error>',
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
@@ -666,31 +720,26 @@ final class RewriteTestsCommand extends Command
             if ($saved === false) {
                 ++$errors;
 
-                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+                $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
+                $message    = $loopMessage . $addMessage;
+
+                if (mb_strlen($message) > $messageLength) {
+                    $messageLength = mb_strlen($message);
+                }
+
                 $output->writeln(
-                    messages: '<error>' . sprintf(
-                        'An error occured while saving file %s',
-                        $file,
-                    ) . '</error>',
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
                 continue;
             }
 
-            $addMessage = sprintf(
-                '[%s] - write to temporary file %s - done',
-                mb_str_pad(
-                    string: number_format(num: $counter, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-                $file,
-            );
+            $addMessage = sprintf(' write to temporary file %s - done', $file);
 
             unset($file);
 
-            $message = $baseMessage . $addMessage;
+            $message = $loopMessage . $addMessage;
 
             if (mb_strlen($message) > $messageLength) {
                 $messageLength = mb_strlen($message);
