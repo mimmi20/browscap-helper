@@ -389,6 +389,22 @@ final class RewriteTestsCommand extends Command
 //                continue;
 //            }
 
+//            if (
+//                !array_key_exists('sec-ch-ua-platform', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
+//            if (
+//                !array_key_exists('sec-ch-ua-model', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
             if (
                 array_key_exists('x-requested-with', $test['headers'])
                 && array_key_exists('http-x-requested-with', $test['headers'])
