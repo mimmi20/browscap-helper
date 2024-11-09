@@ -478,6 +478,8 @@ final class RewriteTestsCommand extends Command
 
             if ($result['client']['name'] === null) {
                 if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
+                    $xRequestHeader = trim($xRequestHeader, '"');
+
                     if (!array_key_exists($xRequestHeader, $headerChecks1)) {
                         $addMessage = sprintf(
                             'Could not detect the Client for the x-requested-with Header "%s"',
@@ -499,6 +501,8 @@ final class RewriteTestsCommand extends Command
                 }
 
                 if ($secChUaHeader !== null) {
+                    $secChUaHeader = trim($secChUaHeader, '"');
+
                     if (!array_key_exists($secChUaHeader, $headerChecks2)) {
                         $addMessage = sprintf(
                             'Could not detect the Client for the sec-ch-ua Header "%s"',
@@ -522,6 +526,8 @@ final class RewriteTestsCommand extends Command
 
             if ($result['os']['name'] === null) {
                 if ($secChPlatformHeader !== null) {
+                    $secChPlatformHeader = trim($secChPlatformHeader, '"');
+
                     if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
                         $addMessage = sprintf(
                             'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
@@ -545,6 +551,8 @@ final class RewriteTestsCommand extends Command
 
             if ($result['device']['deviceName'] === null) {
                 if ($secChModelHeader !== null) {
+                    $secChModelHeader = trim($secChModelHeader, '"');
+
                     if (!array_key_exists($secChModelHeader, $headerChecks4)) {
                         $addMessage = sprintf(
                             'Could not detect the Device for the sec-ch-ua-model Header "%s"',
@@ -661,14 +669,14 @@ final class RewriteTestsCommand extends Command
                     $timeRead += microtime(true) - $startTime;
                 }
             } else {
-                $addMessage = sprintf('<error>temporary file %s not found</error>', $file);
+                $addMessage = sprintf('temporary file %s not found', $file);
                 $message    = $loopMessage . $addMessage;
 
                 if (mb_strlen($message) > $messageLength) {
                     $messageLength = mb_strlen($message);
                 }
 
-                $output->writeln(
+                $output->write(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
