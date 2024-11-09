@@ -315,6 +315,8 @@ final class RewriteTestsCommand extends Command
         $txtChecks     = [];
         $headerChecks1 = [];
         $headerChecks2 = [];
+        $headerChecks3 = [];
+        $headerChecks4 = [];
         $messageLength = 0;
         $counter       = 0;
         $duplicates    = 0;
@@ -412,6 +414,18 @@ final class RewriteTestsCommand extends Command
                 $secChUaHeader = $test['headers']['sec-ch-ua'];
             }
 
+            $secChPlatformHeader = null;
+
+            if (array_key_exists('sec-ch-ua-platform', $test['headers'])) {
+                $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
+            }
+
+            $secChModelHeader = null;
+
+            if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
+                $secChModelHeader = $test['headers']['sec-ch-ua-model'];
+            }
+
             $addMessage = sprintf(
                 '[%s] - redetect',
                 mb_str_pad(
@@ -481,6 +495,44 @@ final class RewriteTestsCommand extends Command
                         );
 
                         $headerChecks2[$secChUaHeader] = true;
+                    }
+                }
+            }
+
+            if ($result['os']['name'] === null) {
+                if ($secChPlatformHeader !== null) {
+                    if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
+                        $output->writeln(
+                            messages: "\r" . mb_str_pad(
+                                string: sprintf(
+                                    'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
+                                    $secChPlatformHeader,
+                                ),
+                                length: $messageLength,
+                            ),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks3[$secChPlatformHeader] = true;
+                    }
+                }
+            }
+
+            if ($result['device']['deviceName'] === null) {
+                if ($secChModelHeader !== null) {
+                    if (!array_key_exists($secChModelHeader, $headerChecks4)) {
+                        $output->writeln(
+                            messages: "\r" . mb_str_pad(
+                                string: sprintf(
+                                    'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                                    $secChModelHeader,
+                                ),
+                                length: $messageLength,
+                            ),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks4[$secChModelHeader] = true;
                     }
                 }
             }
