@@ -607,7 +607,6 @@ final class RewriteTestsCommand extends Command
 
                         $headerChecks5[$puffinHeader] = true;
                     }
-
                 }
             }
 
