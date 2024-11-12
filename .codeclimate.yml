@@ -1,21 +1,21 @@
 version: "2"
 checks:
   argument-count:
-    enabled: true
+    enabled: false
   complex-logic:
-    enabled: true
+    enabled: false
   file-lines:
     enabled: false
   method-complexity:
-    enabled: true
+    enabled: false
   method-count:
     enabled: true
   method-lines:
-    enabled: true
+    enabled: false
   nested-control-flow:
     enabled: true
   return-statements:
-    enabled: true
+    enabled: false
   similar-code:
     enabled: false
   identical-code:

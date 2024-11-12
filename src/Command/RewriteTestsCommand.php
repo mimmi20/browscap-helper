@@ -317,6 +317,7 @@ final class RewriteTestsCommand extends Command
         $headerChecks2 = [];
         $headerChecks3 = [];
         $headerChecks4 = [];
+        $headerChecks5 = [];
         $messageLength = 0;
         $counter       = 0;
         $duplicates    = 0;
@@ -405,6 +406,14 @@ final class RewriteTestsCommand extends Command
 //                continue;
 //            }
 
+//            if (
+//                !array_key_exists('x-puffin-ua', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                continue;
+//            }
+
             if (
                 array_key_exists('x-requested-with', $test['headers'])
                 && array_key_exists('http-x-requested-with', $test['headers'])
@@ -445,6 +454,12 @@ final class RewriteTestsCommand extends Command
 
             if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
                 $secChModelHeader = $test['headers']['sec-ch-ua-model'];
+            }
+
+            $puffinHeader = null;
+
+            if (array_key_exists('x-puffin-ua', $test['headers'])) {
+                $puffinHeader = $test['headers']['x-puffin-ua'];
             }
 
             $message = $loopMessage . 'redetect';
@@ -571,6 +586,28 @@ final class RewriteTestsCommand extends Command
 
                         $headerChecks4[$secChModelHeader] = true;
                     }
+                }
+
+                if ($puffinHeader !== null) {
+                    if (!array_key_exists($puffinHeader, $headerChecks5)) {
+                        $addMessage = sprintf(
+                            'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                            $puffinHeader,
+                        );
+                        $message    = $loopMessage . $addMessage;
+
+                        if (mb_strlen($message) > $messageLength) {
+                            $messageLength = mb_strlen($message);
+                        }
+
+                        $output->writeln(
+                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+
+                        $headerChecks5[$puffinHeader] = true;
+                    }
+
                 }
             }
 
