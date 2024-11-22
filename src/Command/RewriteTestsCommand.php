@@ -21,6 +21,7 @@ use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
 use DateInterval;
+use DateTimeImmutable;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -59,17 +60,20 @@ use function is_array;
 use function is_scalar;
 use function json_decode;
 use function json_encode;
+use function max;
 use function mb_str_pad;
 use function mb_strlen;
-use function mb_strpos;
 use function mb_strtolower;
 use function microtime;
+use function min;
 use function mkdir;
 use function number_format;
 use function preg_match;
 use function sprintf;
+use function str_contains;
 use function str_replace;
 use function trim;
+use function var_export;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -133,7 +137,7 @@ final class RewriteTestsCommand extends Command
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $startTimeExec = new \DateTimeImmutable('now');
+        $startTimeExec = new DateTimeImmutable('now');
 
         $output->writeln(messages: 'init Detector ...', options: OutputInterface::VERBOSITY_NORMAL);
 
@@ -352,7 +356,7 @@ final class RewriteTestsCommand extends Command
 
             ++$counter;
 
-            $actualTimeExec = new \DateTimeImmutable('now');
+            $actualTimeExec = new DateTimeImmutable('now');
 
             $interval = $actualTimeExec->diff($startTimeExec);
 
@@ -479,7 +483,7 @@ final class RewriteTestsCommand extends Command
 
             $startTime = microtime(true);
 
-            [$result /*, $key, $headers, $exit/**/] = $this->handleTest(
+            [$result /* , $key, $headers, $exit/* */] = $this->handleTest(
                 output: $output,
                 detector: $detector,
                 headers: $test['headers'],
@@ -1098,13 +1102,7 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
-        if (
-            in_array(
-                $newResult['client']['type'],
-                ['bot', 'crawler'],
-                true,
-            )
-        ) {
+        if (in_array($newResult['client']['type'], ['bot', 'crawler'], true)) {
             assert(is_scalar($newResult['client']['name']));
             assert(is_scalar($newResult['os']['name']));
             assert(is_scalar($newResult['device']['deviceName']));
@@ -1162,9 +1160,17 @@ final class RewriteTestsCommand extends Command
 
         if (
             is_scalar($newResult['client']['name'])
-            && (str_contains((string) $newResult['client']['name'], 'general') || in_array($newResult['client']['name'], ['unknown'], true))
+            && (str_contains((string) $newResult['client']['name'], 'general') || in_array(
+                $newResult['client']['name'],
+                ['unknown'],
+                true,
+            ))
             && is_scalar($newResult['device']['deviceName'])
-            && (str_contains((string) $newResult['device']['deviceName'], 'general') || in_array($newResult['device']['deviceName'], ['unknown'], true))
+            && (str_contains((string) $newResult['device']['deviceName'], 'general') || in_array(
+                $newResult['device']['deviceName'],
+                ['unknown'],
+                true,
+            ))
         ) {
             return [$newResult, null, $headers, 4];
         }
@@ -1177,11 +1183,7 @@ final class RewriteTestsCommand extends Command
             $deviceType = new Unknown();
         }
 
-        if (
-            !$deviceType->isMobile()
-            && !$deviceType->isTablet()
-            && !$deviceType->isTv()
-        ) {
+        if (!$deviceType->isMobile() && !$deviceType->isTablet() && !$deviceType->isTv()) {
             assert(is_scalar($newResult['client']['name']));
             assert(is_scalar($newResult['os']['name']));
             assert(is_scalar($newResult['device']['deviceName']));
