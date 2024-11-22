@@ -21,6 +21,7 @@ use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
 use DateInterval;
+use DateTimeImmutable;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -59,17 +60,20 @@ use function is_array;
 use function is_scalar;
 use function json_decode;
 use function json_encode;
+use function max;
 use function mb_str_pad;
 use function mb_strlen;
-use function mb_strpos;
 use function mb_strtolower;
 use function microtime;
+use function min;
 use function mkdir;
 use function number_format;
 use function preg_match;
 use function sprintf;
+use function str_contains;
 use function str_replace;
 use function trim;
+use function var_export;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -133,6 +137,8 @@ final class RewriteTestsCommand extends Command
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $startTimeExec = new DateTimeImmutable('now');
+
         $output->writeln(messages: 'init Detector ...', options: OutputInterface::VERBOSITY_NORMAL);
 
         $cache = new class () implements CacheInterface {
@@ -350,21 +356,25 @@ final class RewriteTestsCommand extends Command
 
             ++$counter;
 
+            $actualTimeExec = new DateTimeImmutable('now');
+
+            $interval = $actualTimeExec->diff($startTimeExec);
+
             $loopMessage = sprintf(
-                '%s[%s] - ',
+                '%s[%s] - [%s] - ',
                 $baseMessage,
                 mb_str_pad(
                     string: number_format(num: $counter, thousands_separator: '.'),
                     length: 14,
                     pad_type: STR_PAD_LEFT,
                 ),
+                $interval->format('%H %I %S %F'),
             );
 
             $message = $loopMessage . 'check';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -420,9 +430,8 @@ final class RewriteTestsCommand extends Command
             ) {
                 $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->writeln(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -464,9 +473,8 @@ final class RewriteTestsCommand extends Command
 
             $message = $loopMessage . 'redetect';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -475,7 +483,7 @@ final class RewriteTestsCommand extends Command
 
             $startTime = microtime(true);
 
-            $result = $this->handleTest(
+            [$result /* , $key, $headers, $exit/* */] = $this->handleTest(
                 output: $output,
                 detector: $detector,
                 headers: $test['headers'],
@@ -487,6 +495,10 @@ final class RewriteTestsCommand extends Command
 
             if (!is_array($result)) {
                 ++$duplicates;
+
+//                if ($exit !== 2 && $exit !== 6) {
+//                    var_dump($key, $headers, $exit);
+//                }
 
                 continue;
             }
@@ -502,9 +514,8 @@ final class RewriteTestsCommand extends Command
                         );
                         $message    = $loopMessage . $addMessage;
 
-                        if (mb_strlen($message) > $messageLength) {
-                            $messageLength = mb_strlen($message);
-                        }
+                        $messageLength = max($messageLength, mb_strlen($message));
+                        $messageLength = min($messageLength, 200);
 
                         $output->writeln(
                             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -520,14 +531,14 @@ final class RewriteTestsCommand extends Command
 
                     if (!array_key_exists($secChUaHeader, $headerChecks2)) {
                         $addMessage = sprintf(
-                            'Could not detect the Client for the sec-ch-ua Header "%s"',
+                            'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
                             $secChUaHeader,
+                            var_export($test['headers'], true),
                         );
                         $message    = $loopMessage . $addMessage;
 
-                        if (mb_strlen($message) > $messageLength) {
-                            $messageLength = mb_strlen($message);
-                        }
+                        $messageLength = max($messageLength, mb_strlen($message));
+                        $messageLength = min($messageLength, 200);
 
                         $output->writeln(
                             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -550,9 +561,8 @@ final class RewriteTestsCommand extends Command
                         );
                         $message    = $loopMessage . $addMessage;
 
-                        if (mb_strlen($message) > $messageLength) {
-                            $messageLength = mb_strlen($message);
-                        }
+                        $messageLength = max($messageLength, mb_strlen($message));
+                        $messageLength = min($messageLength, 200);
 
                         $output->writeln(
                             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -575,9 +585,8 @@ final class RewriteTestsCommand extends Command
                         );
                         $message    = $loopMessage . $addMessage;
 
-                        if (mb_strlen($message) > $messageLength) {
-                            $messageLength = mb_strlen($message);
-                        }
+                        $messageLength = max($messageLength, mb_strlen($message));
+                        $messageLength = min($messageLength, 200);
 
                         $output->writeln(
                             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -596,9 +605,8 @@ final class RewriteTestsCommand extends Command
                         );
                         $message    = $loopMessage . $addMessage;
 
-                        if (mb_strlen($message) > $messageLength) {
-                            $messageLength = mb_strlen($message);
-                        }
+                        $messageLength = max($messageLength, mb_strlen($message));
+                        $messageLength = min($messageLength, 200);
 
                         $output->writeln(
                             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -661,9 +669,8 @@ final class RewriteTestsCommand extends Command
                 $addMessage = sprintf('read temporary file %s', $file);
                 $message    = $loopMessage . $addMessage;
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->write(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -678,9 +685,8 @@ final class RewriteTestsCommand extends Command
                     $addMessage = sprintf('read temporary file %s - done', $file);
                     $message    = $loopMessage . $addMessage;
 
-                    if (mb_strlen($message) > $messageLength) {
-                        $messageLength = mb_strlen($message);
-                    }
+                    $messageLength = max($messageLength, mb_strlen($message));
+                    $messageLength = min($messageLength, 200);
 
                     $output->write(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -708,9 +714,8 @@ final class RewriteTestsCommand extends Command
                 $addMessage = sprintf('temporary file %s not found', $file);
                 $message    = $loopMessage . $addMessage;
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->write(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -721,9 +726,8 @@ final class RewriteTestsCommand extends Command
             $addMessage = sprintf('write to temporary file %s', $file);
             $message    = $loopMessage . $addMessage;
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -745,9 +749,8 @@ final class RewriteTestsCommand extends Command
                 $addMessage = sprintf('<error>An error occured while encoding file %s</error>', $file);
                 $message    = $loopMessage . $addMessage;
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->writeln(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -767,9 +770,8 @@ final class RewriteTestsCommand extends Command
                 $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
                 $message    = $loopMessage . $addMessage;
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->writeln(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -785,9 +787,8 @@ final class RewriteTestsCommand extends Command
 
             $message = $loopMessage . $addMessage;
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -953,9 +954,8 @@ final class RewriteTestsCommand extends Command
                 );
                 $message .= ' - normalizing';
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->write(
                     "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1000,9 +1000,8 @@ final class RewriteTestsCommand extends Command
                 );
                 $message .= ' - writing';
 
-                if (mb_strlen($message) > $messageLength) {
-                    $messageLength = mb_strlen($message);
-                }
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
 
                 $output->write(
                     "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1061,7 +1060,7 @@ final class RewriteTestsCommand extends Command
     /**
      * @param array<non-empty-string, non-empty-string> $headers
      *
-     * @return array<mixed>
+     * @return array<int, mixed>
      *
      * @throws void
      */
@@ -1071,12 +1070,11 @@ final class RewriteTestsCommand extends Command
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
-    ): array | null {
+    ): array {
         $message = $parentMessage . ' - <info>detect for new result ...</info>';
 
-        if (mb_strlen($message) > $messageLength) {
-            $messageLength = mb_strlen($message);
-        }
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1091,19 +1089,91 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            return null;
+            return [null, null, $headers, 0];
         }
 
         $message = $parentMessage . ' - <info>analyze new result ...</info>';
 
-        if (mb_strlen($message) > $messageLength) {
-            $messageLength = mb_strlen($message);
-        }
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
+
+        if (in_array($newResult['client']['type'], ['bot', 'crawler'], true)) {
+            assert(is_scalar($newResult['client']['name']));
+            assert(is_scalar($newResult['os']['name']));
+            assert(is_scalar($newResult['device']['deviceName']));
+
+            $keys = [
+                (string) $newResult['client']['name'],
+                (string) $newResult['os']['name'],
+                (string) $newResult['device']['deviceName'],
+            ];
+
+            $key = implode('-', $keys);
+
+            if (array_key_exists($key, $this->tests)) {
+                return [null, $key, $headers, 1];
+            }
+
+            $this->tests[$key] = 1;
+
+            return [$newResult, $key, $headers, 1];
+        }
+
+        if (
+            in_array(
+                $newResult['device']['deviceName'],
+                ['general Desktop', 'general Apple Device', 'general Philips TV', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
+                true,
+            )
+        ) {
+            assert(is_scalar($newResult['client']['name']));
+            assert(is_scalar($newResult['os']['name']));
+            assert(is_scalar($newResult['device']['deviceName']));
+            assert(is_scalar($newResult['device']['manufacturer']));
+
+            $keys = [
+                (string) $newResult['client']['name'],
+                (string) $newResult['os']['name'],
+                (string) $newResult['device']['deviceName'],
+                (string) $newResult['device']['manufacturer'],
+            ];
+
+            $key = implode('-', $keys);
+
+            if (array_key_exists($key, $this->tests)) {
+                return [null, $key, $headers, 2];
+            }
+
+            $this->tests[$key] = 1;
+
+            return [$newResult, $key, $headers, 2];
+        }
+
+        if ($newResult['client']['name'] === null || $newResult['device']['deviceName'] === null) {
+            return [$newResult, null, $headers, 3];
+        }
+
+        if (
+            is_scalar($newResult['client']['name'])
+            && (str_contains((string) $newResult['client']['name'], 'general') || in_array(
+                $newResult['client']['name'],
+                ['unknown'],
+                true,
+            ))
+            && is_scalar($newResult['device']['deviceName'])
+            && (str_contains((string) $newResult['device']['deviceName'], 'general') || in_array(
+                $newResult['device']['deviceName'],
+                ['unknown'],
+                true,
+            ))
+        ) {
+            return [$newResult, null, $headers, 4];
+        }
 
         $deviceTypeLoader = new TypeLoader();
 
@@ -1113,54 +1183,40 @@ final class RewriteTestsCommand extends Command
             $deviceType = new Unknown();
         }
 
-        if (
-            in_array(
-                $newResult['device']['deviceName'],
-                ['general Desktop', 'general Apple Device', 'general Philips TV', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
-                true,
-            )
-            || in_array(
-                $newResult['client']['type'],
-                ['bot'],
-                true,
-            )
-            || (
-                !$deviceType->isMobile()
-                && !$deviceType->isTablet()
-                && !$deviceType->isTv()
-            )
-        ) {
+        if (!$deviceType->isMobile() && !$deviceType->isTablet() && !$deviceType->isTv()) {
             assert(is_scalar($newResult['client']['name']));
-            assert(is_scalar($newResult['engine']['name']));
             assert(is_scalar($newResult['os']['name']));
             assert(is_scalar($newResult['device']['deviceName']));
-            assert(is_scalar($newResult['device']['marketingName']));
             assert(is_scalar($newResult['device']['manufacturer']));
 
             $keys = [
                 (string) $newResult['client']['name'],
-                (string) $newResult['engine']['name'],
                 (string) $newResult['os']['name'],
                 (string) $newResult['device']['deviceName'],
-                (string) $newResult['device']['marketingName'],
                 (string) $newResult['device']['manufacturer'],
             ];
 
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return null;
+                return [null, $newResult, $headers, 5];
             }
 
             $this->tests[$key] = 1;
-        } elseif (
+
+            return [$newResult, $key, $headers, 5];
+        }
+
+        $key = null;
+
+        if (
             ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv())
             && is_scalar($newResult['client']['name'])
-            && mb_strpos((string) $newResult['client']['name'], 'general') === false
-            && !in_array($newResult['client']['name'], [null, 'unknown'], true)
+            && !str_contains((string) $newResult['client']['name'], 'general')
+            && !in_array($newResult['client']['name'], ['unknown'], true)
             && is_scalar($newResult['device']['deviceName'])
-            && mb_strpos((string) $newResult['device']['deviceName'], 'general') === false
-            && !in_array($newResult['device']['deviceName'], [null, 'unknown'], true)
+            && !str_contains((string) $newResult['device']['deviceName'], 'general')
+            && !in_array($newResult['device']['deviceName'], ['unknown'], true)
         ) {
             assert(is_scalar($newResult['engine']['name']));
             assert(is_scalar($newResult['os']['name']));
@@ -1179,12 +1235,12 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return null;
+                return [null, $key, $headers, 6];
             }
 
             $this->tests[$key] = 1;
         }
 
-        return $newResult;
+        return [$newResult, $key, $headers, 7];
     }
 }
