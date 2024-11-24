@@ -1102,7 +1102,13 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
-        if (in_array($newResult['client']['type'], ['bot', 'crawler'], true)) {
+        if (
+            in_array(
+                $newResult['client']['type'],
+                ['bot', 'crawler', 'search-bot', 'service-agent', 'offline-browser'],
+                true,
+            )
+        ) {
             assert(is_scalar($newResult['client']['name']));
             assert(is_scalar($newResult['os']['name']));
             assert(is_scalar($newResult['device']['deviceName']));
@@ -1159,20 +1165,24 @@ final class RewriteTestsCommand extends Command
         }
 
         if (
-            is_scalar($newResult['client']['name'])
-            && (str_contains((string) $newResult['client']['name'], 'general') || in_array(
-                $newResult['client']['name'],
-                ['unknown'],
-                true,
-            ))
-            && is_scalar($newResult['device']['deviceName'])
-            && (str_contains((string) $newResult['device']['deviceName'], 'general') || in_array(
-                $newResult['device']['deviceName'],
-                ['unknown'],
-                true,
-            ))
+            !is_scalar($newResult['client']['name'])
+            || !is_scalar($newResult['device']['deviceName'])
         ) {
             return [$newResult, null, $headers, 4];
+        }
+
+        if (
+            str_contains((string) $newResult['client']['name'], 'general')
+            || $newResult['client']['name'] === 'unknown'
+        ) {
+            return [$newResult, null, $headers, 5];
+        }
+
+        if (
+            str_contains((string) $newResult['device']['deviceName'], 'general')
+            || $newResult['device']['deviceName'] === 'unknown'
+        ) {
+            return [$newResult, null, $headers, 6];
         }
 
         $deviceTypeLoader = new TypeLoader();
@@ -1183,41 +1193,7 @@ final class RewriteTestsCommand extends Command
             $deviceType = new Unknown();
         }
 
-        if (!$deviceType->isMobile() && !$deviceType->isTablet() && !$deviceType->isTv()) {
-            assert(is_scalar($newResult['client']['name']));
-            assert(is_scalar($newResult['os']['name']));
-            assert(is_scalar($newResult['device']['deviceName']));
-            assert(is_scalar($newResult['device']['manufacturer']));
-
-            $keys = [
-                (string) $newResult['client']['name'],
-                (string) $newResult['os']['name'],
-                (string) $newResult['device']['deviceName'],
-                (string) $newResult['device']['manufacturer'],
-            ];
-
-            $key = implode('-', $keys);
-
-            if (array_key_exists($key, $this->tests)) {
-                return [null, $newResult, $headers, 5];
-            }
-
-            $this->tests[$key] = 1;
-
-            return [$newResult, $key, $headers, 5];
-        }
-
-        $key = null;
-
-        if (
-            ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv())
-            && is_scalar($newResult['client']['name'])
-            && !str_contains((string) $newResult['client']['name'], 'general')
-            && !in_array($newResult['client']['name'], ['unknown'], true)
-            && is_scalar($newResult['device']['deviceName'])
-            && !str_contains((string) $newResult['device']['deviceName'], 'general')
-            && !in_array($newResult['device']['deviceName'], ['unknown'], true)
-        ) {
+        if ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv()) {
             assert(is_scalar($newResult['engine']['name']));
             assert(is_scalar($newResult['os']['name']));
             assert(is_scalar($newResult['device']['marketingName']));
@@ -1235,12 +1211,34 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, 6];
+                return [null, $key, $headers, 7];
             }
 
             $this->tests[$key] = 1;
+
+            return [$newResult, $key, $headers, 7];
         }
 
-        return [$newResult, $key, $headers, 7];
+        assert(is_scalar($newResult['client']['name']));
+        assert(is_scalar($newResult['os']['name']));
+        assert(is_scalar($newResult['device']['deviceName']));
+        assert(is_scalar($newResult['device']['manufacturer']));
+
+        $keys = [
+            (string) $newResult['client']['name'],
+            (string) $newResult['os']['name'],
+            (string) $newResult['device']['deviceName'],
+            (string) $newResult['device']['manufacturer'],
+        ];
+
+        $key = implode('-', $keys);
+
+        if (array_key_exists($key, $this->tests)) {
+            return [null, $newResult, $headers, 8];
+        }
+
+        $this->tests[$key] = 1;
+
+        return [$newResult, $key, $headers, 8];
     }
 }
