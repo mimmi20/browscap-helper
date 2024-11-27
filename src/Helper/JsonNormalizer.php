@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the browscap-helper package.
  *
@@ -98,7 +99,7 @@ final class JsonNormalizer
     }
 
     /**
-     * @param array<int, array<string, string>> $headers
+     * @param array<int|string, array<string, string>|string> $headers
      *
      * @throws SchemaUriReferencesInvalidJsonDocument
      * @throws SchemaUriReferencesDocumentWithInvalidMediaType
