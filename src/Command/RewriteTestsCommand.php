@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the browscap-helper package.
  *
@@ -54,16 +55,20 @@ use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
+use function get_debug_type;
 use function implode;
 use function in_array;
 use function is_array;
 use function is_scalar;
+use function is_string;
 use function json_decode;
 use function json_encode;
 use function max;
 use function mb_str_pad;
 use function mb_strlen;
 use function mb_strtolower;
+use function memory_get_peak_usage;
+use function memory_get_usage;
 use function microtime;
 use function min;
 use function mkdir;
@@ -73,6 +78,7 @@ use function sprintf;
 use function str_contains;
 use function str_replace;
 use function trim;
+use function var_dump;
 use function var_export;
 
 use const JSON_PRETTY_PRINT;
@@ -422,12 +428,18 @@ final class RewriteTestsCommand extends Command
 
         foreach ($fileFinder as $file) {
             try {
-                $this->rewriteTests(output: $output, file: $file, basePath: $basePath, baseMessage: $baseMessage, errors: $errors, messageLength: $messageLength);
-            } catch (\RuntimeException $e) {
-
+                $this->rewriteTests(
+                    output: $output,
+                    file: $file,
+                    basePath: $basePath,
+                    baseMessage: $baseMessage,
+                    errors: $errors,
+                    messageLength: $messageLength,
+                );
+            } catch (RuntimeException $e) {
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln(
-                    messages: '<error>' . (string) $e . '</error>',
+                    messages: '<error>' . $e . '</error>',
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
@@ -650,17 +662,15 @@ final class RewriteTestsCommand extends Command
         return [$newResult, $key, $headers, 8];
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param mixed $file
-     * @param string $basePath
-     * @param int &$errors
-     * @param int &$messageLength
-     * @return void
-     * @throws \RuntimeException
-     */
-    private function rewriteTests(OutputInterface $output, mixed $file, string $basePath, string $baseMessage, int &$errors, int &$messageLength = 0): void
-    {
+    /** @throws RuntimeException */
+    private function rewriteTests(
+        OutputInterface $output,
+        mixed $file,
+        string $basePath,
+        string $baseMessage,
+        int &$errors,
+        int &$messageLength = 0,
+    ): void {
         var_dump(get_debug_type($file));
 
         if (
@@ -703,24 +713,35 @@ final class RewriteTestsCommand extends Command
         }
 
         foreach (array_chunk($data, 100) as $number => $parts) {
-            $this->rewriteFile(output: $output, basePath: $basePath, baseMessage: $baseMessage, matches: $matches, parts: $parts, number: $number, errors: $errors, messageLength: $messageLength);
+            $this->rewriteFile(
+                output: $output,
+                basePath: $basePath,
+                baseMessage: $baseMessage,
+                matches: $matches,
+                parts: $parts,
+                number: $number,
+                errors: $errors,
+                messageLength: $messageLength,
+            );
         }
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string $basePath
-     * @param string $baseMessage
-     * @param array<string, string> $matches
-     * @param array<string|int, string> $parts
-     * @param int $number
-     * @param int $errors
-     * @param int $messageLength
-     * @return void
-     * @throws \RuntimeException
+     * @param array<int|string, string> $matches
+     * @param array<int|string, string> $parts
+     *
+     * @throws RuntimeException
      */
-    private function rewriteFile(OutputInterface $output, string $basePath, string $baseMessage, array $matches, array $parts, int $number, int &$errors, int &$messageLength): void
-    {
+    private function rewriteFile(
+        OutputInterface $output,
+        string $basePath,
+        string $baseMessage,
+        array $matches,
+        array $parts,
+        int $number,
+        int &$errors,
+        int &$messageLength,
+    ): void {
         $path  = $basePath;
         $path .= sprintf(
             'tests/data/%s/%s/%s/%s/%07d.json',
@@ -737,11 +758,7 @@ final class RewriteTestsCommand extends Command
             mkdir($basePath . $p1);
         }
 
-        $p2 = sprintf(
-            'tests/data/%s/%s',
-            $matches['deviceManufaturer'],
-            $matches['deviceType'],
-        );
+        $p2 = sprintf('tests/data/%s/%s', $matches['deviceManufaturer'], $matches['deviceType']);
 
         if (!file_exists($basePath . $p2)) {
             mkdir($basePath . $p2);
@@ -790,21 +807,19 @@ final class RewriteTestsCommand extends Command
         );
 
         try {
-            $normalized = $this->jsonNormalizer->normalize(
-                $output,
-                $parts,
-                $message,
-                $messageLength,
-            );
+            $normalized = $this->jsonNormalizer->normalize($output, $parts, $message, $messageLength);
         } catch (InvalidArgumentException | RuntimeException $e) {
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERBOSE);
-            $output->writeln(messages: '<error>' . $e . '</error>', options: OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln(
+                messages: '<error>' . $e . '</error>',
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
 
             return;
         }
 
         if ($normalized === null) {
-            throw new \RuntimeException(sprintf('file "%s" contains invalid json', $path));
+            throw new RuntimeException(sprintf('file "%s" contains invalid json', $path));
         }
 
         $message  = $baseMessage;
@@ -844,28 +859,14 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @param Detector $detector
-     * @param array $test
-     * @param DateTimeImmutable $startTimeExec
-     * @param string $baseMessage
-     * @param int $counter
-     * @param int $skipped
-     * @param int $duplicates
-     * @param int $errors
-     * @param int $testCount
-     * @param int $messageLength
-     * @param float $timeCheck
-     * @param float $timeDetect
-     * @param float $timeRead
-     * @param float $timeWrite
+     * @param array<string, array<mixed>> $test
      * @param array<string, array<mixed>> $txtChecks
-     * @param array<string, bool> $headerChecks1
-     * @param array<string, bool> $headerChecks2
-     * @param array<string, bool> $headerChecks3
-     * @param array<string, bool> $headerChecks4
-     * @param array<string, bool> $headerChecks5
-     * @return void
+     * @param array<string, bool>         $headerChecks1
+     * @param array<string, bool>         $headerChecks2
+     * @param array<string, bool>         $headerChecks3
+     * @param array<string, bool>         $headerChecks4
+     * @param array<string, bool>         $headerChecks5
+     *
      * @throws void
      */
     private function handleTestCase(
@@ -891,6 +892,11 @@ final class RewriteTestsCommand extends Command
         array &$headerChecks4,
         array &$headerChecks5,
     ): void {
+        $test['headers'] = array_filter(
+            $test['headers'],
+            static fn (mixed $header): bool => is_string($header),
+        );
+
         $test['headers'] = array_map(
             static fn (string $header) => trim($header),
             $test['headers'],
@@ -1224,7 +1230,16 @@ final class RewriteTestsCommand extends Command
             $clientType,
         );
 
-        $saved = $this->saveResult(output: $output, result: $result, file: $file, loopMessage: $loopMessage, errors: $errors, messageLength: $messageLength, timeRead: $timeRead, timeWrite: $timeWrite);
+        $saved = $this->saveResult(
+            output: $output,
+            result: $result,
+            file: $file,
+            loopMessage: $loopMessage,
+            errors: $errors,
+            messageLength: $messageLength,
+            timeRead: $timeRead,
+            timeWrite: $timeWrite,
+        );
 
         if ($saved === false) {
             ++$errors;
@@ -1261,19 +1276,20 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
      * @param array<int|string, mixed> $result
-     * @param string $file
-     * @param string $loopMessage
-     * @param int $errors
-     * @param int $messageLength
-     * @param float $timeRead
-     * @param float $timeWrite
-     * @return bool
+     *
      * @throws void
      */
-    private function saveResult(OutputInterface $output, array $result, string $file, string $loopMessage, int &$errors, int &$messageLength, float &$timeRead, float &$timeWrite): bool
-    {
+    private function saveResult(
+        OutputInterface $output,
+        array $result,
+        string $file,
+        string $loopMessage,
+        int &$errors,
+        int &$messageLength,
+        float &$timeRead,
+        float &$timeWrite,
+    ): bool {
         $tests = [];
 
         if (file_exists($file)) {
