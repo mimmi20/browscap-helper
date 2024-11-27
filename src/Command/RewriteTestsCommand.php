@@ -340,462 +340,29 @@ final class RewriteTestsCommand extends Command
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
         foreach ($this->testsLoader->getProperties($clonedOutput, $sources) as $test) {
-            $test['headers'] = array_map(
-                static fn (string $header) => trim($header),
-                $test['headers'],
-            );
-
-            $test['headers'] = array_filter(
-                $test['headers'],
-                static fn (string $header): bool => $header !== '',
-            );
-
-            $startTime = microtime(true);
-
-            $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
-
-            ++$counter;
-
-            $actualTimeExec = new DateTimeImmutable('now');
-
-            $interval = $actualTimeExec->diff($startTimeExec);
-
-            $loopMessage = sprintf(
-                '%s[%s] - [%s] - ',
-                $baseMessage,
-                mb_str_pad(
-                    string: number_format(num: $counter, thousands_separator: '.'),
-                    length: 14,
-                    pad_type: STR_PAD_LEFT,
-                ),
-                $interval->format('%H %I %S %F'),
-            );
-
-            $message = $loopMessage . 'check';
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
-
-            $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            $timeCheck += microtime(true) - $startTime;
-
-            if (array_key_exists($seachHeader, $txtChecks)) {
-                ++$skipped;
-
-                continue;
-            }
-
-            $txtChecks[$seachHeader] = $test;
-
-//            if (
-//                !array_key_exists('x-requested-with', $test['headers'])
-//                && !array_key_exists('http-x-requested-with', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                continue;
-//            }
-
-//            if (
-//                !array_key_exists('sec-ch-ua-platform', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                continue;
-//            }
-
-//            if (
-//                !array_key_exists('sec-ch-ua-model', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                continue;
-//            }
-
-//            if (
-//                !array_key_exists('x-puffin-ua', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                continue;
-//            }
-
-            if (
-                array_key_exists('x-requested-with', $test['headers'])
-                && array_key_exists('http-x-requested-with', $test['headers'])
-            ) {
-                $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-            }
-
-            $xRequestHeader = null;
-
-            if (array_key_exists('x-requested-with', $test['headers'])) {
-                $xRequestHeader = $test['headers']['x-requested-with'];
-            } elseif (array_key_exists('http-x-requested-with', $test['headers'])) {
-                $xRequestHeader = $test['headers']['http-x-requested-with'];
-            }
-
-            $secChUaHeader = null;
-
-            if (array_key_exists('sec-ch-ua', $test['headers'])) {
-                $secChUaHeader = $test['headers']['sec-ch-ua'];
-            }
-
-            $secChPlatformHeader = null;
-
-            if (array_key_exists('sec-ch-ua-platform', $test['headers'])) {
-                $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
-            }
-
-            $secChModelHeader = null;
-
-            if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
-                $secChModelHeader = $test['headers']['sec-ch-ua-model'];
-            }
-
-            $puffinHeader = null;
-
-            if (array_key_exists('x-puffin-ua', $test['headers'])) {
-                $puffinHeader = $test['headers']['x-puffin-ua'];
-            }
-
-            $message = $loopMessage . 'redetect';
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
-
-            $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            $startTime = microtime(true);
-
-            [$result /* , $key, $headers, $exit/* */] = $this->handleTest(
+            $this->handleTestCase(
                 output: $output,
                 detector: $detector,
-                headers: $test['headers'],
-                parentMessage: $message,
+                test: $test,
+                startTimeExec: $startTimeExec,
+                baseMessage: $baseMessage,
+                counter: $counter,
+                skipped: $skipped,
+                duplicates: $duplicates,
+                errors: $errors,
+                testCount: $testCount,
                 messageLength: $messageLength,
+                timeCheck: $timeCheck,
+                timeDetect: $timeDetect,
+                timeRead: $timeRead,
+                timeWrite: $timeWrite,
+                txtChecks: $txtChecks,
+                headerChecks1: $headerChecks1,
+                headerChecks2: $headerChecks2,
+                headerChecks3: $headerChecks3,
+                headerChecks4: $headerChecks4,
+                headerChecks5: $headerChecks5,
             );
-
-            $timeDetect += microtime(true) - $startTime;
-
-            if (!is_array($result)) {
-                ++$duplicates;
-
-//                if ($exit !== 2 && $exit !== 6) {
-//                    var_dump($key, $headers, $exit);
-//                }
-
-                continue;
-            }
-
-            if ($result['client']['name'] === null) {
-                if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
-                    $xRequestHeader = trim($xRequestHeader, '"');
-
-                    if (!array_key_exists($xRequestHeader, $headerChecks1)) {
-                        $addMessage = sprintf(
-                            'Could not detect the Client for the x-requested-with Header "%s"',
-                            $xRequestHeader,
-                        );
-                        $message    = $loopMessage . $addMessage;
-
-                        $messageLength = max($messageLength, mb_strlen($message));
-                        $messageLength = min($messageLength, 200);
-
-                        $output->writeln(
-                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                            options: OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        $headerChecks1[$xRequestHeader] = true;
-                    }
-                }
-
-                if ($secChUaHeader !== null) {
-                    $secChUaHeader = trim($secChUaHeader, '"');
-
-                    if (!array_key_exists($secChUaHeader, $headerChecks2)) {
-                        $addMessage = sprintf(
-                            'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
-                            $secChUaHeader,
-                            var_export($test['headers'], true),
-                        );
-                        $message    = $loopMessage . $addMessage;
-
-                        $messageLength = max($messageLength, mb_strlen($message));
-                        $messageLength = min($messageLength, 200);
-
-                        $output->writeln(
-                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                            options: OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        $headerChecks2[$secChUaHeader] = true;
-                    }
-                }
-            }
-
-            if ($result['os']['name'] === null) {
-                if ($secChPlatformHeader !== null) {
-                    $secChPlatformHeader = trim($secChPlatformHeader, '"');
-
-                    if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
-                        $addMessage = sprintf(
-                            'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
-                            $secChPlatformHeader,
-                        );
-                        $message    = $loopMessage . $addMessage;
-
-                        $messageLength = max($messageLength, mb_strlen($message));
-                        $messageLength = min($messageLength, 200);
-
-                        $output->writeln(
-                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                            options: OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        $headerChecks3[$secChPlatformHeader] = true;
-                    }
-                }
-            }
-
-            if ($result['device']['deviceName'] === null) {
-                if ($secChModelHeader !== null) {
-                    $secChModelHeader = trim($secChModelHeader, '"');
-
-                    if (!array_key_exists($secChModelHeader, $headerChecks4)) {
-                        $addMessage = sprintf(
-                            'Could not detect the Device for the sec-ch-ua-model Header "%s"',
-                            $secChModelHeader,
-                        );
-                        $message    = $loopMessage . $addMessage;
-
-                        $messageLength = max($messageLength, mb_strlen($message));
-                        $messageLength = min($messageLength, 200);
-
-                        $output->writeln(
-                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                            options: OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        $headerChecks4[$secChModelHeader] = true;
-                    }
-                }
-
-                if ($puffinHeader !== null) {
-                    if (!array_key_exists($puffinHeader, $headerChecks5)) {
-                        $addMessage = sprintf(
-                            'Could not detect the Device for the sec-ch-ua-model Header "%s"',
-                            $puffinHeader,
-                        );
-                        $message    = $loopMessage . $addMessage;
-
-                        $messageLength = max($messageLength, mb_strlen($message));
-                        $messageLength = min($messageLength, 200);
-
-                        $output->writeln(
-                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                            options: OutputInterface::VERBOSITY_NORMAL,
-                        );
-
-                        $headerChecks5[$puffinHeader] = true;
-                    }
-                }
-            }
-
-            $deviceManufaturer = mb_strtolower(
-                UConverter::transcode($result['device']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
-            );
-            $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
-                ['.', ' '],
-                ['', '-'],
-                $deviceManufaturer,
-            );
-
-            $clientManufaturer = mb_strtolower(
-                UConverter::transcode($result['client']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
-            );
-            $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
-                ['.', ' '],
-                ['', '-'],
-                $clientManufaturer,
-            );
-
-            $deviceType = mb_strtolower($result['device']['type'] ?? 'unknown');
-            $clientType = mb_strtolower($result['client']['type'] ?? 'unknown');
-
-            if (!file_exists(sprintf('.build/%s', $deviceManufaturer))) {
-                mkdir(sprintf('.build/%s', $deviceManufaturer));
-            }
-
-            if (!file_exists(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType))) {
-                mkdir(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType));
-            }
-
-            if (
-                !file_exists(
-                    sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer),
-                )
-            ) {
-                mkdir(sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer));
-            }
-
-            $file = sprintf(
-                '.build/%s/%s/%s/%s.json',
-                $deviceManufaturer,
-                $deviceType,
-                $clientManufaturer,
-                $clientType,
-            );
-
-            $tests = [];
-
-            if (file_exists($file)) {
-                $addMessage = sprintf('read temporary file %s', $file);
-                $message    = $loopMessage . $addMessage;
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->write(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                try {
-                    $startTime = microtime(true);
-
-                    $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
-
-                    $addMessage = sprintf('read temporary file %s - done', $file);
-                    $message    = $loopMessage . $addMessage;
-
-                    $messageLength = max($messageLength, mb_strlen($message));
-                    $messageLength = min($messageLength, 200);
-
-                    $output->write(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-                } catch (JsonException $e) {
-                    ++$errors;
-
-                    $exception = new Exception('An error occured while decoding a result', 0, $e);
-
-                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                    $message = $loopMessage . $addMessage;
-
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-
-                    continue;
-                } finally {
-                    $timeRead += microtime(true) - $startTime;
-                }
-            } else {
-                $addMessage = sprintf('temporary file %s not found', $file);
-                $message    = $loopMessage . $addMessage;
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->write(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-            }
-
-            $addMessage = sprintf('write to temporary file %s', $file);
-            $message    = $loopMessage . $addMessage;
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
-
-            $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            $tests[] = $result;
-
-            try {
-                $startTime = microtime(true);
-
-                $saved = file_put_contents(
-                    filename: $file,
-                    data: json_encode($tests, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
-                );
-            } catch (JsonException) {
-                ++$errors;
-
-                $addMessage = sprintf('<error>An error occured while encoding file %s</error>', $file);
-                $message    = $loopMessage . $addMessage;
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            } finally {
-                $timeWrite += microtime(true) - $startTime;
-            }
-
-            unset($tests);
-
-            if ($saved === false) {
-                ++$errors;
-
-                $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
-                $message    = $loopMessage . $addMessage;
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            }
-
-            $addMessage = sprintf(' write to temporary file %s - done', $file);
-
-            unset($file);
-
-            $message = $loopMessage . $addMessage;
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
-
-            $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            ++$testCount;
         }
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -854,180 +421,21 @@ final class RewriteTestsCommand extends Command
         $fileFinder->in('.build');
 
         foreach ($fileFinder as $file) {
-            if (
-                !preg_match(
-                    '/\.build\\\(?P<deviceManufaturer>[^\\\]+)\\\(?P<deviceType>[^\\\]+)\\\(?P<clientManufaturer>[^\\\]+)\\\(?P<clientType>[^\\\]+)\.json/',
-                    $file->getPathname(),
-                    $matches,
-                )
-            ) {
-                ++$errors;
+            try {
+                $this->rewriteTests(output: $output, file: $file, basePath: $basePath, baseMessage: $baseMessage, errors: $errors, messageLength: $messageLength);
+            } catch (\RuntimeException $e) {
 
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
                 $output->writeln(
-                    messages: sprintf(
-                        '<error>the path "%s" does not match required structure</error>',
-                        $file->getPathname(),
-                    ),
+                    messages: '<error>' . (string) $e . '</error>',
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
-                continue;
-            }
-
-            try {
-                $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
-                ++$errors;
-
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    '<error>' . (new Exception(
-                        'An error occured while encoding a resultset',
-                        0,
-                        $e,
-                    )) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                continue;
-            }
-
-            foreach (array_chunk($data, 100) as $number => $parts) {
-                $path  = $basePath;
-                $path .= sprintf(
-                    'tests/data/%s/%s/%s/%s/%07d.json',
-                    $matches['deviceManufaturer'],
-                    $matches['deviceType'],
-                    $matches['clientManufaturer'],
-                    $matches['clientType'],
-                    $number,
-                );
-
-                $p1 = sprintf('tests/data/%s', $matches['deviceManufaturer']);
-
-                if (!file_exists($basePath . $p1)) {
-                    mkdir($basePath . $p1);
-                }
-
-                $p2 = sprintf(
-                    'tests/data/%s/%s',
-                    $matches['deviceManufaturer'],
-                    $matches['deviceType'],
-                );
-
-                if (!file_exists($basePath . $p2)) {
-                    mkdir($basePath . $p2);
-                }
-
-                $p3 = sprintf(
-                    'tests/data/%s/%s/%s',
-                    $matches['deviceManufaturer'],
-                    $matches['deviceType'],
-                    $matches['clientManufaturer'],
-                );
-
-                if (!file_exists($basePath . $p3)) {
-                    mkdir($basePath . $p3);
-                }
-
-                $p4 = sprintf(
-                    'tests/data/%s/%s/%s/%s',
-                    $matches['deviceManufaturer'],
-                    $matches['deviceType'],
-                    $matches['clientManufaturer'],
-                    $matches['clientType'],
-                );
-
-                if (!file_exists($basePath . $p4)) {
-                    mkdir($basePath . $p4);
-                }
-
-                $message  = $baseMessage;
-                $message .= sprintf(
-                    'tests/data/%s/%s/%s/%s/%07d.json',
-                    $matches['deviceManufaturer'],
-                    $matches['deviceType'],
-                    $matches['clientManufaturer'],
-                    $matches['clientType'],
-                    $number,
-                );
-                $message .= ' - normalizing';
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->write(
-                    "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    false,
-                    OutputInterface::VERBOSITY_VERY_VERBOSE,
-                );
-
-                try {
-                    $normalized = $this->jsonNormalizer->normalize(
-                        $output,
-                        $parts,
-                        $message,
-                        $messageLength,
-                    );
-                } catch (InvalidArgumentException | RuntimeException $e) {
-                    $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
-                    $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
-
-                    continue;
-                }
-
-                if ($normalized === null) {
-                    $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                    $output->writeln(
-                        '<error>' . (new Exception(
-                            sprintf('file "%s" contains invalid json', $path),
-                        )) . '</error>',
-                        OutputInterface::VERBOSITY_NORMAL,
-                    );
-
-                    return 1;
-                }
-
-                $message  = $baseMessage;
-                $message .= sprintf(
-                    'tests/data/%s/%s/%s/%s/%07d.json',
-                    $matches['deviceManufaturer'],
-                    $matches['deviceType'],
-                    $matches['clientManufaturer'],
-                    $matches['clientType'],
-                    $number,
-                );
-                $message .= ' - writing';
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
-
-                $output->write(
-                    "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    false,
-                    OutputInterface::VERBOSITY_VERY_VERBOSE,
-                );
-
-                $success = @file_put_contents($path, $normalized);
-
-                if ($success !== false) {
-                    continue;
-                }
-
-                ++$errors;
-                $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    '<error>' . sprintf(
-                        'An error occured while writing file %s',
-                        $path,
-                    ) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
-                );
+                return 1;
             }
         }
 
-        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $dataToOutput = [
             'useragents processed' => $counter,
             'tests written' => $testCount,
@@ -1038,7 +446,7 @@ final class RewriteTestsCommand extends Command
 
         foreach ($dataToOutput as $title => $number) {
             $output->writeln(
-                sprintf(
+                messages: sprintf(
                     '%s%s',
                     mb_str_pad(
                         string: $title . ':',
@@ -1050,7 +458,7 @@ final class RewriteTestsCommand extends Command
                         pad_type: STR_PAD_LEFT,
                     ),
                 ),
-                OutputInterface::VERBOSITY_NORMAL,
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
         }
 
@@ -1102,6 +510,31 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
+        if ($newResult['client']['name'] === null || $newResult['device']['deviceName'] === null) {
+            return [$newResult, null, $headers, 1];
+        }
+
+        if (
+            !is_scalar($newResult['client']['name'])
+            || !is_scalar($newResult['device']['deviceName'])
+        ) {
+            return [$newResult, null, $headers, 2];
+        }
+
+        if (
+            str_contains((string) $newResult['client']['name'], 'general')
+            || $newResult['client']['name'] === 'unknown'
+        ) {
+            return [$newResult, null, $headers, 3];
+        }
+
+        if (
+            str_contains((string) $newResult['device']['deviceName'], 'general')
+            || $newResult['device']['deviceName'] === 'unknown'
+        ) {
+            return [$newResult, null, $headers, 4];
+        }
+
         if (
             in_array(
                 $newResult['client']['type'],
@@ -1122,12 +555,12 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, 1];
+                return [null, $key, $headers, 5];
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, 1];
+            return [$newResult, $key, $headers, 5];
         }
 
         if (
@@ -1152,37 +585,12 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, 2];
+                return [null, $key, $headers, 6];
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, 2];
-        }
-
-        if ($newResult['client']['name'] === null || $newResult['device']['deviceName'] === null) {
-            return [$newResult, null, $headers, 3];
-        }
-
-        if (
-            !is_scalar($newResult['client']['name'])
-            || !is_scalar($newResult['device']['deviceName'])
-        ) {
-            return [$newResult, null, $headers, 4];
-        }
-
-        if (
-            str_contains((string) $newResult['client']['name'], 'general')
-            || $newResult['client']['name'] === 'unknown'
-        ) {
-            return [$newResult, null, $headers, 5];
-        }
-
-        if (
-            str_contains((string) $newResult['device']['deviceName'], 'general')
-            || $newResult['device']['deviceName'] === 'unknown'
-        ) {
-            return [$newResult, null, $headers, 6];
+            return [$newResult, $key, $headers, 6];
         }
 
         $deviceTypeLoader = new TypeLoader();
@@ -1240,5 +648,733 @@ final class RewriteTestsCommand extends Command
         $this->tests[$key] = 1;
 
         return [$newResult, $key, $headers, 8];
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param mixed $file
+     * @param string $basePath
+     * @param int &$errors
+     * @param int &$messageLength
+     * @return void
+     * @throws \RuntimeException
+     */
+    private function rewriteTests(OutputInterface $output, mixed $file, string $basePath, string $baseMessage, int &$errors, int &$messageLength = 0): void
+    {
+        var_dump(get_debug_type($file));
+
+        if (
+            !preg_match(
+                '/\.build\\\(?P<deviceManufaturer>[^\\\]+)\\\(?P<deviceType>[^\\\]+)\\\(?P<clientManufaturer>[^\\\]+)\\\(?P<clientType>[^\\\]+)\.json/',
+                $file->getPathname(),
+                $matches,
+            )
+        ) {
+            ++$errors;
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln(
+                messages: sprintf(
+                    '<error>the path "%s" does not match required structure</error>',
+                    $file->getPathname(),
+                ),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return;
+        }
+
+        try {
+            $data = json_decode($file->getContents(), false, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            ++$errors;
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln(
+                messages: '<error>' . (new Exception(
+                    'An error occured while encoding a resultset',
+                    0,
+                    $e,
+                )) . '</error>',
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return;
+        }
+
+        foreach (array_chunk($data, 100) as $number => $parts) {
+            $this->rewriteFile(output: $output, basePath: $basePath, baseMessage: $baseMessage, matches: $matches, parts: $parts, number: $number, errors: $errors, messageLength: $messageLength);
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param string $basePath
+     * @param string $baseMessage
+     * @param array<string, string> $matches
+     * @param array<string|int, string> $parts
+     * @param int $number
+     * @param int $errors
+     * @param int $messageLength
+     * @return void
+     * @throws \RuntimeException
+     */
+    private function rewriteFile(OutputInterface $output, string $basePath, string $baseMessage, array $matches, array $parts, int $number, int &$errors, int &$messageLength): void
+    {
+        $path  = $basePath;
+        $path .= sprintf(
+            'tests/data/%s/%s/%s/%s/%07d.json',
+            $matches['deviceManufaturer'],
+            $matches['deviceType'],
+            $matches['clientManufaturer'],
+            $matches['clientType'],
+            $number,
+        );
+
+        $p1 = sprintf('tests/data/%s', $matches['deviceManufaturer']);
+
+        if (!file_exists($basePath . $p1)) {
+            mkdir($basePath . $p1);
+        }
+
+        $p2 = sprintf(
+            'tests/data/%s/%s',
+            $matches['deviceManufaturer'],
+            $matches['deviceType'],
+        );
+
+        if (!file_exists($basePath . $p2)) {
+            mkdir($basePath . $p2);
+        }
+
+        $p3 = sprintf(
+            'tests/data/%s/%s/%s',
+            $matches['deviceManufaturer'],
+            $matches['deviceType'],
+            $matches['clientManufaturer'],
+        );
+
+        if (!file_exists($basePath . $p3)) {
+            mkdir($basePath . $p3);
+        }
+
+        $p4 = sprintf(
+            'tests/data/%s/%s/%s/%s',
+            $matches['deviceManufaturer'],
+            $matches['deviceType'],
+            $matches['clientManufaturer'],
+            $matches['clientType'],
+        );
+
+        if (!file_exists($basePath . $p4)) {
+            mkdir($basePath . $p4);
+        }
+
+        $message  = $baseMessage;
+        $message .= sprintf(
+            'tests/data/%s/%s/%s/%s/%07d.json',
+            $matches['deviceManufaturer'],
+            $matches['deviceType'],
+            $matches['clientManufaturer'],
+            $matches['clientType'],
+            $number,
+        );
+        $message .= ' - normalizing';
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->write(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
+
+        try {
+            $normalized = $this->jsonNormalizer->normalize(
+                $output,
+                $parts,
+                $message,
+                $messageLength,
+            );
+        } catch (InvalidArgumentException | RuntimeException $e) {
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERBOSE);
+            $output->writeln(messages: '<error>' . $e . '</error>', options: OutputInterface::VERBOSITY_NORMAL);
+
+            return;
+        }
+
+        if ($normalized === null) {
+            throw new \RuntimeException(sprintf('file "%s" contains invalid json', $path));
+        }
+
+        $message  = $baseMessage;
+        $message .= sprintf(
+            'tests/data/%s/%s/%s/%s/%07d.json',
+            $matches['deviceManufaturer'],
+            $matches['deviceType'],
+            $matches['clientManufaturer'],
+            $matches['clientType'],
+            $number,
+        );
+        $message .= ' - writing';
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->write(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
+
+        $success = @file_put_contents($path, $normalized);
+
+        if ($success !== false) {
+            return;
+        }
+
+        ++$errors;
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            messages: '<error>' . sprintf(
+                'An error occured while writing file %s',
+                $path,
+            ) . '</error>',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param Detector $detector
+     * @param array $test
+     * @param DateTimeImmutable $startTimeExec
+     * @param string $baseMessage
+     * @param int $counter
+     * @param int $skipped
+     * @param int $duplicates
+     * @param int $errors
+     * @param int $testCount
+     * @param int $messageLength
+     * @param float $timeCheck
+     * @param float $timeDetect
+     * @param float $timeRead
+     * @param float $timeWrite
+     * @param array<string, array<mixed>> $txtChecks
+     * @param array<string, bool> $headerChecks1
+     * @param array<string, bool> $headerChecks2
+     * @param array<string, bool> $headerChecks3
+     * @param array<string, bool> $headerChecks4
+     * @param array<string, bool> $headerChecks5
+     * @return void
+     * @throws void
+     */
+    private function handleTestCase(
+        OutputInterface $output,
+        Detector $detector,
+        array $test,
+        DateTimeImmutable $startTimeExec,
+        string $baseMessage,
+        int &$counter,
+        int &$skipped,
+        int &$duplicates,
+        int &$errors,
+        int &$testCount,
+        int &$messageLength,
+        float &$timeCheck,
+        float &$timeDetect,
+        float &$timeRead,
+        float &$timeWrite,
+        array &$txtChecks,
+        array &$headerChecks1,
+        array &$headerChecks2,
+        array &$headerChecks3,
+        array &$headerChecks4,
+        array &$headerChecks5,
+    ): void {
+        $test['headers'] = array_map(
+            static fn (string $header) => trim($header),
+            $test['headers'],
+        );
+
+        $test['headers'] = array_filter(
+            $test['headers'],
+            static fn (string $header): bool => $header !== '',
+        );
+
+        $startTime = microtime(true);
+
+        $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
+
+        ++$counter;
+
+        $actualTimeExec = new DateTimeImmutable('now');
+
+        $interval = $actualTimeExec->diff($startTimeExec);
+
+        $loopMessage = sprintf(
+            '%s[%s] - [%s] - [%s] - [%s] - ',
+            $baseMessage,
+            mb_str_pad(
+                string: number_format(num: $counter, thousands_separator: '.'),
+                length: 14,
+                pad_type: STR_PAD_LEFT,
+            ),
+            $interval->format('%H:%I:%S.%F'),
+            mb_str_pad(
+                string: number_format(num: memory_get_usage(true), thousands_separator: '.') . 'B',
+                length: 14,
+                pad_type: STR_PAD_LEFT,
+            ),
+            mb_str_pad(
+                string: number_format(num: memory_get_peak_usage(true), thousands_separator: '.') . 'B',
+                length: 14,
+                pad_type: STR_PAD_LEFT,
+            ),
+        );
+
+        $message = $loopMessage . 'check';
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->write(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $timeCheck += microtime(true) - $startTime;
+
+        if (array_key_exists($seachHeader, $txtChecks)) {
+            ++$skipped;
+
+            return;
+        }
+
+        $txtChecks[$seachHeader] = $test;
+
+//            if (
+//                !array_key_exists('x-requested-with', $test['headers'])
+//                && !array_key_exists('http-x-requested-with', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                return;
+//            }
+
+//            if (
+//                !array_key_exists('sec-ch-ua-platform', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                return;
+//            }
+
+//            if (
+//                !array_key_exists('sec-ch-ua-model', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                return;
+//            }
+
+//            if (
+//                !array_key_exists('x-puffin-ua', $test['headers'])
+//            ) {
+//                ++$skipped;
+//
+//                return;
+//            }
+
+        if (
+            array_key_exists('x-requested-with', $test['headers'])
+            && array_key_exists('http-x-requested-with', $test['headers'])
+        ) {
+            $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
+
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
+
+            $output->writeln(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
+        $xRequestHeader = null;
+
+        if (array_key_exists('x-requested-with', $test['headers'])) {
+            $xRequestHeader = $test['headers']['x-requested-with'];
+        } elseif (array_key_exists('http-x-requested-with', $test['headers'])) {
+            $xRequestHeader = $test['headers']['http-x-requested-with'];
+        }
+
+        $secChUaHeader = null;
+
+        if (array_key_exists('sec-ch-ua', $test['headers'])) {
+            $secChUaHeader = $test['headers']['sec-ch-ua'];
+        }
+
+        $secChPlatformHeader = null;
+
+        if (array_key_exists('sec-ch-ua-platform', $test['headers'])) {
+            $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
+        }
+
+        $secChModelHeader = null;
+
+        if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
+            $secChModelHeader = $test['headers']['sec-ch-ua-model'];
+        }
+
+        $puffinHeader = null;
+
+        if (array_key_exists('x-puffin-ua', $test['headers'])) {
+            $puffinHeader = $test['headers']['x-puffin-ua'];
+        }
+
+        $message = $loopMessage . 'redetect';
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->write(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $startTime = microtime(true);
+
+        [$result /* , $key, $headers, $exit/* */] = $this->handleTest(
+            output: $output,
+            detector: $detector,
+            headers: $test['headers'],
+            parentMessage: $message,
+            messageLength: $messageLength,
+        );
+
+        $timeDetect += microtime(true) - $startTime;
+
+        if (!is_array($result)) {
+            ++$duplicates;
+
+//                if ($exit !== 2 && $exit !== 6) {
+//                    var_dump($key, $headers, $exit);
+//                }
+
+            return;
+        }
+
+        if ($result['client']['name'] === null) {
+            if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
+                $xRequestHeader = trim($xRequestHeader, '"');
+
+                if (!array_key_exists($xRequestHeader, $headerChecks1)) {
+                    $addMessage = sprintf(
+                        'Could not detect the Client for the x-requested-with Header "%s"',
+                        $xRequestHeader,
+                    );
+                    $message    = $loopMessage . $addMessage;
+
+                    $messageLength = max($messageLength, mb_strlen($message));
+                    $messageLength = min($messageLength, 200);
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    $headerChecks1[$xRequestHeader] = true;
+                }
+            }
+
+            if ($secChUaHeader !== null) {
+                $secChUaHeader = trim($secChUaHeader, '"');
+
+                if (!array_key_exists($secChUaHeader, $headerChecks2)) {
+                    $addMessage = sprintf(
+                        'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
+                        $secChUaHeader,
+                        var_export($test['headers'], true),
+                    );
+                    $message    = $loopMessage . $addMessage;
+
+                    $messageLength = max($messageLength, mb_strlen($message));
+                    $messageLength = min($messageLength, 200);
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    $headerChecks2[$secChUaHeader] = true;
+                }
+            }
+        }
+
+        if ($result['os']['name'] === null) {
+            if ($secChPlatformHeader !== null) {
+                $secChPlatformHeader = trim($secChPlatformHeader, '"');
+
+                if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
+                    $addMessage = sprintf(
+                        'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
+                        $secChPlatformHeader,
+                    );
+                    $message    = $loopMessage . $addMessage;
+
+                    $messageLength = max($messageLength, mb_strlen($message));
+                    $messageLength = min($messageLength, 200);
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    $headerChecks3[$secChPlatformHeader] = true;
+                }
+            }
+        }
+
+        if ($result['device']['deviceName'] === null) {
+            if ($secChModelHeader !== null) {
+                $secChModelHeader = trim($secChModelHeader, '"');
+
+                if (!array_key_exists($secChModelHeader, $headerChecks4)) {
+                    $addMessage = sprintf(
+                        'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                        $secChModelHeader,
+                    );
+                    $message    = $loopMessage . $addMessage;
+
+                    $messageLength = max($messageLength, mb_strlen($message));
+                    $messageLength = min($messageLength, 200);
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    $headerChecks4[$secChModelHeader] = true;
+                }
+            }
+
+            if ($puffinHeader !== null) {
+                if (!array_key_exists($puffinHeader, $headerChecks5)) {
+                    $addMessage = sprintf(
+                        'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                        $puffinHeader,
+                    );
+                    $message    = $loopMessage . $addMessage;
+
+                    $messageLength = max($messageLength, mb_strlen($message));
+                    $messageLength = min($messageLength, 200);
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    $headerChecks5[$puffinHeader] = true;
+                }
+            }
+        }
+
+        $deviceManufaturer = mb_strtolower(
+            UConverter::transcode($result['device']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
+        );
+        $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
+            ['.', ' '],
+            ['', '-'],
+            $deviceManufaturer,
+        );
+
+        $clientManufaturer = mb_strtolower(
+            UConverter::transcode($result['client']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
+        );
+        $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
+            ['.', ' '],
+            ['', '-'],
+            $clientManufaturer,
+        );
+
+        $deviceType = mb_strtolower($result['device']['type'] ?? 'unknown');
+        $clientType = mb_strtolower($result['client']['type'] ?? 'unknown');
+
+        if (!file_exists(sprintf('.build/%s', $deviceManufaturer))) {
+            mkdir(sprintf('.build/%s', $deviceManufaturer));
+        }
+
+        if (!file_exists(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType))) {
+            mkdir(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType));
+        }
+
+        if (
+            !file_exists(
+                sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer),
+            )
+        ) {
+            mkdir(sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer));
+        }
+
+        $file = sprintf(
+            '.build/%s/%s/%s/%s.json',
+            $deviceManufaturer,
+            $deviceType,
+            $clientManufaturer,
+            $clientType,
+        );
+
+        $saved = $this->saveResult(output: $output, result: $result, file: $file, loopMessage: $loopMessage, errors: $errors, messageLength: $messageLength, timeRead: $timeRead, timeWrite: $timeWrite);
+
+        if ($saved === false) {
+            ++$errors;
+
+            $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
+            $message    = $loopMessage . $addMessage;
+
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
+
+            $output->writeln(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return;
+        }
+
+        $addMessage = sprintf(' write to temporary file %s - done', $file);
+
+        unset($file);
+
+        $message = $loopMessage . $addMessage;
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->write(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        ++$testCount;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param array<int|string, mixed> $result
+     * @param string $file
+     * @param string $loopMessage
+     * @param int $errors
+     * @param int $messageLength
+     * @param float $timeRead
+     * @param float $timeWrite
+     * @return bool
+     * @throws void
+     */
+    private function saveResult(OutputInterface $output, array $result, string $file, string $loopMessage, int &$errors, int &$messageLength, float &$timeRead, float &$timeWrite): bool
+    {
+        $tests = [];
+
+        if (file_exists($file)) {
+            $addMessage = sprintf('read temporary file %s', $file);
+            $message    = $loopMessage . $addMessage;
+
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
+
+            $output->write(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            $startTime = microtime(true);
+
+            try {
+                $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
+
+                $addMessage = sprintf('read temporary file %s - done', $file);
+                $message    = $loopMessage . $addMessage;
+
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
+
+                $output->write(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+            } catch (JsonException $e) {
+                ++$errors;
+
+                $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                $message = $loopMessage . $addMessage;
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return false;
+            } finally {
+                $timeRead += microtime(true) - $startTime;
+            }
+        } else {
+            $addMessage = sprintf('temporary file %s not found', $file);
+            $message    = $loopMessage . $addMessage;
+
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
+
+            $output->write(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
+        $addMessage = sprintf('write to temporary file %s', $file);
+        $message    = $loopMessage . $addMessage;
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->write(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $tests[] = $result;
+
+        $startTime = microtime(true);
+
+        try {
+            $saved = file_put_contents(
+                filename: $file,
+                data: json_encode($tests, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
+            );
+        } catch (JsonException) {
+            ++$errors;
+
+            $addMessage = sprintf('<error>An error occured while encoding file %s</error>', $file);
+            $message    = $loopMessage . $addMessage;
+
+            $messageLength = max($messageLength, mb_strlen($message));
+            $messageLength = min($messageLength, 200);
+
+            $output->writeln(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return false;
+        } finally {
+            $timeWrite += microtime(true) - $startTime;
+
+            unset($tests);
+        }
+
+        return $saved !== false;
     }
 }
