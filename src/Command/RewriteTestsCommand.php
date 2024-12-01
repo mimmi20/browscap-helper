@@ -924,12 +924,12 @@ final class RewriteTestsCommand extends Command
             $interval->format('%H:%I:%S.%F'),
             mb_str_pad(
                 string: number_format(num: memory_get_usage(true), thousands_separator: '.') . 'B',
-                length: 14,
+                length: 16,
                 pad_type: STR_PAD_LEFT,
             ),
             mb_str_pad(
                 string: number_format(num: memory_get_peak_usage(true), thousands_separator: '.') . 'B',
-                length: 14,
+                length: 16,
                 pad_type: STR_PAD_LEFT,
             ),
         );
