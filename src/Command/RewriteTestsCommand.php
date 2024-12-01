@@ -40,6 +40,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 use UaDeviceType\Exception\NotFoundException;
 use UaDeviceType\TypeLoader;
@@ -68,6 +69,7 @@ use function mb_strlen;
 use function mb_strtolower;
 use function memory_get_peak_usage;
 use function memory_get_usage;
+use function memory_reset_peak_usage;
 use function microtime;
 use function min;
 use function mkdir;
@@ -663,7 +665,7 @@ final class RewriteTestsCommand extends Command
     /** @throws RuntimeException */
     private function rewriteTests(
         OutputInterface $output,
-        \Symfony\Component\Finder\SplFileInfo $file,
+        SplFileInfo $file,
         string $basePath,
         string $baseMessage,
         int &$errors,
