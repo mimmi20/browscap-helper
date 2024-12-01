@@ -40,6 +40,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 use UaDeviceType\Exception\NotFoundException;
 use UaDeviceType\TypeLoader;
@@ -55,7 +56,6 @@ use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function get_debug_type;
 use function implode;
 use function in_array;
 use function is_array;
@@ -69,6 +69,7 @@ use function mb_strlen;
 use function mb_strtolower;
 use function memory_get_peak_usage;
 use function memory_get_usage;
+use function memory_reset_peak_usage;
 use function microtime;
 use function min;
 use function mkdir;
@@ -78,7 +79,6 @@ use function sprintf;
 use function str_contains;
 use function str_replace;
 use function trim;
-use function var_dump;
 use function var_export;
 
 use const JSON_PRETTY_PRINT;
@@ -665,14 +665,12 @@ final class RewriteTestsCommand extends Command
     /** @throws RuntimeException */
     private function rewriteTests(
         OutputInterface $output,
-        mixed $file,
+        SplFileInfo $file,
         string $basePath,
         string $baseMessage,
         int &$errors,
         int &$messageLength = 0,
     ): void {
-        var_dump(get_debug_type($file));
-
         if (
             !preg_match(
                 '/\.build\\\(?P<deviceManufaturer>[^\\\]+)\\\(?P<deviceType>[^\\\]+)\\\(?P<clientManufaturer>[^\\\]+)\\\(?P<clientType>[^\\\]+)\.json/',
@@ -928,15 +926,17 @@ final class RewriteTestsCommand extends Command
             $interval->format('%H:%I:%S.%F'),
             mb_str_pad(
                 string: number_format(num: memory_get_usage(true), thousands_separator: '.') . 'B',
-                length: 14,
+                length: 16,
                 pad_type: STR_PAD_LEFT,
             ),
             mb_str_pad(
                 string: number_format(num: memory_get_peak_usage(true), thousands_separator: '.') . 'B',
-                length: 14,
+                length: 16,
                 pad_type: STR_PAD_LEFT,
             ),
         );
+
+        memory_reset_peak_usage();
 
         $message = $loopMessage . 'check';
 
