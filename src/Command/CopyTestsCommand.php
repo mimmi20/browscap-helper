@@ -16,7 +16,6 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
 use BrowscapHelper\Helper\RewriteTests;
-use BrowscapHelper\Source\BrowscapSource;
 use BrowscapHelper\Source\CrawlerDetectSource;
 use BrowscapHelper\Source\DonatjSource;
 use BrowscapHelper\Source\JsonFileSource;
@@ -147,7 +146,6 @@ final class CopyTestsCommand extends Command
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $sources = [
-            new BrowscapSource(),
             new CrawlerDetectSource(),
             new DonatjSource(),
             new MatomoSource(),
