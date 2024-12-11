@@ -27,6 +27,7 @@ use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
+use BrowscapHelper\Traits\FilterHeaderTrait;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -45,17 +46,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_key_exists;
-use function array_map;
 use function count;
-use function is_string;
 use function json_encode;
 use function sprintf;
-use function trim;
 
 use const JSON_THROW_ON_ERROR;
 
 final class CopyTestsCommand extends Command
 {
+    use FilterHeaderTrait;
+
     /** @throws LogicException */
     public function __construct(
         private readonly ExistingTestsLoader $testsLoader,
@@ -122,17 +122,17 @@ final class CopyTestsCommand extends Command
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $row) {
+            try {
+                $row['headers'] = $this->filterHeaders($row['headers']);
+            } catch (UnexpectedValueException $e) {
+                $output->writeln(sprintf('<error>%s</error>', $e));
+
+                continue;
+            }
+
             $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                $output->writeln(
-                    '<error>' . sprintf(
-                        'Header "%s" added more than once --> skipped',
-                        $seachHeader,
-                    ) . '</error>',
-                    OutputInterface::VERBOSITY_NORMAL,
-                );
-
                 continue;
             }
 
@@ -191,16 +191,13 @@ final class CopyTestsCommand extends Command
         $txtTotalCounter = 0;
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
-            $test['headers'] = array_map(
-                static function (string | array $header): string {
-                    if (is_string($header)) {
-                        return trim($header);
-                    }
+            try {
+                $test['headers'] = $this->filterHeaders($test['headers']);
+            } catch (UnexpectedValueException $e) {
+                $output->writeln(sprintf('<error>%s</error>', $e));
 
-                    return '';
-                },
-                $test['headers'],
-            );
+                continue;
+            }
 
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 

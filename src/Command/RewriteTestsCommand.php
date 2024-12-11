@@ -18,6 +18,7 @@ use BrowscapHelper\Helper\ExistingTestsRemover;
 use BrowscapHelper\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
+use BrowscapHelper\Traits\FilterHeaderTrait;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
@@ -49,9 +50,7 @@ use UConverter;
 use UnexpectedValueException;
 
 use function array_chunk;
-use function array_filter;
 use function array_key_exists;
-use function array_map;
 use function assert;
 use function file_exists;
 use function file_get_contents;
@@ -60,7 +59,6 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_scalar;
-use function is_string;
 use function json_decode;
 use function json_encode;
 use function max;
@@ -87,6 +85,8 @@ use const STR_PAD_LEFT;
 
 final class RewriteTestsCommand extends Command
 {
+    use FilterHeaderTrait;
+
     /** @var array<string, int> */
     private array $tests = [];
 
@@ -857,13 +857,13 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<string, array<mixed>> $test
-     * @param array<string, array<mixed>> $txtChecks
-     * @param array<string, bool>         $headerChecks1
-     * @param array<string, bool>         $headerChecks2
-     * @param array<string, bool>         $headerChecks3
-     * @param array<string, bool>         $headerChecks4
-     * @param array<string, bool>         $headerChecks5
+     * @param array{headers: array<string, string>} $test
+     * @param array<string, array<mixed>>           $txtChecks
+     * @param array<string, bool>                   $headerChecks1
+     * @param array<string, bool>                   $headerChecks2
+     * @param array<string, bool>                   $headerChecks3
+     * @param array<string, bool>                   $headerChecks4
+     * @param array<string, bool>                   $headerChecks5
      *
      * @throws void
      */
@@ -890,20 +890,15 @@ final class RewriteTestsCommand extends Command
         array &$headerChecks4,
         array &$headerChecks5,
     ): void {
-        $test['headers'] = array_filter(
-            $test['headers'],
-            static fn (mixed $header): bool => is_string($header),
-        );
+        try {
+            $test['headers'] = $this->filterHeaders($test['headers']);
+        } catch (UnexpectedValueException $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e));
 
-        $test['headers'] = array_map(
-            static fn (string $header) => trim($header),
-            $test['headers'],
-        );
+            ++$errors;
 
-        $test['headers'] = array_filter(
-            $test['headers'],
-            static fn (string $header): bool => $header !== '',
-        );
+            return;
+        }
 
         $startTime = microtime(true);
 
