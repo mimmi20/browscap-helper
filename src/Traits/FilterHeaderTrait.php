@@ -89,10 +89,7 @@ trait FilterHeaderTrait
                     'dpr',
                     'ect',
                     'rtt',
-                    'origin',
                     'viewport-width',
-                    'via',
-                    'from',
                     'x-client',
                     'screenwidth',
                     'http-x-requested-with',
@@ -475,6 +472,9 @@ trait FilterHeaderTrait
                     'sec-ms-gec-version',
                     'document',
                     'server-timing',
+                    'via',
+                    'from',
+                    'origin',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
