@@ -27,6 +27,7 @@ $finder = PhpCsFixer\Finder::create()
     ->name('*.php')
     ->in(__DIR__ . '/src')
     ->append([__DIR__ . '/rector.php'])
+    ->append([__DIR__ . '/composer-dependency-analyser.php'])
     ->append([__FILE__]);
 
 $rules = require 'vendor/mimmi20/coding-standard/src/php-cs-fixer.config.php';
