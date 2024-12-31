@@ -37,7 +37,6 @@ use function str_replace;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
-/** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
 final readonly class FormatNormalizer implements Normalizer
 {
     private const string PLACE_HOLDER = '$ni$';

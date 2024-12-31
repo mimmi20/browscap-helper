@@ -18,7 +18,6 @@ use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
-use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
@@ -108,7 +107,7 @@ final readonly class RewriteTests
                     $message,
                     $messageLength,
                 );
-            } catch (InvalidArgumentException | RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
                 $output->writeln('<error>' . $e . '</error>', OutputInterface::VERBOSITY_NORMAL);
 
