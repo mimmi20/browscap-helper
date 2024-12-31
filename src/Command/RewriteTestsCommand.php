@@ -21,7 +21,6 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Traits\FilterHeaderTrait;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
-use BrowserDetector\Version\Exception\NotNumericException;
 use DateInterval;
 use DateTimeImmutable;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
@@ -29,10 +28,10 @@ use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
-use InvalidArgumentException;
 use JsonException;
 use Override;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
@@ -42,7 +41,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Throwable;
 use UaDeviceType\Exception\NotFoundException;
 use UaDeviceType\TypeLoader;
 use UaDeviceType\Unknown;
@@ -133,7 +131,7 @@ final class RewriteTestsCommand extends Command
      * @throws InvalidIndentStyle
      * @throws InvalidIndentSize
      * @throws InvalidJsonEncodeOptions
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @throws RuntimeException
      * @throws \LogicException
@@ -503,7 +501,7 @@ final class RewriteTestsCommand extends Command
 
         try {
             $newResult = $detector->getBrowser($headers);
-        } catch (\Psr\SimpleCache\InvalidArgumentException | NotNumericException | UnexpectedValueException | Throwable $e) {
+        } catch (InvalidArgumentException | UnexpectedValueException $e) {
             $output->writeln(
                 messages: sprintf('<error>%s</error>', $e),
                 options: OutputInterface::VERBOSITY_NORMAL,
@@ -806,7 +804,7 @@ final class RewriteTestsCommand extends Command
 
         try {
             $normalized = $this->jsonNormalizer->normalize($output, $parts, $message, $messageLength);
-        } catch (InvalidArgumentException | RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERBOSE);
             $output->writeln(
                 messages: '<error>' . $e . '</error>',
