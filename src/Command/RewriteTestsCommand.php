@@ -41,9 +41,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use UaDeviceType\Exception\NotFoundException;
-use UaDeviceType\TypeLoader;
-use UaDeviceType\Unknown;
+use UaDeviceType\Type;
 use UConverter;
 use UnexpectedValueException;
 
@@ -603,13 +601,7 @@ final class RewriteTestsCommand extends Command
             return [$newResult, $key, $headers, 6];
         }
 
-        $deviceTypeLoader = new TypeLoader();
-
-        try {
-            $deviceType = $deviceTypeLoader->load($newResult['device']['type'] ?? 'unknown');
-        } catch (NotFoundException) {
-            $deviceType = new Unknown();
-        }
+        $deviceType = Type::fromName($newResult['device']['type'] ?? 'unknown');
 
         if ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv()) {
             assert(is_scalar($newResult['engine']['name']));
