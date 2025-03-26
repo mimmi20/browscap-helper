@@ -107,6 +107,7 @@ trait FilterHeaderTrait
                     'x-crawled-by',
                     'sec-ch-ua-form-factors',
                     'viewport-height',
+                    'x-client-name',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
@@ -170,6 +171,8 @@ trait FilterHeaderTrait
                     'llf-override-control',
                     'if-none-match',
                     'x-request-id',
+                    'x-request-start',
+                    'x-request-client-start',
                     'x-openai-traffic-source',
                     'x-openai-originator-env',
                     'x-openai-originator',
@@ -470,7 +473,6 @@ trait FilterHeaderTrait
                     'fly-region',
                     'fly-request-id',
                     'fly-traceparent',
-                    'x-request-start',
                     'x-swg-via',
                     'sec-ms-gec',
                     'sec-ms-gec-version',
@@ -493,6 +495,21 @@ trait FilterHeaderTrait
                     'x-sslvpn-protocol',
                     'x-sslvpn-service',
                     'trace-id',
+                    'x-atlassian-token',
+                    'shellshock',
+                    'soapaction',
+                    'nx-anti-csrf-token',
+                    'x-invoke-status',
+                    'x-middleware-prefetch',
+                    'rsc',
+                    'l5d-dtab',
+                    'user-agentt',
+                    'sdblanguage',
+                    'x-php-ob-level',
+                    'x-search-safesearch',
+                    'sch-ch-ua',
+                    'charset',
+                    'language',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
