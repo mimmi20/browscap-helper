@@ -510,6 +510,10 @@ trait FilterHeaderTrait
                     'sch-ch-ua',
                     'charset',
                     'language',
+                    'proxytag',
+                    'x-fah-caching-token',
+                    'sec-speculation-tags',
+                    'x-content-length-limit',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
