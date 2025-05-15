@@ -514,6 +514,7 @@ trait FilterHeaderTrait
                     'x-fah-caching-token',
                     'sec-speculation-tags',
                     'x-content-length-limit',
+                    'x-proxy-request-tag',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
