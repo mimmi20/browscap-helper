@@ -71,6 +71,7 @@ trait FilterHeaderTrait
                     'x-mobile-gateway',
                     'x-nb-content',
                     'sec-ch-ua',
+                    'sec-ch-ua-arc',
                     'sec-ch-ua-arch',
                     'sec-ch-ua-bitness',
                     'sec-ch-ua-full-version',
@@ -515,6 +516,8 @@ trait FilterHeaderTrait
                     'sec-speculation-tags',
                     'x-content-length-limit',
                     'x-proxy-request-tag',
+                    'sourceapp',
+                    'zyte-client',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
