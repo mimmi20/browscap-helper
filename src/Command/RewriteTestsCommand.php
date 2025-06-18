@@ -943,38 +943,38 @@ final class RewriteTestsCommand extends Command
 
         $txtChecks[$seachHeader] = $test;
 
-//            if (
-//                !array_key_exists('x-requested-with', $test['headers'])
-//                && !array_key_exists('http-x-requested-with', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                return;
-//            }
-
-//            if (
-//                !array_key_exists('sec-ch-ua-platform', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                return;
-//            }
-
-//            if (
-//                !array_key_exists('sec-ch-ua-model', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                return;
-//            }
-
-//            if (
-//                !array_key_exists('x-puffin-ua', $test['headers'])
-//            ) {
-//                ++$skipped;
-//
-//                return;
-//            }
+        // if (
+        //    !array_key_exists('x-requested-with', $test['headers'])
+        //    && !array_key_exists('http-x-requested-with', $test['headers'])
+        // ) {
+        //    ++$skipped;
+        //
+        //    return;
+        // }
+        //
+        // if (
+        //    !array_key_exists('sec-ch-ua-platform', $test['headers'])
+        // ) {
+        //    ++$skipped;
+        //
+        //    return;
+        // }
+        //
+        // if (
+        //    !array_key_exists('sec-ch-ua-model', $test['headers'])
+        // ) {
+        //    ++$skipped;
+        //
+        //    return;
+        // }
+        //
+        // if (
+        //    !array_key_exists('x-puffin-ua', $test['headers'])
+        // ) {
+        //    ++$skipped;
+        //
+        //    return;
+        // }
 
         if (
             array_key_exists('x-requested-with', $test['headers'])
@@ -1048,9 +1048,9 @@ final class RewriteTestsCommand extends Command
         if (!is_array($result)) {
             ++$duplicates;
 
-//                if ($exit !== 2 && $exit !== 6) {
-//                    var_dump($key, $headers, $exit);
-//                }
+            // if ($exit !== 2 && $exit !== 6) {
+            //    var_dump($key, $headers, $exit);
+            // }
 
             return;
         }
