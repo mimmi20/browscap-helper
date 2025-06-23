@@ -15,6 +15,12 @@ updates:
       time: "04:00"
       timezone: "Europe/Berlin"
 
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+
     open-pull-requests-limit: 10
 
     assignees:
@@ -46,6 +52,12 @@ updates:
       day: "tuesday"
       time: "04:00"
       timezone: "Europe/Berlin"
+
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
 
     open-pull-requests-limit: 10
 
