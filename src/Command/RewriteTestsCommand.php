@@ -320,23 +320,25 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $txtChecks     = [];
-        $headerChecks1 = [];
-        $headerChecks2 = [];
-        $headerChecks3 = [];
-        $headerChecks4 = [];
-        $headerChecks5 = [];
-        $messageLength = 0;
-        $counter       = 0;
-        $duplicates    = 0;
-        $errors        = 0;
-        $skipped       = 0;
-        $testCount     = 0;
-        $baseMessage   = 'checking Header ';
-        $timeCheck     = 0.0;
-        $timeDetect    = 0.0;
-        $timeRead      = 0.0;
-        $timeWrite     = 0.0;
+        $txtChecks      = [];
+        $headerChecks1  = [];
+        $headerChecks2  = [];
+        $headerChecks3  = [];
+        $headerChecks4  = [];
+        $headerChecks5  = [];
+        $messageLength  = 0;
+        $counter        = 0;
+        $duplicates     = 0;
+        $errors         = 0;
+        $skipped        = 0;
+        $testCount      = 0;
+        $baseMessage    = 'checking Header ';
+        $timeCheck      = 0.0;
+        $timeDetect     = 0.0;
+        $timeRead       = 0.0;
+        $timeWrite      = 0.0;
+        $counterChecks6 = 0;
+        $counterChecks7 = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -364,6 +366,8 @@ final class RewriteTestsCommand extends Command
                 headerChecks3: $headerChecks3,
                 headerChecks4: $headerChecks4,
                 headerChecks5: $headerChecks5,
+                counterChecks6: $counterChecks6,
+                counterChecks7: $counterChecks7,
             );
         }
 
@@ -406,6 +410,14 @@ final class RewriteTestsCommand extends Command
                 'time writing cache: %f sec',
                 $timeWrite,
             ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: $counterChecks6 . ' Headers sind von Android auf ARM',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: $counterChecks7 . ' Headers sind von Android',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
@@ -879,6 +891,8 @@ final class RewriteTestsCommand extends Command
         array &$headerChecks3,
         array &$headerChecks4,
         array &$headerChecks5,
+        int &$counterChecks6,
+        int &$counterChecks7,
     ): void {
         try {
             $test['headers'] = $this->filterHeaders($test['headers']);
@@ -1021,6 +1035,14 @@ final class RewriteTestsCommand extends Command
 
         if (array_key_exists('x-puffin-ua', $test['headers'])) {
             $puffinHeader = $test['headers']['x-puffin-ua'];
+        }
+
+        if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
+            if (preg_match('/^mozilla\/5\.0 \(linux; arm_64; android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i', $test['headers']['user-agent'])) {
+                $counterChecks6++;
+            } elseif (preg_match('/^mozilla\/5\.0 \(linux;(?: ([iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i', $test['headers']['user-agent'])) {
+                $counterChecks7++;
+            }
         }
 
         $message = $loopMessage . 'redetect';
