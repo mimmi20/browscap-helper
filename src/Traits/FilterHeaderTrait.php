@@ -33,6 +33,8 @@ trait FilterHeaderTrait
      * @return array<non-empty-string, non-empty-string>
      *
      * @throws UnexpectedValueException
+     *
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     private function filterHeaders(array $headers): array
     {
