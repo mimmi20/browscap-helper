@@ -916,7 +916,7 @@ final class RewriteTestsCommand extends Command
                 ++$counterChecks6;
             } elseif (
                 preg_match(
-                    '/^mozilla\/5\.0 \(linux;(?: ([iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
+                    '/^mozilla\/5\.0 \(linux;(?: (?:[iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
                     $test['headers']['user-agent'],
                 )
             ) {
