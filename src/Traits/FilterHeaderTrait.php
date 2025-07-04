@@ -520,6 +520,10 @@ trait FilterHeaderTrait
                     'x-proxy-request-tag',
                     'sourceapp',
                     'zyte-client',
+                    'x-ms-edu',
+                    'x-oxylabs-render',
+                    'si-caller-identifier',
+                    'x-token',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
