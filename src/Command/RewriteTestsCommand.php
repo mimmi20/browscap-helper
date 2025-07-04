@@ -134,7 +134,8 @@ final class RewriteTestsCommand extends Command
      * @throws RuntimeException
      * @throws \LogicException
      *
-     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -154,7 +155,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function get(string $key, mixed $default = null): mixed
@@ -175,7 +176,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function set(string $key, mixed $value, int | DateInterval | null $ttl = null): bool
@@ -192,7 +193,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function delete(string $key): bool
@@ -223,7 +224,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function getMultiple(iterable $keys, mixed $default = null): iterable
@@ -243,7 +244,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function setMultiple(iterable $values, int | DateInterval | null $ttl = null): bool
@@ -260,7 +261,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function deleteMultiple(iterable $keys): bool
@@ -280,7 +281,7 @@ final class RewriteTestsCommand extends Command
              *
              * @throws void
              *
-             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
             #[Override]
             public function has(string $key): bool
@@ -320,23 +321,26 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $txtChecks     = [];
-        $headerChecks1 = [];
-        $headerChecks2 = [];
-        $headerChecks3 = [];
-        $headerChecks4 = [];
-        $headerChecks5 = [];
-        $messageLength = 0;
-        $counter       = 0;
-        $duplicates    = 0;
-        $errors        = 0;
-        $skipped       = 0;
-        $testCount     = 0;
-        $baseMessage   = 'checking Header ';
-        $timeCheck     = 0.0;
-        $timeDetect    = 0.0;
-        $timeRead      = 0.0;
-        $timeWrite     = 0.0;
+        $txtChecks      = [];
+        $headerChecks1  = [];
+        $headerChecks2  = [];
+        $headerChecks3  = [];
+        $headerChecks4  = [];
+        $headerChecks5  = [];
+        $messageLength  = 0;
+        $counter        = 0;
+        $duplicates     = 0;
+        $errors         = 0;
+        $skipped        = 0;
+        $testCount      = 0;
+        $baseMessage    = 'checking Header ';
+        $timeCheck      = 0.0;
+        $timeDetect     = 0.0;
+        $timeRead       = 0.0;
+        $timeWrite      = 0.0;
+        $counterChecks6 = 0;
+        $counterChecks7 = 0;
+        $counterChecks8 = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -364,6 +368,9 @@ final class RewriteTestsCommand extends Command
                 headerChecks3: $headerChecks3,
                 headerChecks4: $headerChecks4,
                 headerChecks5: $headerChecks5,
+                counterChecks6: $counterChecks6,
+                counterChecks7: $counterChecks7,
+                counterChecks8: $counterChecks8,
             );
         }
 
@@ -406,6 +413,18 @@ final class RewriteTestsCommand extends Command
                 'time writing cache: %f sec',
                 $timeWrite,
             ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: $counterChecks6 . ' Headers are from Android on ARM',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: $counterChecks7 . ' Headers are from Android',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: $counterChecks8 . ' Headers do not start with \'Mozilla/5.0\'',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
@@ -479,6 +498,8 @@ final class RewriteTestsCommand extends Command
      * @return array<int, mixed>
      *
      * @throws void
+     *
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     private function handleTest(
         OutputInterface $output,
@@ -856,6 +877,8 @@ final class RewriteTestsCommand extends Command
      * @param array<string, bool>                   $headerChecks5
      *
      * @throws void
+     *
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     private function handleTestCase(
         OutputInterface $output,
@@ -879,7 +902,30 @@ final class RewriteTestsCommand extends Command
         array &$headerChecks3,
         array &$headerChecks4,
         array &$headerChecks5,
+        int &$counterChecks6,
+        int &$counterChecks7,
+        int &$counterChecks8,
     ): void {
+        if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
+            if (
+                preg_match(
+                    '/^mozilla\/5\.0 \(linux; arm_64; android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
+                    $test['headers']['user-agent'],
+                )
+            ) {
+                ++$counterChecks6;
+            } elseif (
+                preg_match(
+                    '/^mozilla\/5\.0 \(linux;(?: (?:[iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
+                    $test['headers']['user-agent'],
+                )
+            ) {
+                ++$counterChecks7;
+            } elseif (!preg_match('/^mozilla\/5\.0/i', $test['headers']['user-agent'])) {
+                ++$counterChecks8;
+            }
+        }
+
         try {
             $test['headers'] = $this->filterHeaders($test['headers']);
         } catch (UnexpectedValueException $e) {

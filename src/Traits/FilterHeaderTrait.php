@@ -33,6 +33,8 @@ trait FilterHeaderTrait
      * @return array<non-empty-string, non-empty-string>
      *
      * @throws UnexpectedValueException
+     *
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     private function filterHeaders(array $headers): array
     {
@@ -518,6 +520,10 @@ trait FilterHeaderTrait
                     'x-proxy-request-tag',
                     'sourceapp',
                     'zyte-client',
+                    'x-ms-edu',
+                    'x-oxylabs-render',
+                    'si-caller-identifier',
+                    'x-token',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
