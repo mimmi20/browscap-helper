@@ -45,10 +45,11 @@ use UaDeviceType\Type;
 use UConverter;
 use UnexpectedValueException;
 
+use function array_any;
 use function array_chunk;
+use function array_filter;
 use function array_key_exists;
 use function assert;
-use function count;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -62,6 +63,7 @@ use function max;
 use function mb_str_pad;
 use function mb_strlen;
 use function mb_strtolower;
+use function mb_trim;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function memory_reset_peak_usage;
@@ -75,7 +77,6 @@ use function str_contains;
 use function str_ends_with;
 use function str_replace;
 use function str_starts_with;
-use function trim;
 use function var_export;
 
 use const JSON_PRETTY_PRINT;
@@ -1042,33 +1043,48 @@ final class RewriteTestsCommand extends Command
 
         $xRequestHeader = null;
 
-        if (array_key_exists('x-requested-with', $test['headers'])) {
+        if (
+            array_key_exists('x-requested-with', $test['headers'])
+            && $test['headers']['x-requested-with'] !== ''
+        ) {
             $xRequestHeader = $test['headers']['x-requested-with'];
-        } elseif (array_key_exists('http-x-requested-with', $test['headers'])) {
+        } elseif (
+            array_key_exists('http-x-requested-with', $test['headers'])
+            && $test['headers']['http-x-requested-with'] !== ''
+        ) {
             $xRequestHeader = $test['headers']['http-x-requested-with'];
         }
 
         $secChUaHeader = null;
 
-        if (array_key_exists('sec-ch-ua', $test['headers'])) {
+        if (array_key_exists('sec-ch-ua', $test['headers']) && $test['headers']['sec-ch-ua'] !== '') {
             $secChUaHeader = $test['headers']['sec-ch-ua'];
         }
 
         $secChPlatformHeader = null;
 
-        if (array_key_exists('sec-ch-ua-platform', $test['headers'])) {
+        if (
+            array_key_exists('sec-ch-ua-platform', $test['headers'])
+            && $test['headers']['sec-ch-ua-platform'] !== ''
+        ) {
             $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
         }
 
         $secChModelHeader = null;
 
-        if (array_key_exists('sec-ch-ua-model', $test['headers'])) {
+        if (
+            array_key_exists('sec-ch-ua-model', $test['headers'])
+            && $test['headers']['sec-ch-ua-model'] !== ''
+        ) {
             $secChModelHeader = $test['headers']['sec-ch-ua-model'];
         }
 
         $puffinHeader = null;
 
-        if (array_key_exists('x-puffin-ua', $test['headers'])) {
+        if (
+            array_key_exists('x-puffin-ua', $test['headers'])
+            && $test['headers']['x-puffin-ua'] !== ''
+        ) {
             $puffinHeader = $test['headers']['x-puffin-ua'];
         }
 
@@ -1082,27 +1098,33 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        if (
-            count($test['headers']) === 2
-            && array_key_exists('x-requested-with', $test['headers'])
-            && $test['headers']['x-requested-with'] === 'XMLHttpRequest'
-            && array_key_exists('user-agent', $test['headers'])
-            && (
-                str_starts_with($test['headers']['user-agent'], '-1\'')
-                || str_starts_with($test['headers']['user-agent'], '-1\"')
-            )
-        ) {
-            return;
-        }
+        $filteredHeaders = array_filter(
+            $test['headers'],
+            static fn (string $v): bool => $v !== '',
+        );
 
-        if (
-            count($test['headers']) === 1
-            && array_key_exists('user-agent', $test['headers'])
-            && (
-                str_ends_with($test['headers']['user-agent'], '\\')
-                || str_starts_with($test['headers']['user-agent'], '@@')
-            )
-        ) {
+        $forbiddenFound = array_any(
+            $filteredHeaders,
+            static function (string $v): bool {
+                $v = mb_strtolower($v);
+
+                return str_starts_with($v, '-1')
+                    || str_ends_with($v, '\\')
+                    || str_starts_with($v, '@@')
+                    || str_contains($v, '{${print(')
+                    || str_contains($v, '<?=print(')
+                    || str_contains($v, '+print(')
+                    || str_contains($v, 'gethostbyname(')
+                    || str_contains($v, 'http/1.')
+                    || str_contains($v, 'nslookup ')
+                    || str_contains($v, '${jndi')
+                    || str_contains($v, 'pg_sleep(')
+                    || str_contains($v, 'concat(')
+                    || str_contains($v, 'waitfor delay ');
+            },
+        );
+
+        if ($forbiddenFound) {
             return;
         }
 
@@ -1111,7 +1133,7 @@ final class RewriteTestsCommand extends Command
         [$result /* , $key, $headers, $exit/* */] = $this->handleTest(
             output: $output,
             detector: $detector,
-            headers: $test['headers'],
+            headers: $filteredHeaders,
             parentMessage: $message,
             messageLength: $messageLength,
         );
@@ -1130,7 +1152,7 @@ final class RewriteTestsCommand extends Command
 
         if ($result['client']['name'] === null) {
             if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
-                $xRequestHeader = trim($xRequestHeader, '"');
+                $xRequestHeader = mb_trim($xRequestHeader, '"');
 
                 if (!array_key_exists($xRequestHeader, $headerChecks1)) {
                     $addMessage = sprintf(
@@ -1152,7 +1174,7 @@ final class RewriteTestsCommand extends Command
             }
 
             if ($secChUaHeader !== null) {
-                $secChUaHeader = trim($secChUaHeader, '"');
+                $secChUaHeader = mb_trim($secChUaHeader, '"');
 
                 if (!array_key_exists($secChUaHeader, $headerChecks2)) {
                     $addMessage = sprintf(
@@ -1177,7 +1199,7 @@ final class RewriteTestsCommand extends Command
 
         if ($result['os']['name'] === null) {
             if ($secChPlatformHeader !== null) {
-                $secChPlatformHeader = trim($secChPlatformHeader, '"');
+                $secChPlatformHeader = mb_trim($secChPlatformHeader, '"');
 
                 if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
                     $addMessage = sprintf(
@@ -1201,7 +1223,7 @@ final class RewriteTestsCommand extends Command
 
         if ($result['device']['deviceName'] === null) {
             if ($secChModelHeader !== null) {
-                $secChModelHeader = trim($secChModelHeader, '"');
+                $secChModelHeader = mb_trim($secChModelHeader, '"');
 
                 if (!array_key_exists($secChModelHeader, $headerChecks4)) {
                     $addMessage = sprintf(

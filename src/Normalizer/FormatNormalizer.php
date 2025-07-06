@@ -29,9 +29,9 @@ use function explode;
 use function implode;
 use function is_string;
 use function json_encode;
+use function mb_rtrim;
 use function mb_strpos;
 use function preg_match;
-use function rtrim;
 use function str_replace;
 
 use const JSON_PRETTY_PRINT;
@@ -67,7 +67,7 @@ final readonly class FormatNormalizer implements Normalizer
 
         $lines = explode(
             $oldNewline,
-            rtrim($json->encoded()),
+            mb_rtrim($json->encoded()),
         );
 
         $newNewline = $this->format->newLine()->toString();
