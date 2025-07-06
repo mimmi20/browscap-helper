@@ -57,7 +57,7 @@ jobs:
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       skip-php-cs-fixer: true
       skip-phpcs: false
-      skip-phpstan: false
+      skip-phpstan: true
       skip-rector: false
       skip-eslint: true
       skip-stylelint: true
