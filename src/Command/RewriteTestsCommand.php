@@ -1100,29 +1100,31 @@ final class RewriteTestsCommand extends Command
 
         $filteredHeaders = array_filter(
             $test['headers'],
-            static function (string $v): bool {
-                if (str_starts_with($v, '-1\'') || str_starts_with($v, '-1\"')) {
-                    return false;
-                }
-
-                if (str_ends_with($v, '\\') || str_starts_with($v, '@@')) {
-                    return false;
-                }
-
-                return !str_contains($v, '{${print(')
-                    && !str_contains($v, '<?=print(')
-                    && !str_contains($v, '+print(');
-            },
-        );
-
-        if (count($test['headers']) !== count($filteredHeaders)) {
-            return;
-        }
-
-        $filteredHeaders = array_filter(
-            $test['headers'],
             static fn (string $v): bool => $v !== '',
         );
+
+        if (array_any(
+            $filteredHeaders,
+            function(string $v): bool {
+                $v = strtolower($v);
+
+                return str_starts_with($v, '-1')
+                    || str_ends_with($v, '\\')
+                    || str_starts_with($v, '@@')
+                    || str_contains($v, '{${print(')
+                    || str_contains($v, '<?=print(')
+                    || str_contains($v, '+print(')
+                    || str_contains($v, 'gethostbyname(')
+                    || str_contains($v, 'http/1.')
+                    || str_contains($v, 'nslookup ')
+                    || str_contains($v, '${jndi')
+                    || str_contains($v, 'pg_sleep(')
+                    || str_contains($v, 'concat(')
+                    || str_contains($v, 'waitfor delay ');
+            }
+        )) {
+            return;
+        }
 
         $startTime = microtime(true);
 
