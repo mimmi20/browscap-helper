@@ -45,11 +45,11 @@ use UaDeviceType\Type;
 use UConverter;
 use UnexpectedValueException;
 
+use function array_any;
 use function array_chunk;
 use function array_filter;
 use function array_key_exists;
 use function assert;
-use function count;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -1103,10 +1103,10 @@ final class RewriteTestsCommand extends Command
             static fn (string $v): bool => $v !== '',
         );
 
-        if (array_any(
+        $forbiddenFound = array_any(
             $filteredHeaders,
-            function(string $v): bool {
-                $v = strtolower($v);
+            static function (string $v): bool {
+                $v = mb_strtolower($v);
 
                 return str_starts_with($v, '-1')
                     || str_ends_with($v, '\\')
@@ -1121,8 +1121,10 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'pg_sleep(')
                     || str_contains($v, 'concat(')
                     || str_contains($v, 'waitfor delay ');
-            }
-        )) {
+            },
+        );
+
+        if ($forbiddenFound) {
             return;
         }
 
