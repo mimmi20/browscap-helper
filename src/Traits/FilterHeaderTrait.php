@@ -19,8 +19,8 @@ use function array_filter;
 use function array_map;
 use function in_array;
 use function is_string;
+use function mb_trim;
 use function sprintf;
-use function trim;
 
 use const ARRAY_FILTER_USE_BOTH;
 use const ARRAY_FILTER_USE_KEY;
@@ -536,7 +536,7 @@ trait FilterHeaderTrait
         );
 
         $headers = array_map(
-            static fn (string $header) => trim($header),
+            static fn (string $header) => mb_trim($header),
             $headers,
         );
 
