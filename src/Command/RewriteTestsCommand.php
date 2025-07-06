@@ -48,6 +48,7 @@ use UnexpectedValueException;
 use function array_chunk;
 use function array_key_exists;
 use function assert;
+use function count;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -71,7 +72,9 @@ use function number_format;
 use function preg_match;
 use function sprintf;
 use function str_contains;
+use function str_ends_with;
 use function str_replace;
+use function str_starts_with;
 use function trim;
 use function var_export;
 
@@ -1078,6 +1081,30 @@ final class RewriteTestsCommand extends Command
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+
+        if (
+            count($test['headers']) === 2
+            && array_key_exists('x-requested-with', $test['headers'])
+            && $test['headers']['x-requested-with'] === 'XMLHttpRequest'
+            && array_key_exists('user-agent', $test['headers'])
+            && (
+                str_starts_with($test['headers']['user-agent'], '-1\'')
+                || str_starts_with($test['headers']['user-agent'], '-1\"')
+            )
+        ) {
+            return;
+        }
+
+        if (
+            count($test['headers']) === 1
+            && array_key_exists('user-agent', $test['headers'])
+            && (
+                str_ends_with($test['headers']['user-agent'], '\\')
+                || str_starts_with($test['headers']['user-agent'], '@@')
+            )
+        ) {
+            return;
+        }
 
         $startTime = microtime(true);
 
