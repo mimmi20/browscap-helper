@@ -140,6 +140,7 @@ trait FilterHeaderTrait
                     'x-b3-parentspanid',
                     'sec-gpc',
                     'x-fb-crawlerbot',
+                    'x-fb-connecttimeout',
                     'ms-cv',
                     'x-bufferbot',
                     'x-icm-a',
