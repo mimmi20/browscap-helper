@@ -930,15 +930,7 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        try {
-            $test['headers'] = $this->filterHeaders($test['headers']);
-        } catch (UnexpectedValueException $e) {
-            $output->writeln(sprintf('<error>%s</error>', $e));
-
-            ++$errors;
-
-            return;
-        }
+        $test['headers'] = $this->filterHeaders($output, $test['headers']);
 
         $startTime = microtime(true);
 
@@ -1115,12 +1107,13 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '<?=print(')
                     || str_contains($v, '+print(')
                     || str_contains($v, 'gethostbyname(')
-                    || str_contains($v, 'http/1.')
-                    || str_contains($v, 'nslookup ')
+                    || str_contains($v, ' http/1.')
+                    || str_contains($v, 'nslookup')
                     || str_contains($v, '${jndi')
                     || str_contains($v, 'pg_sleep(')
                     || str_contains($v, 'concat(')
-                    || str_contains($v, 'waitfor delay ');
+                    || str_contains($v, 'waitfor delay ')
+                    || str_contains($v, 'wget http://');
             },
         );
 
