@@ -122,13 +122,7 @@ final class CopyTestsCommand extends Command
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $row) {
-            try {
-                $row['headers'] = $this->filterHeaders($row['headers']);
-            } catch (UnexpectedValueException $e) {
-                $output->writeln(sprintf('<error>%s</error>', $e));
-
-                continue;
-            }
+            $row['headers'] = $this->filterHeaders($output, $row['headers']);
 
             $seachHeader = (string) UserAgent::fromHeaderArray($row['headers']);
 
@@ -191,13 +185,7 @@ final class CopyTestsCommand extends Command
         $txtTotalCounter = 0;
 
         foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
-            try {
-                $test['headers'] = $this->filterHeaders($test['headers']);
-            } catch (UnexpectedValueException $e) {
-                $output->writeln(sprintf('<error>%s</error>', $e));
-
-                continue;
-            }
+            $test['headers'] = $this->filterHeaders($output, $test['headers']);
 
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 

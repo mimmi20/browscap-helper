@@ -38,7 +38,7 @@ return static function (RectorConfig $rectorConfig): void {
             FirstClassCallableRector::class,
             RemoveAlwaysTrueIfConditionRector::class,
             RemoveParentCallWithoutParentRector::class,
-            NewMethodCallWithoutParenthesesRector::class
+            NewMethodCallWithoutParenthesesRector::class,
         ],
     );
 };

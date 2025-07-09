@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Traits;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_filter;
@@ -32,11 +33,11 @@ trait FilterHeaderTrait
      *
      * @return array<non-empty-string, non-empty-string>
      *
-     * @throws UnexpectedValueException
+     * @throws void
      *
      * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
-    private function filterHeaders(array $headers): array
+    private function filterHeaders(OutputInterface $output, array $headers): array
     {
         $headers = array_filter(
             $headers,
@@ -46,7 +47,7 @@ trait FilterHeaderTrait
         $headers = array_filter(
             $headers,
             /** @throws UnexpectedValueException */
-            static function (string $header): bool {
+            static function (string $header) use ($output): bool {
                 $allowedHeaders = [
                     'user-agent',
                     'ua-os',
@@ -531,7 +532,14 @@ trait FilterHeaderTrait
                     return false;
                 }
 
-                throw new UnexpectedValueException(sprintf('invalid header: "%s"', $header));
+                $output->writeln(
+                    sprintf(
+                        '<error>%s</error>',
+                        new UnexpectedValueException(sprintf('invalid header: "%s"', $header)),
+                    ),
+                );
+
+                return false;
             },
             ARRAY_FILTER_USE_KEY,
         );

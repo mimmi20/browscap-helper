@@ -930,15 +930,7 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        try {
-            $test['headers'] = $this->filterHeaders($test['headers']);
-        } catch (UnexpectedValueException $e) {
-            $output->writeln(sprintf('<error>%s</error>', $e));
-
-            ++$errors;
-
-            return;
-        }
+        $test['headers'] = $this->filterHeaders($output, $test['headers']);
 
         $startTime = microtime(true);
 
