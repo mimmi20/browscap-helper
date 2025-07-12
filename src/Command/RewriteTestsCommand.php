@@ -83,6 +83,7 @@ use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const STR_PAD_LEFT;
 
+/** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
 final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
@@ -342,9 +343,12 @@ final class RewriteTestsCommand extends Command
         $timeDetect     = 0.0;
         $timeRead       = 0.0;
         $timeWrite      = 0.0;
+        $counterChecks1 = 0;
+        $counterChecks2 = 0;
+        $counterChecks3 = 0;
+        $counterChecks4 = 0;
+        $counterChecks5 = 0;
         $counterChecks6 = 0;
-        $counterChecks7 = 0;
-        $counterChecks8 = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -372,9 +376,12 @@ final class RewriteTestsCommand extends Command
                 headerChecks3: $headerChecks3,
                 headerChecks4: $headerChecks4,
                 headerChecks5: $headerChecks5,
+                counterChecks1: $counterChecks1,
+                counterChecks2: $counterChecks2,
+                counterChecks3: $counterChecks3,
+                counterChecks4: $counterChecks4,
+                counterChecks5: $counterChecks5,
                 counterChecks6: $counterChecks6,
-                counterChecks7: $counterChecks7,
-                counterChecks8: $counterChecks8,
             );
         }
 
@@ -382,6 +389,7 @@ final class RewriteTestsCommand extends Command
 
         $this->jsonNormalizer->init($output);
 
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
             messages: sprintf(
                 'check result:       %7d test(s), %7d duplicate(s), %7d error(s)',
@@ -391,46 +399,91 @@ final class RewriteTestsCommand extends Command
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
             messages: sprintf(
-                'time checking:      %f sec',
-                $timeCheck,
+                'time checking:      %s sec',
+                mb_str_pad(number_format($timeCheck, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
             messages: sprintf(
-                'time detecting:     %f sec',
-                $timeDetect,
+                'time detecting:     %s sec',
+                mb_str_pad(number_format($timeDetect, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
             messages: sprintf(
-                'time reading cache: %f sec',
-                $timeRead,
+                'time reading cache: %s sec',
+                mb_str_pad(number_format($timeRead, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
             messages: sprintf(
-                'time writing cache: %f sec',
-                $timeWrite,
+                'time writing cache: %s sec',
+                mb_str_pad(number_format($timeWrite, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
-            messages: $counterChecks6 . ' Headers are from Android on ARM',
+            messages: mb_str_pad(
+                number_format($counterChecks1, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers are from Android on ARM',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
-            messages: $counterChecks7 . ' Headers are from Android',
+            messages: mb_str_pad(
+                number_format($counterChecks2, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers are from Android',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
-            messages: $counterChecks8 . ' Headers do not start with \'Mozilla/5.0\'',
+            messages: mb_str_pad(
+                number_format($counterChecks4, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers are from MacOS',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+        $output->writeln(
+            messages: mb_str_pad(
+                number_format($counterChecks5, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers are from Windows 10',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: mb_str_pad(
+                number_format($counterChecks6, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers are from Linux',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: mb_str_pad(
+                number_format($counterChecks3, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers do not start with \'Mozilla/5.0\'',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
 
         $messageLength = 0;
@@ -906,9 +959,12 @@ final class RewriteTestsCommand extends Command
         array &$headerChecks3,
         array &$headerChecks4,
         array &$headerChecks5,
+        int &$counterChecks1,
+        int &$counterChecks2,
+        int &$counterChecks3,
+        int &$counterChecks4,
+        int &$counterChecks5,
         int &$counterChecks6,
-        int &$counterChecks7,
-        int &$counterChecks8,
     ): void {
         if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
             if (
@@ -917,16 +973,29 @@ final class RewriteTestsCommand extends Command
                     $test['headers']['user-agent'],
                 )
             ) {
-                ++$counterChecks6;
+                ++$counterChecks1;
             } elseif (
                 preg_match(
                     '/^mozilla\/5\.0 \(linux;(?: (?:[iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
                     $test['headers']['user-agent'],
                 )
             ) {
-                ++$counterChecks7;
+                ++$counterChecks2;
+            } elseif (
+                preg_match(
+                    '/^mozilla\/5\.0 \(macintosh; intel mac os x/i',
+                    $test['headers']['user-agent'],
+                )
+            ) {
+                ++$counterChecks4;
+            } elseif (
+                preg_match('/^mozilla\/5\.0 \(windows nt 10\.0/i', $test['headers']['user-agent'])
+            ) {
+                ++$counterChecks5;
+            } elseif (preg_match('/^mozilla\/5\.0 \(x11; linux/i', $test['headers']['user-agent'])) {
+                ++$counterChecks6;
             } elseif (!preg_match('/^mozilla\/5\.0/i', $test['headers']['user-agent'])) {
-                ++$counterChecks8;
+                ++$counterChecks3;
             }
         }
 
@@ -1106,6 +1175,7 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '{${print(')
                     || str_contains($v, '<?=print(')
                     || str_contains($v, '+print(')
+                    || str_contains($v, ' print(')
                     || str_contains($v, 'gethostbyname(')
                     || str_contains($v, ' http/1.')
                     || str_contains($v, 'nslookup')
@@ -1113,7 +1183,9 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'pg_sleep(')
                     || str_contains($v, 'concat(')
                     || str_contains($v, 'waitfor delay ')
-                    || str_contains($v, 'wget http://');
+                    || str_contains($v, 'wget http://')
+                    || str_contains($v, '<?php')
+                    || str_contains($v, ' eval(');
             },
         );
 
