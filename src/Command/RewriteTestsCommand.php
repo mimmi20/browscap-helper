@@ -21,8 +21,12 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Traits\FilterHeaderTrait;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
+use BrowserDetector\Version\Exception\NotNumericException;
+use BrowserDetector\Version\VersionBuilder;
 use DateInterval;
 use DateTimeImmutable;
+use DeviceDetector\ClientHints;
+use DeviceDetector\DeviceDetector;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -57,6 +61,7 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_scalar;
+use function is_string;
 use function json_decode;
 use function json_encode;
 use function max;
@@ -149,7 +154,7 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln(messages: 'init Detector ...', options: OutputInterface::VERBOSITY_NORMAL);
 
-        $cache = new class () implements CacheInterface {
+        $detectorCache = new class () implements CacheInterface {
             /**
              * Fetches a value from the cache.
              *
@@ -296,17 +301,21 @@ final class RewriteTestsCommand extends Command
         };
 
         $logger   = new ConsoleLogger($output);
-        $factory  = new DetectorFactory($cache, $logger);
+        $factory  = new DetectorFactory($detectorCache, $logger);
         $detector = $factory();
 
-        $basePath                = 'vendor/mimmi20/browser-detector/';
-        $detectorTargetDirectory = $basePath . 'tests/data/';
-        $testSource              = 'tests';
+        $output->writeln(messages: 'init Matomo ...', options: OutputInterface::VERBOSITY_NORMAL);
+
+        $dd = new DeviceDetector();
 
         $output->writeln(
             messages: 'removing old existing files from vendor ...',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+
+        $basePath                = 'vendor/mimmi20/browser-detector/';
+        $detectorTargetDirectory = $basePath . 'tests/data/';
+        $testSource              = 'tests';
 
         $this->testsRemover->remove(output: $output, testSource: $detectorTargetDirectory);
         $this->testsRemover->remove(output: $output, testSource: $detectorTargetDirectory, dirs: true);
@@ -349,6 +358,7 @@ final class RewriteTestsCommand extends Command
         $counterChecks4 = 0;
         $counterChecks5 = 0;
         $counterChecks6 = 0;
+        $counterChecks7 = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -357,6 +367,7 @@ final class RewriteTestsCommand extends Command
             $this->handleTestCase(
                 output: $output,
                 detector: $detector,
+                dd: $dd,
                 test: $test,
                 startTimeExec: $startTimeExec,
                 baseMessage: $baseMessage,
@@ -382,6 +393,7 @@ final class RewriteTestsCommand extends Command
                 counterChecks4: $counterChecks4,
                 counterChecks5: $counterChecks5,
                 counterChecks6: $counterChecks6,
+                counterChecks7: $counterChecks7,
             );
         }
 
@@ -481,6 +493,15 @@ final class RewriteTestsCommand extends Command
                 ' ',
                 STR_PAD_LEFT,
             ) . ' Headers do not start with \'Mozilla/5.0\'',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: mb_str_pad(
+                number_format($counterChecks7, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers were not detected, but could with Matomo',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -940,6 +961,7 @@ final class RewriteTestsCommand extends Command
     private function handleTestCase(
         OutputInterface $output,
         Detector $detector,
+        DeviceDetector $dd,
         array $test,
         DateTimeImmutable $startTimeExec,
         string $baseMessage,
@@ -965,6 +987,7 @@ final class RewriteTestsCommand extends Command
         int &$counterChecks4,
         int &$counterChecks5,
         int &$counterChecks6,
+        int &$counterChecks7,
     ): void {
         if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
             if (
@@ -1195,7 +1218,7 @@ final class RewriteTestsCommand extends Command
 
         $startTime = microtime(true);
 
-        [$result /* , $key, $headers, $exit/* */] = $this->handleTest(
+        [$result, , $headers, $exit] = $this->handleTest(
             output: $output,
             detector: $detector,
             headers: $filteredHeaders,
@@ -1213,6 +1236,82 @@ final class RewriteTestsCommand extends Command
             // }
 
             return;
+        }
+
+        if ($exit === 2 || $exit === 4) {
+            if (
+                !empty($result['os']['name'])
+                && is_string($result['os']['name'])
+                && mb_strtolower($result['os']['name']) === 'android'
+                && is_scalar($result['os']['version'])
+            ) {
+                try {
+                    $version = (new VersionBuilder())->set((string) $result['os']['version']);
+                } catch (NotNumericException $e) {
+                    ++$errors;
+
+                    $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                    $message = $loopMessage . $addMessage;
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    return;
+                }
+
+                if ($result['device']['deviceName'] === null) {
+                    $this->seviceNotFound(
+                        output: $output,
+                        loopMessage: $loopMessage,
+                        messageLength: $messageLength,
+                        secChModelHeader: $secChModelHeader,
+                        puffinHeader: $puffinHeader,
+                        headerChecks4: $headerChecks4,
+                        headerChecks5: $headerChecks5,
+                    );
+                }
+
+                if ((int) $version->getMajor() < 9) {
+                    return;
+                }
+
+                if ((int) $version->getMajor() >= 13) {
+                    $clientHints = ClientHints::factory($headers);
+
+                    $dd->setUserAgent($headers['user-agent']);
+                    $dd->setClientHints($clientHints);
+                    $dd->parse();
+                    $ddModel      = $dd->getModel();
+                    $ddBrand      = $dd->getBrandName();
+                    $ddDeviceType = $dd->getDeviceName();
+
+                    if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
+                        ++$counterChecks7;
+
+                        $addMessage = sprintf(
+                            'The device for user-agent Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
+                            $headers['user-agent'],
+                            $ddBrand,
+                            $ddModel,
+                            $ddDeviceType,
+                        );
+                        $message    = $loopMessage . $addMessage;
+
+                        $messageLength = max($messageLength, mb_strlen($message));
+                        $messageLength = min($messageLength, 200);
+
+                        $output->writeln(
+                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+                    }
+                }
+            }
         }
 
         if ($result['client']['name'] === null) {
@@ -1287,15 +1386,38 @@ final class RewriteTestsCommand extends Command
         }
 
         if ($result['device']['deviceName'] === null) {
+            $this->seviceNotFound(
+                output: $output,
+                loopMessage: $loopMessage,
+                messageLength: $messageLength,
+                secChModelHeader: $secChModelHeader,
+                puffinHeader: $puffinHeader,
+                headerChecks4: $headerChecks4,
+                headerChecks5: $headerChecks5,
+            );
+
             if ($secChModelHeader !== null) {
-                $secChModelHeader = mb_trim($secChModelHeader, '"');
+                $clientHints = ClientHints::factory($headers);
 
-                if (!array_key_exists($secChModelHeader, $headerChecks4)) {
+                $dd->setUserAgent($headers['user-agent']);
+                $dd->setClientHints($clientHints);
+                $dd->parse();
+                $ddModel = $dd->getModel();
+                $ddBrand = $dd->getBrandName();
+                $ddDeviceType = $dd->getDeviceName();
+
+                if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
+                    ++$counterChecks7;
+
                     $addMessage = sprintf(
-                        'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                        'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
+                        $headers['user-agent'],
                         $secChModelHeader,
+                        $ddBrand,
+                        $ddModel,
+                        $ddDeviceType,
                     );
-                    $message    = $loopMessage . $addMessage;
+                    $message = $loopMessage . $addMessage;
 
                     $messageLength = max($messageLength, mb_strlen($message));
                     $messageLength = min($messageLength, 200);
@@ -1304,28 +1426,6 @@ final class RewriteTestsCommand extends Command
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
-
-                    $headerChecks4[$secChModelHeader] = true;
-                }
-            }
-
-            if ($puffinHeader !== null) {
-                if (!array_key_exists($puffinHeader, $headerChecks5)) {
-                    $addMessage = sprintf(
-                        'Could not detect the Device for the sec-ch-ua-model Header "%s"',
-                        $puffinHeader,
-                    );
-                    $message    = $loopMessage . $addMessage;
-
-                    $messageLength = max($messageLength, mb_strlen($message));
-                    $messageLength = min($messageLength, 200);
-
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-
-                    $headerChecks5[$puffinHeader] = true;
                 }
             }
         }
@@ -1537,5 +1637,67 @@ final class RewriteTestsCommand extends Command
         }
 
         return $saved !== false;
+    }
+
+    /**
+     * @param array<string, bool> $headerChecks4
+     * @param array<string, bool> $headerChecks5
+     *
+     * @throws void
+     */
+    private function seviceNotFound(
+        OutputInterface $output,
+        string $loopMessage,
+        int $messageLength,
+        string | null $secChModelHeader,
+        string | null $puffinHeader,
+        array &$headerChecks4,
+        array &$headerChecks5,
+    ): void {
+        if ($secChModelHeader !== null) {
+            $secChModelHeader = mb_trim($secChModelHeader, '"');
+
+            if (!array_key_exists($secChModelHeader, $headerChecks4)) {
+                $addMessage = sprintf(
+                    'Could not detect the Device for the sec-ch-ua-model Header "%s"',
+                    $secChModelHeader,
+                );
+                $message    = $loopMessage . $addMessage;
+
+                $messageLength = max($messageLength, mb_strlen($message));
+                $messageLength = min($messageLength, 200);
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                $headerChecks4[$secChModelHeader] = true;
+            }
+        }
+
+        if ($puffinHeader === null) {
+            return;
+        }
+
+        if (array_key_exists($puffinHeader, $headerChecks5)) {
+            return;
+        }
+
+        $addMessage = sprintf(
+            'Could not detect the Device for the x-puffin-ua Header "%s"',
+            $puffinHeader,
+        );
+        $message    = $loopMessage . $addMessage;
+
+        $messageLength = max($messageLength, mb_strlen($message));
+        $messageLength = min($messageLength, 200);
+
+        $output->writeln(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $headerChecks5[$puffinHeader] = true;
     }
 }
