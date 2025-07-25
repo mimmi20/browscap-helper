@@ -39,6 +39,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -66,7 +67,6 @@ use function json_decode;
 use function json_encode;
 use function max;
 use function mb_str_pad;
-use function mb_strlen;
 use function mb_strtolower;
 use function mb_trim;
 use function memory_get_peak_usage;
@@ -92,6 +92,34 @@ use const STR_PAD_LEFT;
 final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
+
+    private const int EXIT_NO_RESULT = 0;
+
+    private const int EXIT_DEVICE_IS_NULL = 1;
+
+    private const int EXIT_CLIENT_IS_NULL = 2;
+
+    private const int EXIT_DEVICE_NOT_SCALAR = 3;
+
+    private const int EXIT_CLIENT_NOT_SCALAR = 4;
+
+    private const int EXIT_DEVICE_IS_UNKNOW = 5;
+
+    private const int EXIT_CLIENT_IS_UNKNOW = 6;
+
+    private const int EXIT_CLIENT_IS_BOT = 7;
+
+    private const int EXIT_DEVICE_IS_DESKTOP = 8;
+
+    private const int EXIT_DEVICE_IS_MOBILE = 9;
+
+    private const int EXIT_DEVICE_IS_TV = 10;
+
+    private const int EXIT_DEVICE_IS_OTHER = 11;
+
+    private const int EXIT_DEVICE_IS_GENERAL = 12;
+
+    private const int EXIT_CLIENT_IS_GENERAL = 13;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -586,10 +614,8 @@ final class RewriteTestsCommand extends Command
         string $parentMessage,
         int &$messageLength = 0,
     ): array {
-        $message = $parentMessage . ' - <info>detect for new result ...</info>';
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $message       = $parentMessage . ' - <info>detect for new result ...</info>';
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -604,42 +630,47 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            return [null, null, $headers, 0];
+            return [null, null, $headers, self::EXIT_NO_RESULT];
         }
 
-        $message = $parentMessage . ' - <info>analyze new result ...</info>';
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $message       = $parentMessage . ' - <info>analyze new result ...</info>';
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
-        if ($newResult['client']['name'] === null || $newResult['device']['deviceName'] === null) {
-            return [$newResult, null, $headers, 1];
+        if ($newResult['device']['deviceName'] === null) {
+            return [$newResult, null, $headers, self::EXIT_DEVICE_IS_NULL];
         }
 
-        if (
-            !is_scalar($newResult['client']['name'])
-            || !is_scalar($newResult['device']['deviceName'])
-        ) {
-            return [$newResult, null, $headers, 2];
+        if ($newResult['client']['name'] === null) {
+            return [$newResult, null, $headers, self::EXIT_CLIENT_IS_NULL];
         }
 
-        if (
-            str_contains((string) $newResult['client']['name'], 'general')
-            || $newResult['client']['name'] === 'unknown'
-        ) {
-            return [$newResult, null, $headers, 3];
+        if (!is_scalar($newResult['device']['deviceName'])) {
+            return [$newResult, null, $headers, self::EXIT_DEVICE_NOT_SCALAR];
         }
 
-        if (
-            str_contains((string) $newResult['device']['deviceName'], 'general')
-            || $newResult['device']['deviceName'] === 'unknown'
-        ) {
-            return [$newResult, null, $headers, 4];
+        if (!is_scalar($newResult['client']['name'])) {
+            return [$newResult, null, $headers, self::EXIT_CLIENT_NOT_SCALAR];
+        }
+
+        if (str_contains((string) $newResult['client']['name'], 'general')) {
+            return [$newResult, null, $headers, self::EXIT_CLIENT_IS_GENERAL];
+        }
+
+        if ($newResult['client']['name'] === 'unknown') {
+            return [$newResult, null, $headers, self::EXIT_CLIENT_IS_UNKNOW];
+        }
+
+        if (str_contains((string) $newResult['device']['deviceName'], 'general')) {
+            return [$newResult, null, $headers, self::EXIT_DEVICE_IS_GENERAL];
+        }
+
+        if ($newResult['device']['deviceName'] === 'unknown') {
+            return [$newResult, null, $headers, self::EXIT_DEVICE_IS_UNKNOW];
         }
 
         if (
@@ -662,12 +693,12 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, 5];
+                return [null, $key, $headers, self::EXIT_CLIENT_IS_BOT];
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, 5];
+            return [$newResult, $key, $headers, self::EXIT_CLIENT_IS_BOT];
         }
 
         if (
@@ -683,6 +714,7 @@ final class RewriteTestsCommand extends Command
             assert(is_scalar($newResult['device']['manufacturer']));
 
             $keys = [
+                'desktop',
                 (string) $newResult['client']['name'],
                 (string) $newResult['os']['name'],
                 (string) $newResult['device']['deviceName'],
@@ -692,50 +724,68 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, 6];
+                return [null, $key, $headers, self::EXIT_DEVICE_IS_DESKTOP];
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, 6];
+            return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_DESKTOP];
         }
 
         $deviceType = Type::fromName($newResult['device']['type'] ?? 'unknown');
 
-        if ($deviceType->isMobile() || $deviceType->isTablet() || $deviceType->isTv()) {
+        if ($deviceType->isMobile() || $deviceType->isTablet()) {
             assert(is_scalar($newResult['engine']['name']));
             assert(is_scalar($newResult['os']['name']));
-            assert(is_scalar($newResult['device']['marketingName']));
+            assert(is_scalar($newResult['device']['deviceName']));
             assert(is_scalar($newResult['device']['manufacturer']));
 
             $keys = [
+                'mobile',
                 (string) $newResult['client']['name'],
                 (string) $newResult['engine']['name'],
                 (string) $newResult['os']['name'],
                 (string) $newResult['device']['deviceName'],
-                (string) $newResult['device']['marketingName'],
                 (string) $newResult['device']['manufacturer'],
             ];
 
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, 7];
+                return [null, $key, $headers, self::EXIT_DEVICE_IS_MOBILE];
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, 7];
+            return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_MOBILE];
         }
 
-        assert(is_scalar($newResult['client']['name']));
-        assert(is_scalar($newResult['os']['name']));
+        if ($deviceType->isTv()) {
+            assert(is_scalar($newResult['device']['deviceName']));
+            assert(is_scalar($newResult['device']['manufacturer']));
+
+            $keys = [
+                'tv',
+                (string) $newResult['device']['deviceName'],
+                (string) $newResult['device']['manufacturer'],
+            ];
+
+            $key = implode('-', $keys);
+
+            if (array_key_exists($key, $this->tests)) {
+                return [null, $key, $headers, self::EXIT_DEVICE_IS_TV];
+            }
+
+            $this->tests[$key] = 1;
+
+            return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_TV];
+        }
+
         assert(is_scalar($newResult['device']['deviceName']));
         assert(is_scalar($newResult['device']['manufacturer']));
 
         $keys = [
-            (string) $newResult['client']['name'],
-            (string) $newResult['os']['name'],
+            'other',
             (string) $newResult['device']['deviceName'],
             (string) $newResult['device']['manufacturer'],
         ];
@@ -743,12 +793,12 @@ final class RewriteTestsCommand extends Command
         $key = implode('-', $keys);
 
         if (array_key_exists($key, $this->tests)) {
-            return [null, $newResult, $headers, 8];
+            return [null, $newResult, $headers, self::EXIT_DEVICE_IS_OTHER];
         }
 
         $this->tests[$key] = 1;
 
-        return [$newResult, $key, $headers, 8];
+        return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_OTHER];
     }
 
     /** @throws RuntimeException */
@@ -885,8 +935,7 @@ final class RewriteTestsCommand extends Command
         );
         $message .= ' - normalizing';
 
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -920,8 +969,7 @@ final class RewriteTestsCommand extends Command
         );
         $message .= ' - writing';
 
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1057,10 +1105,8 @@ final class RewriteTestsCommand extends Command
 
         memory_reset_peak_usage();
 
-        $message = $loopMessage . 'check';
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $message       = $loopMessage . 'check';
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1114,10 +1160,8 @@ final class RewriteTestsCommand extends Command
             array_key_exists('x-requested-with', $test['headers'])
             && array_key_exists('http-x-requested-with', $test['headers'])
         ) {
-            $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
+            $message       = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
+            $messageLength = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1172,10 +1216,8 @@ final class RewriteTestsCommand extends Command
             $puffinHeader = $test['headers']['x-puffin-ua'];
         }
 
-        $message = $loopMessage . 'redetect';
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $message       = $loopMessage . 'redetect';
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1213,6 +1255,8 @@ final class RewriteTestsCommand extends Command
         );
 
         if ($forbiddenFound) {
+            ++$skipped;
+
             return;
         }
 
@@ -1238,11 +1282,15 @@ final class RewriteTestsCommand extends Command
             return;
         }
 
-        if ($exit === 2 || $exit === 4) {
+        if (
+            $exit === self::EXIT_DEVICE_IS_NULL
+            || $exit === self::EXIT_DEVICE_NOT_SCALAR
+            || $exit === self::EXIT_DEVICE_IS_GENERAL
+            || $exit === self::EXIT_DEVICE_IS_UNKNOW
+        ) {
             if (
                 !empty($result['os']['name'])
                 && is_string($result['os']['name'])
-                && mb_strtolower($result['os']['name']) === 'android'
                 && is_scalar($result['os']['version'])
             ) {
                 try {
@@ -1264,51 +1312,103 @@ final class RewriteTestsCommand extends Command
                     return;
                 }
 
-                if ($result['device']['deviceName'] === null) {
-                    $this->seviceNotFound(
-                        output: $output,
-                        loopMessage: $loopMessage,
-                        messageLength: $messageLength,
-                        secChModelHeader: $secChModelHeader,
-                        puffinHeader: $puffinHeader,
-                        headerChecks4: $headerChecks4,
-                        headerChecks5: $headerChecks5,
-                    );
-                }
-
-                if ((int) $version->getMajor() < 9) {
-                    return;
-                }
-
-                if ((int) $version->getMajor() >= 13) {
-                    $clientHints = ClientHints::factory($headers);
-
-                    $dd->setUserAgent($headers['user-agent']);
-                    $dd->setClientHints($clientHints);
-                    $dd->parse();
-                    $ddModel      = $dd->getModel();
-                    $ddBrand      = $dd->getBrandName();
-                    $ddDeviceType = $dd->getDeviceName();
-
-                    if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
-                        ++$counterChecks7;
-
-                        $addMessage = sprintf(
-                            'The device for user-agent Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
-                            $headers['user-agent'],
-                            $ddBrand,
-                            $ddModel,
-                            $ddDeviceType,
+                if (mb_strtolower($result['os']['name']) === 'android') {
+                    if ($result['device']['deviceName'] === null) {
+                        $this->seviceNotFound(
+                            output: $output,
+                            loopMessage: $loopMessage,
+                            messageLength: $messageLength,
+                            secChModelHeader: $secChModelHeader,
+                            puffinHeader: $puffinHeader,
+                            headerChecks4: $headerChecks4,
+                            headerChecks5: $headerChecks5,
                         );
-                        $message    = $loopMessage . $addMessage;
+                    }
 
-                        $messageLength = max($messageLength, mb_strlen($message));
-                        $messageLength = min($messageLength, 200);
+                    if ((int) $version->getMajor() < 9) {
+                        ++$skipped;
 
-                        $output->writeln(
-                            messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                            options: OutputInterface::VERBOSITY_NORMAL,
+                        return;
+                    }
+
+                    if ((int) $version->getMajor() >= 13) {
+                        $clientHints = ClientHints::factory($headers);
+
+                        $dd->setUserAgent($headers['user-agent']);
+                        $dd->setClientHints($clientHints);
+                        $dd->parse();
+                        $ddModel      = $dd->getModel();
+                        $ddBrand      = $dd->getBrandName();
+                        $ddDeviceType = $dd->getDeviceName();
+
+                        if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
+                            ++$counterChecks7;
+
+                            $addMessage = sprintf(
+                                'The device for user-agent Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
+                                $headers['user-agent'],
+                                $ddBrand,
+                                $ddModel,
+                                $ddDeviceType,
+                            );
+
+                            $message       = $loopMessage . $addMessage;
+                            $messageLength = $this->messageLength($output, $message, $messageLength);
+
+                            $output->writeln(
+                                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                                options: OutputInterface::VERBOSITY_NORMAL,
+                            );
+                        }
+                    }
+                } elseif (mb_strtolower($result['os']['name']) === 'ios') {
+                    if ($result['device']['deviceName'] === null) {
+                        $this->seviceNotFound(
+                            output: $output,
+                            loopMessage: $loopMessage,
+                            messageLength: $messageLength,
+                            secChModelHeader: $secChModelHeader,
+                            puffinHeader: $puffinHeader,
+                            headerChecks4: $headerChecks4,
+                            headerChecks5: $headerChecks5,
                         );
+                    }
+
+                    if ((int) $version->getMajor() < 9) {
+                        ++$skipped;
+
+                        return;
+                    }
+
+                    if ((int) $version->getMajor() >= 13) {
+                        $clientHints = ClientHints::factory($headers);
+
+                        $dd->setUserAgent($headers['user-agent']);
+                        $dd->setClientHints($clientHints);
+                        $dd->parse();
+                        $ddModel      = $dd->getModel();
+                        $ddBrand      = $dd->getBrandName();
+                        $ddDeviceType = $dd->getDeviceName();
+
+                        if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
+                            ++$counterChecks7;
+
+                            $addMessage = sprintf(
+                                'The device for user-agent Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
+                                $headers['user-agent'],
+                                $ddBrand,
+                                $ddModel,
+                                $ddDeviceType,
+                            );
+
+                            $message       = $loopMessage . $addMessage;
+                            $messageLength = $this->messageLength($output, $message, $messageLength);
+
+                            $output->writeln(
+                                messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                                options: OutputInterface::VERBOSITY_NORMAL,
+                            );
+                        }
                     }
                 }
             }
@@ -1319,14 +1419,12 @@ final class RewriteTestsCommand extends Command
                 $xRequestHeader = mb_trim($xRequestHeader, '"');
 
                 if (!array_key_exists($xRequestHeader, $headerChecks1)) {
-                    $addMessage = sprintf(
+                    $addMessage    = sprintf(
                         'Could not detect the Client for the x-requested-with Header "%s"',
                         $xRequestHeader,
                     );
-                    $message    = $loopMessage . $addMessage;
-
-                    $messageLength = max($messageLength, mb_strlen($message));
-                    $messageLength = min($messageLength, 200);
+                    $message       = $loopMessage . $addMessage;
+                    $messageLength = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1341,15 +1439,13 @@ final class RewriteTestsCommand extends Command
                 $secChUaHeader = mb_trim($secChUaHeader, '"');
 
                 if (!array_key_exists($secChUaHeader, $headerChecks2)) {
-                    $addMessage = sprintf(
+                    $addMessage    = sprintf(
                         'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
                         $secChUaHeader,
                         var_export($test['headers'], true),
                     );
-                    $message    = $loopMessage . $addMessage;
-
-                    $messageLength = max($messageLength, mb_strlen($message));
-                    $messageLength = min($messageLength, 200);
+                    $message       = $loopMessage . $addMessage;
+                    $messageLength = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1366,14 +1462,12 @@ final class RewriteTestsCommand extends Command
                 $secChPlatformHeader = mb_trim($secChPlatformHeader, '"');
 
                 if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
-                    $addMessage = sprintf(
+                    $addMessage    = sprintf(
                         'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
                         $secChPlatformHeader,
                     );
-                    $message    = $loopMessage . $addMessage;
-
-                    $messageLength = max($messageLength, mb_strlen($message));
-                    $messageLength = min($messageLength, 200);
+                    $message       = $loopMessage . $addMessage;
+                    $messageLength = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1402,14 +1496,14 @@ final class RewriteTestsCommand extends Command
                 $dd->setUserAgent($headers['user-agent']);
                 $dd->setClientHints($clientHints);
                 $dd->parse();
-                $ddModel = $dd->getModel();
-                $ddBrand = $dd->getBrandName();
+                $ddModel      = $dd->getModel();
+                $ddBrand      = $dd->getBrandName();
                 $ddDeviceType = $dd->getDeviceName();
 
                 if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
                     ++$counterChecks7;
 
-                    $addMessage = sprintf(
+                    $addMessage    = sprintf(
                         'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
                         $headers['user-agent'],
                         $secChModelHeader,
@@ -1417,10 +1511,8 @@ final class RewriteTestsCommand extends Command
                         $ddModel,
                         $ddDeviceType,
                     );
-                    $message = $loopMessage . $addMessage;
-
-                    $messageLength = max($messageLength, mb_strlen($message));
-                    $messageLength = min($messageLength, 200);
+                    $message       = $loopMessage . $addMessage;
+                    $messageLength = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1489,11 +1581,9 @@ final class RewriteTestsCommand extends Command
         if ($saved === false) {
             ++$errors;
 
-            $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
-            $message    = $loopMessage . $addMessage;
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
+            $addMessage    = sprintf('<error>An error occured while saving file %s</error>', $file);
+            $message       = $loopMessage . $addMessage;
+            $messageLength = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1507,10 +1597,8 @@ final class RewriteTestsCommand extends Command
 
         unset($file);
 
-        $message = $loopMessage . $addMessage;
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $message       = $loopMessage . $addMessage;
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1538,11 +1626,9 @@ final class RewriteTestsCommand extends Command
         $tests = [];
 
         if (file_exists($file)) {
-            $addMessage = sprintf('read temporary file %s', $file);
-            $message    = $loopMessage . $addMessage;
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
+            $addMessage    = sprintf('read temporary file %s', $file);
+            $message       = $loopMessage . $addMessage;
+            $messageLength = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1554,11 +1640,9 @@ final class RewriteTestsCommand extends Command
             try {
                 $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
 
-                $addMessage = sprintf('read temporary file %s - done', $file);
-                $message    = $loopMessage . $addMessage;
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
+                $addMessage    = sprintf('read temporary file %s - done', $file);
+                $message       = $loopMessage . $addMessage;
+                $messageLength = $this->messageLength($output, $message, $messageLength);
 
                 $output->write(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1583,11 +1667,9 @@ final class RewriteTestsCommand extends Command
                 $timeRead += microtime(true) - $startTime;
             }
         } else {
-            $addMessage = sprintf('temporary file %s not found', $file);
-            $message    = $loopMessage . $addMessage;
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
+            $addMessage    = sprintf('temporary file %s not found', $file);
+            $message       = $loopMessage . $addMessage;
+            $messageLength = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1595,11 +1677,9 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        $addMessage = sprintf('write to temporary file %s', $file);
-        $message    = $loopMessage . $addMessage;
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $addMessage    = sprintf('write to temporary file %s', $file);
+        $message       = $loopMessage . $addMessage;
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1618,11 +1698,9 @@ final class RewriteTestsCommand extends Command
         } catch (JsonException) {
             ++$errors;
 
-            $addMessage = sprintf('<error>An error occured while encoding file %s</error>', $file);
-            $message    = $loopMessage . $addMessage;
-
-            $messageLength = max($messageLength, mb_strlen($message));
-            $messageLength = min($messageLength, 200);
+            $addMessage    = sprintf('<error>An error occured while encoding file %s</error>', $file);
+            $message       = $loopMessage . $addMessage;
+            $messageLength = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1658,14 +1736,12 @@ final class RewriteTestsCommand extends Command
             $secChModelHeader = mb_trim($secChModelHeader, '"');
 
             if (!array_key_exists($secChModelHeader, $headerChecks4)) {
-                $addMessage = sprintf(
+                $addMessage    = sprintf(
                     'Could not detect the Device for the sec-ch-ua-model Header "%s"',
                     $secChModelHeader,
                 );
-                $message    = $loopMessage . $addMessage;
-
-                $messageLength = max($messageLength, mb_strlen($message));
-                $messageLength = min($messageLength, 200);
+                $message       = $loopMessage . $addMessage;
+                $messageLength = $this->messageLength($output, $message, $messageLength);
 
                 $output->writeln(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1684,14 +1760,12 @@ final class RewriteTestsCommand extends Command
             return;
         }
 
-        $addMessage = sprintf(
+        $addMessage    = sprintf(
             'Could not detect the Device for the x-puffin-ua Header "%s"',
             $puffinHeader,
         );
-        $message    = $loopMessage . $addMessage;
-
-        $messageLength = max($messageLength, mb_strlen($message));
-        $messageLength = min($messageLength, 200);
+        $message       = $loopMessage . $addMessage;
+        $messageLength = $this->messageLength($output, $message, $messageLength);
 
         $output->writeln(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
@@ -1699,5 +1773,17 @@ final class RewriteTestsCommand extends Command
         );
 
         $headerChecks5[$puffinHeader] = true;
+    }
+
+    /** @throws void */
+    private function messageLength(OutputInterface $output, string $message, int $messageLength): int
+    {
+        return min(
+            max(
+                $messageLength,
+                Helper::width(Helper::removeDecoration($output->getFormatter(), $message)),
+            ),
+            200,
+        );
     }
 }
