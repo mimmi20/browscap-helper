@@ -16,10 +16,12 @@ namespace BrowscapHelper\Helper;
 use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\SourceInterface;
 use RuntimeException;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function max;
 use function mb_str_pad;
-use function mb_strlen;
+use function min;
 use function sprintf;
 
 final class ExistingTestsLoader
@@ -32,14 +34,14 @@ final class ExistingTestsLoader
      *
      * @throws RuntimeException
      */
-    public function getProperties(OutputInterface $output, array $sources): iterable
+    public function getProperties(OutputInterface $output, array $sources, int &$messageLength = 0): iterable
     {
-        $baseMessage   = 'reading sources';
-        $message       = $baseMessage . ' ...';
-        $messageLength = mb_strlen($message);
+        $baseMessage = 'reading sources';
+        $message     = $baseMessage . ' ...';
+        $diff        = $this->messageLength($output, $message, $messageLength);
 
         $output->writeln(
-            mb_str_pad(string: $message, length: $messageLength),
+            mb_str_pad(string: $message, length: $messageLength + $diff),
             OutputInterface::VERBOSITY_NORMAL,
         );
 
@@ -54,30 +56,45 @@ final class ExistingTestsLoader
                 continue;
             }
 
-            $message = $baseMessage . '...';
+            $message = '<info>' . $baseMessage . '...</info>';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+            $diff = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                "\r" . '<info>' . mb_str_pad(string: $message, length: $messageLength) . '</info>',
+                "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 false,
                 OutputInterface::VERBOSITY_VERBOSE,
             );
 
             yield from $source->getProperties($baseMessage, $messageLength);
 
-            $message = $baseMessage . '- done';
+            $message = '<info>' . $baseMessage . '- done</info>';
 
-            if (mb_strlen($message) > $messageLength) {
-                $messageLength = mb_strlen($message);
-            }
+            $diff = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
-                "\r" . '<info>' . mb_str_pad(string: $message, length: $messageLength) . '</info>',
+                "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 OutputInterface::VERBOSITY_VERBOSE,
             );
         }
+    }
+
+    /** @throws void */
+    private function messageLength(OutputInterface $output, string $message, int &$messageLength): int
+    {
+        $messageLengthWithoutFormat = Helper::width(
+            Helper::removeDecoration($output->getFormatter(), $message),
+        );
+        $messageLengthWithFormat    = Helper::width($message);
+
+        $messageLength = min(
+            max(
+                $messageLength,
+                $messageLengthWithFormat,
+            ),
+            200,
+        );
+
+        return $messageLengthWithFormat - $messageLengthWithoutFormat;
     }
 }

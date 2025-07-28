@@ -30,13 +30,16 @@ use Ergebnis\Json\Normalizer\Exception\SchemaUriReferencesInvalidJsonDocument;
 use Ergebnis\Json\Normalizer\Normalizer as NormalizerInterface;
 use Exception;
 use JsonException;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function assert;
 use function json_encode;
+use function max;
 use function mb_str_pad;
 use function mb_strlen;
+use function min;
 use function sprintf;
 
 use const JSON_PRETTY_PRINT;
@@ -114,17 +117,16 @@ final class JsonNormalizer
         string $message,
         int &$messageLength = 0,
     ): string | null {
-        $message2 = $message . ' - encode data ...';
+        $message2 = '<info>' . $message . '</info> - encode data ...';
 
-        if (mb_strlen($message2) > $messageLength) {
-            $messageLength = mb_strlen($message2);
-        }
+        $diff = $this->messageLength($output, $message2, $messageLength);
 
         $output->write(
-            "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
+            "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
+        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         try {
             $content = json_encode($headers, JSON_THROW_ON_ERROR);
@@ -134,6 +136,8 @@ final class JsonNormalizer
                 '<error>' . (new Exception('could not encode content', 0, $e)) . '</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
+
+            $messageLength = 0;
 
             return null;
         }
@@ -147,50 +151,71 @@ final class JsonNormalizer
                 OutputInterface::VERBOSITY_NORMAL,
             );
 
+            $messageLength = 0;
+
             return null;
         }
 
-        $message2 = $message . ' - normalize ...';
+        $message2 = '<info>' . $message . '</info> - normalize ...';
 
-        if (mb_strlen($message2) > $messageLength) {
-            $messageLength = mb_strlen($message2);
-        }
+        $diff = $this->messageLength($output, $message2, $messageLength);
 
         $output->write(
-            "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
+            "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
+        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         foreach ($this->normalizers as $name => $normalizer) {
-            $message2 = $message . sprintf(' - normalize with %s ...', $name);
+            $message2 = '<info>' . $message . '</info>' . sprintf(' - normalize with %s ...', $name);
 
-            if (mb_strlen($message2) > $messageLength) {
-                $messageLength = mb_strlen($message2);
-            }
+            $diff = $this->messageLength($output, $message2, $messageLength);
 
             $output->write(
-                "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
+                "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
+            );
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
             );
 
             assert($normalizer instanceof NormalizerInterface);
             $json = $normalizer->normalize($json);
         }
 
-        $message2 = $message . ' - normalizing done';
+        $message2 = '<info>' . $message . '</info> - normalizing done';
 
-        if (mb_strlen($message2) > $messageLength) {
-            $messageLength = mb_strlen($message2);
-        }
+        $diff = $this->messageLength($output, $message2, $messageLength);
 
         $output->write(
-            "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
+            "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
             false,
             OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
+        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         return $json->encoded();
+    }
+
+    /** @throws void */
+    private function messageLength(OutputInterface $output, string $message, int &$messageLength): int
+    {
+        $messageLengthWithoutFormat = Helper::width(
+            Helper::removeDecoration($output->getFormatter(), $message),
+        );
+        $messageLengthWithFormat    = Helper::width($message);
+
+        $messageLength = min(
+            max(
+                $messageLength,
+                $messageLengthWithFormat,
+            ),
+            200,
+        );
+
+        return $messageLengthWithFormat - $messageLengthWithoutFormat;
     }
 }
