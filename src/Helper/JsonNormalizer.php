@@ -36,8 +36,10 @@ use UnexpectedValueException;
 
 use function assert;
 use function json_encode;
+use function max;
 use function mb_str_pad;
 use function mb_strlen;
+use function min;
 use function sprintf;
 
 use const JSON_PRETTY_PRINT;
@@ -175,7 +177,10 @@ final class JsonNormalizer
                 false,
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
-            $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
+            );
 
             assert($normalizer instanceof NormalizerInterface);
             $json = $normalizer->normalize($json);
@@ -198,7 +203,9 @@ final class JsonNormalizer
     /** @throws void */
     private function messageLength(OutputInterface $output, string $message, int &$messageLength): int
     {
-        $messageLengthWithoutFormat = Helper::width(Helper::removeDecoration($output->getFormatter(), $message));
+        $messageLengthWithoutFormat = Helper::width(
+            Helper::removeDecoration($output->getFormatter(), $message),
+        );
         $messageLengthWithFormat    = Helper::width($message);
 
         $messageLength = min(

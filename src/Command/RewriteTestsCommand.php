@@ -427,7 +427,7 @@ final class RewriteTestsCommand extends Command
             // exit;
         }
 
-        $messageLength  = 0;
+        $messageLength = 0;
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
@@ -618,8 +618,8 @@ final class RewriteTestsCommand extends Command
         string $parentMessage,
         int &$messageLength = 0,
     ): array {
-        $message       = $parentMessage . ' - <info>detect for new result ...</info>';
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $message = $parentMessage . ' - <info>detect for new result ...</info>';
+        $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -638,8 +638,8 @@ final class RewriteTestsCommand extends Command
             return [null, null, $headers, self::EXIT_NO_RESULT];
         }
 
-        $message       = $parentMessage . ' - <info>analyze new result ...</info>';
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $message = $parentMessage . ' - <info>analyze new result ...</info>';
+        $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1121,8 +1121,8 @@ final class RewriteTestsCommand extends Command
 
         memory_reset_peak_usage();
 
-        $message       = $loopMessage . 'check';
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $message = $loopMessage . 'check';
+        $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1177,8 +1177,8 @@ final class RewriteTestsCommand extends Command
             array_key_exists('x-requested-with', $test['headers'])
             && array_key_exists('http-x-requested-with', $test['headers'])
         ) {
-            $message       = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
-            $diff = $this->messageLength($output, $message, $messageLength);
+            $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
+            $diff    = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1233,8 +1233,8 @@ final class RewriteTestsCommand extends Command
             $puffinHeader = $test['headers']['x-puffin-ua'];
         }
 
-        $message       = $loopMessage . 'redetect';
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $message = $loopMessage . 'redetect';
+        $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1371,11 +1371,14 @@ final class RewriteTestsCommand extends Command
                                 $ddDeviceType,
                             );
 
-                            $message       = $loopMessage . $addMessage;
-                            $diff = $this->messageLength($output, $message, $messageLength);
+                            $message = $loopMessage . $addMessage;
+                            $diff    = $this->messageLength($output, $message, $messageLength);
 
                             $output->writeln(
-                                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                                messages: "\r" . mb_str_pad(
+                                    string: $message,
+                                    length: $messageLength + $diff,
+                                ),
                                 options: OutputInterface::VERBOSITY_NORMAL,
                             );
                         }
@@ -1421,11 +1424,14 @@ final class RewriteTestsCommand extends Command
                                 $ddDeviceType,
                             );
 
-                            $message       = $loopMessage . $addMessage;
-                            $diff = $this->messageLength($output, $message, $messageLength);
+                            $message = $loopMessage . $addMessage;
+                            $diff    = $this->messageLength($output, $message, $messageLength);
 
                             $output->writeln(
-                                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                                messages: "\r" . mb_str_pad(
+                                    string: $message,
+                                    length: $messageLength + $diff,
+                                ),
                                 options: OutputInterface::VERBOSITY_NORMAL,
                             );
                         }
@@ -1439,12 +1445,12 @@ final class RewriteTestsCommand extends Command
                 $xRequestHeader = mb_trim($xRequestHeader, '"');
 
                 if (!array_key_exists($xRequestHeader, $headerChecks1)) {
-                    $addMessage    = sprintf(
+                    $addMessage = sprintf(
                         'Could not detect the Client for the x-requested-with Header "%s"',
                         $xRequestHeader,
                     );
-                    $message       = $loopMessage . $addMessage;
-                    $diff = $this->messageLength($output, $message, $messageLength);
+                    $message    = $loopMessage . $addMessage;
+                    $diff       = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1459,13 +1465,13 @@ final class RewriteTestsCommand extends Command
                 $secChUaHeader = mb_trim($secChUaHeader, '"');
 
                 if (!array_key_exists($secChUaHeader, $headerChecks2)) {
-                    $addMessage    = sprintf(
+                    $addMessage = sprintf(
                         'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
                         $secChUaHeader,
                         var_export($test['headers'], true),
                     );
-                    $message       = $loopMessage . $addMessage;
-                    $diff = $this->messageLength($output, $message, $messageLength);
+                    $message    = $loopMessage . $addMessage;
+                    $diff       = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1482,12 +1488,12 @@ final class RewriteTestsCommand extends Command
                 $secChPlatformHeader = mb_trim($secChPlatformHeader, '"');
 
                 if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
-                    $addMessage    = sprintf(
+                    $addMessage = sprintf(
                         'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
                         $secChPlatformHeader,
                     );
-                    $message       = $loopMessage . $addMessage;
-                    $diff = $this->messageLength($output, $message, $messageLength);
+                    $message    = $loopMessage . $addMessage;
+                    $diff       = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1523,7 +1529,7 @@ final class RewriteTestsCommand extends Command
                 if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
                     ++$counterChecks7;
 
-                    $addMessage    = sprintf(
+                    $addMessage = sprintf(
                         'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
                         $headers['user-agent'],
                         $secChModelHeader,
@@ -1531,8 +1537,8 @@ final class RewriteTestsCommand extends Command
                         $ddModel,
                         $ddDeviceType,
                     );
-                    $message       = $loopMessage . $addMessage;
-                    $diff = $this->messageLength($output, $message, $messageLength);
+                    $message    = $loopMessage . $addMessage;
+                    $diff       = $this->messageLength($output, $message, $messageLength);
 
                     $output->writeln(
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1601,9 +1607,9 @@ final class RewriteTestsCommand extends Command
         if ($saved === false) {
             ++$errors;
 
-            $addMessage    = sprintf('<error>An error occured while saving file %s</error>', $file);
-            $message       = $loopMessage . $addMessage;
-            $diff = $this->messageLength($output, $message, $messageLength);
+            $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
+            $message    = $loopMessage . $addMessage;
+            $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1617,8 +1623,8 @@ final class RewriteTestsCommand extends Command
 
         unset($file);
 
-        $message       = $loopMessage . $addMessage;
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $message = $loopMessage . $addMessage;
+        $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1647,30 +1653,36 @@ final class RewriteTestsCommand extends Command
         $tests = [];
 
         if (file_exists($file)) {
-            $addMessage    = sprintf('read temporary file %s', $file);
-            $message       = $loopMessage . $addMessage;
-            $diff = $this->messageLength($output, $message, $messageLength);
+            $addMessage = sprintf('read temporary file %s', $file);
+            $message    = $loopMessage . $addMessage;
+            $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
+            );
 
             $startTime = microtime(true);
 
             try {
                 $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
 
-                $addMessage    = sprintf('read temporary file %s - <info>done</info>', $file);
-                $message       = $loopMessage . $addMessage;
-                $diff = $this->messageLength($output, $message, $messageLength);
+                $addMessage = sprintf('read temporary file %s - <info>done</info>', $file);
+                $message    = $loopMessage . $addMessage;
+                $diff       = $this->messageLength($output, $message, $messageLength);
 
                 $output->write(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
-                $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+                $output->writeln(
+                    sprintf(' <bg=red>%d</>', $messageLength),
+                    OutputInterface::VERBOSITY_DEBUG,
+                );
             } catch (JsonException $e) {
                 ++$errors;
 
@@ -1690,20 +1702,23 @@ final class RewriteTestsCommand extends Command
                 $timeRead += microtime(true) - $startTime;
             }
         } else {
-            $addMessage    = sprintf('temporary file %s <info>not found</info>', $file);
-            $message       = $loopMessage . $addMessage;
-            $diff = $this->messageLength($output, $message, $messageLength);
+            $addMessage = sprintf('temporary file %s <info>not found</info>', $file);
+            $message    = $loopMessage . $addMessage;
+            $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
+            );
         }
 
-        $addMessage    = sprintf('write to temporary file %s', $file);
-        $message       = $loopMessage . $addMessage;
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $addMessage = sprintf('write to temporary file %s', $file);
+        $message    = $loopMessage . $addMessage;
+        $diff       = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1723,9 +1738,9 @@ final class RewriteTestsCommand extends Command
         } catch (JsonException) {
             ++$errors;
 
-            $addMessage    = sprintf('<error>An error occured while encoding file %s</error>', $file);
-            $message       = $loopMessage . $addMessage;
-            $diff = $this->messageLength($output, $message, $messageLength);
+            $addMessage = sprintf('<error>An error occured while encoding file %s</error>', $file);
+            $message    = $loopMessage . $addMessage;
+            $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1761,12 +1776,12 @@ final class RewriteTestsCommand extends Command
             $secChModelHeader = mb_trim($secChModelHeader, '"');
 
             if (!array_key_exists($secChModelHeader, $headerChecks4)) {
-                $addMessage    = sprintf(
+                $addMessage = sprintf(
                     'Could not detect the Device for the sec-ch-ua-model Header "%s"',
                     $secChModelHeader,
                 );
-                $message       = $loopMessage . $addMessage;
-                $diff = $this->messageLength($output, $message, $messageLength);
+                $message    = $loopMessage . $addMessage;
+                $diff       = $this->messageLength($output, $message, $messageLength);
 
                 $output->writeln(
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1785,12 +1800,12 @@ final class RewriteTestsCommand extends Command
             return;
         }
 
-        $addMessage    = sprintf(
+        $addMessage = sprintf(
             'Could not detect the Device for the x-puffin-ua Header "%s"',
             $puffinHeader,
         );
-        $message       = $loopMessage . $addMessage;
-        $diff = $this->messageLength($output, $message, $messageLength);
+        $message    = $loopMessage . $addMessage;
+        $diff       = $this->messageLength($output, $message, $messageLength);
 
         $output->writeln(
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
@@ -1803,7 +1818,9 @@ final class RewriteTestsCommand extends Command
     /** @throws void */
     private function messageLength(OutputInterface $output, string $message, int &$messageLength): int
     {
-        $messageLengthWithoutFormat = Helper::width(Helper::removeDecoration($output->getFormatter(), $message));
+        $messageLengthWithoutFormat = Helper::width(
+            Helper::removeDecoration($output->getFormatter(), $message),
+        );
         $messageLengthWithFormat    = Helper::width($message);
 
         $messageLength = min(
