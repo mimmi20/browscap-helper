@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Entity\TestResult;
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
 use BrowscapHelper\Helper\JsonNormalizer;
@@ -60,7 +61,6 @@ use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
-use function is_array;
 use function is_scalar;
 use function is_string;
 use function json_decode;
@@ -92,34 +92,6 @@ use const STR_PAD_LEFT;
 final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
-
-    private const int EXIT_NO_RESULT = 0;
-
-    private const int EXIT_DEVICE_IS_NULL = 1;
-
-    private const int EXIT_CLIENT_IS_NULL = 2;
-
-    private const int EXIT_DEVICE_NOT_SCALAR = 3;
-
-    private const int EXIT_CLIENT_NOT_SCALAR = 4;
-
-    private const int EXIT_DEVICE_IS_UNKNOW = 5;
-
-    private const int EXIT_CLIENT_IS_UNKNOW = 6;
-
-    private const int EXIT_CLIENT_IS_BOT = 7;
-
-    private const int EXIT_DEVICE_IS_DESKTOP = 8;
-
-    private const int EXIT_DEVICE_IS_MOBILE = 9;
-
-    private const int EXIT_DEVICE_IS_TV = 10;
-
-    private const int EXIT_DEVICE_IS_OTHER = 11;
-
-    private const int EXIT_DEVICE_IS_GENERAL = 12;
-
-    private const int EXIT_CLIENT_IS_GENERAL = 13;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -436,16 +408,6 @@ final class RewriteTestsCommand extends Command
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
             messages: sprintf(
-                'check result:       %7d test(s), %7d duplicate(s), %7d error(s)',
-                $testCount,
-                $duplicates,
-                $errors,
-            ),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(
-            messages: sprintf(
                 'time checking:      %s sec',
                 mb_str_pad(number_format($timeCheck, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
@@ -573,6 +535,8 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+
         $dataToOutput = [
             'useragents processed' => $counter,
             'tests written' => $testCount,
@@ -605,8 +569,6 @@ final class RewriteTestsCommand extends Command
     /**
      * @param array<non-empty-string, non-empty-string> $headers
      *
-     * @return array<int, mixed>
-     *
      * @throws void
      *
      * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
@@ -617,7 +579,7 @@ final class RewriteTestsCommand extends Command
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
-    ): array {
+    ): TestResult {
         $message = $parentMessage . ' - <info>detect for new result ...</info>';
         $diff    = $this->messageLength($output, $message, $messageLength);
 
@@ -635,7 +597,12 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
-            return [null, null, $headers, self::EXIT_NO_RESULT];
+            return new TestResult(
+                result: null,
+                status: TestResult::STATUS_ERROR,
+                headers: $headers,
+                exit: TestResult::EXIT_NO_RESULT,
+            );
         }
 
         $message = $parentMessage . ' - <info>analyze new result ...</info>';
@@ -648,35 +615,75 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         if ($newResult['device']['deviceName'] === null) {
-            return [$newResult, null, $headers, self::EXIT_DEVICE_IS_NULL];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_NULL,
+            );
         }
 
         if ($newResult['client']['name'] === null) {
-            return [$newResult, null, $headers, self::EXIT_CLIENT_IS_NULL];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_CLIENT_IS_NULL,
+            );
         }
 
         if (!is_scalar($newResult['device']['deviceName'])) {
-            return [$newResult, null, $headers, self::EXIT_DEVICE_NOT_SCALAR];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_NOT_SCALAR,
+            );
         }
 
         if (!is_scalar($newResult['client']['name'])) {
-            return [$newResult, null, $headers, self::EXIT_CLIENT_NOT_SCALAR];
+            return new TestResult(
+                result: null,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_CLIENT_NOT_SCALAR,
+            );
         }
 
         if (str_contains((string) $newResult['client']['name'], 'general')) {
-            return [$newResult, null, $headers, self::EXIT_CLIENT_IS_GENERAL];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_CLIENT_IS_GENERAL,
+            );
         }
 
         if ($newResult['client']['name'] === 'unknown') {
-            return [$newResult, null, $headers, self::EXIT_CLIENT_IS_UNKNOW];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_CLIENT_IS_UNKNOW,
+            );
         }
 
         if (str_contains((string) $newResult['device']['deviceName'], 'general')) {
-            return [$newResult, null, $headers, self::EXIT_DEVICE_IS_GENERAL];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_GENERAL,
+            );
         }
 
         if ($newResult['device']['deviceName'] === 'unknown') {
-            return [$newResult, null, $headers, self::EXIT_DEVICE_IS_UNKNOW];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_UNKNOW,
+            );
         }
 
         if (
@@ -699,12 +706,22 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, self::EXIT_CLIENT_IS_BOT];
+                return new TestResult(
+                    result: null,
+                    status: TestResult::STATUS_DUPLICATE,
+                    headers: $headers,
+                    exit: TestResult::EXIT_CLIENT_IS_BOT,
+                );
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, self::EXIT_CLIENT_IS_BOT];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_CLIENT_IS_BOT,
+            );
         }
 
         if (
@@ -730,12 +747,22 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, self::EXIT_DEVICE_IS_DESKTOP];
+                return new TestResult(
+                    result: null,
+                    status: TestResult::STATUS_DUPLICATE,
+                    headers: $headers,
+                    exit: TestResult::EXIT_DEVICE_IS_DESKTOP,
+                );
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_DESKTOP];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_DESKTOP,
+            );
         }
 
         $deviceType = Type::fromName($newResult['device']['type'] ?? 'unknown');
@@ -758,12 +785,22 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, self::EXIT_DEVICE_IS_MOBILE];
+                return new TestResult(
+                    result: null,
+                    status: TestResult::STATUS_DUPLICATE,
+                    headers: $headers,
+                    exit: TestResult::EXIT_DEVICE_IS_MOBILE,
+                );
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_MOBILE];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_MOBILE,
+            );
         }
 
         if ($deviceType->isTv()) {
@@ -783,12 +820,22 @@ final class RewriteTestsCommand extends Command
             $key = implode('-', $keys);
 
             if (array_key_exists($key, $this->tests)) {
-                return [null, $key, $headers, self::EXIT_DEVICE_IS_TV];
+                return new TestResult(
+                    result: null,
+                    status: TestResult::STATUS_DUPLICATE,
+                    headers: $headers,
+                    exit: TestResult::EXIT_DEVICE_IS_TV,
+                );
             }
 
             $this->tests[$key] = 1;
 
-            return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_TV];
+            return new TestResult(
+                result: $newResult,
+                status: TestResult::STATUS_OK,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_TV,
+            );
         }
 
         assert(is_scalar($newResult['device']['deviceName']));
@@ -807,12 +854,22 @@ final class RewriteTestsCommand extends Command
         $key = implode('-', $keys);
 
         if (array_key_exists($key, $this->tests)) {
-            return [null, $newResult, $headers, self::EXIT_DEVICE_IS_OTHER];
+            return new TestResult(
+                result: null,
+                status: TestResult::STATUS_DUPLICATE,
+                headers: $headers,
+                exit: TestResult::EXIT_DEVICE_IS_OTHER,
+            );
         }
 
         $this->tests[$key] = 1;
 
-        return [$newResult, $key, $headers, self::EXIT_DEVICE_IS_OTHER];
+        return new TestResult(
+            result: $newResult,
+            status: TestResult::STATUS_OK,
+            headers: $headers,
+            exit: TestResult::EXIT_DEVICE_IS_OTHER,
+        );
     }
 
     /** @throws RuntimeException */
@@ -1280,7 +1337,7 @@ final class RewriteTestsCommand extends Command
 
         $startTime = microtime(true);
 
-        [$result, , $headers, $exit] = $this->handleTest(
+        $testResult = $this->handleTest(
             output: $output,
             detector: $detector,
             headers: $filteredHeaders,
@@ -1290,21 +1347,34 @@ final class RewriteTestsCommand extends Command
 
         $timeDetect += microtime(true) - $startTime;
 
-        if (!is_array($result)) {
-            ++$duplicates;
+        $result = $testResult->getResult();
 
-            // if ($exit !== 2 && $exit !== 6) {
-            //    var_dump($key, $headers, $exit);
-            // }
+        if ($testResult->getStatus() === TestResult::STATUS_ERROR || $result === null) {
+            ++$errors;
 
             return;
         }
 
+        if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
+            ++$skipped;
+
+            return;
+        }
+
+        if ($testResult->getStatus() === TestResult::STATUS_DUPLICATE) {
+            ++$duplicates;
+
+            return;
+        }
+
+        $headers = $testResult->getHeaders();
+
         if (
-            $exit === self::EXIT_DEVICE_IS_NULL
-            || $exit === self::EXIT_DEVICE_NOT_SCALAR
-            || $exit === self::EXIT_DEVICE_IS_GENERAL
-            || $exit === self::EXIT_DEVICE_IS_UNKNOW
+            in_array(
+                $testResult->getExit(),
+                [TestResult::EXIT_DEVICE_IS_NULL, TestResult::EXIT_DEVICE_NOT_SCALAR, TestResult::EXIT_DEVICE_IS_GENERAL, TestResult::EXIT_DEVICE_IS_UNKNOW],
+                true,
+            )
         ) {
             if (
                 !empty($result['os']['name'])
@@ -1332,7 +1402,7 @@ final class RewriteTestsCommand extends Command
 
                 if (mb_strtolower($result['os']['name']) === 'android') {
                     if ($result['device']['deviceName'] === null) {
-                        $this->seviceNotFound(
+                        $this->deviceNotFound(
                             output: $output,
                             loopMessage: $loopMessage,
                             messageLength: $messageLength,
@@ -1385,7 +1455,7 @@ final class RewriteTestsCommand extends Command
                     }
                 } elseif (mb_strtolower($result['os']['name']) === 'ios') {
                     if ($result['device']['deviceName'] === null) {
-                        $this->seviceNotFound(
+                        $this->deviceNotFound(
                             output: $output,
                             loopMessage: $loopMessage,
                             messageLength: $messageLength,
@@ -1441,34 +1511,46 @@ final class RewriteTestsCommand extends Command
         }
 
         if ($result['client']['name'] === null) {
-            if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
-                $xRequestHeader = mb_trim($xRequestHeader, '"');
+            $this->clientNotFound(
+                output: $output,
+                loopMessage: $loopMessage,
+                messageLength: $messageLength,
+                xRequestHeader: $xRequestHeader,
+                secChUaHeader: $secChUaHeader,
+                headerChecks1: $headerChecks1,
+                headerChecks2: $headerChecks2,
+                test: $test,
+            );
 
-                if (!array_key_exists($xRequestHeader, $headerChecks1)) {
+            if (
+                $secChUaHeader !== null
+                || (
+                    $xRequestHeader !== null
+                    && $xRequestHeader !== 'XMLHttpRequest'
+                )
+            ) {
+                $clientHints = ClientHints::factory($headers);
+
+                $dd->setUserAgent($headers['user-agent']);
+                $dd->setClientHints($clientHints);
+                $dd->parse();
+                $isBot      = $dd->isBot();
+                $clientInfo = $dd->getClient();
+                $botInfo    = $dd->getBot();
+
+                $clientName = $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null);
+                $clientType = $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null);
+
+                if (!in_array($clientName, ['', null], true)) {
+                    ++$counterChecks7;
+
                     $addMessage = sprintf(
-                        'Could not detect the Client for the x-requested-with Header "%s"',
-                        $xRequestHeader,
-                    );
-                    $message    = $loopMessage . $addMessage;
-                    $diff       = $this->messageLength($output, $message, $messageLength);
-
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-
-                    $headerChecks1[$xRequestHeader] = true;
-                }
-            }
-
-            if ($secChUaHeader !== null) {
-                $secChUaHeader = mb_trim($secChUaHeader, '"');
-
-                if (!array_key_exists($secChUaHeader, $headerChecks2)) {
-                    $addMessage = sprintf(
-                        'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
+                        'The client for user-agent Header "%s" and sec-ch-ua Header "%s" or x-requested-with Header "%s" was not detected, but Matomo was able to detect it as "%s" (%s)',
+                        $headers['user-agent'],
                         $secChUaHeader,
-                        var_export($test['headers'], true),
+                        $xRequestHeader,
+                        $clientName,
+                        $clientType,
                     );
                     $message    = $loopMessage . $addMessage;
                     $diff       = $this->messageLength($output, $message, $messageLength);
@@ -1477,36 +1559,22 @@ final class RewriteTestsCommand extends Command
                         messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
-
-                    $headerChecks2[$secChUaHeader] = true;
                 }
             }
         }
 
         if ($result['os']['name'] === null) {
-            if ($secChPlatformHeader !== null) {
-                $secChPlatformHeader = mb_trim($secChPlatformHeader, '"');
-
-                if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
-                    $addMessage = sprintf(
-                        'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
-                        $secChPlatformHeader,
-                    );
-                    $message    = $loopMessage . $addMessage;
-                    $diff       = $this->messageLength($output, $message, $messageLength);
-
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-
-                    $headerChecks3[$secChPlatformHeader] = true;
-                }
-            }
+            $this->platformNotFound(
+                output: $output,
+                loopMessage: $loopMessage,
+                messageLength: $messageLength,
+                secChPlatformHeader: $secChPlatformHeader,
+                headerChecks3: $headerChecks3,
+            );
         }
 
         if ($result['device']['deviceName'] === null) {
-            $this->seviceNotFound(
+            $this->deviceNotFound(
                 output: $output,
                 loopMessage: $loopMessage,
                 messageLength: $messageLength,
@@ -1516,7 +1584,7 @@ final class RewriteTestsCommand extends Command
                 headerChecks5: $headerChecks5,
             );
 
-            if ($secChModelHeader !== null) {
+            if ($secChModelHeader !== null || $puffinHeader !== null) {
                 $clientHints = ClientHints::factory($headers);
 
                 $dd->setUserAgent($headers['user-agent']);
@@ -1530,9 +1598,10 @@ final class RewriteTestsCommand extends Command
                     ++$counterChecks7;
 
                     $addMessage = sprintf(
-                        'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
+                        'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" or x-puffin-ua Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
                         $headers['user-agent'],
                         $secChModelHeader,
+                        $puffinHeader,
                         $ddBrand,
                         $ddModel,
                         $ddDeviceType,
@@ -1763,7 +1832,7 @@ final class RewriteTestsCommand extends Command
      *
      * @throws void
      */
-    private function seviceNotFound(
+    private function deviceNotFound(
         OutputInterface $output,
         string $loopMessage,
         int $messageLength,
@@ -1813,6 +1882,102 @@ final class RewriteTestsCommand extends Command
         );
 
         $headerChecks5[$puffinHeader] = true;
+    }
+
+    /**
+     * @param array<string, bool>                   $headerChecks1
+     * @param array<string, bool>                   $headerChecks2
+     * @param array{headers: array<string, string>} $test
+     *
+     * @throws void
+     */
+    private function clientNotFound(
+        OutputInterface $output,
+        string $loopMessage,
+        int $messageLength,
+        string | null $xRequestHeader,
+        string | null $secChUaHeader,
+        array &$headerChecks1,
+        array &$headerChecks2,
+        array $test,
+    ): void {
+        if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
+            $xRequestHeader = mb_trim($xRequestHeader, '"');
+
+            if (!array_key_exists($xRequestHeader, $headerChecks1)) {
+                $addMessage = sprintf(
+                    'Could not detect the Client for the x-requested-with Header "%s"',
+                    $xRequestHeader,
+                );
+                $message    = $loopMessage . $addMessage;
+                $diff       = $this->messageLength($output, $message, $messageLength);
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                $headerChecks1[$xRequestHeader] = true;
+            }
+        }
+
+        if ($secChUaHeader === null) {
+            return;
+        }
+
+        $secChUaHeader = mb_trim($secChUaHeader, '"');
+
+        if (array_key_exists($secChUaHeader, $headerChecks2)) {
+            return;
+        }
+
+        $addMessage = sprintf(
+            'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
+            $secChUaHeader,
+            var_export($test['headers'], true),
+        );
+        $message    = $loopMessage . $addMessage;
+        $diff       = $this->messageLength($output, $message, $messageLength);
+
+        $output->writeln(
+            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $headerChecks2[$secChUaHeader] = true;
+    }
+
+    /**
+     * @param array<string, bool> $headerChecks3
+     *
+     * @throws void
+     */
+    private function platformNotFound(
+        OutputInterface $output,
+        string $loopMessage,
+        int $messageLength,
+        string | null $secChPlatformHeader,
+        array &$headerChecks3,
+    ): void {
+        if ($secChPlatformHeader !== null) {
+            $secChPlatformHeader = mb_trim($secChPlatformHeader, '"');
+
+            if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
+                $addMessage = sprintf(
+                    'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
+                    $secChPlatformHeader,
+                );
+                $message    = $loopMessage . $addMessage;
+                $diff       = $this->messageLength($output, $message, $messageLength);
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                $headerChecks3[$secChPlatformHeader] = true;
+            }
+        }
     }
 
     /** @throws void */
