@@ -1422,7 +1422,7 @@ final class RewriteTestsCommand extends Command
                     if ((int) $version->getMajor() >= 13) {
                         $clientHints = ClientHints::factory($headers);
 
-                        $dd->setUserAgent($headers['user-agent']);
+                        $dd->setUserAgent($headers['user-agent'] ?? '');
                         $dd->setClientHints($clientHints);
                         $dd->parse();
                         $ddModel      = $dd->getModel();
@@ -1434,7 +1434,7 @@ final class RewriteTestsCommand extends Command
 
                             $addMessage = sprintf(
                                 'The device for user-agent Header "%s" was detected as "%s", but Matomo was able to detect it as "%s %s" (%s) [android]',
-                                $headers['user-agent'],
+                                $headers['user-agent'] ?? '',
                                 $result['device']['deviceName'] ?? '',
                                 $ddBrand,
                                 $ddModel,
@@ -1475,7 +1475,7 @@ final class RewriteTestsCommand extends Command
                     if ((int) $version->getMajor() >= 13) {
                         $clientHints = ClientHints::factory($headers);
 
-                        $dd->setUserAgent($headers['user-agent']);
+                        $dd->setUserAgent($headers['user-agent'] ?? '');
                         $dd->setClientHints($clientHints);
                         $dd->parse();
                         $ddModel      = $dd->getModel();
@@ -1487,7 +1487,7 @@ final class RewriteTestsCommand extends Command
 
                             $addMessage = sprintf(
                                 'The device for user-agent Header "%s" was detected as "%s", but Matomo was able to detect it as "%s %s" (%s) [ios]',
-                                $headers['user-agent'],
+                                $headers['user-agent'] ?? '',
                                 $result['device']['deviceName'] ?? '',
                                 $ddBrand,
                                 $ddModel,
@@ -1531,7 +1531,7 @@ final class RewriteTestsCommand extends Command
             ) {
                 $clientHints = ClientHints::factory($headers);
 
-                $dd->setUserAgent($headers['user-agent']);
+                $dd->setUserAgent($headers['user-agent'] ?? '');
                 $dd->setClientHints($clientHints);
                 $dd->parse();
                 $isBot      = $dd->isBot();
@@ -1546,7 +1546,7 @@ final class RewriteTestsCommand extends Command
 
                     $addMessage = sprintf(
                         'The client for user-agent Header "%s" and sec-ch-ua Header "%s" or x-requested-with Header "%s" was not detected, but Matomo was able to detect it as "%s" (%s)',
-                        $headers['user-agent'],
+                        $headers['user-agent'] ?? '',
                         $secChUaHeader,
                         $xRequestHeader,
                         $clientName,
@@ -1587,7 +1587,7 @@ final class RewriteTestsCommand extends Command
             if ($secChModelHeader !== null || $puffinHeader !== null) {
                 $clientHints = ClientHints::factory($headers);
 
-                $dd->setUserAgent($headers['user-agent']);
+                $dd->setUserAgent($headers['user-agent'] ?? '');
                 $dd->setClientHints($clientHints);
                 $dd->parse();
                 $ddModel      = $dd->getModel();
@@ -1599,7 +1599,7 @@ final class RewriteTestsCommand extends Command
 
                     $addMessage = sprintf(
                         'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" or x-puffin-ua Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
-                        $headers['user-agent'],
+                        $headers['user-agent'] ?? '',
                         $secChModelHeader,
                         $puffinHeader,
                         $ddBrand,
