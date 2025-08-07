@@ -1326,11 +1326,28 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'wget http://')
                     || str_contains($v, '<?php')
                     || str_contains($v, '((')
-                    || str_contains($v, '))')
-                    || str_contains($v, '()')
                     || str_contains($v, '<\'')
                     || str_contains($v, '">')
-                    || str_contains($v, '/**/');
+                    || str_contains($v, '/**/')
+                    || str_contains($v, ':()')
+                    || str_contains($v, '>&0')
+                    || str_contains($v, ' convert(')
+                    || str_contains($v, '(select')
+                    || str_contains($v, '</a>')
+                    || str_contains($v, ';echo')
+                    || str_contains($v, '; echo')
+                    || str_contains($v, 'bin/uname')
+                    || str_contains($v, 'bin/bash')
+                    || str_contains($v, '(curl ')
+                    || str_contains($v, 'curl -O')
+                    || str_contains($v, '<input')
+                    || str_contains($v, '<img')
+                    || str_contains($v, '<video')
+                    || str_contains($v, '<source')
+                    || str_contains($v, '<a ')
+                    || str_contains($v, 'file_put_contents(')
+                    || str_contains($v, 'file_get_contents(')
+                    || str_contains($v, 'fromcharcode(');
             },
         );
 
@@ -1354,12 +1371,6 @@ final class RewriteTestsCommand extends Command
 
         $result = $testResult->getResult();
 
-        if ($testResult->getStatus() === TestResult::STATUS_ERROR || $result === null) {
-            ++$errors;
-
-            return;
-        }
-
         if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
             ++$skipped;
 
@@ -1368,6 +1379,12 @@ final class RewriteTestsCommand extends Command
 
         if ($testResult->getStatus() === TestResult::STATUS_DUPLICATE) {
             ++$duplicates;
+
+            return;
+        }
+
+        if ($testResult->getStatus() === TestResult::STATUS_ERROR || $result === null) {
+            ++$errors;
 
             return;
         }
