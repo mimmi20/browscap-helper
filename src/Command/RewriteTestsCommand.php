@@ -1325,7 +1325,12 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'waitfor delay ')
                     || str_contains($v, 'wget http://')
                     || str_contains($v, '<?php')
-                    || str_contains($v, ' eval(');
+                    || str_contains($v, '((')
+                    || str_contains($v, '))')
+                    || str_contains($v, '()')
+                    || str_contains($v, '<\'')
+                    || str_contains($v, '">')
+                    || str_contains($v, '/**/');
             },
         );
 
