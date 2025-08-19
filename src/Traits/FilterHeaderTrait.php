@@ -88,12 +88,6 @@ trait FilterHeaderTrait
                     'sec-ch-device-memory',
                     'sec-ch-dpr',
                     'sec-ch-viewport-width',
-                    'device-memory',
-                    'downlink',
-                    'dpr',
-                    'ect',
-                    'rtt',
-                    'viewport-width',
                     'x-client',
                     'screenwidth',
                     'http-x-requested-with',
@@ -527,6 +521,12 @@ trait FilterHeaderTrait
                     'x-oxylabs-render',
                     'si-caller-identifier',
                     'x-token',
+                    'device-memory',
+                    'downlink',
+                    'dpr',
+                    'ect',
+                    'rtt',
+                    'viewport-width',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
