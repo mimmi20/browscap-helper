@@ -530,6 +530,7 @@ trait FilterHeaderTrait
                     'x-ks-testmode',
                     'x-ks-linktorestart',
                     'x-ks-linktodashboard',
+                    'hb-proxy-type',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
