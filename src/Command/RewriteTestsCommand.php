@@ -24,6 +24,7 @@ use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\VersionBuilder;
+use Closure;
 use DateInterval;
 use DateTimeImmutable;
 use DeviceDetector\ClientHints;
@@ -92,6 +93,14 @@ use const STR_PAD_LEFT;
 final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
+
+    private const int LOWER_ANDROID_VERSION = 9;
+
+    private const int UPPER_ANDROID_VERSION = 13;
+
+    private const int LOWER_IOS_VERSION = 8;
+
+    private const int UPPER_IOS_VERSION = 12;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -1434,26 +1443,20 @@ final class RewriteTestsCommand extends Command
                         );
                     }
 
-                    if ((int) $version->getMajor() < 9) {
+                    if ((int) $version->getMajor() < self::LOWER_ANDROID_VERSION) {
                         ++$skipped;
 
                         return;
                     }
 
-                    if ((int) $version->getMajor() >= 13) {
-                        $clientHints = ClientHints::factory($headers);
+                    if ((int) $version->getMajor() >= self::UPPER_ANDROID_VERSION) {
+                        $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
+                            $ddModel      = $dd->getModel();
+                            $ddBrand      = $dd->getBrandName();
+                            $ddDeviceType = $dd->getDeviceName();
+                            $message      = $loopMessage;
 
-                        $dd->setUserAgent($headers['user-agent'] ?? '');
-                        $dd->setClientHints($clientHints);
-                        $dd->parse();
-                        $ddModel      = $dd->getModel();
-                        $ddBrand      = $dd->getBrandName();
-                        $ddDeviceType = $dd->getDeviceName();
-
-                        if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
-                            ++$counterChecks7;
-
-                            $addMessage = sprintf(
+                            return $message . sprintf(
                                 'The device for user-agent Header "%s" was detected as "%s", but Matomo was able to detect it as "%s %s" (%s) [android]',
                                 $headers['user-agent'] ?? '',
                                 $result['device']['deviceName'] ?? '',
@@ -1461,18 +1464,16 @@ final class RewriteTestsCommand extends Command
                                 $ddModel,
                                 $ddDeviceType,
                             );
+                        };
 
-                            $message = $loopMessage . $addMessage;
-                            $diff    = $this->messageLength($output, $message, $messageLength);
-
-                            $output->writeln(
-                                messages: "\r" . mb_str_pad(
-                                    string: $message,
-                                    length: $messageLength + $diff,
-                                ),
-                                options: OutputInterface::VERBOSITY_NORMAL,
-                            );
-                        }
+                        $this->compareDeviceWithMatomo(
+                            output: $output,
+                            dd: $dd,
+                            headers: $headers,
+                            getMessage: $getMessage,
+                            messageLength: $messageLength,
+                            counterChecks7: $counterChecks7,
+                        );
                     }
                 } elseif (mb_strtolower($result['os']['name']) === 'ios') {
                     if ($result['device']['deviceName'] === null) {
@@ -1487,26 +1488,20 @@ final class RewriteTestsCommand extends Command
                         );
                     }
 
-                    if ((int) $version->getMajor() < 9) {
+                    if ((int) $version->getMajor() < self::LOWER_IOS_VERSION) {
                         ++$skipped;
 
                         return;
                     }
 
-                    if ((int) $version->getMajor() >= 13) {
-                        $clientHints = ClientHints::factory($headers);
+                    if ((int) $version->getMajor() >= self::UPPER_IOS_VERSION) {
+                        $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
+                            $ddModel      = $dd->getModel();
+                            $ddBrand      = $dd->getBrandName();
+                            $ddDeviceType = $dd->getDeviceName();
+                            $message      = $loopMessage;
 
-                        $dd->setUserAgent($headers['user-agent'] ?? '');
-                        $dd->setClientHints($clientHints);
-                        $dd->parse();
-                        $ddModel      = $dd->getModel();
-                        $ddBrand      = $dd->getBrandName();
-                        $ddDeviceType = $dd->getDeviceName();
-
-                        if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
-                            ++$counterChecks7;
-
-                            $addMessage = sprintf(
+                            return $message . sprintf(
                                 'The device for user-agent Header "%s" was detected as "%s", but Matomo was able to detect it as "%s %s" (%s) [ios]',
                                 $headers['user-agent'] ?? '',
                                 $result['device']['deviceName'] ?? '',
@@ -1514,18 +1509,16 @@ final class RewriteTestsCommand extends Command
                                 $ddModel,
                                 $ddDeviceType,
                             );
+                        };
 
-                            $message = $loopMessage . $addMessage;
-                            $diff    = $this->messageLength($output, $message, $messageLength);
-
-                            $output->writeln(
-                                messages: "\r" . mb_str_pad(
-                                    string: $message,
-                                    length: $messageLength + $diff,
-                                ),
-                                options: OutputInterface::VERBOSITY_NORMAL,
-                            );
-                        }
+                        $this->compareDeviceWithMatomo(
+                            output: $output,
+                            dd: $dd,
+                            headers: $headers,
+                            getMessage: $getMessage,
+                            messageLength: $messageLength,
+                            counterChecks7: $counterChecks7,
+                        );
                     }
                 }
             }
@@ -1606,19 +1599,13 @@ final class RewriteTestsCommand extends Command
             );
 
             if ($secChModelHeader !== null || $puffinHeader !== null) {
-                $clientHints = ClientHints::factory($headers);
+                $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $headers, $secChModelHeader, $puffinHeader): string {
+                    $ddModel      = $dd->getModel();
+                    $ddBrand      = $dd->getBrandName();
+                    $ddDeviceType = $dd->getDeviceName();
+                    $message      = $loopMessage;
 
-                $dd->setUserAgent($headers['user-agent'] ?? '');
-                $dd->setClientHints($clientHints);
-                $dd->parse();
-                $ddModel      = $dd->getModel();
-                $ddBrand      = $dd->getBrandName();
-                $ddDeviceType = $dd->getDeviceName();
-
-                if (!in_array($ddModel, [''], true) && $ddBrand !== '') {
-                    ++$counterChecks7;
-
-                    $addMessage = sprintf(
+                    return $message . sprintf(
                         'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" or x-puffin-ua Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
                         $headers['user-agent'] ?? '',
                         $secChModelHeader,
@@ -1627,14 +1614,16 @@ final class RewriteTestsCommand extends Command
                         $ddModel,
                         $ddDeviceType,
                     );
-                    $message    = $loopMessage . $addMessage;
-                    $diff       = $this->messageLength($output, $message, $messageLength);
+                };
 
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-                }
+                $this->compareDeviceWithMatomo(
+                    output: $output,
+                    dd: $dd,
+                    headers: $headers,
+                    getMessage: $getMessage,
+                    messageLength: $messageLength,
+                    counterChecks7: $counterChecks7,
+                );
             }
         }
 
@@ -2018,5 +2007,45 @@ final class RewriteTestsCommand extends Command
         );
 
         return $messageLengthWithFormat - $messageLengthWithoutFormat;
+    }
+
+    /**
+     * @param array<string, string>  $headers
+     * @param Closure(DeviceDetector $dd):    string $getMessage
+     *
+     * @throws void
+     */
+    private function compareDeviceWithMatomo(
+        OutputInterface $output,
+        DeviceDetector $dd,
+        array $headers,
+        Closure $getMessage,
+        int &$messageLength,
+        int &$counterChecks7,
+    ): void {
+        $clientHints = ClientHints::factory($headers);
+
+        $dd->setUserAgent($headers['user-agent'] ?? '');
+        $dd->setClientHints($clientHints);
+        $dd->parse();
+        $ddModel = $dd->getModel();
+        $ddBrand = $dd->getBrandName();
+
+        if (in_array($ddModel, [''], true) || $ddBrand === '') {
+            return;
+        }
+
+        ++$counterChecks7;
+
+        $message = $getMessage($dd);
+        $diff    = $this->messageLength($output, $message, $messageLength);
+
+        $output->writeln(
+            messages: "\r" . mb_str_pad(
+                string: $message,
+                length: $messageLength + $diff,
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
     }
 }
