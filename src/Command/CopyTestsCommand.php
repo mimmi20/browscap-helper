@@ -181,6 +181,37 @@ final class CopyTestsCommand extends Command
             );
         }
 
+        try {
+            $dbname   = 'ua3';
+            $host     = 'localhost';
+            $port     = 3306;
+            $charset  = 'utf8mb4';
+            $user     = 'root';
+            $password = '';
+
+            $driverOptions = [
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_PERSISTENT => true,
+                PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+            ];
+
+            $pdo = new PDO(
+                sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
+                $user,
+                $password,
+                $driverOptions,
+            );
+
+            $sources[] = new PdoSource($pdo);
+        } catch (PDOException) {
+            $output->writeln(
+                '<error>An error occured while initializing the database</error>',
+                OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
