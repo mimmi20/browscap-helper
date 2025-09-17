@@ -22,6 +22,7 @@ use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\MatomoSource;
 use BrowscapHelper\Source\MobileDetectSource;
 use BrowscapHelper\Source\PdoSource;
+use BrowscapHelper\Source\SourceInterface;
 use BrowscapHelper\Source\TxtCounterFileSource;
 use BrowscapHelper\Source\TxtFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
@@ -151,29 +152,16 @@ final class CopyTestsCommand extends Command
         ];
 
         try {
-            $dbname   = 'ua';
-            $host     = 'localhost';
-            $port     = 3306;
-            $charset  = 'utf8mb4';
-            $user     = 'root';
-            $password = '';
-
-            $driverOptions = [
-                PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => true,
-                PDO::MYSQL_ATTR_DIRECT_QUERY => false,
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
-            ];
-
-            $pdo = new PDO(
-                sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
-                $user,
-                $password,
-                $driverOptions,
+            $sources[] = $this->addPdoSource(dbname: 'ua');
+        } catch (PDOException) {
+            $output->writeln(
+                '<error>An error occured while initializing the database</error>',
+                OutputInterface::VERBOSITY_NORMAL,
             );
+        }
 
-            $sources[] = new PdoSource($pdo);
+        try {
+            $sources[] = $this->addPdoSource(dbname: 'ua3');
         } catch (PDOException) {
             $output->writeln(
                 '<error>An error occured while initializing the database</error>',
@@ -184,6 +172,64 @@ final class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
+        $txtChecks = $this->readTests($output, $sources, $txtChecks, $txtTotalCounter);
+
+        $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
+
+        $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
+
+        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            'tests copied for Browscap helper:    ' . $txtTotalCounter,
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            'tests available for Browscap helper: ' . count($txtChecks),
+            OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        return self::SUCCESS;
+    }
+
+    /** @throws PDOException */
+    private function addPdoSource(
+        string $dbname,
+        string $host = 'localhost',
+        int $port = 3306,
+        string $charset = 'utf8mb4',
+        string $user = 'root',
+        string $password = '',
+    ): PdoSource {
+        $password = '';
+
+        $driverOptions = [
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => true,
+            PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+        ];
+
+        $pdo = new PDO(
+            sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
+            $user,
+            $password,
+            $driverOptions,
+        );
+
+        return new PdoSource($pdo);
+    }
+
+    /**
+     * @param array<int, SourceInterface>                                                                                     $sources
+     * @param array<string, array<string, array<string, array<string, bool|float|int|string|null>|bool|int|string|null>>|int> $txtChecks
+     *
+     * @return array<string, array<string, array<string, array<string, bool|float|int|string|null>|bool|int|string|null>>|int>
+     *
+     * @throws RuntimeException
+     */
+    private function readTests(OutputInterface $output, array $sources, array $txtChecks, int &$txtTotalCounter): array
+    {
         foreach ($this->testsLoader->getProperties($output, $sources) as $test) {
             $test['headers'] = $this->filterHeaders($output, $test['headers']);
 
@@ -211,20 +257,6 @@ final class CopyTestsCommand extends Command
             ++$txtTotalCounter;
         }
 
-        $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
-
-        $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
-
-        $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(
-            'tests copied for Browscap helper:    ' . $txtTotalCounter,
-            OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            'tests available for Browscap helper: ' . count($txtChecks),
-            OutputInterface::VERBOSITY_NORMAL,
-        );
-
-        return self::SUCCESS;
+        return $txtChecks;
     }
 }
