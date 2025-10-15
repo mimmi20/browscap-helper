@@ -48,6 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
 use UConverter;
 use UnexpectedValueException;
@@ -60,6 +61,7 @@ use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
+use function get_debug_type;
 use function implode;
 use function in_array;
 use function is_scalar;
@@ -94,13 +96,11 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int LOWER_ANDROID_VERSION = 9;
+    private const int COMPARE_MATOMO_LOWER_VERSION = 9;
 
-    private const int UPPER_ANDROID_VERSION = 13;
+    private const int COMPARE_MATOMO_UPPER_VERSION = 13;
 
-    private const int LOWER_IOS_VERSION = 8;
-
-    private const int UPPER_IOS_VERSION = 12;
+    private const int COMPARE_MAPPER_LOWER_VERSION = 15;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -368,6 +368,7 @@ final class RewriteTestsCommand extends Command
         $counterChecks5 = 0;
         $counterChecks6 = 0;
         $counterChecks7 = 0;
+        $counterChecks8 = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -403,9 +404,12 @@ final class RewriteTestsCommand extends Command
                 counterChecks5: $counterChecks5,
                 counterChecks6: $counterChecks6,
                 counterChecks7: $counterChecks7,
+                counterChecks8: $counterChecks8,
             );
 
-            // exit;
+            //            if ($counterChecks8 >= 10) {
+            //                exit;
+            //            }
         }
 
         $messageLength = 0;
@@ -505,6 +509,15 @@ final class RewriteTestsCommand extends Command
                 ' ',
                 STR_PAD_LEFT,
             ) . ' Headers were not detected, but could with Matomo',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: mb_str_pad(
+                number_format($counterChecks8, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers were detected, but different from Matomo',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -1118,6 +1131,7 @@ final class RewriteTestsCommand extends Command
         int &$counterChecks5,
         int &$counterChecks6,
         int &$counterChecks7,
+        int &$counterChecks8,
     ): void {
         if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
             if (
@@ -1430,7 +1444,7 @@ final class RewriteTestsCommand extends Command
                     return;
                 }
 
-                if (mb_strtolower($result['os']['name']) === 'android') {
+                if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
                     if ($result['device']['deviceName'] === null) {
                         $this->deviceNotFound(
                             output: $output,
@@ -1443,71 +1457,33 @@ final class RewriteTestsCommand extends Command
                         );
                     }
 
-                    if ((int) $version->getMajor() < self::LOWER_ANDROID_VERSION) {
+                    if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
                         ++$skipped;
 
                         return;
                     }
 
-                    if ((int) $version->getMajor() >= self::UPPER_ANDROID_VERSION) {
+                    if ((int) $version->getMajor() >= self::COMPARE_MATOMO_UPPER_VERSION) {
                         $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
                             $ddModel      = $dd->getModel();
                             $ddBrand      = $dd->getBrandName();
                             $ddDeviceType = $dd->getDeviceName();
                             $message      = $loopMessage;
 
+                            $brModel      = $result['device']['deviceName'] ?? '';
+                            $brBrand      = $result['device']['brand'] ?? '';
+                            $brDeviceType = $result['device']['type'] ?? '';
+
                             return $message . sprintf(
-                                'The device for user-agent Header "%s" was detected as "%s", but Matomo was able to detect it as "%s %s" (%s) [android]',
+                                'The device for user-agent Header "%s" was detected as "<fg=green>%s</>" "<fg=green>%s</>" (<fg=green>%s</>), but Matomo was able to detect it as "<fg=red>%s</>" "<fg=red>%s</>" (<fg=red>%s</>) [%s]',
                                 $headers['user-agent'] ?? '',
-                                $result['device']['deviceName'] ?? '',
+                                $brBrand,
+                                $brModel,
+                                $brDeviceType,
                                 $ddBrand,
                                 $ddModel,
                                 $ddDeviceType,
-                            );
-                        };
-
-                        $this->compareDeviceWithMatomo(
-                            output: $output,
-                            dd: $dd,
-                            headers: $headers,
-                            getMessage: $getMessage,
-                            messageLength: $messageLength,
-                            counterChecks7: $counterChecks7,
-                        );
-                    }
-                } elseif (mb_strtolower($result['os']['name']) === 'ios') {
-                    if ($result['device']['deviceName'] === null) {
-                        $this->deviceNotFound(
-                            output: $output,
-                            loopMessage: $loopMessage,
-                            messageLength: $messageLength,
-                            secChModelHeader: $secChModelHeader,
-                            puffinHeader: $puffinHeader,
-                            headerChecks4: $headerChecks4,
-                            headerChecks5: $headerChecks5,
-                        );
-                    }
-
-                    if ((int) $version->getMajor() < self::LOWER_IOS_VERSION) {
-                        ++$skipped;
-
-                        return;
-                    }
-
-                    if ((int) $version->getMajor() >= self::UPPER_IOS_VERSION) {
-                        $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
-                            $ddModel      = $dd->getModel();
-                            $ddBrand      = $dd->getBrandName();
-                            $ddDeviceType = $dd->getDeviceName();
-                            $message      = $loopMessage;
-
-                            return $message . sprintf(
-                                'The device for user-agent Header "%s" was detected as "%s", but Matomo was able to detect it as "%s %s" (%s) [ios]',
-                                $headers['user-agent'] ?? '',
-                                $result['device']['deviceName'] ?? '',
-                                $ddBrand,
-                                $ddModel,
-                                $ddDeviceType,
+                                mb_strtolower($result['os']['name']),
                             );
                         };
 
@@ -1624,6 +1600,105 @@ final class RewriteTestsCommand extends Command
                     messageLength: $messageLength,
                     counterChecks7: $counterChecks7,
                 );
+            }
+        }
+
+        if (
+            !empty($result['os']['name'])
+            && is_string($result['os']['name'])
+            && is_scalar($result['os']['version'])
+        ) {
+            if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
+                try {
+                    $version = (new VersionBuilder())->set((string) $result['os']['version']);
+                } catch (NotNumericException $e) {
+                    ++$errors;
+
+                    $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                    $message = $loopMessage . $addMessage;
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    return;
+                }
+
+                if ((int) $version->getMajor() >= self::COMPARE_MAPPER_LOWER_VERSION) {
+                    $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
+                        $mapper       = new InputMapper();
+                        $ddModel      = $mapper->mapDeviceName($dd->getModel());
+                        $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName(), $ddModel);
+                        $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
+                        $message      = $loopMessage;
+
+                        $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
+                        $brModel2     = $mapper->mapDeviceMarketingName(
+                            $result['device']['marketingName'] ?? '',
+                        );
+                        $brBrand      = $mapper->mapDeviceBrandName(
+                            $result['device']['brand'] ?? '',
+                            $brModel,
+                        );
+                        $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? '');
+
+                        $format1d = '<fg=yellow>';
+                        $format2d = '<fg=yellow>';
+                        $format3d = '<fg=yellow>';
+                        $format1b = '<fg=yellow>';
+                        $format2b = '<fg=yellow>';
+                        $format3b = '<fg=yellow>';
+
+                        if ($ddBrand !== $brBrand) {
+                            $format1b = '<fg=green>';
+                            $format1d = '<fg=red>';
+                        }
+
+                        if ($ddModel !== $brModel && $ddModel !== $brModel2) {
+                            $format2b = '<fg=green>';
+                            $format2d = '<fg=red>';
+                        }
+
+                        if ($ddDeviceType->getType() !== $brDeviceType->getType()) {
+                            $format3b = '<fg=green>';
+                            $format3d = '<fg=red>';
+                        }
+
+                        return $message . sprintf(
+                            'The device for user-agent Header "%s" was detected as "%s%s</>" "%s%s</>" (%s%s</>), but Matomo detected it as "%s%s</>" "%s%s</>" (%s%s</>) [%s]',
+                            $headers['user-agent'] ?? '',
+                            $format1b,
+                            $brBrand,
+                            $format2b,
+                            $brModel . '/' . $brModel2,
+                            $format3b,
+                            $brDeviceType->getType(),
+                            $format1d,
+                            $ddBrand . '[' . get_debug_type($ddBrand) . ']',
+                            $format2d,
+                            $ddModel . '[' . get_debug_type($ddModel) . ']',
+                            $format3d,
+                            $ddDeviceType->getType() . '[' . get_debug_type(
+                                $ddDeviceType->getType(),
+                            ) . ']',
+                            mb_strtolower($result['os']['name']),
+                        );
+                    };
+
+                    $this->compareDeviceWithMapper(
+                        output: $output,
+                        dd: $dd,
+                        result: $result,
+                        headers: $headers,
+                        getMessage: $getMessage,
+                        messageLength: $messageLength,
+                        counterChecks8: $counterChecks8,
+                    );
+                }
             }
         }
 
@@ -2036,6 +2111,68 @@ final class RewriteTestsCommand extends Command
         }
 
         ++$counterChecks7;
+
+        $message = $getMessage($dd);
+        $diff    = $this->messageLength($output, $message, $messageLength);
+
+        $output->writeln(
+            messages: "\r" . mb_str_pad(
+                string: $message,
+                length: $messageLength + $diff,
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+    }
+
+    /**
+     * @param array<int|string, mixed> $result
+     * @param array<string, string>    $headers
+     * @param Closure(DeviceDetector   $dd):    string $getMessage
+     *
+     * @throws void
+     */
+    private function compareDeviceWithMapper(
+        OutputInterface $output,
+        DeviceDetector $dd,
+        array $result,
+        array $headers,
+        Closure $getMessage,
+        int &$messageLength,
+        int &$counterChecks8,
+    ): void {
+        $clientHints = ClientHints::factory($headers);
+
+        $dd->setUserAgent($headers['user-agent'] ?? '');
+        $dd->setClientHints($clientHints);
+        $dd->parse();
+
+        $mapper       = new InputMapper();
+        $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
+        $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName(), $ddModel);
+        $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
+
+        if (
+            in_array($ddModel, ['', null], true)
+            || in_array($ddBrand, ['', null], true)
+            || in_array($ddDeviceType->getType(), ['', null], true)
+        ) {
+            return;
+        }
+
+        $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
+        $brModel2     = $mapper->mapDeviceMarketingName($result['device']['marketingName'] ?? '');
+        $brBrand      = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '', $brModel);
+        $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? '');
+
+        if (
+            $ddBrand === $brBrand
+            && ($ddModel === $brModel || $ddModel === $brModel2)
+            && $ddDeviceType->getType() === $brDeviceType->getType()
+        ) {
+            return;
+        }
+
+        ++$counterChecks8;
 
         $message = $getMessage($dd);
         $diff    = $this->messageLength($output, $message, $messageLength);
