@@ -61,6 +61,7 @@ use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
+use function get_debug_type;
 use function implode;
 use function in_array;
 use function is_scalar;
@@ -406,9 +407,9 @@ final class RewriteTestsCommand extends Command
                 counterChecks8: $counterChecks8,
             );
 
-//            if ($counterChecks8 >= 10) {
-//                exit;
-//            }
+            //            if ($counterChecks8 >= 10) {
+            //                exit;
+            //            }
         }
 
         $messageLength = 0;
@@ -1636,8 +1637,13 @@ final class RewriteTestsCommand extends Command
                         $message      = $loopMessage;
 
                         $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
-                        $brModel2     = $mapper->mapDeviceMarketingName($result['device']['marketingName'] ?? '');
-                        $brBrand      = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '', $brModel);
+                        $brModel2     = $mapper->mapDeviceMarketingName(
+                            $result['device']['marketingName'] ?? '',
+                        );
+                        $brBrand      = $mapper->mapDeviceBrandName(
+                            $result['device']['brand'] ?? '',
+                            $brModel,
+                        );
                         $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? '');
 
                         $format1d = '<fg=yellow>';
@@ -1668,7 +1674,7 @@ final class RewriteTestsCommand extends Command
                             $format1b,
                             $brBrand,
                             $format2b,
-                            $brModel . '/'. $brModel2,
+                            $brModel . '/' . $brModel2,
                             $format3b,
                             $brDeviceType->getType(),
                             $format1d,
@@ -1676,7 +1682,9 @@ final class RewriteTestsCommand extends Command
                             $format2d,
                             $ddModel . '[' . get_debug_type($ddModel) . ']',
                             $format3d,
-                            $ddDeviceType->getType() . '[' . get_debug_type($ddDeviceType->getType()) . ']',
+                            $ddDeviceType->getType() . '[' . get_debug_type(
+                                $ddDeviceType->getType(),
+                            ) . ']',
                             mb_strtolower($result['os']['name']),
                         );
                     };
@@ -2143,7 +2151,8 @@ final class RewriteTestsCommand extends Command
         $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName(), $ddModel);
         $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
 
-        if (in_array($ddModel, ['', null], true)
+        if (
+            in_array($ddModel, ['', null], true)
             || in_array($ddBrand, ['', null], true)
             || in_array($ddDeviceType->getType(), ['', null], true)
         ) {
