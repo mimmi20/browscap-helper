@@ -100,7 +100,7 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_UPPER_VERSION = 13;
 
-    private const int COMPARE_MAPPER_LOWER_VERSION = 15;
+    private const int COMPARE_MAPPER_LOWER_VERSION = 14;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -2151,23 +2151,22 @@ final class RewriteTestsCommand extends Command
         $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName(), $ddModel);
         $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
 
-        if (
-            in_array($ddModel, ['', null], true)
-            || in_array($ddBrand, ['', null], true)
-            || in_array($ddDeviceType->getType(), ['', null], true)
-        ) {
+        if ($ddModel === null || $ddBrand === null || $ddDeviceType === Type::Unknown) {
             return;
         }
 
         $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
-        $brModel2     = $mapper->mapDeviceMarketingName($result['device']['marketingName'] ?? '');
+        $brModel2     = $mapper->mapDeviceMarketingName(
+            $result['device']['marketingName'] ?? '',
+            $brModel,
+        );
         $brBrand      = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '', $brModel);
         $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? '');
 
         if (
             $ddBrand === $brBrand
             && ($ddModel === $brModel || $ddModel === $brModel2)
-            && $ddDeviceType->getType() === $brDeviceType->getType()
+            && $ddDeviceType === $brDeviceType
         ) {
             return;
         }

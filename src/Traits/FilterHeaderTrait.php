@@ -543,6 +543,7 @@ trait FilterHeaderTrait
                     'x-ks-linktodashboard',
                     'hb-proxy-type',
                     'x-oxylabs-geo-location',
+                    'x-nextjs-data',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
