@@ -2198,7 +2198,10 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (($result['device']['type'] ?? '') !== 'unknown' && Type::fromName($result['device']['type'] ?? '') === Type::Unknown) {
+        if (
+            ($result['device']['type'] ?? '') !== 'unknown'
+            && Type::fromName($result['device']['type'] ?? '') === Type::Unknown
+        ) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
                     string: sprintf(
@@ -2248,18 +2251,22 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<string, string>    $headers
+     * @param array<string, string> $headers
+     *
      * @return array<int, string>
+     *
+     * @throws void
      */
     private function getHeaderList(array $headers): array
     {
-        $headerList = ["\t\t\"user-agent\" => \"{$headers['user-agent']}\""];
+        $headerList = ["\t\t\"user-agent\" => \"" . $headers['user-agent'] . '"'];
 
         foreach ($headers as $name => $value) {
             if ($name === 'user-agent') {
                 continue;
             }
-            $headerList[] = "\t\t\"{$name}\" => \"{$value}\"";
+
+            $headerList[] = "\t\t\"" . $name . '" => "' . $value . '"';
         }
 
         return $headerList;
