@@ -20,6 +20,7 @@ use BrowscapHelper\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Traits\FilterHeaderTrait;
+use BrowserDetector\Data\Company;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
@@ -61,7 +62,6 @@ use function assert;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function get_debug_type;
 use function implode;
 use function in_array;
 use function is_scalar;
@@ -89,6 +89,7 @@ use function var_export;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
+use const PHP_EOL;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
@@ -100,7 +101,7 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_UPPER_VERSION = 13;
 
-    private const int COMPARE_MAPPER_LOWER_VERSION = 14;
+    private const int COMPARE_MAPPER_LOWER_VERSION = 13;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -1464,7 +1465,7 @@ final class RewriteTestsCommand extends Command
                     }
 
                     if ((int) $version->getMajor() >= self::COMPARE_MATOMO_UPPER_VERSION) {
-                        $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
+                        $getMessage = function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
                             $ddModel      = $dd->getModel();
                             $ddBrand      = $dd->getBrandName();
                             $ddDeviceType = $dd->getDeviceName();
@@ -1474,16 +1475,19 @@ final class RewriteTestsCommand extends Command
                             $brBrand      = $result['device']['brand'] ?? '';
                             $brDeviceType = $result['device']['type'] ?? '';
 
-                            return $message . sprintf(
-                                'The device for user-agent Header "%s" was detected as "<fg=green>%s</>" "<fg=green>%s</>" (<fg=green>%s</>), but Matomo was able to detect it as "<fg=red>%s</>" "<fg=red>%s</>" (<fg=red>%s</>) [%s]',
-                                $headers['user-agent'] ?? '',
+                            $headerList = $this->getHeaderList($headers);
+
+                            return $message . PHP_EOL . sprintf(
+                                "\t" . 'The device for the Headers' . PHP_EOL . '%s' . PHP_EOL
+                                . "\t" . 'was detected as                     "<fg=green>%s</>" "<fg=green>%s</>" (<fg=green>%s</>), ' . PHP_EOL
+                                . "\t" . 'but Matomo was able to detect it as "<fg=red>%s</>" "<fg=red>%s</>" (<fg=red>%s</>)',
+                                implode(PHP_EOL, $headerList),
                                 $brBrand,
                                 $brModel,
                                 $brDeviceType,
                                 $ddBrand,
                                 $ddModel,
                                 $ddDeviceType,
-                                mb_strtolower($result['os']['name']),
                             );
                         };
 
@@ -1575,17 +1579,19 @@ final class RewriteTestsCommand extends Command
             );
 
             if ($secChModelHeader !== null || $puffinHeader !== null) {
-                $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $headers, $secChModelHeader, $puffinHeader): string {
+                $getMessage = function (DeviceDetector $dd) use ($loopMessage, $headers): string {
                     $ddModel      = $dd->getModel();
                     $ddBrand      = $dd->getBrandName();
                     $ddDeviceType = $dd->getDeviceName();
                     $message      = $loopMessage;
 
-                    return $message . sprintf(
-                        'The device for user-agent Header "%s" and sec-ch-ua-model Header "%s" or x-puffin-ua Header "%s" was not detected, but Matomo was able to detect it as "%s %s" (%s)',
-                        $headers['user-agent'] ?? '',
-                        $secChModelHeader,
-                        $puffinHeader,
+                    $headerList = $this->getHeaderList($headers);
+
+                    return $message . PHP_EOL . sprintf(
+                        "\t" . 'The device for the Headers' . PHP_EOL . '%s' . PHP_EOL
+                        . "\t" . 'was not detected, ' . PHP_EOL
+                        . "\t" . 'but Matomo was able to detect it as "<fg=red>%s</>" "<fg=red>%s</>" (<fg=red>%s</>)',
+                        implode(PHP_EOL, $headerList),
                         $ddBrand,
                         $ddModel,
                         $ddDeviceType,
@@ -1629,7 +1635,7 @@ final class RewriteTestsCommand extends Command
                 }
 
                 if ((int) $version->getMajor() >= self::COMPARE_MAPPER_LOWER_VERSION) {
-                    $getMessage = static function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
+                    $getMessage = function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
                         $mapper       = new InputMapper();
                         $ddModel      = $mapper->mapDeviceName($dd->getModel());
                         $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName(), $ddModel);
@@ -1668,24 +1674,35 @@ final class RewriteTestsCommand extends Command
                             $format3d = '<fg=red>';
                         }
 
-                        return $message . sprintf(
-                            'The device for user-agent Header "%s" was detected as "%s%s</>" "%s%s</>" (%s%s</>), but Matomo detected it as "%s%s</>" "%s%s</>" (%s%s</>) [%s]',
-                            $headers['user-agent'] ?? '',
+                        $headerList = $this->getHeaderList($headers);
+
+                        return $message . PHP_EOL . sprintf(
+                            "\t" . 'The device for the Headers' . PHP_EOL . '%s' . PHP_EOL
+                            . "\t" . 'was detected as           "%s%s</>" "%s%s</>" (%s%s</>), ' . PHP_EOL
+                            . "\t" . 'but Matomo detected it as "%s%s</>" "%s%s</>" (%s%s</>)',
+                            implode(PHP_EOL, $headerList),
                             $format1b,
-                            $brBrand,
+                            sprintf('%s -> %s', $result['device']['brand'] ?? '', $brBrand),
                             $format2b,
-                            $brModel . '/' . $brModel2,
+                            sprintf(
+                                '%s/%s -> %s/%s',
+                                $result['device']['deviceName'] ?? '',
+                                $result['device']['marketingName'] ?? '',
+                                $brModel,
+                                $brModel2,
+                            ),
                             $format3b,
-                            $brDeviceType->getType(),
+                            sprintf(
+                                '%s -> %s',
+                                $result['device']['type'] ?? '',
+                                $brDeviceType->getType(),
+                            ),
                             $format1d,
-                            $ddBrand . '[' . get_debug_type($ddBrand) . ']',
+                            sprintf('%s -> %s', $dd->getBrandName(), $ddBrand),
                             $format2d,
-                            $ddModel . '[' . get_debug_type($ddModel) . ']',
+                            sprintf('%s -> %s', $dd->getModel(), $ddModel),
                             $format3d,
-                            $ddDeviceType->getType() . '[' . get_debug_type(
-                                $ddDeviceType->getType(),
-                            ) . ']',
-                            mb_strtolower($result['os']['name']),
+                            sprintf('%s -> %s', $dd->getDeviceName(), $ddDeviceType->getType()),
                         );
                     };
 
@@ -2116,12 +2133,13 @@ final class RewriteTestsCommand extends Command
         $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->writeln(
-            messages: "\r" . mb_str_pad(
+            messages: "\n" . mb_str_pad(
                 string: $message,
                 length: $messageLength + $diff,
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
     }
 
     /**
@@ -2151,6 +2169,49 @@ final class RewriteTestsCommand extends Command
         $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName(), $ddModel);
         $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
 
+        if ($dd->getDeviceName() !== '' && Type::fromName($dd->getDeviceName()) === Type::Unknown) {
+            $output->writeln(
+                messages: "\n" . mb_str_pad(
+                    string: sprintf(
+                        'The device type "<fg=magenta>%s</>" from Matomo for user-agent Header "%s" was not found in the Enum. Please add it.',
+                        $dd->getDeviceName(),
+                        $headers['user-agent'] ?? '',
+                    ),
+                    length: $messageLength,
+                ),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
+        try {
+            Company::fromName($result['device']['brand'] ?? '');
+        } catch (UnexpectedValueException) {
+            $output->writeln(
+                messages: "\n" . mb_str_pad(
+                    string: sprintf(
+                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
+                        $result['device']['brand'] ?? '',
+                    ),
+                    length: $messageLength,
+                ),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
+        if (($result['device']['type'] ?? '') !== 'unknown' && Type::fromName($result['device']['type'] ?? '') === Type::Unknown) {
+            $output->writeln(
+                messages: "\n" . mb_str_pad(
+                    string: sprintf(
+                        'The device type "<fg=magenta>%s</>" for user-agent Header "%s" was not found in the Enum. Please add it.',
+                        $result['device']['type'] ?? '',
+                        $headers['user-agent'] ?? '',
+                    ),
+                    length: $messageLength,
+                ),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
         if ($ddModel === null || $ddBrand === null || $ddDeviceType === Type::Unknown) {
             return;
         }
@@ -2177,11 +2238,30 @@ final class RewriteTestsCommand extends Command
         $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->writeln(
-            messages: "\r" . mb_str_pad(
+            messages: "\n" . mb_str_pad(
                 string: $message,
                 length: $messageLength + $diff,
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+    }
+
+    /**
+     * @param array<string, string>    $headers
+     * @return array<int, string>
+     */
+    private function getHeaderList(array $headers): array
+    {
+        $headerList = ["\t\t\"user-agent\" => \"{$headers['user-agent']}\""];
+
+        foreach ($headers as $name => $value) {
+            if ($name === 'user-agent') {
+                continue;
+            }
+            $headerList[] = "\t\t\"{$name}\" => \"{$value}\"";
+        }
+
+        return $headerList;
     }
 }
