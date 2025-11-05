@@ -50,6 +50,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Throwable;
 use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
 use UConverter;
@@ -65,6 +66,7 @@ use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
+use function is_array;
 use function is_scalar;
 use function is_string;
 use function json_decode;
@@ -99,8 +101,6 @@ final class RewriteTestsCommand extends Command
     use FilterHeaderTrait;
 
     private const int COMPARE_MATOMO_LOWER_VERSION = 9;
-
-    private const int COMPARE_MATOMO_UPPER_VERSION = 12;
 
     private const int COMPARE_MAPPER_LOWER_VERSION = 12;
 
@@ -1604,28 +1604,43 @@ final class RewriteTestsCommand extends Command
                         $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
                         $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
                         $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
-                        $ddOsName     = $mapper->mapOsName($dd->getOs('name'));
-                        $ddOsVersion  = $mapper->mapOsVersion($dd->getOs('version'), $ddOsName);
-                        $ddEngineName     = $mapper->mapEngineName($dd->getClient('engine'));
-                        $ddEngineVersion  = $mapper->mapEngineVersion($dd->getClient('engine_version'));
+
+                        $osName        = $dd->getOs('name');
+                        $osVersion     = $dd->getOs('version');
+                        $engine        = $dd->getClient('engine');
+                        $engineVersion = $dd->getClient('engine_version');
+
+                        $ddOsName        = $mapper->mapOsName(is_array($osName) ? null : $osName);
+                        $ddOsVersion     = $mapper->mapOsVersion(
+                            is_array($osVersion) ? null : $osVersion,
+                            $ddOsName,
+                        );
+                        $ddEngineName    = $mapper->mapEngineName(is_array($engine) ? null : $engine);
+                        $ddEngineVersion = $mapper->mapEngineVersion(
+                            is_array($engineVersion) ? null : $engineVersion,
+                        );
 
                         $message = $loopMessage;
 
-                        $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
-                        $brModel2     = $mapper->mapDeviceMarketingName(
+                        $brModel         = $mapper->mapDeviceName(
+                            $result['device']['deviceName'] ?? '',
+                        );
+                        $brModel2        = $mapper->mapDeviceMarketingName(
                             $result['device']['marketingName'] ?? '',
                         );
-                        $brBrand      = $mapper->mapDeviceBrandName(
+                        $brBrand         = $mapper->mapDeviceBrandName(
                             $result['device']['brand'] ?? '',
                         );
-                        $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? '');
-                        $brOsName     = $mapper->mapOsName($result['os']['name'] ?? '');
-                        $brOsVersion  = $mapper->mapOsVersion(
-                            $result['os']['version'] ?? '',
+                        $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
+                        $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
+                        $brOsVersion     = $mapper->mapOsVersion(
+                            (string) ($result['os']['version'] ?? ''),
                             $brOsName,
                         );
-                        $brEngineName     = $mapper->mapEngineName($result['engine']['name'] ?? '');
-                        $brEngineVersion  = $mapper->mapEngineVersion($result['engine']['version'] ?? '');
+                        $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
+                        $brEngineVersion = $mapper->mapEngineVersion(
+                            $result['engine']['version'] ?? '',
+                        );
 
                         $format1d = '<fg=yellow>';
                         $format2d = '<fg=yellow>';
@@ -1721,10 +1736,10 @@ final class RewriteTestsCommand extends Command
                             $result['os']['version'] ?? '<n/a>',
                             $brOsVersion->getVersion(),
                             $format4d,
-                            $dd->getOs('name'),
+                            is_array($osName) ? '' : $osName,
                             $ddOsName,
                             $format5d,
-                            $dd->getOs('version'),
+                            is_array($osVersion) ? '' : $osVersion,
                             $ddOsVersion->getVersion(),
                             $format6b,
                             $result['engine']['name'] ?? '',
@@ -1733,10 +1748,10 @@ final class RewriteTestsCommand extends Command
                             $result['engine']['version'] ?? '',
                             $brEngineVersion->getVersion(),
                             $format6d,
-                            $dd->getClient('engine'),
+                            is_array($engine) ? '' : $engine,
                             $ddEngineName,
                             $format7d,
-                            $dd->getClient('engine_version'),
+                            is_array($engineVersion) ? '' : $engineVersion,
                             $ddEngineVersion->getVersion(),
                         );
                     };
@@ -2199,14 +2214,32 @@ final class RewriteTestsCommand extends Command
         $dd->setClientHints($clientHints);
         $dd->parse();
 
-        $mapper       = new InputMapper();
-        $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
-        $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
-        $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
-        $ddOsName     = $mapper->mapOsName($dd->getOs('name'));
-        $ddOsVersion  = $mapper->mapOsVersion($dd->getOs('version'), $ddOsName);
-        $ddEngineName     = $mapper->mapEngineName($dd->getClient('engine'));
-        $ddEngineVersion  = $mapper->mapEngineVersion($dd->getClient('engine_version'));
+        $mapper = new InputMapper();
+
+        try {
+            $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
+            $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
+            $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
+
+            $osName        = $dd->getOs('name');
+            $osVersion     = $dd->getOs('version');
+            $engine        = $dd->getClient('engine');
+            $engineVersion = $dd->getClient('engine_version');
+
+            $ddOsName        = $mapper->mapOsName(is_array($osName) ? null : $osName);
+            $ddOsVersion     = $mapper->mapOsVersion(
+                is_array($osVersion) ? null : $osVersion,
+                $ddOsName,
+            );
+            $ddEngineName    = $mapper->mapEngineName(is_array($engine) ? null : $engine);
+            $ddEngineVersion = $mapper->mapEngineVersion(
+                is_array($engineVersion) ? null : $engineVersion,
+            );
+        } catch (Throwable $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
 
         if ($dd->getDeviceName() !== '' && Type::fromName($dd->getDeviceName()) === Type::Unknown) {
             $output->writeln(
@@ -2334,26 +2367,38 @@ final class RewriteTestsCommand extends Command
             return;
         }
 
-        $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
-        $brModel2     = $mapper->mapDeviceMarketingName(
-            $result['device']['marketingName'] ?? '',
-        );
-        $brBrand      = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '');
-        $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? '');
-        $brOsName     = $mapper->mapOsName($result['os']['name'] ?? '');
-        $brOsVersion  = $mapper->mapOsVersion($result['os']['version'] ?? '', $brOsName);
-        $brEngineName     = $mapper->mapEngineName($result['engine']['name'] ?? '');
-        $brEngineVersion  = $mapper->mapEngineVersion($result['engine']['version'] ?? '');
+        try {
+            $brModel         = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
+            $brModel2        = $mapper->mapDeviceMarketingName(
+                $result['device']['marketingName'] ?? '',
+            );
+            $brBrand         = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '');
+            $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
+            $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
+            $brOsVersion     = $mapper->mapOsVersion($result['os']['version'] ?? '', $brOsName);
+            $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
+            $brEngineVersion = $mapper->mapEngineVersion($result['engine']['version'] ?? '');
 
-        if (
-            $ddBrand === $brBrand
-            && ($ddModel === $brModel || $ddModel === $brModel2)
-            && $ddDeviceType === $brDeviceType
-            && $ddOsName === $brOsName
-            && $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-            && ($ddEngineName === $brEngineName || $ddEngineName === null)
-            && ($ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)
-        ) {
+            if (
+                $ddBrand === $brBrand
+                && ($ddModel === $brModel || $ddModel === $brModel2)
+                && $ddDeviceType === $brDeviceType
+                && $ddOsName === $brOsName
+                && $ddOsVersion->getVersion(
+                    VersionInterface::IGNORE_MICRO,
+                ) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                && ($ddEngineName === $brEngineName || $ddEngineName === null)
+                && ($ddEngineVersion->getVersion(
+                    VersionInterface::IGNORE_MICRO,
+                ) === $brEngineVersion->getVersion(
+                    VersionInterface::IGNORE_MICRO,
+                ) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)
+            ) {
+                return;
+            }
+        } catch (Throwable $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
             return;
         }
 
