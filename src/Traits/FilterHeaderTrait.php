@@ -544,6 +544,15 @@ trait FilterHeaderTrait
                     'hb-proxy-type',
                     'x-oxylabs-geo-location',
                     'x-nextjs-data',
+                    'cookie',
+                    'referer',
+                    'pragma',
+                    'authorization',
+                    'interceptor',
+                    'x-browser-year',
+                    'x-browser-validation',
+                    'x-browser-copyright',
+                    'x-browser-channel',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
