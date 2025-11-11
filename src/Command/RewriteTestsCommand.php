@@ -1573,12 +1573,14 @@ final class RewriteTestsCommand extends Command
             }
         }
 
+        $compareWithMapper = false;
+
         if (
             !empty($result['os']['name'])
             && is_string($result['os']['name'])
             && is_scalar($result['os']['version'])
         ) {
-            if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
+            if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios', 'ipados', 'watchos'], true)) {
                 try {
                     $version = (new VersionBuilder())->set((string) $result['os']['version']);
                 } catch (NotNumericException $e) {
@@ -1599,178 +1601,185 @@ final class RewriteTestsCommand extends Command
                 }
 
                 if ((int) $version->getMajor() >= self::COMPARE_MAPPER_LOWER_VERSION) {
-                    $getMessage = function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
-                        $mapper       = new InputMapper();
-                        $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
-                        $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
-                        $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
-
-                        $osName        = $dd->getOs('name');
-                        $osVersion     = $dd->getOs('version');
-                        $engine        = $dd->getClient('engine');
-                        $engineVersion = $dd->getClient('engine_version');
-
-                        $ddOsName        = $mapper->mapOsName(is_array($osName) ? null : $osName);
-                        $ddOsVersion     = $mapper->mapOsVersion(
-                            is_array($osVersion) ? null : $osVersion,
-                            $ddOsName,
-                        );
-                        $ddEngineName    = $mapper->mapEngineName(is_array($engine) ? null : $engine);
-                        $ddEngineVersion = $mapper->mapEngineVersion(
-                            is_array($engineVersion) ? null : $engineVersion,
-                        );
-
-                        $message = $loopMessage;
-
-                        $brModel         = $mapper->mapDeviceName(
-                            $result['device']['deviceName'] ?? '',
-                        );
-                        $brModel2        = $mapper->mapDeviceMarketingName(
-                            $result['device']['marketingName'] ?? '',
-                        );
-                        $brBrand         = $mapper->mapDeviceBrandName(
-                            $result['device']['brand'] ?? '',
-                        );
-                        $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
-                        $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
-                        $brOsVersion     = $mapper->mapOsVersion(
-                            (string) ($result['os']['version'] ?? ''),
-                            $brOsName,
-                        );
-                        $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
-                        $brEngineVersion = $mapper->mapEngineVersion(
-                            $result['engine']['version'] ?? '',
-                        );
-
-                        $format1d = '<fg=yellow>';
-                        $format2d = '<fg=yellow>';
-                        $format3d = '<fg=yellow>';
-                        $format4d = '<fg=yellow>';
-                        $format5d = '<fg=yellow>';
-                        $format6d = '<fg=yellow>';
-                        $format7d = '<fg=yellow>';
-                        $format1b = '<fg=yellow>';
-                        $format2b = '<fg=yellow>';
-                        $format3b = '<fg=yellow>';
-                        $format4b = '<fg=yellow>';
-                        $format5b = '<fg=yellow>';
-                        $format6b = '<fg=yellow>';
-                        $format7b = '<fg=yellow>';
-
-                        if ($ddBrand !== $brBrand) {
-                            $format1b = '<fg=green>';
-                            $format1d = '<fg=red>';
-                        }
-
-                        if ($ddModel !== $brModel && $ddModel !== $brModel2) {
-                            $format2b = '<fg=green>';
-                            $format2d = '<fg=red>';
-                        }
-
-                        if ($ddDeviceType->getType() !== $brDeviceType->getType()) {
-                            $format3b = '<fg=green>';
-                            $format3d = '<fg=red>';
-                        }
-
-                        if ($ddOsName !== $brOsName) {
-                            $format4b = '<fg=green>';
-                            $format4d = '<fg=red>';
-                        }
-
-                        if (
-                            $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                            !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                        ) {
-                            $format5b = '<fg=green>';
-                            $format5d = '<fg=red>';
-                        }
-
-                        if ($ddEngineName !== $brEngineName) {
-                            $format6b = '<fg=green>';
-                            $format6d = '<fg=red>';
-                        }
-
-                        if (
-                            $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                            !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                        ) {
-                            $format7b = '<fg=green>';
-                            $format7d = '<fg=red>';
-                        }
-
-                        $headerList = $this->getHeaderList($headers);
-
-                        return $message . PHP_EOL . sprintf(
-                            "\t" . 'For the Headers' . PHP_EOL . '%s' . PHP_EOL
-                            . "\t" . 'the device was detected as    "%s%s -> %s</>" "%s%s/%s -> %s/%s</>" (%s%s -> %s</>), ' . PHP_EOL
-                            . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)' . PHP_EOL
-                            . "\t" . 'the platform was detected as  "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
-                            . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
-                            . "\t" . 'the engine was detected as    "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
-                            . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"',
-                            implode(PHP_EOL, $headerList),
-                            $format1b,
-                            $result['device']['brand'] ?? '<n/a>',
-                            $brBrand,
-                            $format2b,
-                            $result['device']['deviceName'] ?? '<n/a>',
-                            $result['device']['marketingName'] ?? '<n/a>',
-                            $brModel,
-                            $brModel2,
-                            $format3b,
-                            $result['device']['type'] ?? '<n/a>',
-                            $brDeviceType->getType(),
-                            $format1d,
-                            $dd->getBrandName(),
-                            $ddBrand,
-                            $format2d,
-                            $dd->getModel(),
-                            $ddModel,
-                            $format3d,
-                            $dd->getDeviceName(),
-                            $ddDeviceType->getType(),
-                            $format4b,
-                            $result['os']['name'] ?? '<n/a>',
-                            $brOsName,
-                            $format5b,
-                            $result['os']['version'] ?? '<n/a>',
-                            $brOsVersion->getVersion(),
-                            $format4d,
-                            is_array($osName) ? '' : $osName,
-                            $ddOsName,
-                            $format5d,
-                            is_array($osVersion) ? '' : $osVersion,
-                            $ddOsVersion->getVersion(),
-                            $format6b,
-                            $result['engine']['name'] ?? '',
-                            $brEngineName,
-                            $format7b,
-                            $result['engine']['version'] ?? '',
-                            $brEngineVersion->getVersion(),
-                            $format6d,
-                            is_array($engine) ? '' : $engine,
-                            $ddEngineName,
-                            $format7d,
-                            is_array($engineVersion) ? '' : $engineVersion,
-                            $ddEngineVersion->getVersion(),
-                        );
-                    };
-
-                    $this->compareDeviceWithMapper(
-                        output: $output,
-                        dd: $dd,
-                        result: $result,
-                        headers: $headers,
-                        getMessage: $getMessage,
-                        messageLength: $messageLength,
-                        counterChecks8: $counterChecks8,
-                    );
+                    $compareWithMapper = true;
                 }
+            }
+
+            if (in_array(mb_strtolower($result['os']['name']), ['harmony-os', 'fire-os', 'fuchsia'], true)) {
+                $compareWithMapper = true;
             }
         }
 
+        if ($compareWithMapper) {
+            $getMessage = function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
+                $mapper       = new InputMapper();
+                $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
+                $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
+                $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
+
+                $isBot      = $dd->isBot();
+                $osInfo     = $dd->getOs();
+                $clientInfo = $dd->getClient();
+
+                $ddOsName        = $mapper->mapOsName($osInfo['name'] ?? null);
+                $ddOsVersion     = $mapper->mapOsVersion(
+                    $osInfo['version'] ?? null,
+                    $ddOsName,
+                );
+                $ddEngineName    = $mapper->mapEngineName($isBot ? null : ($clientInfo['engine'] ?? null));
+                $ddEngineVersion = $mapper->mapEngineVersion(
+                    $isBot ? null : ($clientInfo['engine_version'] ?? null),
+                );
+
+                $message = $loopMessage;
+
+                $brModel         = $mapper->mapDeviceName(
+                    $result['device']['deviceName'] ?? '',
+                );
+                $brModel2        = $mapper->mapDeviceMarketingName(
+                    $result['device']['marketingName'] ?? '',
+                );
+                $brBrand         = $mapper->mapDeviceBrandName(
+                    $result['device']['brand'] ?? '',
+                );
+                $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
+                $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
+                $brOsVersion     = $mapper->mapOsVersion(
+                    (string) ($result['os']['version'] ?? ''),
+                    $brOsName,
+                );
+                $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
+                $brEngineVersion = $mapper->mapEngineVersion(
+                    $result['engine']['version'] ?? '',
+                );
+
+                $format1d = '<fg=yellow>';
+                $format2d = '<fg=yellow>';
+                $format3d = '<fg=yellow>';
+                $format4d = '<fg=yellow>';
+                $format5d = '<fg=yellow>';
+                $format6d = '<fg=yellow>';
+                $format7d = '<fg=yellow>';
+                $format1b = '<fg=yellow>';
+                $format2b = '<fg=yellow>';
+                $format3b = '<fg=yellow>';
+                $format4b = '<fg=yellow>';
+                $format5b = '<fg=yellow>';
+                $format6b = '<fg=yellow>';
+                $format7b = '<fg=yellow>';
+
+                if ($ddBrand !== $brBrand) {
+                    $format1b = '<fg=green>';
+                    $format1d = '<fg=red>';
+                }
+
+                if ($ddModel !== $brModel && $ddModel !== $brModel2) {
+                    $format2b = '<fg=green>';
+                    $format2d = '<fg=red>';
+                }
+
+                if ($ddDeviceType->getType() !== $brDeviceType->getType()) {
+                    $format3b = '<fg=green>';
+                    $format3d = '<fg=red>';
+                }
+
+                if ($ddOsName !== $brOsName) {
+                    $format4b = '<fg=green>';
+                    $format4d = '<fg=red>';
+                }
+
+                if (
+                    $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                    !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                ) {
+                    $format5b = '<fg=green>';
+                    $format5d = '<fg=red>';
+                }
+
+                if ($ddEngineName !== $brEngineName) {
+                    $format6b = '<fg=green>';
+                    $format6d = '<fg=red>';
+                }
+
+                if (
+                    $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                    !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                ) {
+                    $format7b = '<fg=green>';
+                    $format7d = '<fg=red>';
+                }
+
+                $headerList = $this->getHeaderList($headers);
+
+                return $message . PHP_EOL . sprintf(
+                        "\t" . 'For the Headers' . PHP_EOL . '%s' . PHP_EOL
+                        . "\t" . 'the device was detected as    "%s%s -> %s</>" "%s%s/%s -> %s/%s</>" (%s%s -> %s</>), ' . PHP_EOL
+                        . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)' . PHP_EOL
+                        . "\t" . 'the platform was detected as  "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
+                        . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
+                        . "\t" . 'the engine was detected as    "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
+                        . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"',
+                        implode(PHP_EOL, $headerList),
+                        $format1b,
+                        $result['device']['brand'] ?? '<n/a>',
+                        $brBrand,
+                        $format2b,
+                        $result['device']['deviceName'] ?? '<n/a>',
+                        $result['device']['marketingName'] ?? '<n/a>',
+                        $brModel,
+                        $brModel2,
+                        $format3b,
+                        $result['device']['type'] ?? '<n/a>',
+                        $brDeviceType->getType(),
+                        $format1d,
+                        $dd->getBrandName(),
+                        $ddBrand,
+                        $format2d,
+                        $dd->getModel(),
+                        $ddModel,
+                        $format3d,
+                        $dd->getDeviceName(),
+                        $ddDeviceType->getType(),
+                        $format4b,
+                        $result['os']['name'] ?? '<n/a>',
+                        $brOsName,
+                        $format5b,
+                        $result['os']['version'] ?? '<n/a>',
+                        $brOsVersion->getVersion(),
+                        $format4d,
+                        $osInfo['name'] ?? '',
+                        $ddOsName,
+                        $format5d,
+                        $osInfo['version'] ?? '',
+                        $ddOsVersion->getVersion(),
+                        $format6b,
+                        $result['engine']['name'] ?? '',
+                        $brEngineName,
+                        $format7b,
+                        $result['engine']['version'] ?? '',
+                        $brEngineVersion->getVersion(),
+                        $format6d,
+                        $isBot ? '' : ($clientInfo['engine'] ?? ''),
+                        $ddEngineName,
+                        $format7d,
+                        $isBot ? '' : ($clientInfo['engine_version'] ?? ''),
+                        $ddEngineVersion->getVersion(),
+                    );
+            };
+
+            $this->compareDeviceWithMapper(
+                output: $output,
+                dd: $dd,
+                result: $result,
+                headers: $headers,
+                getMessage: $getMessage,
+                messageLength: $messageLength,
+                counterChecks8: $counterChecks8,
+            );
+        }
+
         $deviceManufaturer = mb_strtolower(
-            UConverter::transcode($result['device']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
+            str_replace([' ', 'ü'], ['-', 'ue'], $result['device']['manufacturer'] ?? ''),
         );
         $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
             ['.', ' '],
@@ -1779,7 +1788,7 @@ final class RewriteTestsCommand extends Command
         );
 
         $clientManufaturer = mb_strtolower(
-            UConverter::transcode($result['client']['manufacturer'] ?? '', 'ISO-8859-1', 'UTF8'),
+            str_replace([' ', 'ü'], ['-', 'ue'], $result['client']['manufacturer'] ?? ''),
         );
         $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
             ['.', ' '],
@@ -2221,19 +2230,18 @@ final class RewriteTestsCommand extends Command
             $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
             $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
 
-            $osName        = $dd->getOs('name');
-            $osVersion     = $dd->getOs('version');
-            $engine        = $dd->getClient('engine');
-            $engineVersion = $dd->getClient('engine_version');
+            $isBot      = $dd->isBot();
+            $osInfo     = $dd->getOs();
+            $clientInfo = $dd->getClient();
 
-            $ddOsName        = $mapper->mapOsName(is_array($osName) ? null : $osName);
+            $ddOsName        = $mapper->mapOsName($osInfo['name'] ?? null);
             $ddOsVersion     = $mapper->mapOsVersion(
-                is_array($osVersion) ? null : $osVersion,
+                $osInfo['version'] ?? null,
                 $ddOsName,
             );
-            $ddEngineName    = $mapper->mapEngineName(is_array($engine) ? null : $engine);
+            $ddEngineName    = $mapper->mapEngineName($isBot ? null : ($clientInfo['engine'] ?? null));
             $ddEngineVersion = $mapper->mapEngineVersion(
-                is_array($engineVersion) ? null : $engineVersion,
+                $isBot ? null : ($clientInfo['engine_version'] ?? null),
             );
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>%s</error>', (string) $e));

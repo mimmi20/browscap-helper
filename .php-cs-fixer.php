@@ -44,7 +44,6 @@ return $config
         array_merge(
             $rules,
             [
-                '@PHP83Migration' => true,
                 'header_comment' => [
                     'header' => $header,
                     'comment_type' => 'PHPDoc',
