@@ -53,7 +53,6 @@ use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
-use UConverter;
 use UnexpectedValueException;
 
 use function array_any;
@@ -66,7 +65,6 @@ use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
-use function is_array;
 use function is_scalar;
 use function is_string;
 use function json_decode;
@@ -1580,7 +1578,13 @@ final class RewriteTestsCommand extends Command
             && is_string($result['os']['name'])
             && is_scalar($result['os']['version'])
         ) {
-            if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios', 'ipados', 'watchos'], true)) {
+            if (
+                in_array(
+                    mb_strtolower($result['os']['name']),
+                    ['android', 'ios', 'ipados', 'watchos'],
+                    true,
+                )
+            ) {
                 try {
                     $version = (new VersionBuilder())->set((string) $result['os']['version']);
                 } catch (NotNumericException $e) {
@@ -1605,7 +1609,13 @@ final class RewriteTestsCommand extends Command
                 }
             }
 
-            if (in_array(mb_strtolower($result['os']['name']), ['harmony-os', 'fire-os', 'fuchsia'], true)) {
+            if (
+                in_array(
+                    mb_strtolower($result['os']['name']),
+                    ['harmony-os', 'fire-os', 'fuchsia'],
+                    true,
+                )
+            ) {
                 $compareWithMapper = true;
             }
         }
@@ -1622,26 +1632,21 @@ final class RewriteTestsCommand extends Command
                 $clientInfo = $dd->getClient();
 
                 $ddOsName        = $mapper->mapOsName($osInfo['name'] ?? null);
-                $ddOsVersion     = $mapper->mapOsVersion(
-                    $osInfo['version'] ?? null,
-                    $ddOsName,
+                $ddOsVersion     = $mapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
+                $ddEngineName    = $mapper->mapEngineName(
+                    $isBot ? null : ($clientInfo['engine'] ?? null),
                 );
-                $ddEngineName    = $mapper->mapEngineName($isBot ? null : ($clientInfo['engine'] ?? null));
                 $ddEngineVersion = $mapper->mapEngineVersion(
                     $isBot ? null : ($clientInfo['engine_version'] ?? null),
                 );
 
                 $message = $loopMessage;
 
-                $brModel         = $mapper->mapDeviceName(
-                    $result['device']['deviceName'] ?? '',
-                );
+                $brModel         = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
                 $brModel2        = $mapper->mapDeviceMarketingName(
                     $result['device']['marketingName'] ?? '',
                 );
-                $brBrand         = $mapper->mapDeviceBrandName(
-                    $result['device']['brand'] ?? '',
-                );
+                $brBrand         = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '');
                 $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
                 $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
                 $brOsVersion     = $mapper->mapOsVersion(
@@ -1649,9 +1654,7 @@ final class RewriteTestsCommand extends Command
                     $brOsName,
                 );
                 $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
-                $brEngineVersion = $mapper->mapEngineVersion(
-                    $result['engine']['version'] ?? '',
-                );
+                $brEngineVersion = $mapper->mapEngineVersion($result['engine']['version'] ?? '');
 
                 $format1d = '<fg=yellow>';
                 $format2d = '<fg=yellow>';
@@ -1712,59 +1715,59 @@ final class RewriteTestsCommand extends Command
                 $headerList = $this->getHeaderList($headers);
 
                 return $message . PHP_EOL . sprintf(
-                        "\t" . 'For the Headers' . PHP_EOL . '%s' . PHP_EOL
+                    "\t" . 'For the Headers' . PHP_EOL . '%s' . PHP_EOL
                         . "\t" . 'the device was detected as    "%s%s -> %s</>" "%s%s/%s -> %s/%s</>" (%s%s -> %s</>), ' . PHP_EOL
                         . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)' . PHP_EOL
                         . "\t" . 'the platform was detected as  "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
                         . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
                         . "\t" . 'the engine was detected as    "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
                         . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"',
-                        implode(PHP_EOL, $headerList),
-                        $format1b,
-                        $result['device']['brand'] ?? '<n/a>',
-                        $brBrand,
-                        $format2b,
-                        $result['device']['deviceName'] ?? '<n/a>',
-                        $result['device']['marketingName'] ?? '<n/a>',
-                        $brModel,
-                        $brModel2,
-                        $format3b,
-                        $result['device']['type'] ?? '<n/a>',
-                        $brDeviceType->getType(),
-                        $format1d,
-                        $dd->getBrandName(),
-                        $ddBrand,
-                        $format2d,
-                        $dd->getModel(),
-                        $ddModel,
-                        $format3d,
-                        $dd->getDeviceName(),
-                        $ddDeviceType->getType(),
-                        $format4b,
-                        $result['os']['name'] ?? '<n/a>',
-                        $brOsName,
-                        $format5b,
-                        $result['os']['version'] ?? '<n/a>',
-                        $brOsVersion->getVersion(),
-                        $format4d,
-                        $osInfo['name'] ?? '',
-                        $ddOsName,
-                        $format5d,
-                        $osInfo['version'] ?? '',
-                        $ddOsVersion->getVersion(),
-                        $format6b,
-                        $result['engine']['name'] ?? '',
-                        $brEngineName,
-                        $format7b,
-                        $result['engine']['version'] ?? '',
-                        $brEngineVersion->getVersion(),
-                        $format6d,
-                        $isBot ? '' : ($clientInfo['engine'] ?? ''),
-                        $ddEngineName,
-                        $format7d,
-                        $isBot ? '' : ($clientInfo['engine_version'] ?? ''),
-                        $ddEngineVersion->getVersion(),
-                    );
+                    implode(PHP_EOL, $headerList),
+                    $format1b,
+                    $result['device']['brand'] ?? '<n/a>',
+                    $brBrand,
+                    $format2b,
+                    $result['device']['deviceName'] ?? '<n/a>',
+                    $result['device']['marketingName'] ?? '<n/a>',
+                    $brModel,
+                    $brModel2,
+                    $format3b,
+                    $result['device']['type'] ?? '<n/a>',
+                    $brDeviceType->getType(),
+                    $format1d,
+                    $dd->getBrandName(),
+                    $ddBrand,
+                    $format2d,
+                    $dd->getModel(),
+                    $ddModel,
+                    $format3d,
+                    $dd->getDeviceName(),
+                    $ddDeviceType->getType(),
+                    $format4b,
+                    $result['os']['name'] ?? '<n/a>',
+                    $brOsName,
+                    $format5b,
+                    $result['os']['version'] ?? '<n/a>',
+                    $brOsVersion->getVersion(),
+                    $format4d,
+                    $osInfo['name'] ?? '',
+                    $ddOsName,
+                    $format5d,
+                    $osInfo['version'] ?? '',
+                    $ddOsVersion->getVersion(),
+                    $format6b,
+                    $result['engine']['name'] ?? '',
+                    $brEngineName,
+                    $format7b,
+                    $result['engine']['version'] ?? '',
+                    $brEngineVersion->getVersion(),
+                    $format6d,
+                    $isBot ? '' : ($clientInfo['engine'] ?? ''),
+                    $ddEngineName,
+                    $format7d,
+                    $isBot ? '' : ($clientInfo['engine_version'] ?? ''),
+                    $ddEngineVersion->getVersion(),
+                );
             };
 
             $this->compareDeviceWithMapper(
@@ -2235,10 +2238,7 @@ final class RewriteTestsCommand extends Command
             $clientInfo = $dd->getClient();
 
             $ddOsName        = $mapper->mapOsName($osInfo['name'] ?? null);
-            $ddOsVersion     = $mapper->mapOsVersion(
-                $osInfo['version'] ?? null,
-                $ddOsName,
-            );
+            $ddOsVersion     = $mapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
             $ddEngineName    = $mapper->mapEngineName($isBot ? null : ($clientInfo['engine'] ?? null));
             $ddEngineVersion = $mapper->mapEngineVersion(
                 $isBot ? null : ($clientInfo['engine_version'] ?? null),
