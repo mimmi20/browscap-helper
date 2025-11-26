@@ -41,7 +41,7 @@ trait FilterHeaderTrait
     {
         $headers = array_filter(
             $headers,
-            static fn (mixed $header): bool => is_string($header),
+            is_string(...),
         );
 
         $headers = array_filter(
@@ -553,6 +553,12 @@ trait FilterHeaderTrait
                     'x-browser-validation',
                     'x-browser-copyright',
                     'x-browser-channel',
+                    'x-prerender-version',
+                    'x-prerender-token',
+                    'proxy-forwarded-for',
+                    'x-aim-plugin-installed',
+                    'x-tooltime-token',
+                    'x-firefox-ai',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
@@ -572,7 +578,7 @@ trait FilterHeaderTrait
         );
 
         $headers = array_map(
-            static fn (string $header) => mb_trim($header),
+            mb_trim(...),
             $headers,
         );
 

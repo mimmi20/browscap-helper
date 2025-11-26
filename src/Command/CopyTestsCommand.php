@@ -169,6 +169,15 @@ final class CopyTestsCommand extends Command
             );
         }
 
+        try {
+            $sources[] = $this->addPdoSource(dbname: 'ua4');
+        } catch (PDOException) {
+            $output->writeln(
+                '<error>An error occured while initializing the database</error>',
+                OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
