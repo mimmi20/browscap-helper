@@ -69,5 +69,7 @@ jobs:
       skip-psalm: false
       skip-nasm-install: true
       skip-libimagequant-install: true
+      skip-librabbitmq-install: true
+      skip-libgif-install: true
       skip-oxlint: true
       phpcs-options: ""
