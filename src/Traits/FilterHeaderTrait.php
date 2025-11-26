@@ -553,6 +553,12 @@ trait FilterHeaderTrait
                     'x-browser-validation',
                     'x-browser-copyright',
                     'x-browser-channel',
+                    'x-prerender-version',
+                    'x-prerender-token',
+                    'proxy-forwarded-for',
+                    'x-aim-plugin-installed',
+                    'x-tooltime-token',
+                    'x-firefox-ai',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
