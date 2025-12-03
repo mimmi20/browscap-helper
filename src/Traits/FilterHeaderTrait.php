@@ -559,6 +559,11 @@ trait FilterHeaderTrait
                     'x-aim-plugin-installed',
                     'x-tooltime-token',
                     'x-firefox-ai',
+                    'signature',
+                    'signature-input',
+                    'signature-agent',
+                    'idempotency-key',
+                    'x-timpi-verify',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
