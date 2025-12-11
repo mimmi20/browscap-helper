@@ -564,6 +564,7 @@ trait FilterHeaderTrait
                     'signature-agent',
                     'idempotency-key',
                     'x-timpi-verify',
+                    'get',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
