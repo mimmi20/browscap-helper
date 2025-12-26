@@ -1624,7 +1624,7 @@ final class RewriteTestsCommand extends Command
             if (
                 in_array(
                     mb_strtolower($result['os']['name']),
-                    ['android', 'ios', 'ipados', 'watchos', 'android tv', 'darwin', 'cyanogenmod', 'miui os', 'yun os', 'android opensource project', 'iphone os', 'mocordroid', 'mre', 'wear os'],
+                    ['android', 'ios', 'ipados', 'android tv', 'cyanogenmod', 'miui os', 'yun os', 'android opensource project', 'iphone os', 'mocordroid', 'mre'],
                     true,
                 )
             ) {
@@ -1707,6 +1707,23 @@ final class RewriteTestsCommand extends Command
                         'lindows',
                         'nintendo switch os',
                         'tvos',
+                        'windows 3.11',
+                        'series 30',
+                        'nintendo wii os',
+                        'windows 2003',
+                        'windows rt',
+                        'tru64 unix',
+                        'cp/m',
+                        'cygwin',
+                        'openvms',
+                        'wear os',
+                        'dragonfly bsd',
+                        'darwin',
+                        'bsd',
+                        'watchos',
+                        'windows 3.1',
+                        'aix',
+                        'macintosh',
                         // 'kaios',
                         // 'vizios',
                     ],
@@ -2213,7 +2230,7 @@ final class RewriteTestsCommand extends Command
 
         $brClientType = $mapper->mapBrowserType($result['client']['type'] ?? null);
 
-        if ($ddModel === null || $ddBrand === null || $ddDeviceType === Type::Unknown) {
+        if ($ddModel === null || $ddBrand === null) {
             return;
         }
 
@@ -2221,7 +2238,7 @@ final class RewriteTestsCommand extends Command
             $checks = [
                 '$ddBrand === $brBrand' => $ddBrand === $brBrand,
                 '($ddModel === $brModel || $ddModel === $brModel2)' => ($ddModel === $brModel || $ddModel === $brModel2),
-                '$ddDeviceType === $brDeviceType' => $ddDeviceType === $brDeviceType,
+                '$ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown' => $ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown,
                 '$ddOsName === $brOsName' => $ddOsName === $brOsName,
                 '($ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddOsVersion->getVersion(
                     VersionInterface::IGNORE_MICRO,
@@ -2240,7 +2257,7 @@ final class RewriteTestsCommand extends Command
                 ) === $brClientVersion->getVersion(
                     VersionInterface::IGNORE_MINOR,
                 ) || $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === null),
-                '($ddClientType === $brClientType)' => ($ddClientType === $brClientType),
+                '($ddClientType === $brClientType || $ddClientType === \UaBrowserType\Type::Unknown)' => ($ddClientType === $brClientType || $ddClientType === \UaBrowserType\Type::Unknown),
             ];
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>%s</error>', (string) $e));
