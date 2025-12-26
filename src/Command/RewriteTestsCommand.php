@@ -26,11 +26,14 @@ use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
-use Closure;
 use DateInterval;
 use DateTimeImmutable;
 use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
+use Ergebnis\Json\Exception\FileCanNotBeRead;
+use Ergebnis\Json\Exception\FileDoesNotContainJson;
+use Ergebnis\Json\Exception\FileDoesNotExist;
+use Ergebnis\Json\Json;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -44,6 +47,8 @@ use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -53,18 +58,20 @@ use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
+use UaResult\Device\FormFactor;
 use UnexpectedValueException;
 
 use function array_any;
 use function array_chunk;
 use function array_filter;
 use function array_key_exists;
+use function array_multisort;
 use function assert;
 use function file_exists;
-use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
+use function is_array;
 use function is_scalar;
 use function is_string;
 use function json_decode;
@@ -72,7 +79,6 @@ use function json_encode;
 use function max;
 use function mb_str_pad;
 use function mb_strtolower;
-use function mb_trim;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function memory_reset_peak_usage;
@@ -81,6 +87,7 @@ use function min;
 use function mkdir;
 use function number_format;
 use function preg_match;
+use function preg_match_all;
 use function sprintf;
 use function str_contains;
 use function str_ends_with;
@@ -90,7 +97,11 @@ use function var_export;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
+use const SORT_DESC;
+use const SORT_NUMERIC;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
@@ -344,31 +355,28 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $txtChecks      = [];
-        $headerChecks1  = [];
-        $headerChecks2  = [];
-        $headerChecks3  = [];
-        $headerChecks4  = [];
-        $headerChecks5  = [];
-        $messageLength  = 0;
-        $counter        = 0;
-        $duplicates     = 0;
-        $errors         = 0;
-        $skipped        = 0;
-        $testCount      = 0;
-        $baseMessage    = 'checking Header ';
-        $timeCheck      = 0.0;
-        $timeDetect     = 0.0;
-        $timeRead       = 0.0;
-        $timeWrite      = 0.0;
-        $counterChecks1 = 0;
-        $counterChecks2 = 0;
-        $counterChecks3 = 0;
-        $counterChecks4 = 0;
-        $counterChecks5 = 0;
-        $counterChecks6 = 0;
-        $counterChecks7 = 0;
-        $counterChecks8 = 0;
+        $txtChecks                  = [];
+        $txtChecksOs                = [];
+        $txtChecksFactor            = [];
+        $messageLength              = 0;
+        $counter                    = 0;
+        $duplicates                 = 0;
+        $errors                     = 0;
+        $skipped                    = 0;
+        $testCount                  = 0;
+        $baseMessage                = 'checking Header ';
+        $timeCheck                  = 0.0;
+        $timeDetect                 = 0.0;
+        $timeRead                   = 0.0;
+        $timeWrite                  = 0.0;
+        $counterHeadersAndroidArm   = 0;
+        $counterHeadersAndroid      = 0;
+        $counterHeadersMozilla5     = 0;
+        $counterHeadersMacos        = 0;
+        $counterHeadersWindows10    = 0;
+        $counterHeadersLinux        = 0;
+        $counterDifferentFromMatomo = 0;
+        $counterComparedWithMatomo  = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -392,27 +400,94 @@ final class RewriteTestsCommand extends Command
                 timeRead: $timeRead,
                 timeWrite: $timeWrite,
                 txtChecks: $txtChecks,
-                headerChecks1: $headerChecks1,
-                headerChecks2: $headerChecks2,
-                headerChecks3: $headerChecks3,
-                headerChecks4: $headerChecks4,
-                headerChecks5: $headerChecks5,
-                counterChecks1: $counterChecks1,
-                counterChecks2: $counterChecks2,
-                counterChecks3: $counterChecks3,
-                counterChecks4: $counterChecks4,
-                counterChecks5: $counterChecks5,
-                counterChecks6: $counterChecks6,
-                counterChecks7: $counterChecks7,
-                counterChecks8: $counterChecks8,
+                txtChecksOs: $txtChecksOs,
+                txtChecksFactor: $txtChecksFactor,
+                counterHeadersAndroidArm: $counterHeadersAndroidArm,
+                counterHeadersAndroid: $counterHeadersAndroid,
+                counterHeadersMozilla5: $counterHeadersMozilla5,
+                counterHeadersMacos: $counterHeadersMacos,
+                counterHeadersWindows10: $counterHeadersWindows10,
+                counterLinuxHeaders: $counterHeadersLinux,
+                counterDifferentFromMatomo: $counterDifferentFromMatomo,
+                counterComparedWithMatomo: $counterComparedWithMatomo,
             );
 
-            //            if ($counterChecks8 >= 10) {
+            //            if ($counterDifferentFromMatomo >= 10) {
             //                exit;
             //            }
         }
 
         $messageLength = 0;
+
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+
+        $table = new Table($output);
+        $table->setHeaders(['FormFactor', 'Counter']);
+        $table->setRows([]);
+
+        $cy = [];
+
+        foreach ($txtChecksFactor as $factor => $factorCounter) {
+            $cy[$factor] = $factorCounter;
+        }
+
+        array_multisort($cy, SORT_DESC, SORT_NUMERIC, $txtChecksFactor);
+
+        foreach ($txtChecksFactor as $factor => $factorCounter) {
+            $table->addRow(
+                ['<info>' . $factor . '</info>', '<error>' . $factorCounter . '</error>'],
+            );
+        }
+
+        $table->render();
+
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $cx = [];
+
+        foreach ($txtChecksOs as $os => $versions) {
+            $c = 0;
+            $x = [];
+            $y = [];
+
+            foreach ($versions as $version => $counterVersions) {
+                $c          += $counterVersions['count'];
+                $x[$version] = $counterVersions['count'];
+                $y[$version] = $version;
+            }
+
+            array_multisort($x, SORT_DESC, SORT_NUMERIC, $y, SORT_DESC, SORT_NUMERIC, $versions);
+
+            $cx[$os]          = $c;
+            $txtChecksOs[$os] = $versions;
+        }
+
+        array_multisort($cx, SORT_DESC, SORT_NUMERIC, $txtChecksOs);
+
+        $table = new Table($output);
+        $table->setHeaders(['OS', 'Version', 'Tests']);
+        $table->setRows([]);
+
+        foreach ($txtChecksOs as $os => $versions) {
+            $c = 0;
+
+            foreach ($versions as $version => $counterVersions) {
+                $count     = $counterVersions['count'];
+                $checkmark = $counterVersions['checked'] ?? false
+                    ? ' <fg=green>+</>'
+                    : ' <fg=red>-</>';
+                $table->addRow([$os, $version, $count . $checkmark]);
+
+                $c += $count;
+            }
+
+            $table->addRow(
+                ['<info>' . $os . '</info>', '<info>summary</info>', '<error>' . $c . '</error>'],
+            );
+            $table->addRow(new TableSeparator());
+        }
+
+        $table->render();
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
@@ -450,7 +525,7 @@ final class RewriteTestsCommand extends Command
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks1, 0, ',', '.'),
+                number_format($counterHeadersAndroidArm, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
@@ -459,7 +534,7 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks2, 0, ',', '.'),
+                number_format($counterHeadersAndroid, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
@@ -468,7 +543,7 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks4, 0, ',', '.'),
+                number_format($counterHeadersMacos, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
@@ -477,7 +552,7 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks5, 0, ',', '.'),
+                number_format($counterHeadersWindows10, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
@@ -486,7 +561,7 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks6, 0, ',', '.'),
+                number_format($counterHeadersLinux, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
@@ -495,7 +570,7 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks3, 0, ',', '.'),
+                number_format($counterHeadersMozilla5, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
@@ -504,20 +579,20 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(
             messages: mb_str_pad(
-                number_format($counterChecks7, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers were not detected, but could with Matomo',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterChecks8, 0, ',', '.'),
+                number_format($counterDifferentFromMatomo, 0, ',', '.'),
                 12,
                 ' ',
                 STR_PAD_LEFT,
             ) . ' Headers were detected, but different from Matomo',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: mb_str_pad(
+                number_format($counterComparedWithMatomo, 0, ',', '.'),
+                12,
+                ' ',
+                STR_PAD_LEFT,
+            ) . ' Headers were compared with Matomo',
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -1089,13 +1164,10 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<string, string>} $test
-     * @param array<string, array<mixed>>           $txtChecks
-     * @param array<string, bool>                   $headerChecks1
-     * @param array<string, bool>                   $headerChecks2
-     * @param array<string, bool>                   $headerChecks3
-     * @param array<string, bool>                   $headerChecks4
-     * @param array<string, bool>                   $headerChecks5
+     * @param array{headers: array<string, string>}                           $test
+     * @param array<string, array<mixed>>                                     $txtChecks
+     * @param array<string, array<string, array{count: int, checked?: bool}>> $txtChecksOs
+     * @param array<string, int>                                              $txtChecksFactor
      *
      * @throws void
      *
@@ -1119,19 +1191,16 @@ final class RewriteTestsCommand extends Command
         float &$timeRead,
         float &$timeWrite,
         array &$txtChecks,
-        array &$headerChecks1,
-        array &$headerChecks2,
-        array &$headerChecks3,
-        array &$headerChecks4,
-        array &$headerChecks5,
-        int &$counterChecks1,
-        int &$counterChecks2,
-        int &$counterChecks3,
-        int &$counterChecks4,
-        int &$counterChecks5,
-        int &$counterChecks6,
-        int &$counterChecks7,
-        int &$counterChecks8,
+        array &$txtChecksOs,
+        array &$txtChecksFactor,
+        int &$counterHeadersAndroidArm,
+        int &$counterHeadersAndroid,
+        int &$counterHeadersMozilla5,
+        int &$counterHeadersMacos,
+        int &$counterHeadersWindows10,
+        int &$counterLinuxHeaders,
+        int &$counterDifferentFromMatomo,
+        int &$counterComparedWithMatomo,
     ): void {
         if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
             if (
@@ -1140,29 +1209,29 @@ final class RewriteTestsCommand extends Command
                     $test['headers']['user-agent'],
                 )
             ) {
-                ++$counterChecks1;
+                ++$counterHeadersAndroidArm;
             } elseif (
                 preg_match(
                     '/^mozilla\/5\.0 \(linux;(?: (?:[iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
                     $test['headers']['user-agent'],
                 )
             ) {
-                ++$counterChecks2;
+                ++$counterHeadersAndroid;
             } elseif (
                 preg_match(
                     '/^mozilla\/5\.0 \(macintosh; intel mac os x/i',
                     $test['headers']['user-agent'],
                 )
             ) {
-                ++$counterChecks4;
+                ++$counterHeadersMacos;
             } elseif (
                 preg_match('/^mozilla\/5\.0 \(windows nt 10\.0/i', $test['headers']['user-agent'])
             ) {
-                ++$counterChecks5;
+                ++$counterHeadersWindows10;
             } elseif (preg_match('/^mozilla\/5\.0 \(x11; linux/i', $test['headers']['user-agent'])) {
-                ++$counterChecks6;
+                ++$counterLinuxHeaders;
             } elseif (!preg_match('/^mozilla\/5\.0/i', $test['headers']['user-agent'])) {
-                ++$counterChecks3;
+                ++$counterHeadersMozilla5;
             }
         }
 
@@ -1252,6 +1321,41 @@ final class RewriteTestsCommand extends Command
         //
         //    return;
         // }
+
+        if (array_key_exists('sec-ch-ua-form-factors', $test['headers'])) {
+            $matches = [];
+
+            if (
+                preg_match_all(
+                    '~["\']([a-z]+)["\']~i',
+                    $test['headers']['sec-ch-ua-form-factors'],
+                    $matches,
+                )
+            ) {
+                foreach ($matches[1] as $factor) {
+                    if (!array_key_exists($factor, $txtChecksFactor)) {
+                        $txtChecksFactor[$factor] = 1;
+                    } else {
+                        ++$txtChecksFactor[$factor];
+                    }
+
+                    $detectedFactor = FormFactor::tryFrom($factor);
+
+                    if ($detectedFactor === null) {
+                        $output->writeln(
+                            messages: "\n" . mb_str_pad(
+                                string: sprintf(
+                                    'The FormFactor "<fg=blue>%s</>", was not found in the Enum. Please add it',
+                                    $factor,
+                                ),
+                                length: $messageLength,
+                            ),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+                    }
+                }
+            }
+        }
 
         if (
             array_key_exists('x-requested-with', $test['headers'])
@@ -1445,18 +1549,6 @@ final class RewriteTestsCommand extends Command
                 }
 
                 if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
-                    if ($result['device']['deviceName'] === null) {
-                        $this->deviceNotFound(
-                            output: $output,
-                            loopMessage: $loopMessage,
-                            messageLength: $messageLength,
-                            secChModelHeader: $secChModelHeader,
-                            puffinHeader: $puffinHeader,
-                            headerChecks4: $headerChecks4,
-                            headerChecks5: $headerChecks5,
-                        );
-                    }
-
                     if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
                         ++$skipped;
 
@@ -1466,319 +1558,178 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        if ($result['client']['name'] === null) {
-            $this->clientNotFound(
-                output: $output,
-                loopMessage: $loopMessage,
-                messageLength: $messageLength,
-                xRequestHeader: $xRequestHeader,
-                secChUaHeader: $secChUaHeader,
-                headerChecks1: $headerChecks1,
-                headerChecks2: $headerChecks2,
-                test: $test,
-            );
+        $compareWithMapper = false;
 
-            if (
+        $osName  = mb_strtolower($result['os']['name'] ?? '');
+        $version = null;
+
+        if (is_scalar($result['os']['version'])) {
+            try {
+                $version = (new VersionBuilder())->set((string) $result['os']['version']);
+            } catch (NotNumericException $e) {
+                ++$errors;
+
+                $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                $message = $loopMessage . $addMessage;
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return;
+            }
+
+            try {
+                $osVersion = $version->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
+            } catch (UnexpectedValueException) {
+                $osVersion = 'e';
+            }
+        } else {
+            $osVersion = '-';
+        }
+
+        if (!isset($txtChecksOs[$osName][$osVersion])) {
+            $txtChecksOs[$osName][$osVersion]['count']   = 1;
+            $txtChecksOs[$osName][$osVersion]['checked'] = false;
+        } else {
+            ++$txtChecksOs[$osName][$osVersion]['count'];
+        }
+
+        if ($result['os']['name'] === null && $secChPlatformHeader !== null) {
+            $compareWithMapper = true;
+        } elseif (
+            $result['client']['name'] === null
+            && (
                 $secChUaHeader !== null
                 || (
                     $xRequestHeader !== null
                     && $xRequestHeader !== 'XMLHttpRequest'
                 )
-            ) {
-                $clientHints = ClientHints::factory($headers);
-
-                $dd->setUserAgent($headers['user-agent'] ?? '');
-                $dd->setClientHints($clientHints);
-                $dd->parse();
-                $isBot      = $dd->isBot();
-                $clientInfo = $dd->getClient();
-                $botInfo    = $dd->getBot();
-
-                $clientName = $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null);
-                $clientType = $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null);
-
-                if (!in_array($clientName, ['', null], true)) {
-                    ++$counterChecks7;
-
-                    $addMessage = sprintf(
-                        'The client for user-agent Header "%s" and sec-ch-ua Header "%s" or x-requested-with Header "%s" was not detected, but Matomo was able to detect it as "%s" (%s)',
-                        $headers['user-agent'] ?? '',
-                        $secChUaHeader,
-                        $xRequestHeader,
-                        $clientName,
-                        $clientType,
-                    );
-                    $message    = $loopMessage . $addMessage;
-                    $diff       = $this->messageLength($output, $message, $messageLength);
-
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-                }
-            }
-        }
-
-        if ($result['os']['name'] === null) {
-            $this->platformNotFound(
-                output: $output,
-                loopMessage: $loopMessage,
-                messageLength: $messageLength,
-                secChPlatformHeader: $secChPlatformHeader,
-                headerChecks3: $headerChecks3,
-            );
-        }
-
-        if ($result['device']['deviceName'] === null) {
-            $this->deviceNotFound(
-                output: $output,
-                loopMessage: $loopMessage,
-                messageLength: $messageLength,
-                secChModelHeader: $secChModelHeader,
-                puffinHeader: $puffinHeader,
-                headerChecks4: $headerChecks4,
-                headerChecks5: $headerChecks5,
-            );
-
-            if ($secChModelHeader !== null || $puffinHeader !== null) {
-                $getMessage = function (DeviceDetector $dd) use ($loopMessage, $headers): string {
-                    $ddModel      = $dd->getModel();
-                    $ddBrand      = $dd->getBrandName();
-                    $ddDeviceType = $dd->getDeviceName();
-                    $message      = $loopMessage;
-
-                    $headerList = $this->getHeaderList($headers);
-
-                    return $message . PHP_EOL . sprintf(
-                        "\t" . 'The device for the Headers' . PHP_EOL . '%s' . PHP_EOL
-                        . "\t" . 'was not detected, ' . PHP_EOL
-                        . "\t" . 'but Matomo was able to detect it as "<fg=red>%s</>" "<fg=red>%s</>" (<fg=red>%s</>)',
-                        implode(PHP_EOL, $headerList),
-                        $ddBrand,
-                        $ddModel,
-                        $ddDeviceType,
-                    );
-                };
-
-                $this->compareDeviceWithMatomo(
-                    output: $output,
-                    dd: $dd,
-                    headers: $headers,
-                    getMessage: $getMessage,
-                    messageLength: $messageLength,
-                    counterChecks7: $counterChecks7,
-                );
-            }
-        }
-
-        $compareWithMapper = false;
-
-        if (
-            !empty($result['os']['name'])
-            && is_string($result['os']['name'])
-            && is_scalar($result['os']['version'])
+            )
         ) {
+            $compareWithMapper = true;
+        } elseif (
+            $result['device']['deviceName'] === null
+            && (
+                $secChModelHeader !== null
+                || $puffinHeader !== null
+            )
+        ) {
+            $compareWithMapper = true;
+        } elseif (!empty($result['os']['name']) && is_string($result['os']['name'])) {
             if (
                 in_array(
                     mb_strtolower($result['os']['name']),
-                    ['android', 'ios', 'ipados', 'watchos'],
+                    ['android', 'ios', 'ipados', 'watchos', 'android tv', 'darwin', 'cyanogenmod', 'miui os', 'yun os', 'android opensource project', 'iphone os', 'mocordroid', 'mre', 'wear os'],
                     true,
                 )
             ) {
-                try {
-                    $version = (new VersionBuilder())->set((string) $result['os']['version']);
-                } catch (NotNumericException $e) {
-                    ++$errors;
-
-                    $exception = new Exception('An error occured while decoding a result', 0, $e);
-
-                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                    $message = $loopMessage . $addMessage;
-
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-
-                    return;
+                if (
+                    $version instanceof VersionInterface
+                    && (int) $version->getMajor() >= self::COMPARE_MAPPER_LOWER_VERSION
+                ) {
+                    $compareWithMapper                           = true;
+                    $txtChecksOs[$osName][$osVersion]['checked'] = true;
                 }
-
-                if ((int) $version->getMajor() >= self::COMPARE_MAPPER_LOWER_VERSION) {
-                    $compareWithMapper = true;
-                }
-            }
-
-            if (
+            } elseif (
                 in_array(
                     mb_strtolower($result['os']['name']),
-                    ['harmony-os', 'fire-os', 'fuchsia'],
+                    [
+                        'harmony-os',
+                        'harmonyos',
+                        'fire-os',
+                        'fireos',
+                        'fire os',
+                        'fuchsia',
+                        'puffin os',
+                        'lineage os',
+                        'wophone',
+                        'star-blade os',
+                        'xubuntu',
+                        'yi',
+                        'chinese operating system',
+                        'nextstep',
+                        'windows iot',
+                        'ultrix',
+                        'genix',
+                        'news-os',
+                        'turbolinux',
+                        'backtrack linux',
+                        'ark linux',
+                        'blackpanther os',
+                        'aros',
+                        'zenwalk gnu linux',
+                        'azure linux',
+                        'wyderos',
+                        'opensolaris',
+                        'startos',
+                        'ventana linux',
+                        'joli os',
+                        'debian with freebsd kernel',
+                        'liberate',
+                        'moblin',
+                        'raspbian',
+                        'rim tablet os',
+                        'blackberry tablet os',
+                        'morphos',
+                        'mandriva linux',
+                        'linux mint',
+                        'inferno os',
+                        'haiku',
+                        'archlinux',
+                        'cent os linux',
+                        'orbis os',
+                        'cellos',
+                        'nintendo os',
+                        'beos',
+                        'chromeos',
+                        'gentoo linux',
+                        'kubuntu',
+                        'slackware linux',
+                        'redhat linux',
+                        'solaris',
+                        'syllable',
+                        'suse linux',
+                        'kin os',
+                        'threadx',
+                        'sailfishos',
+                        'remix os',
+                        'meego',
+                        'palmos',
+                        'risc os',
+                        'hp-ux',
+                        'pardus',
+                        'danger os',
+                        'lindows',
+                        'nintendo switch os',
+                        'tvos',
+                        // 'kaios',
+                        // 'vizios',
+                    ],
                     true,
                 )
             ) {
-                $compareWithMapper = true;
+                $compareWithMapper                           = true;
+                $txtChecksOs[$osName][$osVersion]['checked'] = true;
             }
         }
 
         if ($compareWithMapper) {
-            $getMessage = function (DeviceDetector $dd) use ($loopMessage, $result, $headers): string {
-                $mapper       = new InputMapper();
-                $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
-                $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
-                $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
-
-                $isBot      = $dd->isBot();
-                $osInfo     = $dd->getOs();
-                $clientInfo = $dd->getClient();
-
-                $ddOsName        = $mapper->mapOsName($osInfo['name'] ?? null);
-                $ddOsVersion     = $mapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
-                $ddEngineName    = $mapper->mapEngineName(
-                    $isBot ? null : ($clientInfo['engine'] ?? null),
-                );
-                $ddEngineVersion = $mapper->mapEngineVersion(
-                    $isBot ? null : ($clientInfo['engine_version'] ?? null),
-                );
-
-                $message = $loopMessage;
-
-                $brModel         = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
-                $brModel2        = $mapper->mapDeviceMarketingName(
-                    $result['device']['marketingName'] ?? '',
-                );
-                $brBrand         = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '');
-                $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
-                $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
-                $brOsVersion     = $mapper->mapOsVersion(
-                    (string) ($result['os']['version'] ?? ''),
-                    $brOsName,
-                );
-                $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
-                $brEngineVersion = $mapper->mapEngineVersion($result['engine']['version'] ?? '');
-
-                $format1d = '<fg=yellow>';
-                $format2d = '<fg=yellow>';
-                $format3d = '<fg=yellow>';
-                $format4d = '<fg=yellow>';
-                $format5d = '<fg=yellow>';
-                $format6d = '<fg=yellow>';
-                $format7d = '<fg=yellow>';
-                $format1b = '<fg=yellow>';
-                $format2b = '<fg=yellow>';
-                $format3b = '<fg=yellow>';
-                $format4b = '<fg=yellow>';
-                $format5b = '<fg=yellow>';
-                $format6b = '<fg=yellow>';
-                $format7b = '<fg=yellow>';
-
-                if ($ddBrand !== $brBrand) {
-                    $format1b = '<fg=green>';
-                    $format1d = '<fg=red>';
-                }
-
-                if ($ddModel !== $brModel && $ddModel !== $brModel2) {
-                    $format2b = '<fg=green>';
-                    $format2d = '<fg=red>';
-                }
-
-                if ($ddDeviceType->getType() !== $brDeviceType->getType()) {
-                    $format3b = '<fg=green>';
-                    $format3d = '<fg=red>';
-                }
-
-                if ($ddOsName !== $brOsName) {
-                    $format4b = '<fg=green>';
-                    $format4d = '<fg=red>';
-                }
-
-                if (
-                    $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                    !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                ) {
-                    $format5b = '<fg=green>';
-                    $format5d = '<fg=red>';
-                }
-
-                if ($ddEngineName !== $brEngineName) {
-                    $format6b = '<fg=green>';
-                    $format6d = '<fg=red>';
-                }
-
-                if (
-                    $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                    !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                ) {
-                    $format7b = '<fg=green>';
-                    $format7d = '<fg=red>';
-                }
-
-                $headerList = $this->getHeaderList($headers);
-
-                return $message . PHP_EOL . sprintf(
-                    "\t" . 'For the Headers' . PHP_EOL . '%s' . PHP_EOL
-                        . "\t" . 'the device was detected as    "%s%s -> %s</>" "%s%s/%s -> %s/%s</>" (%s%s -> %s</>), ' . PHP_EOL
-                        . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)' . PHP_EOL
-                        . "\t" . 'the platform was detected as  "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
-                        . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
-                        . "\t" . 'the engine was detected as    "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
-                        . "\t" . '    but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"',
-                    implode(PHP_EOL, $headerList),
-                    $format1b,
-                    $result['device']['brand'] ?? '<n/a>',
-                    $brBrand,
-                    $format2b,
-                    $result['device']['deviceName'] ?? '<n/a>',
-                    $result['device']['marketingName'] ?? '<n/a>',
-                    $brModel,
-                    $brModel2,
-                    $format3b,
-                    $result['device']['type'] ?? '<n/a>',
-                    $brDeviceType->getType(),
-                    $format1d,
-                    $dd->getBrandName(),
-                    $ddBrand,
-                    $format2d,
-                    $dd->getModel(),
-                    $ddModel,
-                    $format3d,
-                    $dd->getDeviceName(),
-                    $ddDeviceType->getType(),
-                    $format4b,
-                    $result['os']['name'] ?? '<n/a>',
-                    $brOsName,
-                    $format5b,
-                    $result['os']['version'] ?? '<n/a>',
-                    $brOsVersion->getVersion(),
-                    $format4d,
-                    $osInfo['name'] ?? '',
-                    $ddOsName,
-                    $format5d,
-                    $osInfo['version'] ?? '',
-                    $ddOsVersion->getVersion(),
-                    $format6b,
-                    $result['engine']['name'] ?? '',
-                    $brEngineName,
-                    $format7b,
-                    $result['engine']['version'] ?? '',
-                    $brEngineVersion->getVersion(),
-                    $format6d,
-                    $isBot ? '' : ($clientInfo['engine'] ?? ''),
-                    $ddEngineName,
-                    $format7d,
-                    $isBot ? '' : ($clientInfo['engine_version'] ?? ''),
-                    $ddEngineVersion->getVersion(),
-                );
-            };
-
             $this->compareDeviceWithMapper(
                 output: $output,
                 dd: $dd,
                 result: $result,
                 headers: $headers,
-                getMessage: $getMessage,
+                loopMessage: $loopMessage,
                 messageLength: $messageLength,
-                counterChecks8: $counterChecks8,
+                counterDifferentFromMatomo: $counterDifferentFromMatomo,
             );
+
+            ++$counterComparedWithMatomo;
         }
 
         $deviceManufaturer = mb_strtolower(
@@ -1902,7 +1853,10 @@ final class RewriteTestsCommand extends Command
             $startTime = microtime(true);
 
             try {
-                $tests = json_decode(file_get_contents($file), false, 512, JSON_THROW_ON_ERROR);
+                $json  = Json::fromFile($file);
+                $tests = $json->decoded();
+
+                assert(is_array($tests));
 
                 $addMessage = sprintf('read temporary file %s - <info>done</info>', $file);
                 $message    = $loopMessage . $addMessage;
@@ -1916,7 +1870,7 @@ final class RewriteTestsCommand extends Command
                     sprintf(' <bg=red>%d</>', $messageLength),
                     OutputInterface::VERBOSITY_DEBUG,
                 );
-            } catch (JsonException $e) {
+            } catch (FileCanNotBeRead | FileDoesNotContainJson | FileDoesNotExist $e) {
                 ++$errors;
 
                 $exception = new Exception('An error occured while decoding a result', 0, $e);
@@ -1966,7 +1920,10 @@ final class RewriteTestsCommand extends Command
         try {
             $saved = file_put_contents(
                 filename: $file,
-                data: json_encode($tests, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
+                data: json_encode(
+                    $tests,
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR,
+                ),
             );
         } catch (JsonException) {
             ++$errors;
@@ -1990,160 +1947,6 @@ final class RewriteTestsCommand extends Command
         return $saved !== false;
     }
 
-    /**
-     * @param array<string, bool> $headerChecks4
-     * @param array<string, bool> $headerChecks5
-     *
-     * @throws void
-     */
-    private function deviceNotFound(
-        OutputInterface $output,
-        string $loopMessage,
-        int $messageLength,
-        string | null $secChModelHeader,
-        string | null $puffinHeader,
-        array &$headerChecks4,
-        array &$headerChecks5,
-    ): void {
-        if ($secChModelHeader !== null) {
-            $secChModelHeader = mb_trim($secChModelHeader, '"');
-
-            if (!array_key_exists($secChModelHeader, $headerChecks4)) {
-                $addMessage = sprintf(
-                    'Could not detect the Device for the sec-ch-ua-model Header "%s"',
-                    $secChModelHeader,
-                );
-                $message    = $loopMessage . $addMessage;
-                $diff       = $this->messageLength($output, $message, $messageLength);
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                $headerChecks4[$secChModelHeader] = true;
-            }
-        }
-
-        if ($puffinHeader === null) {
-            return;
-        }
-
-        if (array_key_exists($puffinHeader, $headerChecks5)) {
-            return;
-        }
-
-        $addMessage = sprintf(
-            'Could not detect the Device for the x-puffin-ua Header "%s"',
-            $puffinHeader,
-        );
-        $message    = $loopMessage . $addMessage;
-        $diff       = $this->messageLength($output, $message, $messageLength);
-
-        $output->writeln(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-
-        $headerChecks5[$puffinHeader] = true;
-    }
-
-    /**
-     * @param array<string, bool>                   $headerChecks1
-     * @param array<string, bool>                   $headerChecks2
-     * @param array{headers: array<string, string>} $test
-     *
-     * @throws void
-     */
-    private function clientNotFound(
-        OutputInterface $output,
-        string $loopMessage,
-        int $messageLength,
-        string | null $xRequestHeader,
-        string | null $secChUaHeader,
-        array &$headerChecks1,
-        array &$headerChecks2,
-        array $test,
-    ): void {
-        if ($xRequestHeader !== null && $xRequestHeader !== 'XMLHttpRequest') {
-            $xRequestHeader = mb_trim($xRequestHeader, '"');
-
-            if (!array_key_exists($xRequestHeader, $headerChecks1)) {
-                $addMessage = sprintf(
-                    'Could not detect the Client for the x-requested-with Header "%s"',
-                    $xRequestHeader,
-                );
-                $message    = $loopMessage . $addMessage;
-                $diff       = $this->messageLength($output, $message, $messageLength);
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                $headerChecks1[$xRequestHeader] = true;
-            }
-        }
-
-        if ($secChUaHeader === null) {
-            return;
-        }
-
-        $secChUaHeader = mb_trim($secChUaHeader, '"');
-
-        if (array_key_exists($secChUaHeader, $headerChecks2)) {
-            return;
-        }
-
-        $addMessage = sprintf(
-            'Could not detect the Client for the sec-ch-ua Header "%s" [%s]',
-            $secChUaHeader,
-            var_export($test['headers'], true),
-        );
-        $message    = $loopMessage . $addMessage;
-        $diff       = $this->messageLength($output, $message, $messageLength);
-
-        $output->writeln(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-
-        $headerChecks2[$secChUaHeader] = true;
-    }
-
-    /**
-     * @param array<string, bool> $headerChecks3
-     *
-     * @throws void
-     */
-    private function platformNotFound(
-        OutputInterface $output,
-        string $loopMessage,
-        int $messageLength,
-        string | null $secChPlatformHeader,
-        array &$headerChecks3,
-    ): void {
-        if ($secChPlatformHeader !== null) {
-            $secChPlatformHeader = mb_trim($secChPlatformHeader, '"');
-
-            if (!array_key_exists($secChPlatformHeader, $headerChecks3)) {
-                $addMessage = sprintf(
-                    'Could not detect the OS for the sec-ch-ua-platform Header "%s"',
-                    $secChPlatformHeader,
-                );
-                $message    = $loopMessage . $addMessage;
-                $diff       = $this->messageLength($output, $message, $messageLength);
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                $headerChecks3[$secChPlatformHeader] = true;
-            }
-        }
-    }
-
     /** @throws void */
     private function messageLength(OutputInterface $output, string $message, int &$messageLength): int
     {
@@ -2164,50 +1967,8 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<string, string>  $headers
-     * @param Closure(DeviceDetector $dd):    string $getMessage
-     *
-     * @throws void
-     */
-    private function compareDeviceWithMatomo(
-        OutputInterface $output,
-        DeviceDetector $dd,
-        array $headers,
-        Closure $getMessage,
-        int &$messageLength,
-        int &$counterChecks7,
-    ): void {
-        $clientHints = ClientHints::factory($headers);
-
-        $dd->setUserAgent($headers['user-agent'] ?? '');
-        $dd->setClientHints($clientHints);
-        $dd->parse();
-        $ddModel = $dd->getModel();
-        $ddBrand = $dd->getBrandName();
-
-        if (in_array($ddModel, [''], true) || $ddBrand === '') {
-            return;
-        }
-
-        ++$counterChecks7;
-
-        $message = $getMessage($dd);
-        $diff    = $this->messageLength($output, $message, $messageLength);
-
-        $output->writeln(
-            messages: "\n" . mb_str_pad(
-                string: $message,
-                length: $messageLength + $diff,
-            ),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-    }
-
-    /**
      * @param array<int|string, mixed> $result
      * @param array<string, string>    $headers
-     * @param Closure(DeviceDetector   $dd):    string $getMessage
      *
      * @throws void
      */
@@ -2216,45 +1977,27 @@ final class RewriteTestsCommand extends Command
         DeviceDetector $dd,
         array $result,
         array $headers,
-        Closure $getMessage,
+        string $loopMessage,
         int &$messageLength,
-        int &$counterChecks8,
+        int &$counterDifferentFromMatomo,
     ): void {
+        $mapper = new InputMapper();
+
         $clientHints = ClientHints::factory($headers);
 
         $dd->setUserAgent($headers['user-agent'] ?? '');
         $dd->setClientHints($clientHints);
         $dd->parse();
 
-        $mapper = new InputMapper();
+        $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
 
-        try {
-            $ddModel      = $mapper->mapDeviceMarketingName($dd->getModel());
-            $ddBrand      = $mapper->mapDeviceBrandName($dd->getBrandName());
-            $ddDeviceType = $mapper->mapDeviceType($dd->getDeviceName());
-
-            $isBot      = $dd->isBot();
-            $osInfo     = $dd->getOs();
-            $clientInfo = $dd->getClient();
-
-            $ddOsName        = $mapper->mapOsName($osInfo['name'] ?? null);
-            $ddOsVersion     = $mapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
-            $ddEngineName    = $mapper->mapEngineName($isBot ? null : ($clientInfo['engine'] ?? null));
-            $ddEngineVersion = $mapper->mapEngineVersion(
-                $isBot ? null : ($clientInfo['engine_version'] ?? null),
-            );
-        } catch (Throwable $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
-
-            return;
-        }
-
-        if ($dd->getDeviceName() !== '' && Type::fromName($dd->getDeviceName()) === Type::Unknown) {
+        if ($dd->getDeviceName() !== '' && $ddDeviceType === Type::Unknown) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
                     string: sprintf(
-                        'The device type "<fg=magenta>%s</>" from Matomo for user-agent Header "%s" was not found in the Enum. Please add it.',
+                        'The device type "<fg=magenta>%s (%s)</>" from Matomo for user-agent Header "%s" was not found in the Enum. Please add it.',
                         $dd->getDeviceName(),
+                        $ddDeviceType->getType(),
                         $headers['user-agent'] ?? '',
                     ),
                     length: $messageLength,
@@ -2264,7 +2007,7 @@ final class RewriteTestsCommand extends Command
         }
 
         try {
-            Company::fromName($result['device']['brand'] ?? '');
+            Company::fromName($result['device']['brand'] ?? null);
         } catch (UnexpectedValueException) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
@@ -2279,7 +2022,7 @@ final class RewriteTestsCommand extends Command
         }
 
         try {
-            Company::fromName($result['device']['manufacturer'] ?? '');
+            Company::fromName($result['device']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
@@ -2294,7 +2037,7 @@ final class RewriteTestsCommand extends Command
         }
 
         try {
-            Company::fromName($result['os']['manufacturer'] ?? '');
+            Company::fromName($result['os']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
@@ -2309,13 +2052,28 @@ final class RewriteTestsCommand extends Command
         }
 
         try {
-            Company::fromName($result['engine']['manufacturer'] ?? '');
+            Company::fromName($result['engine']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
                     string: sprintf(
                         'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
                         $result['engine']['manufacturer'] ?? '',
+                    ),
+                    length: $messageLength,
+                ),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
+        try {
+            Company::fromName($result['client']['manufacturer'] ?? null);
+        } catch (UnexpectedValueException) {
+            $output->writeln(
+                messages: "\n" . mb_str_pad(
+                    string: sprintf(
+                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
+                        $result['client']['manufacturer'] ?? '',
                     ),
                     length: $messageLength,
                 ),
@@ -2371,49 +2129,327 @@ final class RewriteTestsCommand extends Command
             }
         }
 
+        $ddModel = $mapper->mapDeviceMarketingName($dd->getModel());
+        $ddBrand = $mapper->mapDeviceBrandName($dd->getBrandName());
+
+        $isBot      = $dd->isBot();
+        $osInfo     = $dd->getOs();
+        $clientInfo = $dd->getClient();
+        $botInfo    = $dd->getBot();
+
+        $ddOsName = $mapper->mapOsName($osInfo['name'] ?? null);
+
+        try {
+            $ddOsVersion = $mapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
+        } catch (NotNumericException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $ddEngineName = $mapper->mapEngineName($isBot ? null : ($clientInfo['engine'] ?? null));
+
+        try {
+            $ddEngineVersion = $mapper->mapEngineVersion(
+                $isBot ? null : ($clientInfo['engine_version'] ?? null),
+            );
+        } catch (NotNumericException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $ddClientName = $mapper->mapBrowserName(
+            $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
+        );
+
+        try {
+            $ddClientVersion = $mapper->mapBrowserVersion(
+                $isBot ? null : ($clientInfo['version'] ?? null),
+            );
+        } catch (NotNumericException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $ddClientType = $mapper->mapBrowserType(
+            $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
+        );
+
+        $brModel      = $mapper->mapDeviceName($result['device']['deviceName'] ?? null);
+        $brModel2     = $mapper->mapDeviceMarketingName($result['device']['marketingName'] ?? null);
+        $brBrand      = $mapper->mapDeviceBrandName($result['device']['brand'] ?? null);
+        $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? null);
+        $brOsName     = $mapper->mapOsName($result['os']['name'] ?? null);
+
+        try {
+            $brOsVersion = $mapper->mapOsVersion($result['os']['version'] ?? null, $brOsName);
+        } catch (NotNumericException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $brEngineName = $mapper->mapEngineName($result['engine']['name'] ?? null);
+
+        try {
+            $brEngineVersion = $mapper->mapEngineVersion($result['engine']['version'] ?? null);
+        } catch (NotNumericException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $brClientName = $mapper->mapBrowserName($result['client']['name'] ?? null);
+
+        try {
+            $brClientVersion = $mapper->mapBrowserVersion($result['client']['version'] ?? null);
+        } catch (NotNumericException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $brClientType = $mapper->mapBrowserType($result['client']['type'] ?? null);
+
         if ($ddModel === null || $ddBrand === null || $ddDeviceType === Type::Unknown) {
             return;
         }
 
         try {
-            $brModel         = $mapper->mapDeviceName($result['device']['deviceName'] ?? '');
-            $brModel2        = $mapper->mapDeviceMarketingName(
-                $result['device']['marketingName'] ?? '',
-            );
-            $brBrand         = $mapper->mapDeviceBrandName($result['device']['brand'] ?? '');
-            $brDeviceType    = $mapper->mapDeviceType($result['device']['type'] ?? '');
-            $brOsName        = $mapper->mapOsName($result['os']['name'] ?? '');
-            $brOsVersion     = $mapper->mapOsVersion($result['os']['version'] ?? '', $brOsName);
-            $brEngineName    = $mapper->mapEngineName($result['engine']['name'] ?? '');
-            $brEngineVersion = $mapper->mapEngineVersion($result['engine']['version'] ?? '');
-
-            if (
-                $ddBrand === $brBrand
-                && ($ddModel === $brModel || $ddModel === $brModel2)
-                && $ddDeviceType === $brDeviceType
-                && $ddOsName === $brOsName
-                && $ddOsVersion->getVersion(
+            $checks = [
+                '$ddBrand === $brBrand' => $ddBrand === $brBrand,
+                '($ddModel === $brModel || $ddModel === $brModel2)' => ($ddModel === $brModel || $ddModel === $brModel2),
+                '$ddDeviceType === $brDeviceType' => $ddDeviceType === $brDeviceType,
+                '$ddOsName === $brOsName' => $ddOsName === $brOsName,
+                '($ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddOsVersion->getVersion(
                     VersionInterface::IGNORE_MICRO,
-                ) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                && ($ddEngineName === $brEngineName || $ddEngineName === null)
-                && ($ddEngineVersion->getVersion(
+                ) === $brOsVersion->getVersion(
+                    VersionInterface::IGNORE_MICRO,
+                ) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null),
+                '($ddEngineName === $brEngineName || $ddEngineName === null)' => ($ddEngineName === $brEngineName || $ddEngineName === null),
+                '($ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddEngineVersion->getVersion(
                     VersionInterface::IGNORE_MICRO,
                 ) === $brEngineVersion->getVersion(
                     VersionInterface::IGNORE_MICRO,
-                ) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)
-            ) {
-                return;
-            }
+                ) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null),
+                '($ddClientName === $brClientName || $ddClientName === null)' => ($ddClientName === $brClientName || $ddClientName === null),
+                '($ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR) || $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === null)' => ($ddClientVersion->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ) === $brClientVersion->getVersion(
+                    VersionInterface::IGNORE_MINOR,
+                ) || $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === null),
+                '($ddClientType === $brClientType)' => ($ddClientType === $brClientType),
+            ];
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>%s</error>', (string) $e));
 
             return;
         }
 
-        ++$counterChecks8;
+        $return = true;
 
-        $message = $getMessage($dd);
-        $diff    = $this->messageLength($output, $message, $messageLength);
+        foreach ($checks as $check) {
+            $return = $return && $check;
+        }
+
+        if ($return) {
+            return;
+        }
+
+        ++$counterDifferentFromMatomo;
+
+        $getMessage = function (DeviceDetector $dd) use ($output, $checks, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
+            $message        = $loopMessage;
+            $someDifference = false;
+
+            $format1d  = '<fg=yellow>';
+            $format2d  = '<fg=yellow>';
+            $format3d  = '<fg=yellow>';
+            $format4d  = '<fg=yellow>';
+            $format5d  = '<fg=yellow>';
+            $format6d  = '<fg=yellow>';
+            $format7d  = '<fg=yellow>';
+            $format8d  = '<fg=yellow>';
+            $format9d  = '<fg=yellow>';
+            $format10d = '<fg=yellow>';
+            $format1b  = '<fg=yellow>';
+            $format2b  = '<fg=yellow>';
+            $format3b  = '<fg=yellow>';
+            $format4b  = '<fg=yellow>';
+            $format5b  = '<fg=yellow>';
+            $format6b  = '<fg=yellow>';
+            $format7b  = '<fg=yellow>';
+            $format8b  = '<fg=yellow>';
+            $format9b  = '<fg=yellow>';
+            $format10b = '<fg=yellow>';
+
+            if ($ddBrand !== $brBrand && $ddBrand !== null) {
+                $format1b       = '<fg=green>';
+                $format1d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if ($ddModel !== $brModel && $ddModel !== $brModel2 && $ddModel !== null) {
+                $format2b       = '<fg=green>';
+                $format2d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if ($ddDeviceType->getType() !== $brDeviceType->getType()) {
+                $format3b       = '<fg=green>';
+                $format3d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if ($ddOsName !== $brOsName && $ddOsName !== null) {
+                $format4b       = '<fg=green>';
+                $format4d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if (
+                $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                && $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null
+            ) {
+                $format5b       = '<fg=green>';
+                $format5d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if ($ddEngineName !== $brEngineName && $ddEngineName !== null) {
+                $format6b       = '<fg=green>';
+                $format6d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if (
+                $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
+                && $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null
+            ) {
+                $format7b       = '<fg=green>';
+                $format7d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if ($ddClientName !== $brClientName && $ddClientName !== null) {
+                $format8b       = '<fg=green>';
+                $format8d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if (
+                $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
+                !== $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
+                && $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) !== null
+            ) {
+                $format9b       = '<fg=green>';
+                $format9d       = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if ($ddClientType !== $brClientType) {
+                $format10b      = '<fg=green>';
+                $format10d      = '<fg=red>';
+                $someDifference = true;
+            }
+
+            if (!$someDifference) {
+                $output->writeln('');
+                $output->writeln(sprintf('<error>%s</error>', var_export($checks, true)));
+                $output->writeln('');
+            }
+
+            $headerList = $this->getHeaderList($headers);
+
+            return $message . PHP_EOL . sprintf(
+                '    For the Headers' . PHP_EOL . '%s' . PHP_EOL
+                . '    the device was detected as    "%s%s -> %s</>" "%s%s/%s -> %s/%s</>" (%s%s -> %s</>), ' . PHP_EOL
+                . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)' . PHP_EOL
+                . '    the platform was detected as  "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
+                . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
+                . '    the engine was detected as    "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
+                . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
+                . '    the client was detected as    "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>), ' . PHP_EOL
+                . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)',
+                implode(PHP_EOL, $headerList),
+                $format1b,
+                $result['device']['brand'] ?? '<n/a>',
+                $brBrand,
+                $format2b,
+                $result['device']['deviceName'] ?? '<n/a>',
+                $result['device']['marketingName'] ?? '<n/a>',
+                $brModel,
+                $brModel2,
+                $format3b,
+                $result['device']['type'] ?? '<n/a>',
+                $brDeviceType->getType(),
+                $format1d,
+                $dd->getBrandName(),
+                $ddBrand,
+                $format2d,
+                $dd->getModel(),
+                $ddModel,
+                $format3d,
+                $dd->getDeviceName(),
+                $ddDeviceType->getType(),
+                $format4b,
+                $result['os']['name'] ?? '<n/a>',
+                $brOsName,
+                $format5b,
+                $result['os']['version'] ?? '<n/a>',
+                $brOsVersion->getVersion(),
+                $format4d,
+                $osInfo['name'] ?? '',
+                $ddOsName,
+                $format5d,
+                $osInfo['version'] ?? '',
+                $ddOsVersion->getVersion(),
+                $format6b,
+                $result['engine']['name'] ?? '',
+                $brEngineName,
+                $format7b,
+                $result['engine']['version'] ?? '',
+                $brEngineVersion->getVersion(),
+                $format6d,
+                $isBot ? '' : ($clientInfo['engine'] ?? ''),
+                $ddEngineName,
+                $format7d,
+                $isBot ? '' : ($clientInfo['engine_version'] ?? ''),
+                $ddEngineVersion->getVersion(),
+                $format8b,
+                $result['client']['name'] ?? '',
+                $brClientName,
+                $format9b,
+                $result['client']['version'] ?? '',
+                $brClientVersion->getVersion(),
+                $format10b,
+                $result['client']['type'] ?? '',
+                $brClientType->getType(),
+                $format8d,
+                $isBot ? ($botInfo['name'] ?? '') : ($clientInfo['name'] ?? ''),
+                $ddClientName,
+                $format9d,
+                $isBot ? '' : ($clientInfo['version'] ?? ''),
+                $ddClientVersion->getVersion(),
+                $format10d,
+                $isBot ? ($botInfo['category'] ?? '') : ($clientInfo['type'] ?? ''),
+                $ddClientType->getType(),
+            );
+        };
+
+        try {
+            $message = $getMessage($dd);
+        } catch (UnexpectedValueException $e) {
+            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+
+            return;
+        }
+
+        $diff = $this->messageLength($output, $message, $messageLength);
 
         $output->writeln(
             messages: "\n" . mb_str_pad(
@@ -2434,14 +2470,14 @@ final class RewriteTestsCommand extends Command
      */
     private function getHeaderList(array $headers): array
     {
-        $headerList = ["\t\t\"user-agent\" => \"" . $headers['user-agent'] . '"'];
+        $headerList = ['        "user-agent" => "' . $headers['user-agent'] . '"'];
 
         foreach ($headers as $name => $value) {
             if ($name === 'user-agent') {
                 continue;
             }
 
-            $headerList[] = "\t\t\"" . $name . '" => "' . $value . '"';
+            $headerList[] = '        "' . $name . '" => "' . $value . '"';
         }
 
         return $headerList;

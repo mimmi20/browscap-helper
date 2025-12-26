@@ -89,10 +89,12 @@ trait FilterHeaderTrait
                     'sec-ch-prefers-color-scheme',
                     'sec-ch-prefers-reduced-motion',
                     'sec-ch-prefers-reduced-transparency',
+                    // only value: Collabim
                     'x-client',
                     'http-x-requested-with',
                     'sapphire-devicetype',
                     'sapphire-osversion',
+                    // only value: WebClient
                     'x-application-type',
                     'x-client-version',
                     'viewport-height',
@@ -100,7 +102,9 @@ trait FilterHeaderTrait
                     'service-name',
                     'x-application',
                     'x-crawled-by',
+                    // only value: spider
                     'x-client-name',
+                    'q-ua2',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
@@ -328,7 +332,6 @@ trait FilterHeaderTrait
                     'dcp-akamai-token',
                     'authority',
                     'accept-languagae',
-                    'q-ua2',
                     'moolah-tag',
                     'surfly-forwarded',
                     'x-ss-proto',
