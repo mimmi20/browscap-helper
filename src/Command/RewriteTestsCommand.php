@@ -3,7 +3,7 @@
 /**
  * This file is part of the browscap-helper package.
  *
- * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2026, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -100,8 +100,10 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
+use const SORT_ASC;
 use const SORT_DESC;
 use const SORT_NUMERIC;
+use const SORT_STRING;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
@@ -369,12 +371,6 @@ final class RewriteTestsCommand extends Command
         $timeDetect                 = 0.0;
         $timeRead                   = 0.0;
         $timeWrite                  = 0.0;
-        $counterHeadersAndroidArm   = 0;
-        $counterHeadersAndroid      = 0;
-        $counterHeadersMozilla5     = 0;
-        $counterHeadersMacos        = 0;
-        $counterHeadersWindows10    = 0;
-        $counterHeadersLinux        = 0;
         $counterDifferentFromMatomo = 0;
         $counterComparedWithMatomo  = 0;
 
@@ -402,12 +398,6 @@ final class RewriteTestsCommand extends Command
                 txtChecks: $txtChecks,
                 txtChecksOs: $txtChecksOs,
                 txtChecksFactor: $txtChecksFactor,
-                counterHeadersAndroidArm: $counterHeadersAndroidArm,
-                counterHeadersAndroid: $counterHeadersAndroid,
-                counterHeadersMozilla5: $counterHeadersMozilla5,
-                counterHeadersMacos: $counterHeadersMacos,
-                counterHeadersWindows10: $counterHeadersWindows10,
-                counterLinuxHeaders: $counterHeadersLinux,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
                 counterComparedWithMatomo: $counterComparedWithMatomo,
             );
@@ -444,6 +434,7 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $cx = [];
+        $cy = [];
 
         foreach ($txtChecksOs as $os => $versions) {
             $c = 0;
@@ -459,10 +450,11 @@ final class RewriteTestsCommand extends Command
             array_multisort($x, SORT_DESC, SORT_NUMERIC, $y, SORT_DESC, SORT_NUMERIC, $versions);
 
             $cx[$os]          = $c;
+            $cy[$os]          = $os;
             $txtChecksOs[$os] = $versions;
         }
 
-        array_multisort($cx, SORT_DESC, SORT_NUMERIC, $txtChecksOs);
+        array_multisort($cx, SORT_DESC, SORT_NUMERIC, $cy, SORT_ASC, SORT_STRING, $txtChecksOs);
 
         $table = new Table($output);
         $table->setHeaders(['OS', 'Version', 'Tests']);
@@ -523,60 +515,6 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterHeadersAndroidArm, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers are from Android on ARM',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterHeadersAndroid, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers are from Android',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterHeadersMacos, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers are from MacOS',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterHeadersWindows10, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers are from Windows 10',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterHeadersLinux, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers are from Linux',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterHeadersMozilla5, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers do not start with \'Mozilla/5.0\'',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
         $output->writeln(
             messages: mb_str_pad(
                 number_format($counterDifferentFromMatomo, 0, ',', '.'),
@@ -1193,48 +1131,9 @@ final class RewriteTestsCommand extends Command
         array &$txtChecks,
         array &$txtChecksOs,
         array &$txtChecksFactor,
-        int &$counterHeadersAndroidArm,
-        int &$counterHeadersAndroid,
-        int &$counterHeadersMozilla5,
-        int &$counterHeadersMacos,
-        int &$counterHeadersWindows10,
-        int &$counterLinuxHeaders,
         int &$counterDifferentFromMatomo,
         int &$counterComparedWithMatomo,
     ): void {
-        if (array_key_exists('user-agent', $test['headers']) && $test['headers']['user-agent'] !== '') {
-            if (
-                preg_match(
-                    '/^mozilla\/5\.0 \(linux; arm_64; android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
-                    $test['headers']['user-agent'],
-                )
-            ) {
-                ++$counterHeadersAndroidArm;
-            } elseif (
-                preg_match(
-                    '/^mozilla\/5\.0 \(linux;(?: (?:[iu]|arm_64);)? android (?P<androidversion>[\d.]+); (?P<devicecode>[^)]+)(?: build\/[^)]+)?\) applewebkit\/[\d.]+ \(khtml, like gecko\) (?P<client>.*)$/i',
-                    $test['headers']['user-agent'],
-                )
-            ) {
-                ++$counterHeadersAndroid;
-            } elseif (
-                preg_match(
-                    '/^mozilla\/5\.0 \(macintosh; intel mac os x/i',
-                    $test['headers']['user-agent'],
-                )
-            ) {
-                ++$counterHeadersMacos;
-            } elseif (
-                preg_match('/^mozilla\/5\.0 \(windows nt 10\.0/i', $test['headers']['user-agent'])
-            ) {
-                ++$counterHeadersWindows10;
-            } elseif (preg_match('/^mozilla\/5\.0 \(x11; linux/i', $test['headers']['user-agent'])) {
-                ++$counterLinuxHeaders;
-            } elseif (!preg_match('/^mozilla\/5\.0/i', $test['headers']['user-agent'])) {
-                ++$counterHeadersMozilla5;
-            }
-        }
-
         $test['headers'] = $this->filterHeaders($output, $test['headers']);
 
         $startTime = microtime(true);
@@ -1624,7 +1523,7 @@ final class RewriteTestsCommand extends Command
             if (
                 in_array(
                     mb_strtolower($result['os']['name']),
-                    ['android', 'ios', 'ipados', 'android tv', 'cyanogenmod', 'miui os', 'yun os', 'android opensource project', 'iphone os', 'mocordroid', 'mre'],
+                    ['android', 'ios', 'ipados', 'android tv', 'cyanogenmod', 'miui os', 'iphone os', 'mocordroid', 'mre'],
                     true,
                 )
             ) {
@@ -1704,7 +1603,7 @@ final class RewriteTestsCommand extends Command
                         'hp-ux',
                         'pardus',
                         'danger os',
-                        'lindows',
+                        'lindowsos',
                         'nintendo switch os',
                         'tvos',
                         'windows 3.11',
@@ -1724,6 +1623,21 @@ final class RewriteTestsCommand extends Command
                         'windows 3.1',
                         'aix',
                         'macintosh',
+                        'fedora linux',
+                        'yun os',
+                        'firefox os',
+                        'windows 95',
+                        'debian',
+                        'irix',
+                        'windows 98',
+                        'openharmony',
+                        'osf/1',
+                        'haiku os',
+                        'opensuse',
+                        'linspire',
+                        'android opensource project',
+                        'maemo',
+                        'bada',
                         // 'kaios',
                         // 'vizios',
                     ],
@@ -2230,16 +2144,12 @@ final class RewriteTestsCommand extends Command
 
         $brClientType = $mapper->mapBrowserType($result['client']['type'] ?? null);
 
-        if ($ddModel === null || $ddBrand === null) {
-            return;
-        }
-
         try {
             $checks = [
-                '$ddBrand === $brBrand' => $ddBrand === $brBrand,
-                '($ddModel === $brModel || $ddModel === $brModel2)' => ($ddModel === $brModel || $ddModel === $brModel2),
+                '($ddBrand === $brBrand || $ddBrand === null)' => ($ddBrand === $brBrand || $ddBrand === null),
+                '($ddModel === $brModel || $ddModel === $brModel2 || $ddModel === null || $ddModel === \'K\')' => ($ddModel === $brModel || $ddModel === $brModel2 || $ddModel === null || $ddModel === 'K'),
                 '$ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown' => $ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown,
-                '$ddOsName === $brOsName' => $ddOsName === $brOsName,
+                '($ddOsName === $brOsName || $ddOsName === null)' => ($ddOsName === $brOsName || $ddOsName === null),
                 '($ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddOsVersion->getVersion(
                     VersionInterface::IGNORE_MICRO,
                 ) === $brOsVersion->getVersion(
@@ -2314,7 +2224,10 @@ final class RewriteTestsCommand extends Command
                 $someDifference = true;
             }
 
-            if ($ddDeviceType->getType() !== $brDeviceType->getType()) {
+            if (
+                $ddDeviceType->getType() !== $brDeviceType->getType()
+                && $ddDeviceType !== Type::Unknown
+            ) {
                 $format3b       = '<fg=green>';
                 $format3d       = '<fg=red>';
                 $someDifference = true;
@@ -2368,7 +2281,7 @@ final class RewriteTestsCommand extends Command
                 $someDifference = true;
             }
 
-            if ($ddClientType !== $brClientType) {
+            if ($ddClientType !== $brClientType && $ddClientType !== \UaBrowserType\Type::Unknown) {
                 $format10b      = '<fg=green>';
                 $format10d      = '<fg=red>';
                 $someDifference = true;
