@@ -100,8 +100,10 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
+use const SORT_ASC;
 use const SORT_DESC;
 use const SORT_NUMERIC;
+use const SORT_STRING;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
@@ -2222,7 +2224,10 @@ final class RewriteTestsCommand extends Command
                 $someDifference = true;
             }
 
-            if ($ddDeviceType->getType() !== $brDeviceType->getType() && $ddDeviceType !== Type::Unknown) {
+            if (
+                $ddDeviceType->getType() !== $brDeviceType->getType()
+                && $ddDeviceType !== Type::Unknown
+            ) {
                 $format3b       = '<fg=green>';
                 $format3d       = '<fg=red>';
                 $someDifference = true;
