@@ -40,14 +40,6 @@ final class BrowscapHelper extends Application
         $existingTestsRemover = new ExistingTestsRemover();
 
         $this->addCommand(
-            new Command\ConvertLogsCommand(
-                $existingTestsLoader,
-                $existingTestsRemover,
-                $rewriteTestsHelper,
-                $sourcesDirectory,
-            ),
-        );
-        $this->addCommand(
             new Command\CopyTestsCommand(
                 $existingTestsLoader,
                 $existingTestsRemover,
