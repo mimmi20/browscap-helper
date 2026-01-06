@@ -29,6 +29,7 @@ use BrowscapHelper\Source\Ua\UserAgent;
 use BrowscapHelper\Source\WhichBrowserSource;
 use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Traits\FilterHeaderTrait;
+use DateTimeImmutable;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -48,6 +49,7 @@ use UnexpectedValueException;
 
 use function array_key_exists;
 use function count;
+use function is_string;
 use function json_encode;
 use function sprintf;
 
@@ -131,7 +133,35 @@ final class CopyTestsCommand extends Command
                 continue;
             }
 
-            $txtChecks[$seachHeader] = 1;
+            if (is_string($row['date-first'])) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d', $row['date-first']);
+
+                if ($date === false) {
+                    $date = new DateTimeImmutable('now');
+                }
+
+                $row['date-first'] = $date;
+            } else {
+                $row['date-first'] = new DateTimeImmutable('now');
+            }
+
+            if (is_string($row['date-last'])) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d', $row['date-last']);
+
+                if ($date === false) {
+                    $date = new DateTimeImmutable('now');
+                }
+
+                $row['date-last'] = $date;
+            } else {
+                $row['date-last'] = new DateTimeImmutable('now');
+            }
+
+            $txtChecks[$seachHeader] = [
+                'headers' => $row['headers'],
+                'date-first' => $row['date-first'],
+                'date-last' => $row['date-last'],
+            ];
         }
 
         $sourcesDirectory = $input->getOption('resources');
@@ -230,10 +260,10 @@ final class CopyTestsCommand extends Command
     }
 
     /**
-     * @param array<int, SourceInterface>                                                                                     $sources
-     * @param array<string, array<string, array<string, array<string, bool|float|int|string|null>|bool|int|string|null>>|int> $txtChecks
+     * @param array<int, SourceInterface>                                                                                       $sources
+     * @param array<string, array{headers: array<string, string>, date-first: DateTimeImmutable, date-last: DateTimeImmutable}> $txtChecks
      *
-     * @return array<string, array<string, array<string, array<string, bool|float|int|string|null>|bool|int|string|null>>|int>
+     * @return array<string, array{headers: array<string, string>, date-first: DateTimeImmutable|false, date-last: DateTimeImmutable|false}>
      *
      * @throws RuntimeException
      */
@@ -245,6 +275,24 @@ final class CopyTestsCommand extends Command
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
+                if (is_string($test['date-first'])) {
+                    $dateOld = $txtChecks[$seachHeader]['date-first'];
+                    $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $test['date-first']);
+
+                    if ($dateOld < $dateNew) {
+                        $txtChecks[$seachHeader]['date-first'] = $dateNew;
+                    }
+                }
+
+                if (is_string($test['date-last'])) {
+                    $dateOld = $txtChecks[$seachHeader]['date-last'];
+                    $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $test['date-last']);
+
+                    if ($dateOld < $dateNew) {
+                        $txtChecks[$seachHeader]['date-last'] = $dateNew;
+                    }
+                }
+
                 continue;
             }
 
@@ -262,7 +310,35 @@ final class CopyTestsCommand extends Command
                 continue;
             }
 
-            $txtChecks[$seachHeader] = $test;
+            if (is_string($test['date-first'])) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d', $test['date-first']);
+
+                if ($date === false) {
+                    $date = new DateTimeImmutable('now');
+                }
+
+                $test['date-first'] = $date;
+            } else {
+                $test['date-first'] = new DateTimeImmutable('now');
+            }
+
+            if (is_string($test['date-last'])) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d', $test['date-last']);
+
+                if ($date === false) {
+                    $date = new DateTimeImmutable('now');
+                }
+
+                $test['date-last'] = $date;
+            } else {
+                $test['date-last'] = new DateTimeImmutable('now');
+            }
+
+            $txtChecks[$seachHeader] = [
+                'headers' => $test['headers'],
+                'date-first' => $test['date-first'],
+                'date-last' => $test['date-last'],
+            ];
             ++$txtTotalCounter;
         }
 
