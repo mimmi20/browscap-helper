@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Source\Ua\UserAgent;
+use DateTimeImmutable;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
 use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
@@ -23,7 +24,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UnexpectedValueException;
 
 use function array_chunk;
-use function array_keys;
 use function file_put_contents;
 use function mb_str_pad;
 use function mb_strlen;
@@ -38,7 +38,7 @@ final readonly class RewriteTests
     }
 
     /**
-     * @param array<string, array<string, array<string, array<string, bool|float|int|string|null>|bool|int|string|null>>|int> $txtChecks
+     * @param array<string, array{headers: array<string, string>, date-first: DateTimeImmutable|false, date-last: DateTimeImmutable|false}> $txtChecks
      *
      * @throws InvalidJsonEncodeOptions
      * @throws InvalidNewLineString
@@ -61,7 +61,7 @@ final readonly class RewriteTests
         );
 
         foreach ($folderChunks as $folderId => $folderChunk) {
-            $headers = [];
+            $testCases = [];
 
             $fileName = $testSource . '/' . sprintf('%1$07d', $folderId) . '.json';
 
@@ -78,14 +78,26 @@ final readonly class RewriteTests
                 OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
 
-            foreach (array_keys($folderChunk) as $headerString) {
+            foreach ($folderChunk as $headerString => $test) {
                 $headerArray = UserAgent::fromString($headerString)->getHeaders();
 
                 if ($headerArray === []) {
                     continue;
                 }
 
-                $headers[] = $headerArray;
+                if (!$test['date-first'] instanceof DateTimeImmutable) {
+                    continue;
+                }
+
+                if (!$test['date-last'] instanceof DateTimeImmutable) {
+                    continue;
+                }
+
+                $testCases[] = [
+                    'headers' => $test['headers'],
+                    'date-first' => $test['date-first']->format('Y-m-d'),
+                    'date-last' => $test['date-last']->format('Y-m-d'),
+                ];
             }
 
             $message2 = $message . ' - normalizing';
@@ -103,7 +115,7 @@ final readonly class RewriteTests
             try {
                 $normalized = $this->jsonNormalizer->normalize(
                     $output,
-                    $headers,
+                    $testCases,
                     $message,
                     $messageLength,
                 );

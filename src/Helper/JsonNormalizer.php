@@ -102,7 +102,7 @@ final class JsonNormalizer
     }
 
     /**
-     * @param array<int|string, array<string, string>|string> $headers
+     * @param array<int|string, array<string, array<string, string>|string>|string> $testCases
      *
      * @throws SchemaUriReferencesInvalidJsonDocument
      * @throws SchemaUriReferencesDocumentWithInvalidMediaType
@@ -113,7 +113,7 @@ final class JsonNormalizer
      */
     public function normalize(
         OutputInterface $output,
-        array $headers,
+        array $testCases,
         string $message,
         int &$messageLength = 0,
     ): string | null {
@@ -129,7 +129,7 @@ final class JsonNormalizer
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         try {
-            $content = json_encode($headers, JSON_THROW_ON_ERROR);
+            $content = json_encode($testCases, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
             $output->writeln(
