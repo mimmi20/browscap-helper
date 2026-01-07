@@ -279,7 +279,7 @@ final class CopyTestsCommand extends Command
                     $dateOld = $txtChecks[$seachHeader]['date-first'];
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $test['date-first']);
 
-                    if ($dateOld < $dateNew) {
+                    if ($dateOld > $dateNew) {
                         $txtChecks[$seachHeader]['date-first'] = $dateNew;
                     }
                 }
