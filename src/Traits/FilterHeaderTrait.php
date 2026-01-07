@@ -568,6 +568,13 @@ trait FilterHeaderTrait
                     'idempotency-key',
                     'x-timpi-verify',
                     'get',
+                    'x-nextjs-request-id',
+                    'x-nextjs-html-request-id',
+                    'next-action',
+                    'next-router-state-tree',
+                    'page',
+                    'bad',
+                    'injected',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
