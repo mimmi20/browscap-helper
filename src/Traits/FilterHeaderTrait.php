@@ -575,6 +575,15 @@ trait FilterHeaderTrait
                     'page',
                     'bad',
                     'injected',
+                    'x-vercel-ip-country',
+                    'x-vercel-ip-country-region',
+                    'x-vercel-ip-city',
+                    'x-authenticated-user',
+                    'x-authenticated-groups',
+                    'x-customer',
+                    'x-uniqid',
+                    'x-method-override',
+                    'x-http-method',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
