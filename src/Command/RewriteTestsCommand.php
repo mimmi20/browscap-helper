@@ -1523,7 +1523,7 @@ final class RewriteTestsCommand extends Command
             if (
                 in_array(
                     mb_strtolower($result['os']['name']),
-                    ['android', 'ios', 'ipados', 'android tv', 'cyanogenmod', 'miui os', 'iphone os', 'mocordroid', 'mre'],
+                    ['android', 'cyanogenmod', 'mocordroid', 'mre'],
                     true,
                 )
             ) {
@@ -1642,6 +1642,24 @@ final class RewriteTestsCommand extends Command
                         'series 40',
                         'nucleus os',
                         'amiga os',
+                        'android tv',
+                        'unix',
+                        'windows nt',
+                        'whale os',
+                        'os/2',
+                        'iphone os',
+                        'macos',
+                        'ipados',
+                        'ubuntu',
+                        'ios',
+                        'miui os',
+                        'brew',
+                        'freebsd',
+                        'openbsd',
+                        'netbsd',
+                        'mac os x',
+                        'sunos',
+                        'series 60',
                         // 'kaios',
                         // 'vizios',
                     ],
