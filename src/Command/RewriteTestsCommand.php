@@ -111,9 +111,9 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION = 9;
+    private const int COMPARE_MATOMO_LOWER_VERSION = 0;
 
-    private const int COMPARE_MAPPER_LOWER_VERSION = 12;
+    private const int TIMERANGE = 20;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -364,11 +364,17 @@ final class RewriteTestsCommand extends Command
         $counter                    = 0;
         $duplicates                 = 0;
         $errors                     = 0;
-        $skipped                    = 0;
+        $checked                    = 0;
+        $skippedBeforeCheck         = 0;
+        $skippedAfterCheck          = 0;
+        $skippedInvalidData         = 0;
+        $skippedVersion             = 0;
+        $skippedHeaderCheck         = 0;
         $testCount                  = 0;
         $baseMessage                = 'checking Header ';
         $timeCheck                  = 0.0;
         $timeDetect                 = 0.0;
+        $timeCompare                = 0.0;
         $timeRead                   = 0.0;
         $timeWrite                  = 0.0;
         $counterDifferentFromMatomo = 0;
@@ -377,24 +383,122 @@ final class RewriteTestsCommand extends Command
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
+        $accept = function(mixed $test, OutputInterface $output, string $loopMessage): bool {
+            if (!is_array($test)) {
+                $output->writeln('');
+                $output->writeln(
+                    messages: $loopMessage . ' <error>wrong data structure</error>',
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return false;
+            }
+
+            if (!array_key_exists('date-last', $test) || $test['date-last'] === null) {
+                $output->writeln('');
+                $output->writeln(
+                    messages: $loopMessage . ' <error>"data-last" field missing or null</error>',
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return true;
+            }
+
+            try {
+                $date = new \DatetimeImmutable($test['date-last']);
+            } catch (\Throwable $e) {
+                $output->writeln('');
+                $output->writeln(
+                    messages: $loopMessage . sprintf(' <error>%s</error>', $e),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return false;
+            }
+
+            return $date > (new \DatetimeImmutable('now'))->sub(new \DateInterval('P' . self::TIMERANGE . 'D'));
+        };
+
         foreach ($this->testsLoader->getProperties($clonedOutput, $sources, $messageLength) as $test) {
+            ++$counter;
+
+            $actualTimeExec = new DateTimeImmutable('now');
+
+            $interval = $actualTimeExec->diff($startTimeExec);
+
+            $loopMessage = sprintf(
+                '%s[%s] - [%s] - [%s] - [%s] - ',
+                $baseMessage,
+                mb_str_pad(
+                    string: number_format(num: $counter, thousands_separator: '.'),
+                    length: 14,
+                    pad_type: STR_PAD_LEFT,
+                ),
+                $interval->format('%H:%I:%S.%F'),
+                mb_str_pad(
+                    string: number_format(num: memory_get_usage(true), thousands_separator: '.') . 'B',
+                    length: 16,
+                    pad_type: STR_PAD_LEFT,
+                ),
+                mb_str_pad(
+                    string: number_format(num: memory_get_peak_usage(true), thousands_separator: '.') . 'B',
+                    length: 16,
+                    pad_type: STR_PAD_LEFT,
+                ),
+            );
+
+            memory_reset_peak_usage();
+
+            $message = $loopMessage . 'check';
+            $diff    = $this->messageLength($output, $message, $messageLength);
+
+            $output->write(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+            $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+
+            if (!$accept($test, $output, $loopMessage)) {
+                ++$skippedBeforeCheck;
+
+                continue;
+            }
+
+            $test['headers'] = $this->filterHeaders($output, $test['headers']);
+
+            $startTime = microtime(true);
+
+            $timeCheck += microtime(true) - $startTime;
+
+            $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
+
+            if (array_key_exists($seachHeader, $txtChecks)) {
+                ++$skippedBeforeCheck;
+
+                continue;
+            }
+
+            ++$checked;
+
             $this->handleTestCase(
                 output: $output,
                 detector: $detector,
                 dd: $dd,
                 test: $test,
-                startTimeExec: $startTimeExec,
-                baseMessage: $baseMessage,
-                counter: $counter,
-                skipped: $skipped,
+                loopMessage: $loopMessage,
+                seachHeader: $seachHeader,
+                skippedAfterCheck: $skippedAfterCheck,
+                skippedInvalidData: $skippedInvalidData,
+                skippedVersion: $skippedVersion,
+                skippedHeaderCheck: $skippedHeaderCheck,
                 duplicates: $duplicates,
                 errors: $errors,
                 testCount: $testCount,
                 messageLength: $messageLength,
-                timeCheck: $timeCheck,
                 timeDetect: $timeDetect,
                 timeRead: $timeRead,
                 timeWrite: $timeWrite,
+                timeCompare: $timeCompare,
                 txtChecks: $txtChecks,
                 txtChecksOs: $txtChecksOs,
                 txtChecksFactor: $txtChecksFactor,
@@ -405,6 +509,39 @@ final class RewriteTestsCommand extends Command
             //            if ($counterDifferentFromMatomo >= 10) {
             //                exit;
             //            }
+        }
+
+        $messageLength = 0;
+        $baseMessage   = 're-write test files in directory ';
+
+        $fileFinder = new Finder();
+        $fileFinder->notName('*.gitkeep');
+        $fileFinder->ignoreDotFiles(true);
+        $fileFinder->ignoreVCS(true);
+        $fileFinder->sortByName();
+        $fileFinder->ignoreUnreadableDirs();
+        $fileFinder->files();
+        $fileFinder->in('.build');
+
+        foreach ($fileFinder as $file) {
+            try {
+                $this->rewriteTests(
+                    output: $output,
+                    file: $file,
+                    basePath: $basePath,
+                    baseMessage: $baseMessage,
+                    errors: $errors,
+                    messageLength: $messageLength,
+                );
+            } catch (RuntimeException $e) {
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+                $output->writeln(
+                    messages: '<error>' . $e . '</error>',
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return 1;
+            }
         }
 
         $messageLength = 0;
@@ -486,117 +623,80 @@ final class RewriteTestsCommand extends Command
         $this->jsonNormalizer->init($output);
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
+
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
             messages: sprintf(
-                'time checking:      %s sec',
+                'time checking:              %s sec',
                 mb_str_pad(number_format($timeCheck, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
             messages: sprintf(
-                'time detecting:     %s sec',
+                'time detecting:             %s sec',
                 mb_str_pad(number_format($timeDetect, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
             messages: sprintf(
-                'time reading cache: %s sec',
+                'time detection with Matomo: %s sec',
+                mb_str_pad(number_format($timeCompare, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
+            ),
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->writeln(
+            messages: sprintf(
+                'time reading cache:         %s sec',
                 mb_str_pad(number_format($timeRead, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
         $output->writeln(
             messages: sprintf(
-                'time writing cache: %s sec',
+                'time writing cache:         %s sec',
                 mb_str_pad(number_format($timeWrite, 3, ',', '.'), 12, ' ', STR_PAD_LEFT),
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
+
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterDifferentFromMatomo, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers were detected, but different from Matomo',
-            options: OutputInterface::VERBOSITY_NORMAL,
+
+        $table = new Table($output);
+        $table->setHeaders(['', 'Tests']);
+        $table->setRows(
+            [
+                ['useragents processed', mb_str_pad(number_format(num: $counter, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['skipped before checks', mb_str_pad(number_format(num: $skippedBeforeCheck, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['useragents checked', mb_str_pad(number_format(num: $checked, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+            ],
         );
-        $output->writeln(
-            messages: mb_str_pad(
-                number_format($counterComparedWithMatomo, 0, ',', '.'),
-                12,
-                ' ',
-                STR_PAD_LEFT,
-            ) . ' Headers were compared with Matomo',
-            options: OutputInterface::VERBOSITY_NORMAL,
+        $table->addRow(new TableSeparator());
+        $table->addRows(
+            [
+                ['skipped after checks', mb_str_pad(number_format(num: $skippedAfterCheck, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['skipped invalid', mb_str_pad(number_format(num: $skippedInvalidData, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['skipped after version check', mb_str_pad(number_format(num: $skippedVersion, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['skipped after header check', mb_str_pad(number_format(num: $skippedHeaderCheck, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['errors', mb_str_pad(number_format(num: $errors, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['duplicates', mb_str_pad(number_format(num: $duplicates, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['tests written', mb_str_pad(number_format(num: $testCount, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+            ],
         );
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
+        $table->addRow(new TableSeparator());
+        $table->addRows(
+            [
+                ['compared with Matomo', mb_str_pad(number_format(num: $counterComparedWithMatomo, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                ['different from Matomo', mb_str_pad(number_format(num: $counterDifferentFromMatomo, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+            ],
+        );
 
-        $messageLength = 0;
-        $baseMessage   = 're-write test files in directory ';
-
-        $fileFinder = new Finder();
-        $fileFinder->notName('*.gitkeep');
-        $fileFinder->ignoreDotFiles(true);
-        $fileFinder->ignoreVCS(true);
-        $fileFinder->sortByName();
-        $fileFinder->ignoreUnreadableDirs();
-        $fileFinder->files();
-        $fileFinder->in('.build');
-
-        foreach ($fileFinder as $file) {
-            try {
-                $this->rewriteTests(
-                    output: $output,
-                    file: $file,
-                    basePath: $basePath,
-                    baseMessage: $baseMessage,
-                    errors: $errors,
-                    messageLength: $messageLength,
-                );
-            } catch (RuntimeException $e) {
-                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    messages: '<error>' . $e . '</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return 1;
-            }
-        }
+        $table->render();
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-
-        $dataToOutput = [
-            'useragents processed' => $counter,
-            'tests written' => $testCount,
-            'skipped' => $skipped,
-            'errors' => $errors,
-            'duplicates' => $duplicates,
-        ];
-
-        foreach ($dataToOutput as $title => $number) {
-            $output->writeln(
-                messages: sprintf(
-                    '%s%s',
-                    mb_str_pad(
-                        string: $title . ':',
-                        length: 21,
-                    ),
-                    mb_str_pad(
-                        string: number_format(num: $number, thousands_separator: '.'),
-                        length: 14,
-                        pad_type: STR_PAD_LEFT,
-                    ),
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-        }
 
         return self::SUCCESS;
     }
@@ -1116,83 +1216,36 @@ final class RewriteTestsCommand extends Command
         Detector $detector,
         DeviceDetector $dd,
         array $test,
-        DateTimeImmutable $startTimeExec,
-        string $baseMessage,
-        int &$counter,
-        int &$skipped,
+        string $loopMessage,
+        string $seachHeader,
+        int &$skippedAfterCheck,
+        int &$skippedInvalidData,
+        int &$skippedVersion,
+        int &$skippedHeaderCheck,
         int &$duplicates,
         int &$errors,
         int &$testCount,
         int &$messageLength,
-        float &$timeCheck,
         float &$timeDetect,
         float &$timeRead,
         float &$timeWrite,
+        float &$timeCompare,
         array &$txtChecks,
         array &$txtChecksOs,
         array &$txtChecksFactor,
         int &$counterDifferentFromMatomo,
         int &$counterComparedWithMatomo,
     ): void {
-        $test['headers'] = $this->filterHeaders($output, $test['headers']);
-
-        $startTime = microtime(true);
-
-        $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
-
-        ++$counter;
-
-        $actualTimeExec = new DateTimeImmutable('now');
-
-        $interval = $actualTimeExec->diff($startTimeExec);
-
-        $loopMessage = sprintf(
-            '%s[%s] - [%s] - [%s] - [%s] - ',
-            $baseMessage,
-            mb_str_pad(
-                string: number_format(num: $counter, thousands_separator: '.'),
-                length: 14,
-                pad_type: STR_PAD_LEFT,
-            ),
-            $interval->format('%H:%I:%S.%F'),
-            mb_str_pad(
-                string: number_format(num: memory_get_usage(true), thousands_separator: '.') . 'B',
-                length: 16,
-                pad_type: STR_PAD_LEFT,
-            ),
-            mb_str_pad(
-                string: number_format(num: memory_get_peak_usage(true), thousands_separator: '.') . 'B',
-                length: 16,
-                pad_type: STR_PAD_LEFT,
-            ),
-        );
-
-        memory_reset_peak_usage();
-
-        $message = $loopMessage . 'check';
-        $diff    = $this->messageLength($output, $message, $messageLength);
-
-        $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
-
-        $timeCheck += microtime(true) - $startTime;
-
-        if (array_key_exists($seachHeader, $txtChecks)) {
-            ++$skipped;
-
-            return;
-        }
-
         $txtChecks[$seachHeader] = $test;
+
+        ++$skippedHeaderCheck;
+        --$skippedHeaderCheck;
 
         // if (
         //    !array_key_exists('x-requested-with', $test['headers'])
         //    && !array_key_exists('http-x-requested-with', $test['headers'])
         // ) {
-        //    ++$skipped;
+        //    ++$skippedHeaderCheck;
         //
         //    return;
         // }
@@ -1200,7 +1253,7 @@ final class RewriteTestsCommand extends Command
         // if (
         //    !array_key_exists('sec-ch-ua-platform', $test['headers'])
         // ) {
-        //    ++$skipped;
+        //    ++$skippedHeaderCheck;
         //
         //    return;
         // }
@@ -1208,7 +1261,7 @@ final class RewriteTestsCommand extends Command
         // if (
         //    !array_key_exists('sec-ch-ua-model', $test['headers'])
         // ) {
-        //    ++$skipped;
+        //    ++$skippedHeaderCheck;
         //
         //    return;
         // }
@@ -1216,7 +1269,7 @@ final class RewriteTestsCommand extends Command
         // if (
         //    !array_key_exists('x-puffin-ua', $test['headers'])
         // ) {
-        //    ++$skipped;
+        //    ++$skippedHeaderCheck;
         //
         //    return;
         // }
@@ -1377,7 +1430,7 @@ final class RewriteTestsCommand extends Command
         );
 
         if ($forbiddenFound) {
-            ++$skipped;
+            ++$skippedInvalidData;
 
             return;
         }
@@ -1397,7 +1450,7 @@ final class RewriteTestsCommand extends Command
         $result = $testResult->getResult();
 
         if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
-            ++$skipped;
+            ++$skippedAfterCheck;
 
             return;
         }
@@ -1449,7 +1502,7 @@ final class RewriteTestsCommand extends Command
 
                 if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
                     if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
-                        ++$skipped;
+                        ++$skippedVersion;
 
                         return;
                     }
@@ -1521,20 +1574,6 @@ final class RewriteTestsCommand extends Command
             $compareWithMapper = true;
         } elseif (!empty($result['os']['name']) && is_string($result['os']['name'])) {
             if (
-                in_array(
-                    mb_strtolower($result['os']['name']),
-                    ['android', 'cyanogenmod', 'mocordroid', 'mre'],
-                    true,
-                )
-            ) {
-                if (
-                    $version instanceof VersionInterface
-                    && (int) $version->getMajor() >= self::COMPARE_MAPPER_LOWER_VERSION
-                ) {
-                    $compareWithMapper                           = true;
-                    $txtChecksOs[$osName][$osVersion]['checked'] = true;
-                }
-            } elseif (
                 in_array(
                     mb_strtolower($result['os']['name']),
                     [
@@ -1660,8 +1699,21 @@ final class RewriteTestsCommand extends Command
                         'mac os x',
                         'sunos',
                         'series 60',
-                        // 'kaios',
-                        // 'vizios',
+                        'javaos',
+                        'linux',
+                        'windows',
+                        'orsay',
+                        'java-me',
+                        'windows ce',
+                        'tizen',
+                        'opera tv',
+                        'java me',
+                        'android',
+                        'cyanogenmod',
+                        'mocordroid',
+                        'mre',
+                        'kaios',
+                        'vizios',
                     ],
                     true,
                 )
@@ -1672,6 +1724,8 @@ final class RewriteTestsCommand extends Command
         }
 
         if ($compareWithMapper) {
+            $startTime = microtime(true);
+
             $this->compareDeviceWithMapper(
                 output: $output,
                 dd: $dd,
@@ -1681,6 +1735,8 @@ final class RewriteTestsCommand extends Command
                 messageLength: $messageLength,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
             );
+
+            $timeCompare += microtime(true) - $startTime;
 
             ++$counterComparedWithMatomo;
         }
