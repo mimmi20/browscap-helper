@@ -27,6 +27,7 @@ use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
 use DateInterval;
+use DateInvalidOperationException;
 use DateTimeImmutable;
 use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
@@ -95,6 +96,7 @@ use function str_replace;
 use function str_starts_with;
 use function var_export;
 
+use const ARRAY_FILTER_USE_KEY;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -113,7 +115,7 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION = 0;
 
-    private const int TIMERANGE = 20;
+    private const int TIMERANGE = 21;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -165,9 +167,10 @@ final class RewriteTestsCommand extends Command
      * @throws UnexpectedValueException
      * @throws RuntimeException
      * @throws \LogicException
+     * @throws Exception
      *
-     * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
+	 * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+	 * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -383,42 +386,6 @@ final class RewriteTestsCommand extends Command
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
-        $accept = function(mixed $test, OutputInterface $output, string $loopMessage): bool {
-            if (!is_array($test)) {
-                $output->writeln('');
-                $output->writeln(
-                    messages: $loopMessage . ' <error>wrong data structure</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return false;
-            }
-
-            if (!array_key_exists('date-last', $test) || $test['date-last'] === null) {
-                $output->writeln('');
-                $output->writeln(
-                    messages: $loopMessage . ' <error>"data-last" field missing or null</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return true;
-            }
-
-            try {
-                $date = new \DatetimeImmutable($test['date-last']);
-            } catch (\Throwable $e) {
-                $output->writeln('');
-                $output->writeln(
-                    messages: $loopMessage . sprintf(' <error>%s</error>', $e),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return false;
-            }
-
-            return $date > (new \DatetimeImmutable('now'))->sub(new \DateInterval('P' . self::TIMERANGE . 'D'));
-        };
-
         foreach ($this->testsLoader->getProperties($clonedOutput, $sources, $messageLength) as $test) {
             ++$counter;
 
@@ -441,7 +408,10 @@ final class RewriteTestsCommand extends Command
                     pad_type: STR_PAD_LEFT,
                 ),
                 mb_str_pad(
-                    string: number_format(num: memory_get_peak_usage(true), thousands_separator: '.') . 'B',
+                    string: number_format(
+                        num: memory_get_peak_usage(true),
+                        thousands_separator: '.',
+                    ) . 'B',
                     length: 16,
                     pad_type: STR_PAD_LEFT,
                 ),
@@ -456,10 +426,30 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
+            );
 
-            if (!$accept($test, $output, $loopMessage)) {
-                ++$skippedBeforeCheck;
+            try {
+                if (!$this->accept($test, $output, $loopMessage)) {
+                    ++$skippedBeforeCheck;
+
+                    continue;
+                }
+            } catch (DateInvalidOperationException $e) {
+                ++$errors;
+
+                $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                $message = $loopMessage . $addMessage;
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
 
                 continue;
             }
@@ -543,8 +533,6 @@ final class RewriteTestsCommand extends Command
                 return 1;
             }
         }
-
-        $messageLength = 0;
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -669,28 +657,124 @@ final class RewriteTestsCommand extends Command
         $table->setHeaders(['', 'Tests']);
         $table->setRows(
             [
-                ['useragents processed', mb_str_pad(number_format(num: $counter, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['skipped before checks', mb_str_pad(number_format(num: $skippedBeforeCheck, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['useragents checked', mb_str_pad(number_format(num: $checked, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                [
+                    'useragents processed',
+                    mb_str_pad(
+                        number_format(num: $counter, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'skipped before checks',
+                    mb_str_pad(
+                        number_format(num: $skippedBeforeCheck, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'useragents checked',
+                    mb_str_pad(
+                        number_format(num: $checked, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
             ],
         );
         $table->addRow(new TableSeparator());
         $table->addRows(
             [
-                ['skipped after checks', mb_str_pad(number_format(num: $skippedAfterCheck, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['skipped invalid', mb_str_pad(number_format(num: $skippedInvalidData, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['skipped after version check', mb_str_pad(number_format(num: $skippedVersion, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['skipped after header check', mb_str_pad(number_format(num: $skippedHeaderCheck, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['errors', mb_str_pad(number_format(num: $errors, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['duplicates', mb_str_pad(number_format(num: $duplicates, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['tests written', mb_str_pad(number_format(num: $testCount, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                [
+                    'skipped after checks',
+                    mb_str_pad(
+                        number_format(num: $skippedAfterCheck, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'skipped invalid',
+                    mb_str_pad(
+                        number_format(num: $skippedInvalidData, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'skipped after version check',
+                    mb_str_pad(
+                        number_format(num: $skippedVersion, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'skipped after header check',
+                    mb_str_pad(
+                        number_format(num: $skippedHeaderCheck, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'errors',
+                    mb_str_pad(
+                        number_format(num: $errors, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'duplicates',
+                    mb_str_pad(
+                        number_format(num: $duplicates, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'tests written',
+                    mb_str_pad(
+                        number_format(num: $testCount, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
             ],
         );
         $table->addRow(new TableSeparator());
         $table->addRows(
             [
-                ['compared with Matomo', mb_str_pad(number_format(num: $counterComparedWithMatomo, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
-                ['different from Matomo', mb_str_pad(number_format(num: $counterDifferentFromMatomo, thousands_separator: '.'), 12, ' ', STR_PAD_LEFT)],
+                [
+                    'compared with Matomo',
+                    mb_str_pad(
+                        number_format(num: $counterComparedWithMatomo, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
+                    'different from Matomo',
+                    mb_str_pad(
+                        number_format(num: $counterDifferentFromMatomo, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
             ],
         );
 
@@ -1381,6 +1465,11 @@ final class RewriteTestsCommand extends Command
         $filteredHeaders = array_filter(
             $test['headers'],
             static fn (string $v): bool => $v !== '',
+        );
+        $filteredHeaders = array_filter(
+            $filteredHeaders,
+            static fn (string $k): bool => $k !== '',
+            ARRAY_FILTER_USE_KEY,
         );
 
         $forbiddenFound = array_any(
@@ -2489,5 +2578,45 @@ final class RewriteTestsCommand extends Command
         }
 
         return $headerList;
+    }
+
+    /** @throws DateInvalidOperationException */
+    private function accept(mixed $test, OutputInterface $output, string $loopMessage): bool
+    {
+        if (!is_array($test)) {
+            $output->writeln('');
+            $output->writeln(
+                messages: $loopMessage . ' <error>wrong data structure</error>',
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return false;
+        }
+
+        if (!array_key_exists('date-last', $test) || $test['date-last'] === null) {
+            $output->writeln('');
+            $output->writeln(
+                messages: $loopMessage . ' <error>"data-last" field missing or null</error>',
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return true;
+        }
+
+        try {
+            $date = new DateTimeImmutable($test['date-last']);
+        } catch (Throwable $e) {
+            $output->writeln('');
+            $output->writeln(
+                messages: $loopMessage . sprintf(' <error>%s</error>', $e),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return false;
+        }
+
+        return $date > (new DateTimeImmutable('now'))->sub(
+            new DateInterval('P' . self::TIMERANGE . 'D'),
+        );
     }
 }
