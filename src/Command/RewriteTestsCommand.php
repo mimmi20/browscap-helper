@@ -169,8 +169,8 @@ final class RewriteTestsCommand extends Command
      * @throws \LogicException
      * @throws Exception
      *
-	 * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-	 * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
+     * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
