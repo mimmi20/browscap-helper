@@ -66,7 +66,6 @@ use function array_any;
 use function array_chunk;
 use function array_filter;
 use function array_key_exists;
-use function array_multisort;
 use function assert;
 use function file_exists;
 use function file_put_contents;
@@ -102,10 +101,6 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
-use const SORT_ASC;
-use const SORT_DESC;
-use const SORT_NUMERIC;
-use const SORT_STRING;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
@@ -115,7 +110,7 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION = 0;
 
-    private const int TIMERANGE = 21;
+    private const string COMPARE_DATE = '2025-12-31';
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -361,8 +356,6 @@ final class RewriteTestsCommand extends Command
         );
 
         $txtChecks                  = [];
-        $txtChecksOs                = [];
-        $txtChecksFactor            = [];
         $messageLength              = 0;
         $counter                    = 0;
         $duplicates                 = 0;
@@ -381,7 +374,6 @@ final class RewriteTestsCommand extends Command
         $timeRead                   = 0.0;
         $timeWrite                  = 0.0;
         $counterDifferentFromMatomo = 0;
-        $counterComparedWithMatomo  = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -431,25 +423,8 @@ final class RewriteTestsCommand extends Command
                 OutputInterface::VERBOSITY_DEBUG,
             );
 
-            try {
-                if (!$this->accept($test, $output, $loopMessage)) {
-                    ++$skippedBeforeCheck;
-
-                    continue;
-                }
-            } catch (DateInvalidOperationException $e) {
-                ++$errors;
-
-                $exception = new Exception('An error occured while decoding a result', 0, $e);
-
-                $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                $message = $loopMessage . $addMessage;
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
+            if (!$this->accept($test, $output, $loopMessage)) {
+                ++$skippedBeforeCheck;
 
                 continue;
             }
@@ -490,10 +465,7 @@ final class RewriteTestsCommand extends Command
                 timeWrite: $timeWrite,
                 timeCompare: $timeCompare,
                 txtChecks: $txtChecks,
-                txtChecksOs: $txtChecksOs,
-                txtChecksFactor: $txtChecksFactor,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
-                counterComparedWithMatomo: $counterComparedWithMatomo,
             );
 
             //            if ($counterDifferentFromMatomo >= 10) {
@@ -533,78 +505,6 @@ final class RewriteTestsCommand extends Command
                 return 1;
             }
         }
-
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-
-        $table = new Table($output);
-        $table->setHeaders(['FormFactor', 'Counter']);
-        $table->setRows([]);
-
-        $cy = [];
-
-        foreach ($txtChecksFactor as $factor => $factorCounter) {
-            $cy[$factor] = $factorCounter;
-        }
-
-        array_multisort($cy, SORT_DESC, SORT_NUMERIC, $txtChecksFactor);
-
-        foreach ($txtChecksFactor as $factor => $factorCounter) {
-            $table->addRow(
-                ['<info>' . $factor . '</info>', '<error>' . $factorCounter . '</error>'],
-            );
-        }
-
-        $table->render();
-
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $cx = [];
-        $cy = [];
-
-        foreach ($txtChecksOs as $os => $versions) {
-            $c = 0;
-            $x = [];
-            $y = [];
-
-            foreach ($versions as $version => $counterVersions) {
-                $c          += $counterVersions['count'];
-                $x[$version] = $counterVersions['count'];
-                $y[$version] = $version;
-            }
-
-            array_multisort($x, SORT_DESC, SORT_NUMERIC, $y, SORT_DESC, SORT_NUMERIC, $versions);
-
-            $cx[$os]          = $c;
-            $cy[$os]          = $os;
-            $txtChecksOs[$os] = $versions;
-        }
-
-        array_multisort($cx, SORT_DESC, SORT_NUMERIC, $cy, SORT_ASC, SORT_STRING, $txtChecksOs);
-
-        $table = new Table($output);
-        $table->setHeaders(['OS', 'Version', 'Tests']);
-        $table->setRows([]);
-
-        foreach ($txtChecksOs as $os => $versions) {
-            $c = 0;
-
-            foreach ($versions as $version => $counterVersions) {
-                $count     = $counterVersions['count'];
-                $checkmark = $counterVersions['checked'] ?? false
-                    ? ' <fg=green>+</>'
-                    : ' <fg=red>-</>';
-                $table->addRow([$os, $version, $count . $checkmark]);
-
-                $c += $count;
-            }
-
-            $table->addRow(
-                ['<info>' . $os . '</info>', '<info>summary</info>', '<error>' . $c . '</error>'],
-            );
-            $table->addRow(new TableSeparator());
-        }
-
-        $table->render();
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
@@ -757,15 +657,6 @@ final class RewriteTestsCommand extends Command
         $table->addRow(new TableSeparator());
         $table->addRows(
             [
-                [
-                    'compared with Matomo',
-                    mb_str_pad(
-                        number_format(num: $counterComparedWithMatomo, thousands_separator: '.'),
-                        12,
-                        ' ',
-                        STR_PAD_LEFT,
-                    ),
-                ],
                 [
                     'different from Matomo',
                     mb_str_pad(
@@ -1286,10 +1177,8 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<string, string>}                           $test
-     * @param array<string, array<mixed>>                                     $txtChecks
-     * @param array<string, array<string, array{count: int, checked?: bool}>> $txtChecksOs
-     * @param array<string, int>                                              $txtChecksFactor
+     * @param array{headers: array<string, string>} $test
+     * @param array<string, array<mixed>>           $txtChecks
      *
      * @throws void
      *
@@ -1315,10 +1204,7 @@ final class RewriteTestsCommand extends Command
         float &$timeWrite,
         float &$timeCompare,
         array &$txtChecks,
-        array &$txtChecksOs,
-        array &$txtChecksFactor,
         int &$counterDifferentFromMatomo,
-        int &$counterComparedWithMatomo,
     ): void {
         $txtChecks[$seachHeader] = $test;
 
@@ -1369,12 +1255,6 @@ final class RewriteTestsCommand extends Command
                 )
             ) {
                 foreach ($matches[1] as $factor) {
-                    if (!array_key_exists($factor, $txtChecksFactor)) {
-                        $txtChecksFactor[$factor] = 1;
-                    } else {
-                        ++$txtChecksFactor[$factor];
-                    }
-
                     $detectedFactor = FormFactor::tryFrom($factor);
 
                     if ($detectedFactor === null) {
@@ -1404,53 +1284,6 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-        }
-
-        $xRequestHeader = null;
-
-        if (
-            array_key_exists('x-requested-with', $test['headers'])
-            && $test['headers']['x-requested-with'] !== ''
-        ) {
-            $xRequestHeader = $test['headers']['x-requested-with'];
-        } elseif (
-            array_key_exists('http-x-requested-with', $test['headers'])
-            && $test['headers']['http-x-requested-with'] !== ''
-        ) {
-            $xRequestHeader = $test['headers']['http-x-requested-with'];
-        }
-
-        $secChUaHeader = null;
-
-        if (array_key_exists('sec-ch-ua', $test['headers']) && $test['headers']['sec-ch-ua'] !== '') {
-            $secChUaHeader = $test['headers']['sec-ch-ua'];
-        }
-
-        $secChPlatformHeader = null;
-
-        if (
-            array_key_exists('sec-ch-ua-platform', $test['headers'])
-            && $test['headers']['sec-ch-ua-platform'] !== ''
-        ) {
-            $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
-        }
-
-        $secChModelHeader = null;
-
-        if (
-            array_key_exists('sec-ch-ua-model', $test['headers'])
-            && $test['headers']['sec-ch-ua-model'] !== ''
-        ) {
-            $secChModelHeader = $test['headers']['sec-ch-ua-model'];
-        }
-
-        $puffinHeader = null;
-
-        if (
-            array_key_exists('x-puffin-ua', $test['headers'])
-            && $test['headers']['x-puffin-ua'] !== ''
-        ) {
-            $puffinHeader = $test['headers']['x-puffin-ua'];
         }
 
         $message = $loopMessage . 'redetect';
@@ -1599,236 +1432,19 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        $compareWithMapper = false;
+        $startTime = microtime(true);
 
-        $osName  = mb_strtolower($result['os']['name'] ?? '');
-        $version = null;
+        $this->compareDeviceWithMapper(
+            output: $output,
+            dd: $dd,
+            result: $result,
+            headers: $headers,
+            loopMessage: $loopMessage,
+            messageLength: $messageLength,
+            counterDifferentFromMatomo: $counterDifferentFromMatomo,
+        );
 
-        if (is_scalar($result['os']['version'])) {
-            try {
-                $version = (new VersionBuilder())->set((string) $result['os']['version']);
-            } catch (NotNumericException $e) {
-                ++$errors;
-
-                $exception = new Exception('An error occured while decoding a result', 0, $e);
-
-                $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                $message = $loopMessage . $addMessage;
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return;
-            }
-
-            try {
-                $osVersion = $version->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
-            } catch (UnexpectedValueException) {
-                $osVersion = 'e';
-            }
-        } else {
-            $osVersion = '-';
-        }
-
-        if (!isset($txtChecksOs[$osName][$osVersion])) {
-            $txtChecksOs[$osName][$osVersion]['count']   = 1;
-            $txtChecksOs[$osName][$osVersion]['checked'] = false;
-        } else {
-            ++$txtChecksOs[$osName][$osVersion]['count'];
-        }
-
-        if ($result['os']['name'] === null && $secChPlatformHeader !== null) {
-            $compareWithMapper = true;
-        } elseif (
-            $result['client']['name'] === null
-            && (
-                $secChUaHeader !== null
-                || (
-                    $xRequestHeader !== null
-                    && $xRequestHeader !== 'XMLHttpRequest'
-                )
-            )
-        ) {
-            $compareWithMapper = true;
-        } elseif (
-            $result['device']['deviceName'] === null
-            && (
-                $secChModelHeader !== null
-                || $puffinHeader !== null
-            )
-        ) {
-            $compareWithMapper = true;
-        } elseif (!empty($result['os']['name']) && is_string($result['os']['name'])) {
-            if (
-                in_array(
-                    mb_strtolower($result['os']['name']),
-                    [
-                        'harmony-os',
-                        'harmonyos',
-                        'fire-os',
-                        'fireos',
-                        'fire os',
-                        'fuchsia',
-                        'puffin os',
-                        'lineage os',
-                        'wophone',
-                        'star-blade os',
-                        'xubuntu',
-                        'yi',
-                        'chinese operating system',
-                        'nextstep',
-                        'windows iot',
-                        'ultrix',
-                        'genix',
-                        'news-os',
-                        'turbolinux',
-                        'backtrack linux',
-                        'ark linux',
-                        'blackpanther os',
-                        'aros',
-                        'zenwalk gnu linux',
-                        'azure linux',
-                        'wyderos',
-                        'opensolaris',
-                        'startos',
-                        'ventana linux',
-                        'joli os',
-                        'debian with freebsd kernel',
-                        'liberate',
-                        'moblin',
-                        'raspbian',
-                        'rim tablet os',
-                        'blackberry tablet os',
-                        'morphos',
-                        'mandriva linux',
-                        'linux mint',
-                        'inferno os',
-                        'haiku',
-                        'archlinux',
-                        'cent os linux',
-                        'orbis os',
-                        'cellos',
-                        'nintendo os',
-                        'beos',
-                        'chromeos',
-                        'gentoo linux',
-                        'kubuntu',
-                        'slackware linux',
-                        'redhat linux',
-                        'solaris',
-                        'syllable',
-                        'suse linux',
-                        'kin os',
-                        'threadx',
-                        'sailfishos',
-                        'remix os',
-                        'meego',
-                        'palmos',
-                        'risc os',
-                        'hp-ux',
-                        'pardus',
-                        'danger os',
-                        'lindowsos',
-                        'nintendo switch os',
-                        'tvos',
-                        'windows 3.11',
-                        'series 30',
-                        'nintendo wii os',
-                        'windows 2003',
-                        'windows rt',
-                        'tru64 unix',
-                        'cp/m',
-                        'cygwin',
-                        'openvms',
-                        'wear os',
-                        'dragonfly bsd',
-                        'darwin',
-                        'bsd',
-                        'watchos',
-                        'windows 3.1',
-                        'aix',
-                        'macintosh',
-                        'fedora linux',
-                        'yun os',
-                        'firefox os',
-                        'windows 95',
-                        'debian',
-                        'irix',
-                        'windows 98',
-                        'openharmony',
-                        'osf/1',
-                        'haiku os',
-                        'opensuse',
-                        'linspire',
-                        'android opensource project',
-                        'maemo',
-                        'bada',
-                        'plasma mobile',
-                        'series 40',
-                        'nucleus os',
-                        'amiga os',
-                        'android tv',
-                        'unix',
-                        'windows nt',
-                        'whale os',
-                        'os/2',
-                        'iphone os',
-                        'macos',
-                        'ipados',
-                        'ubuntu',
-                        'ios',
-                        'miui os',
-                        'brew',
-                        'freebsd',
-                        'openbsd',
-                        'netbsd',
-                        'mac os x',
-                        'sunos',
-                        'series 60',
-                        'javaos',
-                        'linux',
-                        'windows',
-                        'orsay',
-                        'java-me',
-                        'windows ce',
-                        'tizen',
-                        'opera tv',
-                        'java me',
-                        'android',
-                        'cyanogenmod',
-                        'mocordroid',
-                        'mre',
-                        'kaios',
-                        'vizios',
-                    ],
-                    true,
-                )
-            ) {
-                $compareWithMapper                           = true;
-                $txtChecksOs[$osName][$osVersion]['checked'] = true;
-            }
-        }
-
-        if ($compareWithMapper) {
-            $startTime = microtime(true);
-
-            $this->compareDeviceWithMapper(
-                output: $output,
-                dd: $dd,
-                result: $result,
-                headers: $headers,
-                loopMessage: $loopMessage,
-                messageLength: $messageLength,
-                counterDifferentFromMatomo: $counterDifferentFromMatomo,
-            );
-
-            $timeCompare += microtime(true) - $startTime;
-
-            ++$counterComparedWithMatomo;
-        }
+        $timeCompare += microtime(true) - $startTime;
 
         $deviceManufaturer = mb_strtolower(
             str_replace([' ', 'ü'], ['-', 'ue'], $result['device']['manufacturer'] ?? ''),
@@ -2580,7 +2196,7 @@ final class RewriteTestsCommand extends Command
         return $headerList;
     }
 
-    /** @throws DateInvalidOperationException */
+    /** @throws void */
     private function accept(mixed $test, OutputInterface $output, string $loopMessage): bool
     {
         if (!is_array($test)) {
@@ -2608,15 +2224,25 @@ final class RewriteTestsCommand extends Command
         } catch (Throwable $e) {
             $output->writeln('');
             $output->writeln(
-                messages: $loopMessage . sprintf(' <error>%s</error>', $e),
+                messages: sprintf('%s <error>invalid date: %s</error>', $loopMessage, $e),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
             return false;
         }
 
-        return $date > (new DateTimeImmutable('now'))->sub(
-            new DateInterval('P' . self::TIMERANGE . 'D'),
-        );
+        try {
+            $compareDate = new DateTimeImmutable(self::COMPARE_DATE);
+        } catch (Throwable $e) {
+            $output->writeln('');
+            $output->writeln(
+                messages: sprintf('%s <error>invalid date: %s</error>', $loopMessage, $e),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return false;
+        }
+
+        return $date > $compareDate;
     }
 }
