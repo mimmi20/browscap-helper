@@ -27,7 +27,6 @@ use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
 use DateInterval;
-use DateInvalidOperationException;
 use DateTimeImmutable;
 use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
@@ -110,7 +109,7 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION = 0;
 
-    private const string COMPARE_DATE = '2025-12-31';
+    private const string COMPARE_DATE = '2025-12-30';
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -2231,17 +2230,7 @@ final class RewriteTestsCommand extends Command
             return false;
         }
 
-        try {
-            $compareDate = new DateTimeImmutable(self::COMPARE_DATE);
-        } catch (Throwable $e) {
-            $output->writeln('');
-            $output->writeln(
-                messages: sprintf('%s <error>invalid date: %s</error>', $loopMessage, $e),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return false;
-        }
+        $compareDate = new DateTimeImmutable(self::COMPARE_DATE);
 
         return $date > $compareDate;
     }
