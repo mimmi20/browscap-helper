@@ -110,7 +110,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION = 0;
 
     /**
-     * last update: 2026-01-21
+     * last update: 2026-02-03
      */
     private const string COMPARE_DATE = '2025-01-01';
 
