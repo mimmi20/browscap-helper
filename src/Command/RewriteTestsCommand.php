@@ -109,7 +109,10 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION = 0;
 
-    private const string COMPARE_DATE = '2025-12-30';
+    /**
+     * last update: 2026-01-21
+     */
+    private const string COMPARE_DATE = '2025-01-01';
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -472,6 +475,10 @@ final class RewriteTestsCommand extends Command
             //            }
         }
 
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+
+        $this->jsonNormalizer->init($output);
+
         $messageLength = 0;
         $baseMessage   = 're-write test files in directory ';
 
@@ -504,10 +511,6 @@ final class RewriteTestsCommand extends Command
                 return 1;
             }
         }
-
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-
-        $this->jsonNormalizer->init($output);
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(messages: 'rewrite tests ...', options: OutputInterface::VERBOSITY_NORMAL);
@@ -1391,42 +1394,34 @@ final class RewriteTestsCommand extends Command
         $headers = $testResult->getHeaders();
 
         if (
-            in_array(
-                $testResult->getExit(),
-                [TestResult::EXIT_DEVICE_IS_NULL, TestResult::EXIT_DEVICE_NOT_SCALAR, TestResult::EXIT_DEVICE_IS_GENERAL, TestResult::EXIT_DEVICE_IS_UNKNOW],
-                true,
-            )
+            !empty($result['os']['name'])
+            && is_string($result['os']['name'])
+            && is_scalar($result['os']['version'])
         ) {
-            if (
-                !empty($result['os']['name'])
-                && is_string($result['os']['name'])
-                && is_scalar($result['os']['version'])
-            ) {
-                try {
-                    $version = (new VersionBuilder())->set((string) $result['os']['version']);
-                } catch (NotNumericException $e) {
-                    ++$errors;
+            try {
+                $version = (new VersionBuilder())->set((string) $result['os']['version']);
+            } catch (NotNumericException $e) {
+                ++$errors;
 
-                    $exception = new Exception('An error occured while decoding a result', 0, $e);
+                $exception = new Exception('An error occured while decoding a result', 0, $e);
 
-                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
+                $addMessage = sprintf('<error>%s</error>', (string) $exception);
 
-                    $message = $loopMessage . $addMessage;
+                $message = $loopMessage . $addMessage;
 
-                    $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return;
+            }
+
+            if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
+                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
+                    ++$skippedVersion;
 
                     return;
-                }
-
-                if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
-                    if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
-                        ++$skippedVersion;
-
-                        return;
-                    }
                 }
             }
         }
