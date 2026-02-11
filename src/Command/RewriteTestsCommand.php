@@ -466,6 +466,7 @@ final class RewriteTestsCommand extends Command
                 test: $test,
                 loopMessage: $loopMessage,
                 seachHeader: $seachHeader,
+                compareWithMatomo: self::COMPARE_ALL,
                 skippedAfterCheck: $skippedAfterCheck,
                 skippedInvalidData: $skippedInvalidData,
                 skippedVersion: $skippedVersion,
@@ -1342,7 +1343,7 @@ final class RewriteTestsCommand extends Command
      * @param array<string, array<mixed>>                                     $txtChecks
      * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
      * @param array<string, int>                                              $notFoundFormfactors
-     * @param array<string, int>                                              $notFoundCompanies
+     * @param array<int>                                                      $notFoundCompanies
      *
      * @throws void
      *
@@ -1355,6 +1356,7 @@ final class RewriteTestsCommand extends Command
         array $test,
         string $loopMessage,
         string $seachHeader,
+        bool $compareWithMatomo,
         int &$skippedAfterCheck,
         int &$skippedInvalidData,
         int &$skippedVersion,
@@ -1608,8 +1610,6 @@ final class RewriteTestsCommand extends Command
                 }
             }
         }
-
-        $compareWithMatomo = self::COMPARE_ALL;
 
         if (!$compareWithMatomo) {
             $compareWithMatomo = $this->compareWithMatomo(
@@ -1877,7 +1877,7 @@ final class RewriteTestsCommand extends Command
     /**
      * @param array<int|string, mixed> $result
      * @param array<string, string>    $headers
-     * @param array<string, int>       $notFoundCompanies
+     * @param array<int>               $notFoundCompanies
      *
      * @throws void
      */
