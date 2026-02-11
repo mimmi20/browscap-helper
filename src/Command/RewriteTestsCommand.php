@@ -65,6 +65,7 @@ use function array_any;
 use function array_chunk;
 use function array_filter;
 use function array_key_exists;
+use function array_multisort;
 use function assert;
 use function file_exists;
 use function file_put_contents;
@@ -72,7 +73,6 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_scalar;
-use function is_string;
 use function json_decode;
 use function json_encode;
 use function max;
@@ -100,6 +100,10 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
+use const SORT_ASC;
+use const SORT_DESC;
+use const SORT_NUMERIC;
+use const SORT_STRING;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
@@ -112,7 +116,9 @@ final class RewriteTestsCommand extends Command
     /**
      * last update: 2026-02-03
      */
-    private const string COMPARE_DATE = '2025-01-01';
+    private const string COMPARE_DATE = '2024-06-01';
+
+    private const bool COMPARE_ALL = true;
 
     /** @var array<string, int> */
     private array $tests = [];
@@ -358,6 +364,9 @@ final class RewriteTestsCommand extends Command
         );
 
         $txtChecks                  = [];
+        $notFoundCompanies          = [];
+        $checkedPlatforms           = [];
+        $notFoundFormfactors        = [];
         $messageLength              = 0;
         $counter                    = 0;
         $duplicates                 = 0;
@@ -376,6 +385,7 @@ final class RewriteTestsCommand extends Command
         $timeRead                   = 0.0;
         $timeWrite                  = 0.0;
         $counterDifferentFromMatomo = 0;
+        $counterComparedWithMatomo  = 0;
 
         $clonedOutput = clone $output;
         $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
@@ -425,17 +435,19 @@ final class RewriteTestsCommand extends Command
                 OutputInterface::VERBOSITY_DEBUG,
             );
 
-            if (!$this->accept($test, $output, $loopMessage)) {
+            $startTime = microtime(true);
+
+            $accepted = $this->accept($test, $output, $loopMessage);
+
+            $timeCheck += microtime(true) - $startTime;
+
+            if (!$accepted) {
                 ++$skippedBeforeCheck;
 
                 continue;
             }
 
             $test['headers'] = $this->filterHeaders($output, $test['headers']);
-
-            $startTime = microtime(true);
-
-            $timeCheck += microtime(true) - $startTime;
 
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
@@ -467,7 +479,11 @@ final class RewriteTestsCommand extends Command
                 timeWrite: $timeWrite,
                 timeCompare: $timeCompare,
                 txtChecks: $txtChecks,
+                checkedPlatforms: $checkedPlatforms,
+                notFoundFormfactors: $notFoundFormfactors,
+                notFoundCompanies: $notFoundCompanies,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
+                counterComparedWithMatomo: $counterComparedWithMatomo,
             );
 
             //            if ($counterDifferentFromMatomo >= 10) {
@@ -554,6 +570,140 @@ final class RewriteTestsCommand extends Command
         );
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+
+        if ($notFoundFormfactors !== []) {
+            $table = new Table($output);
+            $table->setHeaders(['FormFactor, not found in Enum', 'Counter']);
+            $table->setRows([]);
+
+            $cy = [];
+            $cx = [];
+
+            foreach ($notFoundFormfactors as $factor => $factorCounter) {
+                $cy[$factor] = $factorCounter;
+                $cx[$factor] = $factor;
+            }
+
+            array_multisort(
+                $cy,
+                SORT_DESC,
+                SORT_NUMERIC,
+                $cx,
+                SORT_ASC,
+                SORT_STRING,
+                $notFoundFormfactors,
+            );
+
+            foreach ($notFoundFormfactors as $factor => $factorCounter) {
+                $table->addRow(
+                    ['<info>' . $factor . '</info>', '<error>' . $factorCounter . '</error>'],
+                );
+            }
+
+            $table->render();
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        }
+
+        if ($checkedPlatforms !== []) {
+            $cx = [];
+            $cy = [];
+
+            foreach ($checkedPlatforms as $os => $versions) {
+                $c = 0;
+                $x = [];
+                $y = [];
+
+                foreach ($versions as $version => $counterVersions) {
+                    $c          += $counterVersions['count'];
+                    $x[$version] = $counterVersions['count'];
+                    $y[$version] = $version;
+                }
+
+                array_multisort($x, SORT_DESC, SORT_NUMERIC, $y, SORT_DESC, SORT_NUMERIC, $versions);
+
+                $cx[$os]               = $c;
+                $cy[$os]               = $os;
+                $checkedPlatforms[$os] = $versions;
+            }
+
+            array_multisort(
+                $cx,
+                SORT_DESC,
+                SORT_NUMERIC,
+                $cy,
+                SORT_ASC,
+                SORT_STRING,
+                $checkedPlatforms,
+            );
+
+            $table = new Table($output);
+            $table->setHeaders(['OS', 'Version', 'Tests']);
+            $table->setRows([]);
+
+            foreach ($checkedPlatforms as $os => $versions) {
+                $c = 0;
+
+                foreach ($versions as $version => $counterVersions) {
+                    $count     = $counterVersions['count'];
+                    $checkmark = $counterVersions['checked'] ?? false
+                        ? ' <fg=green>+</>'
+                        : ' <fg=red>-</>';
+                    $table->addRow(
+                        [$os, $version, $count . $checkmark],
+                    );
+
+                    $c += $count;
+                }
+
+                $table->addRow(
+                    [
+                        '<info>' . $os . '</info>',
+                        '<info>summary</info>',
+                        '<error>' . $c . '</error>',
+                    ],
+                );
+                $table->addRow(new TableSeparator());
+            }
+
+            $table->render();
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        }
+
+        if ($notFoundCompanies !== []) {
+            $table = new Table($output);
+            $table->setHeaders(['Company, not found in the Enum', 'Counter']);
+            $table->setRows([]);
+
+            $cy = [];
+            $cx = [];
+
+            foreach ($notFoundCompanies as $company => $companyCounter) {
+                $cy[$company] = $companyCounter;
+                $cx[$company] = $company;
+            }
+
+            array_multisort(
+                $cy,
+                SORT_DESC,
+                SORT_NUMERIC,
+                $cx,
+                SORT_ASC,
+                SORT_STRING,
+                $notFoundCompanies,
+            );
+
+            foreach ($notFoundCompanies as $company => $companyCounter) {
+                $table->addRow(
+                    ['<info>' . $company . '</info>', '<error>' . $companyCounter . '</error>'],
+                );
+            }
+
+            $table->render();
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        }
 
         $table = new Table($output);
         $table->setHeaders(['', 'Tests']);
@@ -659,6 +809,15 @@ final class RewriteTestsCommand extends Command
         $table->addRow(new TableSeparator());
         $table->addRows(
             [
+                [
+                    'compared with Matomo',
+                    mb_str_pad(
+                        number_format(num: $counterComparedWithMatomo, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
                 [
                     'different from Matomo',
                     mb_str_pad(
@@ -1179,8 +1338,11 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<string, string>} $test
-     * @param array<string, array<mixed>>           $txtChecks
+     * @param array{headers: array<string, string>}                           $test
+     * @param array<string, array<mixed>>                                     $txtChecks
+     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
+     * @param array<string, int>                                              $notFoundFormfactors
+     * @param array<string, int>                                              $notFoundCompanies
      *
      * @throws void
      *
@@ -1206,7 +1368,11 @@ final class RewriteTestsCommand extends Command
         float &$timeWrite,
         float &$timeCompare,
         array &$txtChecks,
+        array &$checkedPlatforms,
+        array &$notFoundFormfactors,
+        array &$notFoundCompanies,
         int &$counterDifferentFromMatomo,
+        int &$counterComparedWithMatomo,
     ): void {
         $txtChecks[$seachHeader] = $test;
 
@@ -1259,18 +1425,26 @@ final class RewriteTestsCommand extends Command
                 foreach ($matches[1] as $factor) {
                     $detectedFactor = FormFactor::tryFrom($factor);
 
-                    if ($detectedFactor === null) {
-                        $output->writeln(
-                            messages: "\n" . mb_str_pad(
-                                string: sprintf(
-                                    'The FormFactor "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                                    $factor,
-                                ),
-                                length: $messageLength,
-                            ),
-                            options: OutputInterface::VERBOSITY_NORMAL,
-                        );
+                    if ($detectedFactor !== null) {
+                        continue;
                     }
+
+                    if (!array_key_exists($factor, $notFoundFormfactors)) {
+                        $notFoundFormfactors[$factor] = 0;
+                    }
+
+                    ++$notFoundFormfactors[$factor];
+
+                    $output->writeln(
+                        messages: "\n" . mb_str_pad(
+                            string: sprintf(
+                                'The FormFactor "<fg=blue>%s</>", was not found in the Enum. Please add it',
+                                $factor,
+                            ),
+                            length: $messageLength,
+                        ),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
                 }
             }
         }
@@ -1393,11 +1567,10 @@ final class RewriteTestsCommand extends Command
 
         $headers = $testResult->getHeaders();
 
-        if (
-            !empty($result['os']['name'])
-            && is_string($result['os']['name'])
-            && is_scalar($result['os']['version'])
-        ) {
+        $osName  = mb_strtolower($result['os']['name'] ?? '');
+        $version = null;
+
+        if (is_scalar($result['os']['version'])) {
             try {
                 $version = (new VersionBuilder())->set((string) $result['os']['version']);
             } catch (NotNumericException $e) {
@@ -1417,7 +1590,17 @@ final class RewriteTestsCommand extends Command
                 return;
             }
 
-            if (in_array(mb_strtolower($result['os']['name']), ['android', 'ios'], true)) {
+            try {
+                $osVersion = $version->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
+            } catch (UnexpectedValueException) {
+                $osVersion = 'e';
+            }
+        } else {
+            $osVersion = '-';
+        }
+
+        if ($version !== null) {
+            if (in_array($osName, ['android', 'ios'], true)) {
                 if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
                     ++$skippedVersion;
 
@@ -1426,19 +1609,36 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        $startTime = microtime(true);
+        $compareWithMatomo = self::COMPARE_ALL;
 
-        $this->compareDeviceWithMapper(
-            output: $output,
-            dd: $dd,
-            result: $result,
-            headers: $headers,
-            loopMessage: $loopMessage,
-            messageLength: $messageLength,
-            counterDifferentFromMatomo: $counterDifferentFromMatomo,
-        );
+        if (!$compareWithMatomo) {
+            $compareWithMatomo = $this->compareWithMatomo(
+                test: $test,
+                result: $result,
+                osName: $osName,
+                osVersion: $osVersion,
+                checkedPlatforms: $checkedPlatforms,
+            );
+        }
 
-        $timeCompare += microtime(true) - $startTime;
+        if ($compareWithMatomo) {
+            $startTime = microtime(true);
+
+            $this->compareDeviceWithMapper(
+                output: $output,
+                dd: $dd,
+                result: $result,
+                headers: $headers,
+                loopMessage: $loopMessage,
+                messageLength: $messageLength,
+                counterDifferentFromMatomo: $counterDifferentFromMatomo,
+                notFoundCompanies: $notFoundCompanies,
+            );
+
+            $timeCompare += microtime(true) - $startTime;
+
+            ++$counterComparedWithMatomo;
+        }
 
         $deviceManufaturer = mb_strtolower(
             str_replace([' ', 'ü'], ['-', 'ue'], $result['device']['manufacturer'] ?? ''),
@@ -1677,6 +1877,7 @@ final class RewriteTestsCommand extends Command
     /**
      * @param array<int|string, mixed> $result
      * @param array<string, string>    $headers
+     * @param array<string, int>       $notFoundCompanies
      *
      * @throws void
      */
@@ -1688,6 +1889,7 @@ final class RewriteTestsCommand extends Command
         string $loopMessage,
         int &$messageLength,
         int &$counterDifferentFromMatomo,
+        array &$notFoundCompanies,
     ): void {
         $mapper = new InputMapper();
 
@@ -1717,76 +1919,51 @@ final class RewriteTestsCommand extends Command
         try {
             Company::fromName($result['device']['brand'] ?? null);
         } catch (UnexpectedValueException) {
-            $output->writeln(
-                messages: "\n" . mb_str_pad(
-                    string: sprintf(
-                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                        $result['device']['brand'] ?? '',
-                    ),
-                    length: $messageLength,
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            if (!array_key_exists($result['device']['brand'] ?? '', $notFoundCompanies)) {
+                $notFoundCompanies[$result['device']['brand'] ?? ''] = 0;
+            }
+
+            ++$notFoundCompanies[$result['device']['brand'] ?? ''];
         }
 
         try {
             Company::fromName($result['device']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
-            $output->writeln(
-                messages: "\n" . mb_str_pad(
-                    string: sprintf(
-                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                        $result['device']['manufacturer'] ?? '',
-                    ),
-                    length: $messageLength,
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            if (!array_key_exists($result['device']['manufacturer'] ?? '', $notFoundCompanies)) {
+                $notFoundCompanies[$result['device']['manufacturer'] ?? ''] = 0;
+            }
+
+            ++$notFoundCompanies[$result['device']['manufacturer'] ?? ''];
         }
 
         try {
             Company::fromName($result['os']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
-            $output->writeln(
-                messages: "\n" . mb_str_pad(
-                    string: sprintf(
-                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                        $result['os']['manufacturer'] ?? '',
-                    ),
-                    length: $messageLength,
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            if (!array_key_exists($result['os']['manufacturer'] ?? '', $notFoundCompanies)) {
+                $notFoundCompanies[$result['os']['manufacturer'] ?? ''] = 0;
+            }
+
+            ++$notFoundCompanies[$result['os']['manufacturer'] ?? ''];
         }
 
         try {
             Company::fromName($result['engine']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
-            $output->writeln(
-                messages: "\n" . mb_str_pad(
-                    string: sprintf(
-                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                        $result['engine']['manufacturer'] ?? '',
-                    ),
-                    length: $messageLength,
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            if (!array_key_exists($result['engine']['manufacturer'] ?? '', $notFoundCompanies)) {
+                $notFoundCompanies[$result['engine']['manufacturer'] ?? ''] = 0;
+            }
+
+            ++$notFoundCompanies[$result['engine']['manufacturer'] ?? ''];
         }
 
         try {
             Company::fromName($result['client']['manufacturer'] ?? null);
         } catch (UnexpectedValueException) {
-            $output->writeln(
-                messages: "\n" . mb_str_pad(
-                    string: sprintf(
-                        'The company "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                        $result['client']['manufacturer'] ?? '',
-                    ),
-                    length: $messageLength,
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            if (!array_key_exists($result['client']['manufacturer'] ?? '', $notFoundCompanies)) {
+                $notFoundCompanies[$result['client']['manufacturer'] ?? ''] = 0;
+            }
+
+            ++$notFoundCompanies[$result['client']['manufacturer'] ?? ''];
         }
 
         $resultTypeName = $result['device']['type'] ?? '';
@@ -2228,5 +2405,265 @@ final class RewriteTestsCommand extends Command
         $compareDate = new DateTimeImmutable(self::COMPARE_DATE);
 
         return $date > $compareDate;
+    }
+
+    /**
+     * @param array{headers: array<string, string>}                           $test
+     * @param array<int|string, mixed>                                        $result
+     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
+     *
+     * @throws void
+     */
+    private function compareWithMatomo(
+        array $test,
+        array $result,
+        string $osName,
+        string $osVersion,
+        array &$checkedPlatforms,
+    ): bool {
+        $xRequestHeader = null;
+
+        if (
+            array_key_exists('x-requested-with', $test['headers'])
+            && $test['headers']['x-requested-with'] !== ''
+        ) {
+            $xRequestHeader = $test['headers']['x-requested-with'];
+        } elseif (
+            array_key_exists('http-x-requested-with', $test['headers'])
+            && $test['headers']['http-x-requested-with'] !== ''
+        ) {
+            $xRequestHeader = $test['headers']['http-x-requested-with'];
+        }
+
+        $secChUaHeader = null;
+
+        if (array_key_exists('sec-ch-ua', $test['headers']) && $test['headers']['sec-ch-ua'] !== '') {
+            $secChUaHeader = $test['headers']['sec-ch-ua'];
+        }
+
+        $secChPlatformHeader = null;
+
+        if (
+            array_key_exists('sec-ch-ua-platform', $test['headers'])
+            && $test['headers']['sec-ch-ua-platform'] !== ''
+        ) {
+            $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
+        }
+
+        $secChModelHeader = null;
+
+        if (
+            array_key_exists('sec-ch-ua-model', $test['headers'])
+            && $test['headers']['sec-ch-ua-model'] !== ''
+        ) {
+            $secChModelHeader = $test['headers']['sec-ch-ua-model'];
+        }
+
+        $puffinHeader = null;
+
+        if (
+            array_key_exists('x-puffin-ua', $test['headers'])
+            && $test['headers']['x-puffin-ua'] !== ''
+        ) {
+            $puffinHeader = $test['headers']['x-puffin-ua'];
+        }
+
+        if (!isset($checkedPlatforms[$osName][$osVersion])) {
+            $checkedPlatforms[$osName][$osVersion]['count']   = 1;
+            $checkedPlatforms[$osName][$osVersion]['checked'] = false;
+        } else {
+            ++$checkedPlatforms[$osName][$osVersion]['count'];
+        }
+
+        if ($osName === '' && $secChPlatformHeader !== null) {
+            $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+
+            return true;
+        }
+
+        if (
+            $result['client']['name'] === null
+            && (
+                $secChUaHeader !== null
+                || (
+                    $xRequestHeader !== null
+                    && $xRequestHeader !== 'XMLHttpRequest'
+                )
+            )
+        ) {
+            return true;
+        }
+
+        if (
+            $result['device']['deviceName'] === null
+            && (
+                $secChModelHeader !== null
+                || $puffinHeader !== null
+            )
+        ) {
+            return true;
+        }
+
+        if (
+            in_array(
+                $osName,
+                [
+                    'harmony-os',
+                    'harmonyos',
+                    'fire-os',
+                    'fireos',
+                    'fire os',
+                    'fuchsia',
+                    'puffin os',
+                    'lineage os',
+                    'wophone',
+                    'star-blade os',
+                    'xubuntu',
+                    'yi',
+                    'chinese operating system',
+                    'nextstep',
+                    'windows iot',
+                    'ultrix',
+                    'genix',
+                    'news-os',
+                    'turbolinux',
+                    'backtrack linux',
+                    'ark linux',
+                    'blackpanther os',
+                    'aros',
+                    'zenwalk gnu linux',
+                    'azure linux',
+                    'wyderos',
+                    'opensolaris',
+                    'startos',
+                    'ventana linux',
+                    'joli os',
+                    'debian with freebsd kernel',
+                    'liberate',
+                    'moblin',
+                    'raspbian',
+                    'rim tablet os',
+                    'blackberry tablet os',
+                    'morphos',
+                    'mandriva linux',
+                    'linux mint',
+                    'inferno os',
+                    'haiku',
+                    'archlinux',
+                    'cent os linux',
+                    'orbis os',
+                    'cellos',
+                    'nintendo os',
+                    'beos',
+                    'chromeos',
+                    'gentoo linux',
+                    'kubuntu',
+                    'slackware linux',
+                    'redhat linux',
+                    'solaris',
+                    'syllable',
+                    'suse linux',
+                    'kin os',
+                    'threadx',
+                    'sailfishos',
+                    'remix os',
+                    'meego',
+                    'palmos',
+                    'risc os',
+                    'hp-ux',
+                    'pardus',
+                    'danger os',
+                    'lindowsos',
+                    'nintendo switch os',
+                    'tvos',
+                    'windows 3.11',
+                    'series 30',
+                    'nintendo wii os',
+                    'windows 2003',
+                    'windows rt',
+                    'tru64 unix',
+                    'cp/m',
+                    'cygwin',
+                    'openvms',
+                    'wear os',
+                    'dragonfly bsd',
+                    'darwin',
+                    'bsd',
+                    'watchos',
+                    'windows 3.1',
+                    'aix',
+                    'macintosh',
+                    'fedora linux',
+                    'yun os',
+                    'firefox os',
+                    'windows 95',
+                    'debian',
+                    'irix',
+                    'windows 98',
+                    'openharmony',
+                    'osf/1',
+                    'haiku os',
+                    'opensuse',
+                    'linspire',
+                    'android opensource project',
+                    'maemo',
+                    'bada',
+                    'plasma mobile',
+                    'series 40',
+                    'nucleus os',
+                    'amiga os',
+                    'android tv',
+                    'unix',
+                    'windows nt',
+                    'whale os',
+                    'os/2',
+                    'iphone os',
+                    'macos',
+                    'ipados',
+                    'ubuntu',
+                    'ios',
+                    'miui os',
+                    'brew',
+                    'freebsd',
+                    'openbsd',
+                    'netbsd',
+                    'mac os x',
+                    'sunos',
+                    'series 60',
+                    'javaos',
+                    'linux',
+                    'windows',
+                    'orsay',
+                    'java-me',
+                    'windows ce',
+                    'tizen',
+                    'opera tv',
+                    'java me',
+                    'android',
+                    'cyanogenmod',
+                    'mocordroid',
+                    'mre',
+                    'kaios',
+                    'vizios',
+                    'windows mobile os',
+                    'smartisan os',
+                    'webos',
+                    'symbian os',
+                    'mocor os',
+                    'horizon',
+                    'rim os',
+                    'lg webos',
+                    'windows phone os',
+                    '',
+                ],
+                true,
+            )
+        ) {
+            $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+
+            return true;
+        }
+
+        return false;
     }
 }
