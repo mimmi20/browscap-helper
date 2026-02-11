@@ -589,6 +589,7 @@ trait FilterHeaderTrait
                     'x-azure-clientip',
                     'next-router-prefetch',
                     'x-middleware-subrequest',
+                    'x-action-redirect',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
