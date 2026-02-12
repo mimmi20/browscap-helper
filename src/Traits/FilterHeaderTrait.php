@@ -584,6 +584,12 @@ trait FilterHeaderTrait
                     'x-uniqid',
                     'x-method-override',
                     'x-http-method',
+                    'x-forwared',
+                    'x-azure-socketip',
+                    'x-azure-clientip',
+                    'next-router-prefetch',
+                    'x-middleware-subrequest',
+                    'x-action-redirect',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {

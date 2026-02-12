@@ -72,6 +72,8 @@ final readonly class TestResult
      * @return array<mixed>|null
      *
      * @throws void
+     *
+     * @api
      */
     public function getResult(): array | null
     {
@@ -82,6 +84,8 @@ final readonly class TestResult
      * @phpstan-return self::STATUS_*
      *
      * @throws void
+     *
+     * @api
      */
     public function getStatus(): int
     {
@@ -92,6 +96,8 @@ final readonly class TestResult
      * @phpstan-return array<non-empty-string, non-empty-string>
      *
      * @throws void
+     *
+     * @api
      */
     public function getHeaders(): array
     {
@@ -102,6 +108,8 @@ final readonly class TestResult
      * @phpstan-return self::EXIT_*
      *
      * @throws void
+     *
+     * @api
      */
     public function getExit(): int
     {
