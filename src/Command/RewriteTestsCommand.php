@@ -111,12 +111,12 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION = 0;
+    private const int COMPARE_MATOMO_LOWER_VERSION = 5;
 
     /**
-     * last update: 2026-02-03
+     * last update: 2026-02-17
      */
-    private const string COMPARE_DATE = '2024-06-01';
+    private const string COMPARE_DATE = '2024-01-01';
 
     private const bool COMPARE_ALL = true;
 
@@ -2654,6 +2654,9 @@ final class RewriteTestsCommand extends Command
                     'rim os',
                     'lg webos',
                     'windows phone os',
+                    'open mandriva',
+                    'nokia os',
+                    'qtopia',
                     '',
                 ],
                 true,
