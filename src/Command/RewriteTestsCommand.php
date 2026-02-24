@@ -1532,10 +1532,8 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'fromcharcode(')
                     || str_contains($v, '>(')
                     || str_contains($v, '<(')
-                    || str_contains($v, ' AND "')
-                    || str_contains($v, 'fromcharcode(')
-                    // || str_contains($v, '­')
-                ;
+                    || str_contains($v, ' and "');
+                // || str_contains($v, '­')
             },
         );
 
