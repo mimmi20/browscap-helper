@@ -111,12 +111,16 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION = 5;
+    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 0;
+
+    private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
     /**
      * last update: 2026-02-17
      */
-    private const string COMPARE_DATE = '2024-01-01';
+    private const string COMPARE_DATE_START = '2023-11-01';
+
+    private const string COMPARE_DATE_END = '2023-11-30';
 
     private const bool COMPARE_ALL = true;
 
@@ -1525,7 +1529,13 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '<a ')
                     || str_contains($v, 'file_put_contents(')
                     || str_contains($v, 'file_get_contents(')
-                    || str_contains($v, 'fromcharcode(');
+                    || str_contains($v, 'fromcharcode(')
+                    || str_contains($v, '>(')
+                    || str_contains($v, '<(')
+                    || str_contains($v, ' AND "')
+                    || str_contains($v, 'fromcharcode(')
+                    // || str_contains($v, '­')
+                ;
             },
         );
 
@@ -1603,7 +1613,15 @@ final class RewriteTestsCommand extends Command
 
         if ($version !== null) {
             if (in_array($osName, ['android', 'ios'], true)) {
-                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION) {
+                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS) {
+                    ++$skippedVersion;
+
+                    return;
+                }
+            }
+
+            if (in_array($osName, ['windows', 'windows rt'], true)) {
+                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
                     ++$skippedVersion;
 
                     return;
@@ -2402,9 +2420,10 @@ final class RewriteTestsCommand extends Command
             return false;
         }
 
-        $compareDate = new DateTimeImmutable(self::COMPARE_DATE);
+        $compareDateStart = new DateTimeImmutable(self::COMPARE_DATE_START);
+        $compareDateEnd   = new DateTimeImmutable(self::COMPARE_DATE_END);
 
-        return $date > $compareDate;
+        return $date > $compareDateStart && $date <= $compareDateEnd;
     }
 
     /**
