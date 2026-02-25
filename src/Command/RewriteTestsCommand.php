@@ -118,9 +118,11 @@ final class RewriteTestsCommand extends Command
     /**
      * last update: 2026-02-24
      */
-    private const string COMPARE_DATE_START = '2026-01-01'; // '2023-09-01';
+    // '2023-09-01';
+    private const string COMPARE_DATE_START = '2026-01-01';
 
-    private const string COMPARE_DATE_END = '2026-02-25'; // '2023-09-30';
+    // '2023-09-30';
+    private const string COMPARE_DATE_END = '2026-02-25';
 
     private const bool COMPARE_ALL = true;
 
