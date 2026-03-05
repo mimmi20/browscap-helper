@@ -2961,7 +2961,9 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, ' and "')
                     || str_contains($v, ' or \'')
                     || str_contains($v, ' union all')
-                    || str_contains($v, ' if(');
+                    || str_contains($v, ' if(')
+                    || str_contains($v, '78.29.51.27')
+                    || str_contains($v, 'blockchain');
                 // || str_contains($v, '­')
             },
         );
