@@ -841,15 +841,10 @@ final class RewriteTestsCommand extends Command
 
             uksort(
                 $resultChecks,
-                function(string $a, string $b): int {
+                static function (string $a, string $b): int {
                     $da = new DateTimeImmutable($a);
                     $db = new DateTimeImmutable($b);
-
-                    if ($da === $db) {
-                        return 0;
-                    }
-
-                    return $da > $db ? 1 : -1;
+                    return $da <=> $db;
                 },
             );
 
