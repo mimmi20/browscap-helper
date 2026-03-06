@@ -63,7 +63,6 @@ use UnexpectedValueException;
 
 use function array_any;
 use function array_chunk;
-use function array_filter;
 use function array_key_exists;
 use function array_multisort;
 use function assert;
@@ -92,9 +91,9 @@ use function str_contains;
 use function str_ends_with;
 use function str_replace;
 use function str_starts_with;
+use function uksort;
 use function var_export;
 
-use const ARRAY_FILTER_USE_KEY;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -116,7 +115,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
     /**
-     * last update: 2026-02-24
+     * last update: 2026-03-04
      */
     private const string COMPARE_DATE_START = '2020-01-01'; // '2023-02-01';
 
@@ -851,7 +850,7 @@ final class RewriteTestsCommand extends Command
                     }
 
                     return $da > $db ? 1 : -1;
-                }
+                },
             );
 
             $table = new Table($output);
@@ -879,15 +878,31 @@ final class RewriteTestsCommand extends Command
                         number_format(num: $generalData['all'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['skippedBeforeCheck'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['skippedInvalidData'] ?? 0, thousands_separator: '.'),
+                        number_format(
+                            num: $generalData['skippedBeforeCheck'] ?? 0,
+                        number_format(
+                            num: $generalData['skippedInvalidData'] ?? 0,
+                            thousands_separator: '.',
+                        ),
                         number_format(num: $generalData['checked'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['skippedAfterCheck'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['skippedVersion'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['skippedHeaderCheck'] ?? 0, thousands_separator: '.'),
+                            num: $generalData['skippedAfterCheck'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(
+                            num: $generalData['skippedVersion'] ?? 0,
+                            thousands_separator: '.',
+                            num: $generalData['skippedHeaderCheck'] ?? 0,
+                            thousands_separator: '.',
+                        ),
                         number_format(num: $generalData['errors'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['duplicates'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['test'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['comparedWithMatomo'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['differentFromMatomo'] ?? 0, thousands_separator: '.'),
+                            num: $generalData['comparedWithMatomo'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(
                     ],
                 ],
             );
@@ -1554,7 +1569,7 @@ final class RewriteTestsCommand extends Command
      * @param array<string, array<mixed>>                                     $txtChecks
      * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
      * @param array<int>                                                      $notFoundCompanies
-     * @param array<string, array<string, int>> $resultChecks
+     * @param array<string, array<string, int>>                               $resultChecks
      *
      * @throws void
      *
@@ -2093,9 +2108,11 @@ final class RewriteTestsCommand extends Command
     /**
      * @param array{headers: array<non-empty-string, non-empty-string>}       $test
      * @param array<int|string, mixed> $result
-     * @param array<string, string>    $headers
-     * @param array<int>               $notFoundCompanies
-     * @param array<string, array<string, int>> $resultChecks
+     * @param array{headers: array<non-empty-string, non-empty-string>} $test
+     * @param array<int|string, mixed>                                  $result
+     * @param array<string, string>                                     $headers
+     * @param array<int>                                                $notFoundCompanies
+     * @param array<string, array<string, int>>                         $resultChecks
      *
      * @throws void
      */
