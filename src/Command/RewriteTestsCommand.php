@@ -112,6 +112,8 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 9;
 
+    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 18;
+
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
     /**
@@ -844,6 +846,7 @@ final class RewriteTestsCommand extends Command
                 static function (string $a, string $b): int {
                     $da = new DateTimeImmutable($a);
                     $db = new DateTimeImmutable($b);
+
                     return $da <=> $db;
                 },
             );
@@ -1775,8 +1778,13 @@ final class RewriteTestsCommand extends Command
         }
 
         if ($version !== null) {
+            $majorVersion = (int) $version->getMajor();
+
             if (in_array($osName, ['android', 'ios'], true)) {
-                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS) {
+                if (
+                    $majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
+                    && $majorVersion >= self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
+                ) {
                     ++$skippedVersion;
 
                     if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
@@ -1796,7 +1804,7 @@ final class RewriteTestsCommand extends Command
             }
 
             if (in_array($osName, ['windows', 'windows rt'], true)) {
-                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
+                if ($majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
                     ++$skippedVersion;
 
                     if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
