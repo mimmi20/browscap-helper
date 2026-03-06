@@ -871,33 +871,38 @@ final class RewriteTestsCommand extends Command
                     [
                         '',
                         number_format(num: $generalData['all'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['skippedBeforeCheck'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['skippedInvalidData'] ?? 0, thousands_separator: '.'),
                         number_format(
                             num: $generalData['skippedBeforeCheck'] ?? 0,
+                            thousands_separator: '.',
+                        ),
                         number_format(
                             num: $generalData['skippedInvalidData'] ?? 0,
                             thousands_separator: '.',
                         ),
                         number_format(num: $generalData['checked'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['skippedHeaderCheck'] ?? 0, thousands_separator: '.'),
+                        number_format(
                             num: $generalData['skippedAfterCheck'] ?? 0,
                             thousands_separator: '.',
                         ),
                         number_format(
                             num: $generalData['skippedVersion'] ?? 0,
                             thousands_separator: '.',
+                        ),
+                        number_format(
                             num: $generalData['skippedHeaderCheck'] ?? 0,
                             thousands_separator: '.',
                         ),
                         number_format(num: $generalData['errors'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['duplicates'] ?? 0, thousands_separator: '.'),
                         number_format(num: $generalData['test'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $generalData['differentFromMatomo'] ?? 0, thousands_separator: '.'),
+                        number_format(
                             num: $generalData['comparedWithMatomo'] ?? 0,
                             thousands_separator: '.',
                         ),
                         number_format(
+                            num: $generalData['differentFromMatomo'] ?? 0,
+                            thousands_separator: '.',
+                        ),
                     ],
                 ],
             );
@@ -2101,8 +2106,6 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>}       $test
-     * @param array<int|string, mixed> $result
      * @param array{headers: array<non-empty-string, non-empty-string>} $test
      * @param array<int|string, mixed>                                  $result
      * @param array<string, string>                                     $headers
