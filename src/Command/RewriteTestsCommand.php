@@ -63,7 +63,6 @@ use UnexpectedValueException;
 
 use function array_any;
 use function array_chunk;
-use function array_filter;
 use function array_key_exists;
 use function array_multisort;
 use function assert;
@@ -92,9 +91,9 @@ use function str_contains;
 use function str_ends_with;
 use function str_replace;
 use function str_starts_with;
+use function uksort;
 use function var_export;
 
-use const ARRAY_FILTER_USE_KEY;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -111,18 +110,18 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 0;
+    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 9;
+
+    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 18;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
     /**
-     * last update: 2026-02-24
+     * last update: 2026-03-04
      */
-    // '2023-09-01';
-    private const string COMPARE_DATE_START = '2026-01-01';
+    private const string COMPARE_DATE_START = '2019-01-01';
 
-    // '2023-09-30';
-    private const string COMPARE_DATE_END = '2026-02-25';
+    private const string COMPARE_DATE_END = '2026-03-31';
 
     private const bool COMPARE_ALL = true;
 
@@ -370,6 +369,7 @@ final class RewriteTestsCommand extends Command
         );
 
         $txtChecks                  = [];
+        $resultChecks               = [];
         $notFoundCompanies          = [];
         $checkedPlatforms           = [];
         $notFoundFormfactors        = [];
@@ -398,6 +398,26 @@ final class RewriteTestsCommand extends Command
 
         foreach ($this->testsLoader->getProperties($clonedOutput, $sources, $messageLength) as $test) {
             ++$counter;
+
+            if (!array_key_exists('general', $resultChecks)) {
+                $resultChecks['general'] = [];
+            }
+
+            if (!array_key_exists('all', $resultChecks['general'])) {
+                $resultChecks['general']['all'] = 0;
+            }
+
+            $resultChecks['general']['all']++;
+
+            if (!array_key_exists($test['date-last'], $resultChecks)) {
+                $resultChecks[$test['date-last']] = [];
+            }
+
+            if (!array_key_exists('all', $resultChecks[$test['date-last']])) {
+                $resultChecks[$test['date-last']]['all'] = 0;
+            }
+
+            $resultChecks[$test['date-last']]['all']++;
 
             $actualTimeExec = new DateTimeImmutable('now');
 
@@ -450,20 +470,126 @@ final class RewriteTestsCommand extends Command
             if (!$accepted) {
                 ++$skippedBeforeCheck;
 
+                if (!array_key_exists('skippedBeforeCheck', $resultChecks['general'])) {
+                    $resultChecks['general']['skippedBeforeCheck'] = 0;
+                }
+
+                $resultChecks['general']['skippedBeforeCheck']++;
+
+                if (!array_key_exists('skippedBeforeCheck', $resultChecks[$test['date-last']])) {
+                    $resultChecks[$test['date-last']]['skippedBeforeCheck'] = 0;
+                }
+
+                $resultChecks[$test['date-last']]['skippedBeforeCheck']++;
+
                 continue;
             }
 
             $test['headers'] = $this->filterHeaders($output, $test['headers']);
+
+            if (array_key_exists('sec-ch-ua-form-factors', $test['headers'])) {
+                $matches = [];
+
+                if (
+                    preg_match_all(
+                        '~["\']([a-z]+)["\']~i',
+                        $test['headers']['sec-ch-ua-form-factors'],
+                        $matches,
+                    )
+                ) {
+                    foreach ($matches[1] as $factor) {
+                        $detectedFactor = FormFactor::tryFrom($factor);
+
+                        if ($detectedFactor !== null) {
+                            continue;
+                        }
+
+                        if (!array_key_exists($factor, $notFoundFormfactors)) {
+                            $notFoundFormfactors[$factor] = 0;
+                        }
+
+                        ++$notFoundFormfactors[$factor];
+
+                        $output->writeln(
+                            messages: "\n" . mb_str_pad(
+                                string: sprintf(
+                                    'The FormFactor "<fg=blue>%s</>", was not found in the Enum. Please add it',
+                                    $factor,
+                                ),
+                                length: $messageLength,
+                            ),
+                            options: OutputInterface::VERBOSITY_NORMAL,
+                        );
+                    }
+                }
+            }
+
+            if (
+                array_key_exists('x-requested-with', $test['headers'])
+                && array_key_exists('http-x-requested-with', $test['headers'])
+            ) {
+                $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
+                $diff    = $this->messageLength($output, $message, $messageLength);
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+            }
+
+            $hasInvalidHeaders = $this->hasInvalidHeaders($test);
+
+            if ($hasInvalidHeaders) {
+                ++$skippedInvalidData;
+
+                if (!array_key_exists('skippedInvalidData', $resultChecks['general'])) {
+                    $resultChecks['general']['skippedInvalidData'] = 0;
+                }
+
+                $resultChecks['general']['skippedInvalidData']++;
+
+                if (!array_key_exists('skippedInvalidData', $resultChecks[$test['date-last']])) {
+                    $resultChecks[$test['date-last']]['skippedInvalidData'] = 0;
+                }
+
+                $resultChecks[$test['date-last']]['skippedInvalidData']++;
+
+                continue;
+            }
 
             $seachHeader = (string) UserAgent::fromHeaderArray($test['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 ++$skippedBeforeCheck;
 
+                if (!array_key_exists('skippedBeforeCheck', $resultChecks['general'])) {
+                    $resultChecks['general']['skippedBeforeCheck'] = 0;
+                }
+
+                $resultChecks['general']['skippedBeforeCheck']++;
+
+                if (!array_key_exists('skippedBeforeCheck', $resultChecks[$test['date-last']])) {
+                    $resultChecks[$test['date-last']]['skippedBeforeCheck'] = 0;
+                }
+
+                $resultChecks[$test['date-last']]['skippedBeforeCheck']++;
+
                 continue;
             }
 
             ++$checked;
+
+            if (!array_key_exists('checked', $resultChecks['general'])) {
+                $resultChecks['general']['checked'] = 0;
+            }
+
+            $resultChecks['general']['checked']++;
+
+            if (!array_key_exists('checked', $resultChecks[$test['date-last']])) {
+                $resultChecks[$test['date-last']]['checked'] = 0;
+            }
+
+            $resultChecks[$test['date-last']]['checked']++;
 
             $this->handleTestCase(
                 output: $output,
@@ -474,7 +600,6 @@ final class RewriteTestsCommand extends Command
                 seachHeader: $seachHeader,
                 compareWithMatomo: self::COMPARE_ALL,
                 skippedAfterCheck: $skippedAfterCheck,
-                skippedInvalidData: $skippedInvalidData,
                 skippedVersion: $skippedVersion,
                 skippedHeaderCheck: $skippedHeaderCheck,
                 duplicates: $duplicates,
@@ -487,8 +612,8 @@ final class RewriteTestsCommand extends Command
                 timeCompare: $timeCompare,
                 txtChecks: $txtChecks,
                 checkedPlatforms: $checkedPlatforms,
-                notFoundFormfactors: $notFoundFormfactors,
                 notFoundCompanies: $notFoundCompanies,
+                resultChecks: $resultChecks,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
                 counterComparedWithMatomo: $counterComparedWithMatomo,
             );
@@ -712,6 +837,104 @@ final class RewriteTestsCommand extends Command
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         }
 
+        if ($resultChecks !== []) {
+            $generalData = $resultChecks['general'];
+            unset($resultChecks['general']);
+
+            uksort(
+                $resultChecks,
+                static function (string $a, string $b): int {
+                    $da = new DateTimeImmutable($a);
+                    $db = new DateTimeImmutable($b);
+
+                    return $da <=> $db;
+                },
+            );
+
+            $table = new Table($output);
+            $table->setHeaders(
+                [
+                    'Date',
+                    'useragents processed',
+                    'skipped before checks',
+                    'skipped invalid',
+                    'useragents checked',
+                    'skipped after checks',
+                    'skipped after version check',
+                    'skipped after header check',
+                    'errors',
+                    'duplicates',
+                    'tests written',
+                    'compared with Matomo',
+                    'different from Matomo',
+                ],
+            );
+            $table->setRows(
+                [
+                    [
+                        '',
+                        number_format(num: $generalData['all'] ?? 0, thousands_separator: '.'),
+                        number_format(
+                            num: $generalData['skippedBeforeCheck'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(
+                            num: $generalData['skippedInvalidData'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(num: $generalData['checked'] ?? 0, thousands_separator: '.'),
+                        number_format(
+                            num: $generalData['skippedAfterCheck'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(
+                            num: $generalData['skippedVersion'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(
+                            num: $generalData['skippedHeaderCheck'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(num: $generalData['errors'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $generalData['duplicates'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $generalData['test'] ?? 0, thousands_separator: '.'),
+                        number_format(
+                            num: $generalData['comparedWithMatomo'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                        number_format(
+                            num: $generalData['differentFromMatomo'] ?? 0,
+                            thousands_separator: '.',
+                        ),
+                    ],
+                ],
+            );
+
+            foreach ($resultChecks as $date => $data) {
+                $table->addRow(
+                    [
+                        $date,
+                        number_format(num: $data['all'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['skippedBeforeCheck'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['skippedInvalidData'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['checked'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['skippedAfterCheck'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['skippedVersion'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['skippedHeaderCheck'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['errors'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['duplicates'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['test'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['comparedWithMatomo'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $data['differentFromMatomo'] ?? 0, thousands_separator: '.'),
+                    ],
+                );
+            }
+
+            $table->render();
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        }
+
         $table = new Table($output);
         $table->setHeaders(['', 'Tests']);
         $table->setRows(
@@ -735,6 +958,15 @@ final class RewriteTestsCommand extends Command
                     ),
                 ],
                 [
+                    'skipped invalid',
+                    mb_str_pad(
+                        number_format(num: $skippedInvalidData, thousands_separator: '.'),
+                        12,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ),
+                ],
+                [
                     'useragents checked',
                     mb_str_pad(
                         number_format(num: $checked, thousands_separator: '.'),
@@ -752,15 +984,6 @@ final class RewriteTestsCommand extends Command
                     'skipped after checks',
                     mb_str_pad(
                         number_format(num: $skippedAfterCheck, thousands_separator: '.'),
-                        12,
-                        ' ',
-                        STR_PAD_LEFT,
-                    ),
-                ],
-                [
-                    'skipped invalid',
-                    mb_str_pad(
-                        number_format(num: $skippedInvalidData, thousands_separator: '.'),
                         12,
                         ' ',
                         STR_PAD_LEFT,
@@ -1345,11 +1568,11 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<string, string>}                           $test
+     * @param array{headers: array<non-empty-string, non-empty-string>}       $test
      * @param array<string, array<mixed>>                                     $txtChecks
      * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
-     * @param array<string, int>                                              $notFoundFormfactors
      * @param array<int>                                                      $notFoundCompanies
+     * @param array<string, array<string, int>>                               $resultChecks
      *
      * @throws void
      *
@@ -1364,7 +1587,6 @@ final class RewriteTestsCommand extends Command
         string $seachHeader,
         bool $compareWithMatomo,
         int &$skippedAfterCheck,
-        int &$skippedInvalidData,
         int &$skippedVersion,
         int &$skippedHeaderCheck,
         int &$duplicates,
@@ -1377,8 +1599,8 @@ final class RewriteTestsCommand extends Command
         float &$timeCompare,
         array &$txtChecks,
         array &$checkedPlatforms,
-        array &$notFoundFormfactors,
         array &$notFoundCompanies,
+        array &$resultChecks,
         int &$counterDifferentFromMatomo,
         int &$counterComparedWithMatomo,
     ): void {
@@ -1386,6 +1608,18 @@ final class RewriteTestsCommand extends Command
 
         ++$skippedHeaderCheck;
         --$skippedHeaderCheck;
+
+        if (!array_key_exists('skippedHeaderCheck', $resultChecks['general'])) {
+            $resultChecks['general']['skippedHeaderCheck'] = 0;
+        }
+
+        // $resultChecks['general']['skippedHeaderCheck']++;
+
+        if (!array_key_exists('skippedHeaderCheck', $resultChecks[$test['date-last']])) {
+            $resultChecks[$test['date-last']]['skippedHeaderCheck'] = 0;
+        }
+
+        // $resultChecks[$test['date-last']]['skippedHeaderCheck']++;
 
         // if (
         //    !array_key_exists('x-requested-with', $test['headers'])
@@ -1420,56 +1654,6 @@ final class RewriteTestsCommand extends Command
         //    return;
         // }
 
-        if (array_key_exists('sec-ch-ua-form-factors', $test['headers'])) {
-            $matches = [];
-
-            if (
-                preg_match_all(
-                    '~["\']([a-z]+)["\']~i',
-                    $test['headers']['sec-ch-ua-form-factors'],
-                    $matches,
-                )
-            ) {
-                foreach ($matches[1] as $factor) {
-                    $detectedFactor = FormFactor::tryFrom($factor);
-
-                    if ($detectedFactor !== null) {
-                        continue;
-                    }
-
-                    if (!array_key_exists($factor, $notFoundFormfactors)) {
-                        $notFoundFormfactors[$factor] = 0;
-                    }
-
-                    ++$notFoundFormfactors[$factor];
-
-                    $output->writeln(
-                        messages: "\n" . mb_str_pad(
-                            string: sprintf(
-                                'The FormFactor "<fg=blue>%s</>", was not found in the Enum. Please add it',
-                                $factor,
-                            ),
-                            length: $messageLength,
-                        ),
-                        options: OutputInterface::VERBOSITY_NORMAL,
-                    );
-                }
-            }
-        }
-
-        if (
-            array_key_exists('x-requested-with', $test['headers'])
-            && array_key_exists('http-x-requested-with', $test['headers'])
-        ) {
-            $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
-            $diff    = $this->messageLength($output, $message, $messageLength);
-
-            $output->writeln(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-        }
-
         $message = $loopMessage . 'redetect';
         $diff    = $this->messageLength($output, $message, $messageLength);
 
@@ -1479,78 +1663,12 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        $filteredHeaders = array_filter(
-            $test['headers'],
-            static fn (string $v): bool => $v !== '',
-        );
-        $filteredHeaders = array_filter(
-            $filteredHeaders,
-            static fn (string $k): bool => $k !== '',
-            ARRAY_FILTER_USE_KEY,
-        );
-
-        $forbiddenFound = array_any(
-            $filteredHeaders,
-            static function (string $v): bool {
-                $v = mb_strtolower($v);
-
-                return str_starts_with($v, '-1')
-                    || str_ends_with($v, '\\')
-                    || str_starts_with($v, '@@')
-                    || str_contains($v, '{${print(')
-                    || str_contains($v, '<?=print(')
-                    || str_contains($v, '+print(')
-                    || str_contains($v, ' print(')
-                    || str_contains($v, 'gethostbyname(')
-                    || str_contains($v, ' http/1.')
-                    || str_contains($v, 'nslookup')
-                    || str_contains($v, '${jndi')
-                    || str_contains($v, 'pg_sleep(')
-                    || str_contains($v, 'concat(')
-                    || str_contains($v, 'waitfor delay ')
-                    || str_contains($v, 'wget http://')
-                    || str_contains($v, '<?php')
-                    || str_contains($v, '<\'')
-                    || str_contains($v, '">')
-                    || str_contains($v, '/**/')
-                    || str_contains($v, ':()')
-                    || str_contains($v, '>&0')
-                    || str_contains($v, ' convert(')
-                    || str_contains($v, '(select')
-                    || str_contains($v, '</a>')
-                    || str_contains($v, ';echo')
-                    || str_contains($v, '; echo')
-                    || str_contains($v, 'bin/uname')
-                    || str_contains($v, 'bin/bash')
-                    || str_contains($v, '(curl ')
-                    || str_contains($v, 'curl -O')
-                    || str_contains($v, '<input')
-                    || str_contains($v, '<img')
-                    || str_contains($v, '<video')
-                    || str_contains($v, '<source')
-                    || str_contains($v, '<a ')
-                    || str_contains($v, 'file_put_contents(')
-                    || str_contains($v, 'file_get_contents(')
-                    || str_contains($v, 'fromcharcode(')
-                    || str_contains($v, '>(')
-                    || str_contains($v, '<(')
-                    || str_contains($v, ' and "');
-                // || str_contains($v, '­')
-            },
-        );
-
-        if ($forbiddenFound) {
-            ++$skippedInvalidData;
-
-            return;
-        }
-
         $startTime = microtime(true);
 
         $testResult = $this->handleTest(
             output: $output,
             detector: $detector,
-            headers: $filteredHeaders,
+            headers: $test['headers'],
             parentMessage: $message,
             messageLength: $messageLength,
         );
@@ -1562,17 +1680,53 @@ final class RewriteTestsCommand extends Command
         if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
             ++$skippedAfterCheck;
 
+            if (!array_key_exists('skippedAfterCheck', $resultChecks['general'])) {
+                $resultChecks['general']['skippedAfterCheck'] = 0;
+            }
+
+            $resultChecks['general']['skippedAfterCheck']++;
+
+            if (!array_key_exists('skippedAfterCheck', $resultChecks[$test['date-last']])) {
+                $resultChecks[$test['date-last']]['skippedAfterCheck'] = 0;
+            }
+
+            $resultChecks[$test['date-last']]['skippedAfterCheck']++;
+
             return;
         }
 
         if ($testResult->getStatus() === TestResult::STATUS_DUPLICATE) {
             ++$duplicates;
 
+            if (!array_key_exists('duplicates', $resultChecks['general'])) {
+                $resultChecks['general']['duplicates'] = 0;
+            }
+
+            $resultChecks['general']['duplicates']++;
+
+            if (!array_key_exists('duplicates', $resultChecks[$test['date-last']])) {
+                $resultChecks[$test['date-last']]['duplicates'] = 0;
+            }
+
+            $resultChecks[$test['date-last']]['duplicates']++;
+
             return;
         }
 
         if ($testResult->getStatus() === TestResult::STATUS_ERROR || $result === null) {
             ++$errors;
+
+            if (!array_key_exists('errors', $resultChecks['general'])) {
+                $resultChecks['general']['errors'] = 0;
+            }
+
+            $resultChecks['general']['errors']++;
+
+            if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
+                $resultChecks[$test['date-last']]['errors'] = 0;
+            }
+
+            $resultChecks[$test['date-last']]['errors']++;
 
             return;
         }
@@ -1587,6 +1741,18 @@ final class RewriteTestsCommand extends Command
                 $version = (new VersionBuilder())->set((string) $result['os']['version']);
             } catch (NotNumericException $e) {
                 ++$errors;
+
+                if (!array_key_exists('errors', $resultChecks['general'])) {
+                    $resultChecks['general']['errors'] = 0;
+                }
+
+                $resultChecks['general']['errors']++;
+
+                if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
+                    $resultChecks[$test['date-last']]['errors'] = 0;
+                }
+
+                $resultChecks[$test['date-last']]['errors']++;
 
                 $exception = new Exception('An error occured while decoding a result', 0, $e);
 
@@ -1612,17 +1778,46 @@ final class RewriteTestsCommand extends Command
         }
 
         if ($version !== null) {
+            $majorVersion = (int) $version->getMajor();
+
             if (in_array($osName, ['android', 'ios'], true)) {
-                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS) {
+                if (
+                    $majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
+                    && $majorVersion >= self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
+                ) {
                     ++$skippedVersion;
+
+                    if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
+                        $resultChecks['general']['skippedVersion'] = 0;
+                    }
+
+                    $resultChecks['general']['skippedVersion']++;
+
+                    if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
+                        $resultChecks[$test['date-last']]['skippedVersion'] = 0;
+                    }
+
+                    $resultChecks[$test['date-last']]['skippedVersion']++;
 
                     return;
                 }
             }
 
             if (in_array($osName, ['windows', 'windows rt'], true)) {
-                if ((int) $version->getMajor() < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
+                if ($majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
                     ++$skippedVersion;
+
+                    if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
+                        $resultChecks['general']['skippedVersion'] = 0;
+                    }
+
+                    $resultChecks['general']['skippedVersion']++;
+
+                    if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
+                        $resultChecks[$test['date-last']]['skippedVersion'] = 0;
+                    }
+
+                    $resultChecks[$test['date-last']]['skippedVersion']++;
 
                     return;
                 }
@@ -1645,17 +1840,31 @@ final class RewriteTestsCommand extends Command
             $this->compareDeviceWithMapper(
                 output: $output,
                 dd: $dd,
+                test: $test,
                 result: $result,
                 headers: $headers,
                 loopMessage: $loopMessage,
                 messageLength: $messageLength,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
                 notFoundCompanies: $notFoundCompanies,
+                resultChecks: $resultChecks,
             );
 
             $timeCompare += microtime(true) - $startTime;
 
             ++$counterComparedWithMatomo;
+
+            if (!array_key_exists('comparedWithMatomo', $resultChecks['general'])) {
+                $resultChecks['general']['comparedWithMatomo'] = 0;
+            }
+
+            $resultChecks['general']['comparedWithMatomo']++;
+
+            if (!array_key_exists('comparedWithMatomo', $resultChecks[$test['date-last']])) {
+                $resultChecks[$test['date-last']]['comparedWithMatomo'] = 0;
+            }
+
+            $resultChecks[$test['date-last']]['comparedWithMatomo']++;
         }
 
         $deviceManufaturer = mb_strtolower(
@@ -1743,6 +1952,18 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         ++$testCount;
+
+        if (!array_key_exists('test', $resultChecks['general'])) {
+            $resultChecks['general']['test'] = 0;
+        }
+
+        $resultChecks['general']['test']++;
+
+        if (!array_key_exists('test', $resultChecks[$test['date-last']])) {
+            $resultChecks[$test['date-last']]['test'] = 0;
+        }
+
+        $resultChecks[$test['date-last']]['test']++;
     }
 
     /**
@@ -1893,21 +2114,25 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<int|string, mixed> $result
-     * @param array<string, string>    $headers
-     * @param array<int>               $notFoundCompanies
+     * @param array{headers: array<non-empty-string, non-empty-string>} $test
+     * @param array<int|string, mixed>                                  $result
+     * @param array<string, string>                                     $headers
+     * @param array<int>                                                $notFoundCompanies
+     * @param array<string, array<string, int>>                         $resultChecks
      *
      * @throws void
      */
     private function compareDeviceWithMapper(
         OutputInterface $output,
         DeviceDetector $dd,
+        array $test,
         array $result,
         array $headers,
         string $loopMessage,
         int &$messageLength,
         int &$counterDifferentFromMatomo,
         array &$notFoundCompanies,
+        array &$resultChecks,
     ): void {
         $mapper = new InputMapper();
 
@@ -2085,6 +2310,7 @@ final class RewriteTestsCommand extends Command
         $brBrand      = $mapper->mapDeviceBrandName($result['device']['brand'] ?? null);
         $brDeviceType = $mapper->mapDeviceType($result['device']['type'] ?? null);
         $brOsName     = $mapper->mapOsName($result['os']['name'] ?? null);
+        $brOsMName    = $mapper->mapOsName($result['os']['marketingName'] ?? null);
 
         try {
             $brOsVersion = $mapper->mapOsVersion($result['os']['version'] ?? null, $brOsName);
@@ -2121,7 +2347,7 @@ final class RewriteTestsCommand extends Command
                 '($ddBrand === $brBrand || $ddBrand === null)' => ($ddBrand === $brBrand || $ddBrand === null),
                 '($ddModel === $brModel || $ddModel === $brModel2 || $ddModel === null || $ddModel === \'K\')' => ($ddModel === $brModel || $ddModel === $brModel2 || $ddModel === null || $ddModel === 'K'),
                 '$ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown' => $ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown,
-                '($ddOsName === $brOsName || $ddOsName === null)' => ($ddOsName === $brOsName || $ddOsName === null),
+                '($ddOsName === $brOsName || $ddOsName === $brOsMName || $ddOsName === null)' => ($ddOsName === $brOsName || $ddOsName === $brOsMName || $ddOsName === null),
                 '($ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddOsVersion->getVersion(
                     VersionInterface::IGNORE_MICRO,
                 ) === $brOsVersion->getVersion(
@@ -2159,7 +2385,19 @@ final class RewriteTestsCommand extends Command
 
         ++$counterDifferentFromMatomo;
 
-        $getMessage = function (DeviceDetector $dd) use ($output, $checks, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
+        if (!array_key_exists('differentFromMatomo', $resultChecks['general'])) {
+            $resultChecks['general']['differentFromMatomo'] = 0;
+        }
+
+        $resultChecks['general']['differentFromMatomo']++;
+
+        if (!array_key_exists('differentFromMatomo', $resultChecks[$test['date-last']])) {
+            $resultChecks[$test['date-last']]['differentFromMatomo'] = 0;
+        }
+
+        $resultChecks[$test['date-last']]['differentFromMatomo']++;
+
+        $getMessage = function (DeviceDetector $dd) use ($output, $checks, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
             $message        = $loopMessage;
             $someDifference = false;
 
@@ -2205,7 +2443,7 @@ final class RewriteTestsCommand extends Command
                 $someDifference = true;
             }
 
-            if ($ddOsName !== $brOsName && $ddOsName !== null) {
+            if ($ddOsName !== $brOsName && $ddOsName !== $brOsMName && $ddOsName !== null) {
                 $format4b       = '<fg=green>';
                 $format4d       = '<fg=red>';
                 $someDifference = true;
@@ -2271,7 +2509,7 @@ final class RewriteTestsCommand extends Command
                 '    For the Headers' . PHP_EOL . '%s' . PHP_EOL
                 . '    the device was detected as    "%s%s -> %s</>" "%s%s/%s -> %s/%s</>" (%s%s -> %s</>), ' . PHP_EOL
                 . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)' . PHP_EOL
-                . '    the platform was detected as  "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
+                . '    the platform was detected as  "%s%s/%s -> %s/%s</>" "%s%s -> %s</>", ' . PHP_EOL
                 . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
                 . '    the engine was detected as    "%s%s -> %s</>" "%s%s -> %s</>", ' . PHP_EOL
                 . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>"' . PHP_EOL
@@ -2300,7 +2538,9 @@ final class RewriteTestsCommand extends Command
                 $ddDeviceType->getType(),
                 $format4b,
                 $result['os']['name'] ?? '<n/a>',
+                $result['os']['marketingName'] ?? '<n/a>',
                 $brOsName,
+                $brOsMName,
                 $format5b,
                 $result['os']['version'] ?? '<n/a>',
                 $brOsVersion->getVersion(),
@@ -2427,7 +2667,7 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<string, string>}                           $test
+     * @param array{headers: array<non-empty-string, non-empty-string>}       $test
      * @param array<int|string, mixed>                                        $result
      * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
      *
@@ -2687,5 +2927,68 @@ final class RewriteTestsCommand extends Command
         }
 
         return false;
+    }
+
+    /**
+     * @param array{headers: array<non-empty-string, non-empty-string>} $test
+     *
+     * @throws void
+     */
+    private function hasInvalidHeaders(array $test): bool
+    {
+        return array_any(
+            $test['headers'],
+            static function (string $v): bool {
+                $v = mb_strtolower($v);
+
+                return str_starts_with($v, '-1')
+                    || str_ends_with($v, '\\')
+                    || str_starts_with($v, '@@')
+                    || str_contains($v, '{${print(')
+                    || str_contains($v, '<?=print(')
+                    || str_contains($v, '+print(')
+                    || str_contains($v, ' print(')
+                    || str_contains($v, 'gethostbyname(')
+                    || str_contains($v, ' http/1.')
+                    || str_contains($v, 'nslookup')
+                    || str_contains($v, '${jndi')
+                    || str_contains($v, 'pg_sleep(')
+                    || str_contains($v, 'concat(')
+                    || str_contains($v, 'waitfor delay ')
+                    || str_contains($v, 'wget http://')
+                    || str_contains($v, '<?php')
+                    || str_contains($v, '<\'')
+                    || str_contains($v, '">')
+                    || str_contains($v, '/**/')
+                    || str_contains($v, ':()')
+                    || str_contains($v, '>&0')
+                    || str_contains($v, ' convert(')
+                    || str_contains($v, '(select')
+                    || str_contains($v, '</a>')
+                    || str_contains($v, ';echo')
+                    || str_contains($v, '; echo')
+                    || str_contains($v, 'bin/uname')
+                    || str_contains($v, 'bin/bash')
+                    || str_contains($v, '(curl ')
+                    || str_contains($v, 'curl -O')
+                    || str_contains($v, '<input')
+                    || str_contains($v, '<img')
+                    || str_contains($v, '<video')
+                    || str_contains($v, '<source')
+                    || str_contains($v, '<a ')
+                    || str_contains($v, 'file_put_contents(')
+                    || str_contains($v, 'file_get_contents(')
+                    || str_contains($v, 'fromcharcode(')
+                    || str_contains($v, '>(')
+                    || str_contains($v, '<(')
+                    || str_contains($v, ' and "')
+                    || str_contains($v, ' or \'')
+                    || str_contains($v, ' union all')
+                    || str_contains($v, ' if(')
+                    || str_contains($v, '78.29.51.27')
+                    || str_contains($v, 'blockchain');
+                // || str_contains($v, '­')
+            },
+        );
     }
 }
