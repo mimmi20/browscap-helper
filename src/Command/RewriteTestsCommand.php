@@ -931,7 +931,11 @@ final class RewriteTestsCommand extends Command
                         number_format(num: $data['duplicates'] ?? 0, thousands_separator: '.'),
                         number_format(num: $data['test'] ?? 0, thousands_separator: '.'),
                         number_format(num: $data['comparedWithMatomo'] ?? 0, thousands_separator: '.'),
-                        sprintf('<fg=%s>%s</>', $differentFromMatomo === 0 ? 'green' : 'red', number_format(num: $differentFromMatomo, thousands_separator: '.')),
+                        sprintf(
+                            '<fg=%s>%s</>',
+                            $differentFromMatomo === 0 ? 'green' : 'red',
+                            number_format(num: $differentFromMatomo, thousands_separator: '.'),
+                        ),
                     ],
                 );
             }
