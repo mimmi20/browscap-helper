@@ -912,8 +912,9 @@ final class RewriteTestsCommand extends Command
 
             foreach ($resultChecks as $date => $data) {
                 $differentFromMatomo = $data['differentFromMatomo'] ?? 0;
+                $comparedWithMatomo  = $data['comparedWithMatomo'] ?? 0;
 
-                if (!self::COMPARE_ALL && $differentFromMatomo === 0) {
+                if ((!self::COMPARE_ALL || $comparedWithMatomo === 0) && $differentFromMatomo === 0) {
                     continue;
                 }
 
@@ -930,7 +931,7 @@ final class RewriteTestsCommand extends Command
                         number_format(num: $data['errors'] ?? 0, thousands_separator: '.'),
                         number_format(num: $data['duplicates'] ?? 0, thousands_separator: '.'),
                         number_format(num: $data['test'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $data['comparedWithMatomo'] ?? 0, thousands_separator: '.'),
+                        number_format(num: $comparedWithMatomo, thousands_separator: '.'),
                         sprintf(
                             '<fg=%s>%s</>',
                             $differentFromMatomo === 0 ? 'green' : 'red',
