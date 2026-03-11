@@ -112,12 +112,12 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 9;
 
-    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 18;
+    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 25;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
     /**
-     * last update: 2026-03-04
+     * last update: 2026-03-11
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -911,6 +911,12 @@ final class RewriteTestsCommand extends Command
             );
 
             foreach ($resultChecks as $date => $data) {
+                $differentFromMatomo = $data['differentFromMatomo'] ?? 0;
+
+                if (!self::COMPARE_ALL && $differentFromMatomo === 0) {
+                    continue;
+                }
+
                 $table->addRow(
                     [
                         $date,
@@ -925,7 +931,7 @@ final class RewriteTestsCommand extends Command
                         number_format(num: $data['duplicates'] ?? 0, thousands_separator: '.'),
                         number_format(num: $data['test'] ?? 0, thousands_separator: '.'),
                         number_format(num: $data['comparedWithMatomo'] ?? 0, thousands_separator: '.'),
-                        number_format(num: $data['differentFromMatomo'] ?? 0, thousands_separator: '.'),
+                        sprintf('<fg=%s>%s</>', $differentFromMatomo === 0 ? 'green' : 'red', number_format(num: $differentFromMatomo, thousands_separator: '.')),
                     ],
                 );
             }
@@ -2680,87 +2686,11 @@ final class RewriteTestsCommand extends Command
         string $osVersion,
         array &$checkedPlatforms,
     ): bool {
-        $xRequestHeader = null;
-
-        if (
-            array_key_exists('x-requested-with', $test['headers'])
-            && $test['headers']['x-requested-with'] !== ''
-        ) {
-            $xRequestHeader = $test['headers']['x-requested-with'];
-        } elseif (
-            array_key_exists('http-x-requested-with', $test['headers'])
-            && $test['headers']['http-x-requested-with'] !== ''
-        ) {
-            $xRequestHeader = $test['headers']['http-x-requested-with'];
-        }
-
-        $secChUaHeader = null;
-
-        if (array_key_exists('sec-ch-ua', $test['headers']) && $test['headers']['sec-ch-ua'] !== '') {
-            $secChUaHeader = $test['headers']['sec-ch-ua'];
-        }
-
-        $secChPlatformHeader = null;
-
-        if (
-            array_key_exists('sec-ch-ua-platform', $test['headers'])
-            && $test['headers']['sec-ch-ua-platform'] !== ''
-        ) {
-            $secChPlatformHeader = $test['headers']['sec-ch-ua-platform'];
-        }
-
-        $secChModelHeader = null;
-
-        if (
-            array_key_exists('sec-ch-ua-model', $test['headers'])
-            && $test['headers']['sec-ch-ua-model'] !== ''
-        ) {
-            $secChModelHeader = $test['headers']['sec-ch-ua-model'];
-        }
-
-        $puffinHeader = null;
-
-        if (
-            array_key_exists('x-puffin-ua', $test['headers'])
-            && $test['headers']['x-puffin-ua'] !== ''
-        ) {
-            $puffinHeader = $test['headers']['x-puffin-ua'];
-        }
-
         if (!isset($checkedPlatforms[$osName][$osVersion])) {
             $checkedPlatforms[$osName][$osVersion]['count']   = 1;
             $checkedPlatforms[$osName][$osVersion]['checked'] = false;
         } else {
             ++$checkedPlatforms[$osName][$osVersion]['count'];
-        }
-
-        if ($osName === '' && $secChPlatformHeader !== null) {
-            $checkedPlatforms[$osName][$osVersion]['checked'] = true;
-
-            return true;
-        }
-
-        if (
-            $result['client']['name'] === null
-            && (
-                $secChUaHeader !== null
-                || (
-                    $xRequestHeader !== null
-                    && $xRequestHeader !== 'XMLHttpRequest'
-                )
-            )
-        ) {
-            return true;
-        }
-
-        if (
-            $result['device']['deviceName'] === null
-            && (
-                $secChModelHeader !== null
-                || $puffinHeader !== null
-            )
-        ) {
-            return true;
         }
 
         if (
