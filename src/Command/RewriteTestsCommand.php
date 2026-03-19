@@ -116,8 +116,10 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
+    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 0;
+
     /**
-     * last update: 2026-03-11
+     * last update: 2026-03-18
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -1794,7 +1796,7 @@ final class RewriteTestsCommand extends Command
             if (in_array($osName, ['android', 'ios'], true)) {
                 if (
                     $majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
-                    && $majorVersion >= self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
+                    || $majorVersion >= self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
                 ) {
                     ++$skippedVersion;
 
@@ -1816,6 +1818,26 @@ final class RewriteTestsCommand extends Command
 
             if (in_array($osName, ['windows', 'windows rt'], true)) {
                 if ($majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
+                    ++$skippedVersion;
+
+                    if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
+                        $resultChecks['general']['skippedVersion'] = 0;
+                    }
+
+                    $resultChecks['general']['skippedVersion']++;
+
+                    if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
+                        $resultChecks[$test['date-last']]['skippedVersion'] = 0;
+                    }
+
+                    $resultChecks[$test['date-last']]['skippedVersion']++;
+
+                    return;
+                }
+            }
+
+            if (in_array($osName, ['mac os x', 'macintosh'], true)) {
+                if ($majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_MACOS) {
                     ++$skippedVersion;
 
                     if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
@@ -2623,13 +2645,9 @@ final class RewriteTestsCommand extends Command
      */
     private function getHeaderList(array $headers): array
     {
-        $headerList = ['        "user-agent" => "' . $headers['user-agent'] . '"'];
+        $headerList = [];
 
         foreach ($headers as $name => $value) {
-            if ($name === 'user-agent') {
-                continue;
-            }
-
             $headerList[] = '        "' . $name . '" => "' . $value . '"';
         }
 
