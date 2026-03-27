@@ -9,7 +9,7 @@ For details, take a look at the following workflow configuration files:
 
 ## Coding Standards
 
-We are using [`friendsofphp/php-cs-fixer`](https://github.com/FriendsOfPHP/PHP-CS-Fixer) and [`squizlabs/php_codesniffer`](https://github.com/squizlabs/PHP_CodeSniffer) to enforce coding standards in PHP files.
+We are using [`friendsofphp/php-cs-fixer`](https://github.com/FriendsOfPHP/PHP-CS-Fixer) and [`squizlabs/php_codesniffer`](https://github.com/PHPCSStandards/PHP_CodeSniffer) to enforce coding standards in PHP files.
 
 Run
 
