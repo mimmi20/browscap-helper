@@ -245,8 +245,8 @@ final class CopyTestsCommand extends Command
             PDO::ATTR_EMULATE_PREPARES => false,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_PERSISTENT => true,
-            PDO::MYSQL_ATTR_DIRECT_QUERY => false,
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+            \Pdo\Mysql::ATTR_DIRECT_QUERY => false,
+            \Pdo\Mysql::ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
         ];
 
         $pdo = new PDO(

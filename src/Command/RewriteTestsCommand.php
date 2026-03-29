@@ -411,7 +411,7 @@ final class RewriteTestsCommand extends Command
 
             $resultChecks['general']['all']++;
 
-            if (!array_key_exists($test['date-last'], $resultChecks)) {
+            if (!array_key_exists((string) $test['date-last'], $resultChecks)) {
                 $resultChecks[$test['date-last']] = [];
             }
 
