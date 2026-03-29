@@ -48,6 +48,7 @@
     "ext-dom": "*",
     "ext-tokenizer": "*",
     "ext-xmlwriter": "*",
+    "ergebnis/composer-normalize": "^2.50.0",
     "jbelien/phpstan-sarif-formatter": "^1.2.0",
     "mimmi20/coding-standard": "^7.0.27",
     "nikic/php-parser": "^5.7.0",
@@ -82,6 +83,7 @@
   "config": {
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
+      "ergebnis/composer-normalize": true,
       "phpstan/extension-installer": true
     },
     "lock": false,
@@ -98,5 +100,11 @@
       "*": "dist"
     },
     "sort-packages": true
+  },
+  "extra": {
+    "composer-normalize": {
+      "indent-size": 2,
+      "indent-style": "space"
+    }
   }
 }
