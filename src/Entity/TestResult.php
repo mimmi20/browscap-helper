@@ -52,7 +52,7 @@ final readonly class TestResult
     public const int EXIT_CLIENT_IS_GENERAL = 14;
 
     /**
-     * @param array<mixed>|null $result
+     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}|null $result
      * @phpstan-param self::STATUS_* $status
      * @phpstan-param array<non-empty-string, non-empty-string> $headers
      * @phpstan-param self::EXIT_* $exit
@@ -69,7 +69,7 @@ final readonly class TestResult
     }
 
     /**
-     * @return array<mixed>|null
+     * @return array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}|null
      *
      * @throws void
      *

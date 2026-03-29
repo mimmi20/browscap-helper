@@ -37,6 +37,7 @@ use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use JsonException;
 use Override;
 use PDO;
+use Pdo\Mysql;
 use PDOException;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -245,8 +246,7 @@ final class CopyTestsCommand extends Command
             PDO::ATTR_EMULATE_PREPARES => false,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_PERSISTENT => true,
-            \Pdo\Mysql::ATTR_DIRECT_QUERY => false,
-            \Pdo\Mysql::ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+            Mysql::ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
         ];
 
         $pdo = new PDO(
