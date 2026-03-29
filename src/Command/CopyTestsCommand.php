@@ -240,8 +240,6 @@ final class CopyTestsCommand extends Command
         string $user = 'root',
         string $password = '',
     ): PdoSource {
-        $password = '';
-
         $driverOptions = [
             PDO::ATTR_EMULATE_PREPARES => false,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
