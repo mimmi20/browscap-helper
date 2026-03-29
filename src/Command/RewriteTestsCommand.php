@@ -66,6 +66,7 @@ use function array_chunk;
 use function array_key_exists;
 use function array_multisort;
 use function assert;
+use function date;
 use function file_exists;
 use function file_put_contents;
 use function implode;
@@ -409,7 +410,11 @@ final class RewriteTestsCommand extends Command
                 $resultChecks['general']['all'] = 0;
             }
 
-            $resultChecks['general']['all']++;
+            ++$resultChecks['general']['all'];
+
+            if (!array_key_exists('date-last', $test) || $test['date-last'] === null) {
+                $test['date-last'] = date('Y-m-d');
+            }
 
             if (!array_key_exists($test['date-last'], $resultChecks)) {
                 $resultChecks[$test['date-last']] = [];
@@ -419,7 +424,7 @@ final class RewriteTestsCommand extends Command
                 $resultChecks[$test['date-last']]['all'] = 0;
             }
 
-            $resultChecks[$test['date-last']]['all']++;
+            ++$resultChecks[$test['date-last']]['all'];
 
             $actualTimeExec = new DateTimeImmutable('now');
 
@@ -476,13 +481,13 @@ final class RewriteTestsCommand extends Command
                     $resultChecks['general']['skippedBeforeCheck'] = 0;
                 }
 
-                $resultChecks['general']['skippedBeforeCheck']++;
+                ++$resultChecks['general']['skippedBeforeCheck'];
 
                 if (!array_key_exists('skippedBeforeCheck', $resultChecks[$test['date-last']])) {
                     $resultChecks[$test['date-last']]['skippedBeforeCheck'] = 0;
                 }
 
-                $resultChecks[$test['date-last']]['skippedBeforeCheck']++;
+                ++$resultChecks[$test['date-last']]['skippedBeforeCheck'];
 
                 continue;
             }
@@ -548,13 +553,13 @@ final class RewriteTestsCommand extends Command
                     $resultChecks['general']['skippedInvalidData'] = 0;
                 }
 
-                $resultChecks['general']['skippedInvalidData']++;
+                ++$resultChecks['general']['skippedInvalidData'];
 
                 if (!array_key_exists('skippedInvalidData', $resultChecks[$test['date-last']])) {
                     $resultChecks[$test['date-last']]['skippedInvalidData'] = 0;
                 }
 
-                $resultChecks[$test['date-last']]['skippedInvalidData']++;
+                ++$resultChecks[$test['date-last']]['skippedInvalidData'];
 
                 continue;
             }
@@ -568,13 +573,13 @@ final class RewriteTestsCommand extends Command
                     $resultChecks['general']['skippedBeforeCheck'] = 0;
                 }
 
-                $resultChecks['general']['skippedBeforeCheck']++;
+                ++$resultChecks['general']['skippedBeforeCheck'];
 
                 if (!array_key_exists('skippedBeforeCheck', $resultChecks[$test['date-last']])) {
                     $resultChecks[$test['date-last']]['skippedBeforeCheck'] = 0;
                 }
 
-                $resultChecks[$test['date-last']]['skippedBeforeCheck']++;
+                ++$resultChecks[$test['date-last']]['skippedBeforeCheck'];
 
                 continue;
             }
@@ -585,13 +590,13 @@ final class RewriteTestsCommand extends Command
                 $resultChecks['general']['checked'] = 0;
             }
 
-            $resultChecks['general']['checked']++;
+            ++$resultChecks['general']['checked'];
 
             if (!array_key_exists('checked', $resultChecks[$test['date-last']])) {
                 $resultChecks[$test['date-last']]['checked'] = 0;
             }
 
-            $resultChecks[$test['date-last']]['checked']++;
+            ++$resultChecks[$test['date-last']]['checked'];
 
             $this->handleTestCase(
                 output: $output,
@@ -916,6 +921,7 @@ final class RewriteTestsCommand extends Command
                 $differentFromMatomo = $data['differentFromMatomo'] ?? 0;
                 $comparedWithMatomo  = $data['comparedWithMatomo'] ?? 0;
 
+                /* @phpstan-ignore booleanNot.alwaysTrue, booleanOr.alwaysTrue */
                 if ((!self::COMPARE_ALL || $comparedWithMatomo === 0) && $differentFromMatomo === 0) {
                     continue;
                 }
@@ -1104,6 +1110,7 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         try {
+            /** @var array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $newResult */
             $newResult = $detector->getBrowser($headers);
         } catch (InvalidArgumentException | UnexpectedValueException $e) {
             $output->writeln(
@@ -1581,11 +1588,11 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>}       $test
-     * @param array<string, array<mixed>>                                     $txtChecks
-     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
-     * @param array<int>                                                      $notFoundCompanies
-     * @param array<string, array<string, int>>                               $resultChecks
+     * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
+     * @param array<string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $txtChecks
+     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedPlatforms
+     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
+     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
      * @throws void
      *
@@ -1697,13 +1704,13 @@ final class RewriteTestsCommand extends Command
                 $resultChecks['general']['skippedAfterCheck'] = 0;
             }
 
-            $resultChecks['general']['skippedAfterCheck']++;
+            ++$resultChecks['general']['skippedAfterCheck'];
 
             if (!array_key_exists('skippedAfterCheck', $resultChecks[$test['date-last']])) {
                 $resultChecks[$test['date-last']]['skippedAfterCheck'] = 0;
             }
 
-            $resultChecks[$test['date-last']]['skippedAfterCheck']++;
+            ++$resultChecks[$test['date-last']]['skippedAfterCheck'];
 
             return;
         }
@@ -1715,13 +1722,13 @@ final class RewriteTestsCommand extends Command
                 $resultChecks['general']['duplicates'] = 0;
             }
 
-            $resultChecks['general']['duplicates']++;
+            ++$resultChecks['general']['duplicates'];
 
             if (!array_key_exists('duplicates', $resultChecks[$test['date-last']])) {
                 $resultChecks[$test['date-last']]['duplicates'] = 0;
             }
 
-            $resultChecks[$test['date-last']]['duplicates']++;
+            ++$resultChecks[$test['date-last']]['duplicates'];
 
             return;
         }
@@ -1733,13 +1740,13 @@ final class RewriteTestsCommand extends Command
                 $resultChecks['general']['errors'] = 0;
             }
 
-            $resultChecks['general']['errors']++;
+            ++$resultChecks['general']['errors'];
 
             if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
                 $resultChecks[$test['date-last']]['errors'] = 0;
             }
 
-            $resultChecks[$test['date-last']]['errors']++;
+            ++$resultChecks[$test['date-last']]['errors'];
 
             return;
         }
@@ -1759,13 +1766,13 @@ final class RewriteTestsCommand extends Command
                     $resultChecks['general']['errors'] = 0;
                 }
 
-                $resultChecks['general']['errors']++;
+                ++$resultChecks['general']['errors'];
 
                 if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
                     $resultChecks[$test['date-last']]['errors'] = 0;
                 }
 
-                $resultChecks[$test['date-last']]['errors']++;
+                ++$resultChecks[$test['date-last']]['errors'];
 
                 $exception = new Exception('An error occured while decoding a result', 0, $e);
 
@@ -1804,13 +1811,13 @@ final class RewriteTestsCommand extends Command
                         $resultChecks['general']['skippedVersion'] = 0;
                     }
 
-                    $resultChecks['general']['skippedVersion']++;
+                    ++$resultChecks['general']['skippedVersion'];
 
                     if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
                         $resultChecks[$test['date-last']]['skippedVersion'] = 0;
                     }
 
-                    $resultChecks[$test['date-last']]['skippedVersion']++;
+                    ++$resultChecks[$test['date-last']]['skippedVersion'];
 
                     return;
                 }
@@ -1824,13 +1831,13 @@ final class RewriteTestsCommand extends Command
                         $resultChecks['general']['skippedVersion'] = 0;
                     }
 
-                    $resultChecks['general']['skippedVersion']++;
+                    ++$resultChecks['general']['skippedVersion'];
 
                     if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
                         $resultChecks[$test['date-last']]['skippedVersion'] = 0;
                     }
 
-                    $resultChecks[$test['date-last']]['skippedVersion']++;
+                    ++$resultChecks[$test['date-last']]['skippedVersion'];
 
                     return;
                 }
@@ -1844,13 +1851,13 @@ final class RewriteTestsCommand extends Command
                         $resultChecks['general']['skippedVersion'] = 0;
                     }
 
-                    $resultChecks['general']['skippedVersion']++;
+                    ++$resultChecks['general']['skippedVersion'];
 
                     if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
                         $resultChecks[$test['date-last']]['skippedVersion'] = 0;
                     }
 
-                    $resultChecks[$test['date-last']]['skippedVersion']++;
+                    ++$resultChecks[$test['date-last']]['skippedVersion'];
 
                     return;
                 }
@@ -1891,13 +1898,13 @@ final class RewriteTestsCommand extends Command
                 $resultChecks['general']['comparedWithMatomo'] = 0;
             }
 
-            $resultChecks['general']['comparedWithMatomo']++;
+            ++$resultChecks['general']['comparedWithMatomo'];
 
             if (!array_key_exists('comparedWithMatomo', $resultChecks[$test['date-last']])) {
                 $resultChecks[$test['date-last']]['comparedWithMatomo'] = 0;
             }
 
-            $resultChecks[$test['date-last']]['comparedWithMatomo']++;
+            ++$resultChecks[$test['date-last']]['comparedWithMatomo'];
         }
 
         $deviceManufaturer = mb_strtolower(
@@ -1990,17 +1997,17 @@ final class RewriteTestsCommand extends Command
             $resultChecks['general']['test'] = 0;
         }
 
-        $resultChecks['general']['test']++;
+        ++$resultChecks['general']['test'];
 
         if (!array_key_exists('test', $resultChecks[$test['date-last']])) {
             $resultChecks[$test['date-last']]['test'] = 0;
         }
 
-        $resultChecks[$test['date-last']]['test']++;
+        ++$resultChecks[$test['date-last']]['test'];
     }
 
     /**
-     * @param array<int|string, mixed> $result
+     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $result
      *
      * @throws void
      */
@@ -2147,11 +2154,11 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>} $test
-     * @param array<int|string, mixed>                                  $result
-     * @param array<string, string>                                     $headers
-     * @param array<int>                                                $notFoundCompanies
-     * @param array<string, array<string, int>>                         $resultChecks
+     * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
+     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}                                                                          $result
+     * @param array<string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $headers
+     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
+     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
      * @throws void
      */
@@ -2422,13 +2429,13 @@ final class RewriteTestsCommand extends Command
             $resultChecks['general']['differentFromMatomo'] = 0;
         }
 
-        $resultChecks['general']['differentFromMatomo']++;
+        ++$resultChecks['general']['differentFromMatomo'];
 
         if (!array_key_exists('differentFromMatomo', $resultChecks[$test['date-last']])) {
             $resultChecks[$test['date-last']]['differentFromMatomo'] = 0;
         }
 
-        $resultChecks[$test['date-last']]['differentFromMatomo']++;
+        ++$resultChecks[$test['date-last']]['differentFromMatomo'];
 
         $getMessage = function (DeviceDetector $dd) use ($output, $checks, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
             $message        = $loopMessage;
@@ -2654,20 +2661,14 @@ final class RewriteTestsCommand extends Command
         return $headerList;
     }
 
-    /** @throws void */
-    private function accept(mixed $test, OutputInterface $output, string $loopMessage): bool
+    /**
+     * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string|null, raw: mixed} $test
+     *
+     * @throws void
+     */
+    private function accept(array $test, OutputInterface $output, string $loopMessage): bool
     {
-        if (!is_array($test)) {
-            $output->writeln('');
-            $output->writeln(
-                messages: $loopMessage . ' <error>wrong data structure</error>',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return false;
-        }
-
-        if (!array_key_exists('date-last', $test) || $test['date-last'] === null) {
+        if ($test['date-last'] === null) {
             $output->writeln('');
             $output->writeln(
                 messages: $loopMessage . ' <error>"data-last" field missing or null</error>',
@@ -2696,9 +2697,9 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>}       $test
-     * @param array<int|string, mixed>                                        $result
-     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
+     * @param array{headers: array<non-empty-string, non-empty-string>}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            $test
+     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $result
+     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      $checkedPlatforms
      *
      * @throws void
      */

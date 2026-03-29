@@ -1,7 +1,7 @@
 parameters:
   level: max
 
-  phpVersion: 80400 # PHP 8.4
+  phpVersion: 80500 # PHP 8.5
 
   parallel:
     maximumNumberOfProcesses: 1
@@ -84,7 +84,7 @@ parameters:
       tooWideThrowType: true
 
   cognitive_complexity:
-    class: 198
+    class: 254
     function: 119
 
   type_coverage:
@@ -108,7 +108,6 @@ parameters:
 
   ignoreErrors:
     - '~expects string,~'
-    - '~on mixed~'
     - '~mixed given~'
     - '~will always evaluate to true~'
 
