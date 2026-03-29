@@ -16,7 +16,7 @@ permissions:
 jobs:
   cleanup:
     name: "Cleanup Caches"
-    uses: "mimmi20/ci/.github/workflows/cleanup-cache.yml@8.4"
+    uses: "mimmi20/ci/.github/workflows/cleanup-cache.yml@8.5"
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.ref }}
