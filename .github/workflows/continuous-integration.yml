@@ -85,7 +85,7 @@ jobs:
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:
-    name: "Unit & Integration Tests Status"
+    name: "CI Status"
 
     runs-on: "ubuntu-latest"
 
