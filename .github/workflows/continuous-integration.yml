@@ -105,3 +105,24 @@ jobs:
       skip-oxlint: true
       use-code-scanning: true
       phpcs-options: ""
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+    name: "Unit & Integration Tests Status"
+
+    runs-on: "ubuntu-latest"
+
+    if: always()
+
+    needs:
+      - "analytics"
+
+    steps:
+      - name: Successful run
+        if: ${{ !(contains(needs.*.result, 'failure')) && !(contains(needs.*.result, 'skipped')) }}
+        run: exit 0
+
+      - name: Failing run
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') }}
+        run: exit 1
