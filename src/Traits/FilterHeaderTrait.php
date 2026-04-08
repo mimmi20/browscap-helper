@@ -597,6 +597,7 @@ trait FilterHeaderTrait
                     'opt-out-email',
                     'x-site-audit',
                     'x-bypass-cache',
+                    'reqkeyproxyinfo',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {

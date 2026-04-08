@@ -120,11 +120,11 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 0;
 
     /**
-     * last update: 2026-03-31
+     * last update: 2026-04-07
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
-    private const string COMPARE_DATE_END = '2026-03-31';
+    private const string COMPARE_DATE_END = '2026-04-30';
 
     private const bool COMPARE_ALL = true;
 
