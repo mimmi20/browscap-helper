@@ -631,6 +631,7 @@ trait FilterHeaderTrait
                     'x-debug',
                     'x-debug-token',
                     'x-pjax',
+                    'x-url-meta-self',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
