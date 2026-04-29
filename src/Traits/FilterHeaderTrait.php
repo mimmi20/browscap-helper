@@ -105,6 +105,8 @@ trait FilterHeaderTrait
                     // only value: spider
                     'x-client-name',
                     'q-ua2',
+                    // only value: YipitData
+                    'x-requested',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
@@ -632,6 +634,7 @@ trait FilterHeaderTrait
                     'x-debug-token',
                     'x-pjax',
                     'x-url-meta-self',
+                    'x-delay-pool',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
