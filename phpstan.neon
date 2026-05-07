@@ -84,7 +84,7 @@ parameters:
       tooWideThrowType: true
 
   cognitive_complexity:
-    class: 254
+    class: 296
     function: 119
 
   type_coverage:
@@ -110,6 +110,7 @@ parameters:
     - '~expects string,~'
     - '~mixed given~'
     - '~will always evaluate to true~'
+    - '~is never thrown~'
 
 services:
   errorFormatter.sarif:

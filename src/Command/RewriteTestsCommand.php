@@ -111,20 +111,28 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 9;
+    private const int DETECT_LOWER_VERSION_ANDROID_IOS = 9;
 
-    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 25;
+    private const int DETECT_UPPER_VERSION_ANDROID_IOS = 50;
+
+    private const int DETECT_LOWER_VERSION_WINDOWS = 0;
+
+    private const float DETECT_LOWER_VERSION_MACOS = 10.5;
+
+    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 13;
+
+    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 50;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 0;
+    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 11;
 
     /**
-     * last update: 2026-04-29
+     * last update: 2026-05-06
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
-    private const string COMPARE_DATE_END = '2026-04-30';
+    private const string COMPARE_DATE_END = '2026-05-31';
 
     private const bool COMPARE_ALL = false;
 
@@ -375,6 +383,7 @@ final class RewriteTestsCommand extends Command
         $resultChecks               = [];
         $notFoundCompanies          = [];
         $checkedPlatforms           = [];
+        $checkedEngines             = [];
         $notFoundFormfactors        = [];
         $messageLength              = 0;
         $counter                    = 0;
@@ -619,6 +628,7 @@ final class RewriteTestsCommand extends Command
                 timeCompare: $timeCompare,
                 txtChecks: $txtChecks,
                 checkedPlatforms: $checkedPlatforms,
+                checkedEngines: $checkedEngines,
                 notFoundCompanies: $notFoundCompanies,
                 resultChecks: $resultChecks,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
@@ -798,6 +808,64 @@ final class RewriteTestsCommand extends Command
                 $table->addRow(
                     [
                         '<info>' . $os . '</info>',
+                        '<info>summary</info>',
+                        '<error>' . $c . '</error>',
+                    ],
+                );
+                $table->addRow(new TableSeparator());
+            }
+
+            $table->render();
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        }
+
+        if ($checkedEngines !== []) {
+            $cx = [];
+            $cy = [];
+
+            foreach ($checkedEngines as $engine => $versions) {
+                $c = 0;
+                $x = [];
+                $y = [];
+
+                foreach ($versions as $version => $counterVersions) {
+                    $c          += $counterVersions['count'];
+                    $x[$version] = $counterVersions['count'];
+                    $y[$version] = $version;
+                }
+
+                array_multisort($x, SORT_DESC, SORT_NUMERIC, $y, SORT_DESC, SORT_NUMERIC, $versions);
+
+                $cx[$engine]             = $c;
+                $cy[$engine]             = $engine;
+                $checkedEngines[$engine] = $versions;
+            }
+
+            array_multisort($cx, SORT_DESC, SORT_NUMERIC, $cy, SORT_ASC, SORT_STRING, $checkedEngines);
+
+            $table = new Table($output);
+            $table->setHeaders(['Engine', 'Version', 'Tests']);
+            $table->setRows([]);
+
+            foreach ($checkedEngines as $engine => $versions) {
+                $c = 0;
+
+                foreach ($versions as $version => $counterVersions) {
+                    $count     = $counterVersions['count'];
+                    $checkmark = $counterVersions['checked'] ?? false
+                        ? ' <fg=green>+</>'
+                        : ' <fg=red>-</>';
+                    $table->addRow(
+                        [$engine, $version, $count . $checkmark],
+                    );
+
+                    $c += $count;
+                }
+
+                $table->addRow(
+                    [
+                        '<info>' . $engine . '</info>',
                         '<info>summary</info>',
                         '<error>' . $c . '</error>',
                     ],
@@ -1135,7 +1203,9 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        if ($newResult['device']['deviceName'] === null) {
+        if ($newResult['device']['deviceName'] === null
+            && $newResult['client']['isbot'] === false
+        ) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1153,7 +1223,9 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (!is_scalar($newResult['device']['deviceName'])) {
+        if (!is_scalar($newResult['device']['deviceName'])
+            && $newResult['client']['isbot'] === false
+        ) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1189,7 +1261,9 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (str_contains((string) $newResult['device']['deviceName'], 'general')) {
+        if (str_contains((string) $newResult['device']['deviceName'], 'general')
+            && $newResult['client']['isbot'] === false
+        ) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1198,7 +1272,11 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if ($newResult['device']['deviceName'] === 'unknown') {
+        if (
+            $newResult['device']['deviceName'] === 'unknown'
+            && $newResult['client']['isbot'] === false
+        ) {
+            // only check for unknown device, if it's not a bot
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1213,6 +1291,7 @@ final class RewriteTestsCommand extends Command
                 ['bot', 'crawler', 'search-bot', 'service-agent', 'offline-browser'],
                 true,
             )
+            || $newResult['client']['isbot'] === true
         ) {
             assert(is_scalar($newResult['client']['name']));
             assert(is_scalar($newResult['os']['name']));
@@ -1224,22 +1303,9 @@ final class RewriteTestsCommand extends Command
                 (string) $newResult['device']['deviceName'],
             ];
 
-            $key = implode('-', $keys);
-
-            if (array_key_exists($key, $this->tests)) {
-                return new TestResult(
-                    result: null,
-                    status: TestResult::STATUS_DUPLICATE,
-                    headers: $headers,
-                    exit: TestResult::EXIT_CLIENT_IS_BOT,
-                );
-            }
-
-            $this->tests[$key] = 1;
-
-            return new TestResult(
-                result: $newResult,
-                status: TestResult::STATUS_OK,
+            return $this->buildTestResult(
+                newResult: $newResult,
+                keys: $keys,
                 headers: $headers,
                 exit: TestResult::EXIT_CLIENT_IS_BOT,
             );
@@ -1265,22 +1331,9 @@ final class RewriteTestsCommand extends Command
                 (string) $newResult['device']['manufacturer'],
             ];
 
-            $key = implode('-', $keys);
-
-            if (array_key_exists($key, $this->tests)) {
-                return new TestResult(
-                    result: null,
-                    status: TestResult::STATUS_DUPLICATE,
-                    headers: $headers,
-                    exit: TestResult::EXIT_DEVICE_IS_DESKTOP,
-                );
-            }
-
-            $this->tests[$key] = 1;
-
-            return new TestResult(
-                result: $newResult,
-                status: TestResult::STATUS_OK,
+            return $this->buildTestResult(
+                newResult: $newResult,
+                keys: $keys,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_IS_DESKTOP,
             );
@@ -1303,22 +1356,9 @@ final class RewriteTestsCommand extends Command
                 (string) $newResult['device']['manufacturer'],
             ];
 
-            $key = implode('-', $keys);
-
-            if (array_key_exists($key, $this->tests)) {
-                return new TestResult(
-                    result: null,
-                    status: TestResult::STATUS_DUPLICATE,
-                    headers: $headers,
-                    exit: TestResult::EXIT_DEVICE_IS_MOBILE,
-                );
-            }
-
-            $this->tests[$key] = 1;
-
-            return new TestResult(
-                result: $newResult,
-                status: TestResult::STATUS_OK,
+            return $this->buildTestResult(
+                newResult: $newResult,
+                keys: $keys,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_IS_MOBILE,
             );
@@ -1338,22 +1378,9 @@ final class RewriteTestsCommand extends Command
                 (string) $newResult['device']['manufacturer'],
             ];
 
-            $key = implode('-', $keys);
-
-            if (array_key_exists($key, $this->tests)) {
-                return new TestResult(
-                    result: null,
-                    status: TestResult::STATUS_DUPLICATE,
-                    headers: $headers,
-                    exit: TestResult::EXIT_DEVICE_IS_TV,
-                );
-            }
-
-            $this->tests[$key] = 1;
-
-            return new TestResult(
-                result: $newResult,
-                status: TestResult::STATUS_OK,
+            return $this->buildTestResult(
+                newResult: $newResult,
+                keys: $keys,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_IS_TV,
             );
@@ -1372,14 +1399,32 @@ final class RewriteTestsCommand extends Command
             (string) $newResult['device']['manufacturer'],
         ];
 
+        return $this->buildTestResult(
+            newResult: $newResult,
+            keys: $keys,
+            headers: $headers,
+            exit: TestResult::EXIT_DEVICE_IS_OTHER,
+        );
+    }
+
+    /**
+     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $newResult
+     * @param array<int, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $keys
+     * @param array<non-empty-string, non-empty-string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            $headers
+     * @param TestResult::EXIT_*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $exit
+     *
+     * @throws void
+     */
+    private function buildTestResult(array $newResult, array $keys, array $headers, int $exit): TestResult
+    {
         $key = implode('-', $keys);
 
         if (array_key_exists($key, $this->tests)) {
             return new TestResult(
-                result: null,
+                result: $newResult,
                 status: TestResult::STATUS_DUPLICATE,
                 headers: $headers,
-                exit: TestResult::EXIT_DEVICE_IS_OTHER,
+                exit: $exit,
             );
         }
 
@@ -1389,7 +1434,7 @@ final class RewriteTestsCommand extends Command
             result: $newResult,
             status: TestResult::STATUS_OK,
             headers: $headers,
-            exit: TestResult::EXIT_DEVICE_IS_OTHER,
+            exit: $exit,
         );
     }
 
@@ -1591,6 +1636,7 @@ final class RewriteTestsCommand extends Command
      * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
      * @param array<string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $txtChecks
      * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedPlatforms
+     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedEngines
      * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
      * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
@@ -1619,6 +1665,7 @@ final class RewriteTestsCommand extends Command
         float &$timeCompare,
         array &$txtChecks,
         array &$checkedPlatforms,
+        array &$checkedEngines,
         array &$notFoundCompanies,
         array &$resultChecks,
         int &$counterDifferentFromMatomo,
@@ -1753,12 +1800,13 @@ final class RewriteTestsCommand extends Command
 
         $headers = $testResult->getHeaders();
 
-        $osName  = mb_strtolower($result['os']['name'] ?? '');
-        $version = null;
+        $osName     = mb_strtolower($result['os']['name'] ?? '');
+        $engineName = mb_strtolower($result['engine']['name'] ?? '');
+        $versionOs  = null;
 
         if (is_scalar($result['os']['version'])) {
             try {
-                $version = (new VersionBuilder())->set((string) $result['os']['version']);
+                $versionOs = (new VersionBuilder())->set((string) $result['os']['version']);
             } catch (NotNumericException $e) {
                 ++$errors;
 
@@ -1789,7 +1837,7 @@ final class RewriteTestsCommand extends Command
             }
 
             try {
-                $osVersion = $version->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
+                $osVersion = $versionOs->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
             } catch (UnexpectedValueException) {
                 $osVersion = 'e';
             }
@@ -1797,13 +1845,60 @@ final class RewriteTestsCommand extends Command
             $osVersion = '-';
         }
 
-        if ($version !== null) {
-            $majorVersion = (int) $version->getMajor();
+        if (is_scalar($result['engine']['version'])) {
+            try {
+                $versionEngine = (new VersionBuilder())->set((string) $result['engine']['version']);
+            } catch (NotNumericException $e) {
+                ++$errors;
+
+                if (!array_key_exists('errors', $resultChecks['general'])) {
+                    $resultChecks['general']['errors'] = 0;
+                }
+
+                ++$resultChecks['general']['errors'];
+
+                if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
+                    $resultChecks[$test['date-last']]['errors'] = 0;
+                }
+
+                ++$resultChecks[$test['date-last']]['errors'];
+
+                $exception = new Exception('An error occured while decoding a result', 0, $e);
+
+                $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                $message = $loopMessage . $addMessage;
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return;
+            }
+
+            try {
+                $engineVersion = $versionEngine->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
+            } catch (UnexpectedValueException) {
+                $engineVersion = 'e';
+            }
+        } else {
+            $engineVersion = '-';
+        }
+
+        if ($versionOs !== null) {
+            $majorVersion = (int) $versionOs->getMajor();
+
+            try {
+                $majorMinorVersion = (float) $versionOs->getVersion(VersionInterface::IGNORE_MICRO);
+            } catch (UnexpectedValueException) {
+                $majorMinorVersion = 0.0;
+            }
 
             if (in_array($osName, ['android', 'ios'], true)) {
                 if (
-                    $majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
-                    || $majorVersion >= self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
+                    $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
+                    || $majorVersion >= self::DETECT_UPPER_VERSION_ANDROID_IOS
                 ) {
                     ++$skippedVersion;
 
@@ -1824,7 +1919,7 @@ final class RewriteTestsCommand extends Command
             }
 
             if (in_array($osName, ['windows', 'windows rt'], true)) {
-                if ($majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
+                if ($majorVersion < self::DETECT_LOWER_VERSION_WINDOWS) {
                     ++$skippedVersion;
 
                     if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
@@ -1844,7 +1939,7 @@ final class RewriteTestsCommand extends Command
             }
 
             if (in_array($osName, ['mac os x', 'macintosh'], true)) {
-                if ($majorVersion < self::COMPARE_MATOMO_LOWER_VERSION_MACOS) {
+                if ($majorMinorVersion < self::DETECT_LOWER_VERSION_MACOS) {
                     ++$skippedVersion;
 
                     if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
@@ -1866,29 +1961,59 @@ final class RewriteTestsCommand extends Command
 
         if (!$compareWithMatomo) {
             $compareWithMatomo = $this->compareWithMatomo(
-                test: $test,
-                result: $result,
                 osName: $osName,
                 osVersion: $osVersion,
+                engineName: $engineName,
+                engineVersion: $engineVersion,
                 checkedPlatforms: $checkedPlatforms,
+                checkedEngines: $checkedEngines,
             );
         }
 
         if ($compareWithMatomo) {
             $startTime = microtime(true);
 
-            $this->compareDeviceWithMapper(
-                output: $output,
-                dd: $dd,
-                test: $test,
-                result: $result,
-                headers: $headers,
-                loopMessage: $loopMessage,
-                messageLength: $messageLength,
-                counterDifferentFromMatomo: $counterDifferentFromMatomo,
-                notFoundCompanies: $notFoundCompanies,
-                resultChecks: $resultChecks,
-            );
+            try {
+                $this->compareDeviceWithMapper(
+                    output: $output,
+                    dd: $dd,
+                    test: $test,
+                    testResult: $testResult,
+                    headers: $headers,
+                    loopMessage: $loopMessage,
+                    messageLength: $messageLength,
+                    counterDifferentFromMatomo: $counterDifferentFromMatomo,
+                    notFoundCompanies: $notFoundCompanies,
+                    resultChecks: $resultChecks,
+                );
+            } catch (UnexpectedValueException $e) {
+                ++$errors;
+
+                if (!array_key_exists('errors', $resultChecks['general'])) {
+                    $resultChecks['general']['errors'] = 0;
+                }
+
+                ++$resultChecks['general']['errors'];
+
+                if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
+                    $resultChecks[$test['date-last']]['errors'] = 0;
+                }
+
+                ++$resultChecks[$test['date-last']]['errors'];
+
+                $exception = new Exception('An error occured while comparing a result', 0, $e);
+
+                $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                $message = $loopMessage . $addMessage;
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                return;
+            }
 
             $timeCompare += microtime(true) - $startTime;
 
@@ -2160,13 +2285,13 @@ final class RewriteTestsCommand extends Command
      * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
      * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
-     * @throws void
+     * @throws UnexpectedValueException
      */
     private function compareDeviceWithMapper(
         OutputInterface $output,
         DeviceDetector $dd,
         array $test,
-        array $result,
+        TestResult $testResult,
         array $headers,
         string $loopMessage,
         int &$messageLength,
@@ -2198,6 +2323,8 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
         }
+
+        $result = $testResult->getResult() ?? [];
 
         try {
             Company::fromName($result['device']['brand'] ?? null);
@@ -2382,30 +2509,46 @@ final class RewriteTestsCommand extends Command
 
         $brClientType = $mapper->mapBrowserType($result['client']['type'] ?? null);
 
+        $deviceBrandCheck   = $ddBrand !== $brBrand && $ddBrand !== null;
+        $deviceNameCheck    = $ddModel !== null && mb_strtolower($ddModel) !== mb_strtolower(
+            $brModel ?? '',
+        )
+            && mb_strtolower($ddModel) !== mb_strtolower($brModel2 ?? '')
+            && $ddModel !== 'K';
+        $deviceTypeCheck    = $ddDeviceType->getType() !== $brDeviceType->getType()
+            && $ddDeviceType !== Type::Unknown;
+        $osNameCheck        = $ddOsName !== null && mb_strtolower($ddOsName) !== mb_strtolower(
+            $brOsName ?? '',
+        )
+            && mb_strtolower($ddOsName) !== mb_strtolower($brOsMName ?? '');
+        $osVersionCheck     = $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+            !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
+            && $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null;
+        $engineNameCheck    = $ddEngineName !== $brEngineName && $ddEngineName !== null;
+        $engineVersionCheck = $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
+            !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
+            && $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null;
+        $clientNameCheck    = $ddClientName !== null && mb_strtolower($ddClientName) !== mb_strtolower(
+            $brClientName ?? '',
+        );
+        $clientVersionCheck = $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
+            !== $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
+            && $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) !== null;
+        $clientTypeCheck    = $ddClientType !== $brClientType
+            && $ddClientType !== \UaBrowserType\Type::Unknown;
+
         try {
             $checks = [
-                '($ddBrand === $brBrand || $ddBrand === null)' => ($ddBrand === $brBrand || $ddBrand === null),
-                '($ddModel === $brModel || $ddModel === $brModel2 || $ddModel === null || $ddModel === \'K\')' => ($ddModel === $brModel || $ddModel === $brModel2 || $ddModel === null || $ddModel === 'K'),
-                '$ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown' => $ddDeviceType === $brDeviceType || $ddDeviceType === Type::Unknown,
-                '($ddOsName === $brOsName || $ddOsName === $brOsMName || $ddOsName === null)' => ($ddOsName === $brOsName || $ddOsName === $brOsMName || $ddOsName === null),
-                '($ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddOsVersion->getVersion(
-                    VersionInterface::IGNORE_MICRO,
-                ) === $brOsVersion->getVersion(
-                    VersionInterface::IGNORE_MICRO,
-                ) || $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) === null),
-                '($ddEngineName === $brEngineName || $ddEngineName === null)' => ($ddEngineName === $brEngineName || $ddEngineName === null),
-                '($ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null)' => ($ddEngineVersion->getVersion(
-                    VersionInterface::IGNORE_MICRO,
-                ) === $brEngineVersion->getVersion(
-                    VersionInterface::IGNORE_MICRO,
-                ) || $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) === null),
-                '($ddClientName === $brClientName || $ddClientName === null)' => ($ddClientName === $brClientName || $ddClientName === null),
-                '($ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR) || $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === null)' => ($ddClientVersion->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ) === $brClientVersion->getVersion(
-                    VersionInterface::IGNORE_MINOR,
-                ) || $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) === null),
-                '($ddClientType === $brClientType || $ddClientType === \UaBrowserType\Type::Unknown)' => ($ddClientType === $brClientType || $ddClientType === \UaBrowserType\Type::Unknown),
+                '$deviceBrandCheck' => !$deviceBrandCheck,
+                '$deviceNameCheck' => !$deviceNameCheck,
+                '$deviceTypeCheck' => !$deviceTypeCheck,
+                '$osNameCheck' => !$osNameCheck,
+                '$osVersionCheck' => !$osVersionCheck,
+                '$engineNameCheck' => !$engineNameCheck,
+                '$engineVersionCheck' => !$engineVersionCheck,
+                '$clientNameCheck' => !$clientNameCheck,
+                '$clientVersionCheck' => !$clientVersionCheck,
+                '$clientTypeCheck' => !$clientTypeCheck,
             ];
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>%s</error>', (string) $e));
@@ -2437,7 +2580,7 @@ final class RewriteTestsCommand extends Command
 
         ++$resultChecks[$test['date-last']]['differentFromMatomo'];
 
-        $getMessage = function (DeviceDetector $dd) use ($output, $checks, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
+        $getMessage = function (DeviceDetector $dd) use ($output, $checks, $deviceBrandCheck, $deviceNameCheck, $deviceTypeCheck, $osNameCheck, $osVersionCheck, $engineNameCheck, $engineVersionCheck, $clientNameCheck, $clientVersionCheck, $clientTypeCheck, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
             $message        = $loopMessage;
             $someDifference = false;
 
@@ -2462,76 +2605,61 @@ final class RewriteTestsCommand extends Command
             $format9b  = '<fg=yellow>';
             $format10b = '<fg=yellow>';
 
-            if ($ddBrand !== $brBrand && $ddBrand !== null) {
+            if ($deviceBrandCheck) {
                 $format1b       = '<fg=green>';
                 $format1d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if ($ddModel !== $brModel && $ddModel !== $brModel2 && $ddModel !== null) {
+            if ($deviceNameCheck) {
                 $format2b       = '<fg=green>';
                 $format2d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if (
-                $ddDeviceType->getType() !== $brDeviceType->getType()
-                && $ddDeviceType !== Type::Unknown
-            ) {
+            if ($deviceTypeCheck) {
                 $format3b       = '<fg=green>';
                 $format3d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if ($ddOsName !== $brOsName && $ddOsName !== $brOsMName && $ddOsName !== null) {
+            if ($osNameCheck) {
                 $format4b       = '<fg=green>';
                 $format4d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if (
-                $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                && $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null
-            ) {
+            if ($osVersionCheck) {
                 $format5b       = '<fg=green>';
                 $format5d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if ($ddEngineName !== $brEngineName && $ddEngineName !== null) {
+            if ($engineNameCheck) {
                 $format6b       = '<fg=green>';
                 $format6d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if (
-                $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
-                && $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null
-            ) {
+            if ($engineVersionCheck) {
                 $format7b       = '<fg=green>';
                 $format7d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if ($ddClientName !== $brClientName && $ddClientName !== null) {
+            if ($clientNameCheck) {
                 $format8b       = '<fg=green>';
                 $format8d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if (
-                $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
-                !== $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
-                && $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) !== null
-            ) {
+            if ($clientVersionCheck) {
                 $format9b       = '<fg=green>';
                 $format9d       = '<fg=red>';
                 $someDifference = true;
             }
 
-            if ($ddClientType !== $brClientType && $ddClientType !== \UaBrowserType\Type::Unknown) {
+            if ($clientTypeCheck) {
                 $format10b      = '<fg=green>';
                 $format10d      = '<fg=red>';
                 $someDifference = true;
@@ -2697,18 +2825,18 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            $test
-     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $result
-     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      $checkedPlatforms
+     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
+     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedEngines
      *
      * @throws void
      */
     private function compareWithMatomo(
-        array $test,
-        array $result,
         string $osName,
         string $osVersion,
+        string $engineName,
+        string $engineVersion,
         array &$checkedPlatforms,
+        array &$checkedEngines,
     ): bool {
         if (!isset($checkedPlatforms[$osName][$osVersion])) {
             $checkedPlatforms[$osName][$osVersion]['count']   = 1;
@@ -2716,6 +2844,16 @@ final class RewriteTestsCommand extends Command
         } else {
             ++$checkedPlatforms[$osName][$osVersion]['count'];
         }
+
+        if (!isset($checkedEngines[$engineName][$engineVersion])) {
+            $checkedEngines[$engineName][$engineVersion]['count']   = 1;
+            $checkedEngines[$engineName][$engineVersion]['checked'] = false;
+        } else {
+            ++$checkedEngines[$engineName][$engineVersion]['count'];
+        }
+
+        $resultOs     = false;
+        $resultEngine = false;
 
         if (
             in_array(
@@ -2761,29 +2899,29 @@ final class RewriteTestsCommand extends Command
                     // 'mandriva linux',
                     // 'linux mint',
                     'inferno os',
-                    'haiku',
+                    // 'haiku',
                     // 'archlinux',
                     // 'cent os linux',
                     'orbis os',
                     'cellos',
                     'nintendo os',
-                    'beos',
+                    // 'beos',
                     'chromeos',
                     'gentoo linux',
                     'kubuntu',
                     'slackware linux',
                     'redhat linux',
-                    'solaris',
+                    // 'solaris',
                     'syllable',
                     // 'suse linux',
-                    'kin os',
+                    // 'kin os',
                     'threadx',
-                    'sailfishos',
+                    // 'sailfishos',
                     'remix os',
                     // 'meego',
                     'palmos',
                     'risc os',
-                    'hp-ux',
+                    // 'hp-ux',
                     'pardus',
                     'danger os',
                     'lindowsos',
@@ -2795,35 +2933,35 @@ final class RewriteTestsCommand extends Command
                     // 'windows 2003',
                     'windows rt',
                     'tru64 unix',
-                    'cp/m',
+                    // 'cp/m',
                     'cygwin',
-                    'openvms',
+                    // 'openvms',
                     'wear os',
                     'dragonfly bsd',
                     'darwin',
-                    'bsd',
+                    // 'bsd',
                     'watchos',
                     // 'windows 3.1',
-                    'aix',
+                    // 'aix',
                     'macintosh',
                     'fedora linux',
                     'yun os',
                     'firefox os',
                     // 'windows 95',
                     'debian',
-                    'irix',
+                    // 'irix',
                     // 'windows 98',
                     'openharmony',
-                    'osf/1',
-                    'haiku os',
+                    // 'osf/1',
+                    // 'haiku os',
                     'opensuse',
                     'linspire',
                     'android opensource project',
-                    'maemo',
-                    'bada',
+                    // 'maemo',
+                    // 'bada',
                     'plasma mobile',
                     // 'series 40',
-                    'nucleus os',
+                    // 'nucleus os',
                     // 'amiga os',
                     'android tv',
                     // 'unix',
@@ -2836,12 +2974,12 @@ final class RewriteTestsCommand extends Command
                     'ubuntu',
                     'ios',
                     'miui os',
-                    'brew',
+                    // 'brew',
                     'freebsd',
                     'openbsd',
                     'netbsd',
                     'mac os x',
-                    'sunos',
+                    // 'sunos',
                     // 'series 60',
                     // 'javaos',
                     'linux',
@@ -2851,12 +2989,12 @@ final class RewriteTestsCommand extends Command
                     // 'windows ce',
                     'tizen',
                     // 'opera tv',
-                    'java me',
+                    // 'java me',
                     'android',
                     // 'cyanogenmod',
                     // 'mocordroid',
-                    'mre',
-                    'kaios',
+                    // 'mre',
+                    // 'kaios',
                     'vizios',
                     // 'windows mobile os',
                     'smartisan os',
@@ -2868,19 +3006,74 @@ final class RewriteTestsCommand extends Command
                     'lg webos',
                     // 'windows phone os',
                     // 'open mandriva',
-                    'nokia os',
+                    // 'nokia os',
                     'qtopia',
                     '',
                 ],
                 true,
             )
         ) {
-            $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+            try {
+                $versionOs = (new VersionBuilder())->set($osVersion);
 
-            return true;
+                $osVersionFloat = (float) $versionOs->getVersion(VersionInterface::IGNORE_MICRO);
+            } catch (NotNumericException | UnexpectedValueException) {
+                $osVersionFloat = 0.0;
+            }
+
+            if (in_array($osName, ['android', 'ios'], true)) {
+                if (
+                    $osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
+                    && $osVersionFloat < self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
+                ) {
+                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+
+                    $resultOs = true;
+                }
+            } elseif (in_array($osName, ['windows', 'windows rt'], true)) {
+                if ($osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
+                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+
+                    $resultOs = true;
+                }
+            } elseif (in_array($osName, ['mac os x', 'macintosh'], true)) {
+                if ($osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_MACOS) {
+                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+
+                    $resultOs = true;
+                }
+            } else {
+                $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+
+                $resultOs = true;
+            }
         }
 
-        return false;
+        if (
+            in_array(
+                $engineName,
+                [
+                    'blink',
+                    'webkit',
+                    'gecko',
+                    'u2',
+                    'u3',
+                    'u4',
+                    't7',
+                    't5',
+                    // 'presto',
+                    // 'trident',
+                    '',
+                ],
+                true,
+            )
+        ) {
+            $checkedEngines[$engineName][$engineVersion]['checked'] = true;
+
+            $resultEngine = true;
+        }
+
+        return $resultOs && $resultEngine;
     }
 
     /**
@@ -2941,7 +3134,8 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, ' if(')
                     || str_contains($v, '78.29.51.27')
                     || str_contains($v, 'blockchain')
-                    || str_contains($v, '${:');
+                    || str_contains($v, '${:')
+                    || str_contains($v, '<![cdata[');
                 // || str_contains($v, '­')
             },
         );
