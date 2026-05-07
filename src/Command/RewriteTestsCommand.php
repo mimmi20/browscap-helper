@@ -1203,9 +1203,7 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        if ($newResult['device']['deviceName'] === null
-            && $newResult['client']['isbot'] === false
-        ) {
+        if ($newResult['device']['deviceName'] === null && $newResult['client']['isbot'] === false) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1223,9 +1221,7 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (!is_scalar($newResult['device']['deviceName'])
-            && $newResult['client']['isbot'] === false
-        ) {
+        if (!is_scalar($newResult['device']['deviceName']) && $newResult['client']['isbot'] === false) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1261,7 +1257,8 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (str_contains((string) $newResult['device']['deviceName'], 'general')
+        if (
+            str_contains((string) $newResult['device']['deviceName'], 'general')
             && $newResult['client']['isbot'] === false
         ) {
             return new TestResult(
