@@ -3165,6 +3165,10 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
+            if ($normalizedHeader === '') {
+                continue;
+            }
+
             $normalized[$key] = $normalizedHeader;
         }
 
