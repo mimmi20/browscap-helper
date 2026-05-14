@@ -58,6 +58,8 @@ use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
+use UaNormalizer\Normalizer\NormalizerChain;
+use UaNormalizer\NormalizerFactory;
 use UaResult\Device\FormFactor;
 use UnexpectedValueException;
 
@@ -111,9 +113,9 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int DETECT_LOWER_VERSION_ANDROID_IOS = 9;
+    private const int DETECT_LOWER_VERSION_ANDROID_IOS = 7;
 
-    private const int DETECT_UPPER_VERSION_ANDROID_IOS = 50;
+    private const int DETECT_UPPER_VERSION_ANDROID_IOS = 100;
 
     private const int DETECT_LOWER_VERSION_WINDOWS = 0;
 
@@ -121,14 +123,14 @@ final class RewriteTestsCommand extends Command
 
     private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 13;
 
-    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 50;
+    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 100;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 11;
 
     /**
-     * last update: 2026-05-06
+     * last update: 2026-05-13
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -138,6 +140,7 @@ final class RewriteTestsCommand extends Command
 
     /** @var array<string, int> */
     private array $tests = [];
+    private NormalizerChain $normalizer;
 
     /** @throws LogicException */
     public function __construct(
@@ -146,6 +149,9 @@ final class RewriteTestsCommand extends Command
         private readonly JsonNormalizer $jsonNormalizer,
     ) {
         parent::__construct();
+
+        $normalizerFactory = new NormalizerFactory();
+        $this->normalizer  = $normalizerFactory->build();
     }
 
     /**
@@ -501,7 +507,8 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $test['headers'] = $this->filterHeaders($output, $test['headers']);
+            $test['headers']            = $this->filterHeaders($output, $test['headers']);
+            $test['normalized-headers'] = $this->normalizeHeaders($test['headers']);
 
             if (array_key_exists('sec-ch-ua-form-factors', $test['headers'])) {
                 $matches = [];
@@ -553,7 +560,9 @@ final class RewriteTestsCommand extends Command
                 );
             }
 
-            $hasInvalidHeaders = $this->hasInvalidHeaders($test);
+            $hasInvalidHeaders = $this->hasInvalidHeaders($test['headers']) || $this->hasInvalidHeaders(
+                $test['normalized-headers'],
+            );
 
             if ($hasInvalidHeaders) {
                 ++$skippedInvalidData;
@@ -1630,12 +1639,12 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
-     * @param array<string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $txtChecks
-     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedPlatforms
-     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedEngines
-     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
-     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
+     * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
+     * @param array<string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $txtChecks
+     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedPlatforms
+     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedEngines
+     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
+     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
      * @throws void
      *
@@ -1892,7 +1901,7 @@ final class RewriteTestsCommand extends Command
                 $majorMinorVersion = 0.0;
             }
 
-            if (in_array($osName, ['android', 'ios'], true)) {
+            if (in_array($osName, ['android', 'ios', 'android tv', 'ipados'], true)) {
                 if (
                     $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
                     || $majorVersion >= self::DETECT_UPPER_VERSION_ANDROID_IOS
@@ -2276,11 +2285,11 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
-     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}                                                                          $result
-     * @param array<string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $headers
-     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
-     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
+     * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
+     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}                                                                                                                                          $result
+     * @param array<string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $headers
+     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
+     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
      * @throws UnexpectedValueException
      */
@@ -2787,7 +2796,7 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string|null, raw: mixed} $test
+     * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string|null, raw: mixed} $test
      *
      * @throws void
      */
@@ -2931,7 +2940,7 @@ final class RewriteTestsCommand extends Command
                     'windows rt',
                     'tru64 unix',
                     // 'cp/m',
-                    'cygwin',
+                    // 'cygwin',
                     // 'openvms',
                     'wear os',
                     'dragonfly bsd',
@@ -2943,7 +2952,7 @@ final class RewriteTestsCommand extends Command
                     'macintosh',
                     'fedora linux',
                     'yun os',
-                    'firefox os',
+                    // 'firefox os',
                     // 'windows 95',
                     'debian',
                     // 'irix',
@@ -2962,7 +2971,7 @@ final class RewriteTestsCommand extends Command
                     // 'amiga os',
                     'android tv',
                     // 'unix',
-                    'windows nt',
+                    // 'windows nt',
                     'whale os',
                     // 'os/2',
                     'iphone os',
@@ -3018,7 +3027,7 @@ final class RewriteTestsCommand extends Command
                 $osVersionFloat = 0.0;
             }
 
-            if (in_array($osName, ['android', 'ios'], true)) {
+            if (in_array($osName, ['android', 'ios', 'android tv', 'ipados'], true)) {
                 if (
                     $osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
                     && $osVersionFloat < self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
@@ -3074,14 +3083,14 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>} $test
+     * @param array<non-empty-string, non-empty-string> $headers
      *
      * @throws void
      */
-    private function hasInvalidHeaders(array $test): bool
+    private function hasInvalidHeaders(array $headers): bool
     {
         return array_any(
-            $test['headers'],
+            $headers,
             static function (string $v): bool {
                 $v = mb_strtolower($v);
 
@@ -3136,5 +3145,33 @@ final class RewriteTestsCommand extends Command
                 // || str_contains($v, '­')
             },
         );
+    }
+
+    /**
+     * @param array<non-empty-string, non-empty-string> $headers
+     *
+     * @return array<non-empty-string, non-empty-string>
+     *
+     * @throws void
+     */
+    private function normalizeHeaders(array $headers): array
+    {
+        $normalized = [];
+
+        foreach ($headers as $key => $header) {
+            try {
+                $normalizedHeader = $this->normalizer->normalize($header);
+            } catch (\UaNormalizer\Normalizer\Exception\Exception) {
+                continue;
+            }
+
+            if ($normalizedHeader === '') {
+                continue;
+            }
+
+            $normalized[$key] = $normalizedHeader;
+        }
+
+        return $normalized;
     }
 }

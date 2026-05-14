@@ -33,7 +33,7 @@ jobs:
 
     uses: "mimmi20/ci/.github/workflows/validate-php.yml@8.5"
     with:
-      extensions: "bcmath, ctype, curl, dom, iconv, intl, mbstring, pdo, simplexml, tokenizer, xml, xmlwriter"
+      extensions: "bcmath, ctype, curl, dom, iconv, intl, mbstring, pdo, pdo_mysql, simplexml, tokenizer, xml, xmlwriter"
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       skip-validate-composer: true
@@ -51,7 +51,7 @@ jobs:
 
     uses: "mimmi20/ci/.github/workflows/install-php.yml@8.5"
     with:
-      extensions: "bcmath, ctype, curl, dom, iconv, intl, mbstring, pdo, simplexml, tokenizer, xml, xmlwriter"
+      extensions: "bcmath, ctype, curl, dom, iconv, intl, mbstring, pdo, pdo_mysql, simplexml, tokenizer, xml, xmlwriter"
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       skip-librabbitmq-install: true
@@ -72,7 +72,7 @@ jobs:
 
     uses: "mimmi20/ci/.github/workflows/analytics-php.yml@8.5"
     with:
-      extensions: "bcmath, ctype, curl, dom, iconv, intl, mbstring, pdo, simplexml, tokenizer, xml, xmlwriter"
+      extensions: "bcmath, ctype, curl, dom, iconv, intl, mbstring, pdo, pdo_mysql, simplexml, tokenizer, xml, xmlwriter"
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       skip-php-cs-fixer: true
