@@ -1901,7 +1901,13 @@ final class RewriteTestsCommand extends Command
                 $majorMinorVersion = 0.0;
             }
 
-            if (in_array($osName, ['android', 'ios', 'android tv', 'ipados', 'android opensource project'], true)) {
+            if (
+                in_array(
+                    $osName,
+                    ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
+                    true,
+                )
+            ) {
                 if (
                     $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
                     || $majorVersion >= self::DETECT_UPPER_VERSION_ANDROID_IOS
@@ -3027,7 +3033,13 @@ final class RewriteTestsCommand extends Command
                 $osVersionFloat = 0.0;
             }
 
-            if (in_array($osName, ['android', 'ios', 'android tv', 'ipados', 'android opensource project'], true)) {
+            if (
+                in_array(
+                    $osName,
+                    ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
+                    true,
+                )
+            ) {
                 if (
                     $osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
                     && $osVersionFloat < self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
