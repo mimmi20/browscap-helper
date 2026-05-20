@@ -113,7 +113,7 @@ final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
-    private const int DETECT_LOWER_VERSION_ANDROID_IOS = 7;
+    private const int DETECT_LOWER_VERSION_ANDROID_IOS = 9;
 
     private const int DETECT_UPPER_VERSION_ANDROID_IOS = 100;
 
@@ -130,7 +130,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 11;
 
     /**
-     * last update: 2026-05-13
+     * last update: 2026-05-19
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -887,40 +887,6 @@ final class RewriteTestsCommand extends Command
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         }
 
-        if ($notFoundCompanies !== []) {
-            $table = new Table($output);
-            $table->setHeaders(['Company, not found in the Enum', 'Counter']);
-            $table->setRows([]);
-
-            $cy = [];
-            $cx = [];
-
-            foreach ($notFoundCompanies as $company => $companyCounter) {
-                $cy[$company] = $companyCounter;
-                $cx[$company] = $company;
-            }
-
-            array_multisort(
-                $cy,
-                SORT_DESC,
-                SORT_NUMERIC,
-                $cx,
-                SORT_ASC,
-                SORT_STRING,
-                $notFoundCompanies,
-            );
-
-            foreach ($notFoundCompanies as $company => $companyCounter) {
-                $table->addRow(
-                    ['<info>' . $company . '</info>', '<error>' . $companyCounter . '</error>'],
-                );
-            }
-
-            $table->render();
-
-            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        }
-
         if ($resultChecks !== []) {
             $generalData = $resultChecks['general'];
             unset($resultChecks['general']);
@@ -1023,6 +989,40 @@ final class RewriteTestsCommand extends Command
                             number_format(num: $differentFromMatomo, thousands_separator: '.'),
                         ),
                     ],
+                );
+            }
+
+            $table->render();
+
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        }
+
+        if ($notFoundCompanies !== []) {
+            $table = new Table($output);
+            $table->setHeaders(['Company, not found in the Enum', 'Counter']);
+            $table->setRows([]);
+
+            $cy = [];
+            $cx = [];
+
+            foreach ($notFoundCompanies as $company => $companyCounter) {
+                $cy[$company] = $companyCounter;
+                $cx[$company] = $company;
+            }
+
+            array_multisort(
+                $cy,
+                SORT_DESC,
+                SORT_NUMERIC,
+                $cx,
+                SORT_ASC,
+                SORT_STRING,
+                $notFoundCompanies,
+            );
+
+            foreach ($notFoundCompanies as $company => $companyCounter) {
+                $table->addRow(
+                    ['<bg=blue>' . $company . '</>', '<error>' . $companyCounter . '</error>'],
                 );
             }
 
@@ -1901,7 +1901,13 @@ final class RewriteTestsCommand extends Command
                 $majorMinorVersion = 0.0;
             }
 
-            if (in_array($osName, ['android', 'ios', 'android tv', 'ipados'], true)) {
+            if (
+                in_array(
+                    $osName,
+                    ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
+                    true,
+                )
+            ) {
                 if (
                     $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
                     || $majorVersion >= self::DETECT_UPPER_VERSION_ANDROID_IOS
@@ -2925,7 +2931,7 @@ final class RewriteTestsCommand extends Command
                     // 'sailfishos',
                     'remix os',
                     // 'meego',
-                    'palmos',
+                    // 'palmos',
                     'risc os',
                     // 'hp-ux',
                     'pardus',
@@ -3027,7 +3033,13 @@ final class RewriteTestsCommand extends Command
                 $osVersionFloat = 0.0;
             }
 
-            if (in_array($osName, ['android', 'ios', 'android tv', 'ipados'], true)) {
+            if (
+                in_array(
+                    $osName,
+                    ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
+                    true,
+                )
+            ) {
                 if (
                     $osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
                     && $osVersionFloat < self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
@@ -3136,12 +3148,32 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '<(')
                     || str_contains($v, ' and "')
                     || str_contains($v, ' or \'')
-                    || str_contains($v, ' union all')
+                    || str_contains($v, 'union all')
                     || str_contains($v, ' if(')
                     || str_contains($v, '78.29.51.27')
                     || str_contains($v, 'blockchain')
                     || str_contains($v, '${:')
-                    || str_contains($v, '<![cdata[');
+                    || str_contains($v, '<![cdata[')
+                    || str_contains($v, 'now(')
+                    || str_contains($v, 'sysdate(')
+                    || str_contains($v, 'sleep(')
+                    || str_contains($v, 'xor(')
+                    || str_contains($v, 'declare @')
+                    || str_contains($v, 'varchar(')
+                    || str_contains($v, 'set @')
+                    || str_contains($v, 'benchmark(')
+                    || str_contains($v, 'md5(')
+                    || str_contains($v, 'order by')
+                    || str_contains($v, 'count(')
+                    || str_contains($v, 'generate_series(')
+                    || str_contains($v, 'like(')
+                    || str_contains($v, 'upper(')
+                    || str_contains($v, 'hex(')
+                    || str_contains($v, 'randomblob(')
+                    || str_contains($v, '\':wts:\'')
+                    || str_contains($v, '\':xkg:\'')
+                    || str_contains($v, 'iif(')
+                    || str_contains($v, 'chr(');
                 // || str_contains($v, '­')
             },
         );
