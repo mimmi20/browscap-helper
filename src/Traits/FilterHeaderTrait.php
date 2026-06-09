@@ -107,6 +107,8 @@ trait FilterHeaderTrait
                     'q-ua2',
                     // only value: YipitData
                     'x-requested',
+                    // value: "Model: MAG254; Link: Ethernet"
+                    'x-user-agent',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
@@ -635,6 +637,17 @@ trait FilterHeaderTrait
                     'x-pjax',
                     'x-url-meta-self',
                     'x-delay-pool',
+                    'dh-proxy-id',
+                    'x-burstmainwp',
+                    'cid',
+                    'x-hubspot-origin-hublet',
+                    'x-vercel-id',
+                    'x-invocation-id',
+                    'x-viewport-width',
+                    'x-device-width',
+                    'x-ias-project',
+                    'x-worker-bypass',
+                    'cf-brapi-devtools',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {

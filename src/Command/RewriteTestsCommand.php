@@ -79,7 +79,9 @@ use function json_decode;
 use function json_encode;
 use function max;
 use function mb_str_pad;
+use function mb_strlen;
 use function mb_strtolower;
+use function mb_trim;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 use function memory_reset_peak_usage;
@@ -130,11 +132,11 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 11;
 
     /**
-     * last update: 2026-05-19
+     * last update: 2026-06-02
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
-    private const string COMPARE_DATE_END = '2026-05-31';
+    private const string COMPARE_DATE_END = '2026-06-30';
 
     private const bool COMPARE_ALL = false;
 
@@ -1320,22 +1322,11 @@ final class RewriteTestsCommand extends Command
         if (
             in_array(
                 $newResult['device']['deviceName'],
-                ['general Desktop', 'general Apple Device', 'general Philips TV', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
+                ['general Desktop', 'general Apple Device', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
                 true,
             )
         ) {
-            assert(is_scalar($newResult['client']['name']));
-            assert(is_scalar($newResult['os']['name']));
-            assert(is_scalar($newResult['device']['deviceName']));
-            assert(is_scalar($newResult['device']['manufacturer']));
-
-            $keys = [
-                'desktop',
-                (string) $newResult['client']['name'],
-                (string) $newResult['os']['name'],
-                (string) $newResult['device']['deviceName'],
-                (string) $newResult['device']['manufacturer'],
-            ];
+            $keys = ['desktop'];
 
             return $this->buildTestResult(
                 newResult: $newResult,
@@ -1348,19 +1339,7 @@ final class RewriteTestsCommand extends Command
         $deviceType = Type::fromName($newResult['device']['type'] ?? 'unknown');
 
         if ($deviceType->isMobile() || $deviceType->isTablet()) {
-            assert(is_scalar($newResult['engine']['name']));
-            assert(is_scalar($newResult['os']['name']));
-            assert(is_scalar($newResult['device']['deviceName']));
-            assert(is_scalar($newResult['device']['manufacturer']));
-
-            $keys = [
-                'mobile',
-                (string) $newResult['client']['name'],
-                (string) $newResult['engine']['name'],
-                (string) $newResult['os']['name'],
-                (string) $newResult['device']['deviceName'],
-                (string) $newResult['device']['manufacturer'],
-            ];
+            $keys = ['mobile'];
 
             return $this->buildTestResult(
                 newResult: $newResult,
@@ -1371,18 +1350,7 @@ final class RewriteTestsCommand extends Command
         }
 
         if ($deviceType->isTv()) {
-            assert(is_scalar($newResult['device']['deviceName']));
-            assert(is_scalar($newResult['device']['manufacturer']));
-            assert(is_scalar($newResult['client']['name']));
-            assert(is_scalar($newResult['os']['name']));
-
-            $keys = [
-                'tv',
-                (string) $newResult['client']['name'],
-                (string) $newResult['os']['name'],
-                (string) $newResult['device']['deviceName'],
-                (string) $newResult['device']['manufacturer'],
-            ];
+            $keys = ['tv'];
 
             return $this->buildTestResult(
                 newResult: $newResult,
@@ -1392,18 +1360,7 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        assert(is_scalar($newResult['device']['deviceName']));
-        assert(is_scalar($newResult['device']['manufacturer']));
-        assert(is_scalar($newResult['client']['name']));
-        assert(is_scalar($newResult['os']['name']));
-
-        $keys = [
-            'other',
-            (string) $newResult['client']['name'],
-            (string) $newResult['os']['name'],
-            (string) $newResult['device']['deviceName'],
-            (string) $newResult['device']['manufacturer'],
-        ];
+        $keys = ['other'];
 
         return $this->buildTestResult(
             newResult: $newResult,
@@ -1423,6 +1380,21 @@ final class RewriteTestsCommand extends Command
      */
     private function buildTestResult(array $newResult, array $keys, array $headers, int $exit): TestResult
     {
+        assert(is_scalar($newResult['client']['name']));
+        assert(is_scalar($newResult['engine']['name']));
+        assert(is_scalar($newResult['os']['name']));
+        assert(is_scalar($newResult['device']['deviceName']));
+        assert(is_scalar($newResult['device']['manufacturer']));
+
+        $keys = [
+            ...$keys,
+            (string) $newResult['client']['name'],
+            (string) $newResult['engine']['name'],
+            (string) $newResult['os']['name'],
+            (string) $newResult['device']['deviceName'],
+            (string) $newResult['device']['manufacturer'],
+        ];
+
         $key = implode('-', $keys);
 
         if (array_key_exists($key, $this->tests)) {
@@ -2292,7 +2264,6 @@ final class RewriteTestsCommand extends Command
 
     /**
      * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
-     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}                                                                                                                                          $result
      * @param array<string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $headers
      * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
      * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
@@ -2914,8 +2885,8 @@ final class RewriteTestsCommand extends Command
                     // 'haiku',
                     // 'archlinux',
                     // 'cent os linux',
-                    'orbis os',
-                    'cellos',
+                    // 'orbis os',
+                    // 'cellos',
                     'nintendo os',
                     // 'beos',
                     'chromeos',
@@ -3010,7 +2981,7 @@ final class RewriteTestsCommand extends Command
                     'vizios',
                     // 'windows mobile os',
                     'smartisan os',
-                    'webos',
+                    // 'webos',
                     // 'symbian os',
                     'mocor os',
                     'horizon',
@@ -3140,6 +3111,7 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '<img')
                     || str_contains($v, '<video')
                     || str_contains($v, '<source')
+                    || str_contains($v, '<script')
                     || str_contains($v, '<a ')
                     || str_contains($v, 'file_put_contents(')
                     || str_contains($v, 'file_get_contents(')
@@ -3173,7 +3145,16 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '\':wts:\'')
                     || str_contains($v, '\':xkg:\'')
                     || str_contains($v, 'iif(')
-                    || str_contains($v, 'chr(');
+                    || str_contains($v, 'chr(')
+                    || str_contains($v, 'new date(')
+                    || str_contains($v, 'while(')
+                    || str_contains($v, '[r]')
+                    || str_contains($v, '[n]')
+                    || str_contains($v, '[r=302]')
+                    || str_contains($v, '[plm=0]')
+                    || preg_match('/gecko\/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}/i', $v)
+                    || preg_match('/^veoh-.+ service \(/i', $v)
+                    || (mb_strlen($v) > 0 && mb_trim($v) === '');
                 // || str_contains($v, '­')
             },
         );
