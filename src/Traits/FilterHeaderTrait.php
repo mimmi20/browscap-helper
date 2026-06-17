@@ -89,6 +89,7 @@ trait FilterHeaderTrait
                     'sec-ch-prefers-color-scheme',
                     'sec-ch-prefers-reduced-motion',
                     'sec-ch-prefers-reduced-transparency',
+                    'sec-ch-prefers-reduced-data',
                     // only value: Collabim
                     'x-client',
                     'http-x-requested-with',
@@ -109,6 +110,9 @@ trait FilterHeaderTrait
                     'x-requested',
                     // value: "Model: MAG254; Link: Ethernet"
                     'x-user-agent',
+                    'x-client-os',
+                    'x-client-type',
+                    'x-client-device',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
@@ -648,6 +652,11 @@ trait FilterHeaderTrait
                     'x-ias-project',
                     'x-worker-bypass',
                     'cf-brapi-devtools',
+                    'x-client-language',
+                    'x-client-phone-cc',
+                    'x-authentication',
+                    'x-auth-token',
+                    'x-forwarded-uri',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
