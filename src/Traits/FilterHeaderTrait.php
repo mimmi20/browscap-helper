@@ -657,6 +657,10 @@ trait FilterHeaderTrait
                     'x-authentication',
                     'x-auth-token',
                     'x-forwarded-uri',
+                    'sec-fetch-des',
+                    'sec-ch-ua-bitnessh',
+                    'x-forwarded-url',
+                    'x-correlation-id',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
