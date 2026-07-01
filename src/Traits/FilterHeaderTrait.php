@@ -113,6 +113,13 @@ trait FilterHeaderTrait
                     'x-client-os',
                     'x-client-type',
                     'x-client-device',
+                    'x-citation',
+                    'x-tls-sni-host',
+                    'x-tls-protocol',
+                    'x-tls-client-intercepted',
+                    'x-tls-cipher',
+                    'startpage-extension-version',
+                    'startpage-extension-segment',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
