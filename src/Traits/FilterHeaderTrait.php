@@ -113,13 +113,6 @@ trait FilterHeaderTrait
                     'x-client-os',
                     'x-client-type',
                     'x-client-device',
-                    'x-citation',
-                    'x-tls-sni-host',
-                    'x-tls-protocol',
-                    'x-tls-client-intercepted',
-                    'x-tls-cipher',
-                    'startpage-extension-version',
-                    'startpage-extension-segment',
                 ];
 
                 if (in_array($header, $allowedHeaders, true)) {
@@ -668,6 +661,19 @@ trait FilterHeaderTrait
                     'sec-ch-ua-bitnessh',
                     'x-forwarded-url',
                     'x-correlation-id',
+                    'x-citation',
+                    'x-tls-sni-host',
+                    'x-tls-protocol',
+                    'x-tls-client-intercepted',
+                    'x-tls-cipher',
+                    'startpage-extension-version',
+                    'startpage-extension-segment',
+                    'x-vercel-sc-host',
+                    'x-vercel-ip-longitude',
+                    'x-vercel-ip-latitude',
+                    'cf-connecting-o2o',
+                    'farpoint-upstream-scheme',
+                    'cf-brapi-request-id',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
