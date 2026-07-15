@@ -674,6 +674,8 @@ trait FilterHeaderTrait
                     'cf-connecting-o2o',
                     'farpoint-upstream-scheme',
                     'cf-brapi-request-id',
+                    'x-cache-status',
+                    'x-qrl',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
