@@ -676,6 +676,11 @@ trait FilterHeaderTrait
                     'cf-brapi-request-id',
                     'x-cache-status',
                     'x-qrl',
+                    'x-fb-fwdproxy-request-id',
+                    'x-fb-fwdproxy-in-browser-crawling-request-type',
+                    'x-fb-fwdproxy-in-browser-crawling-request-id',
+                    'propagated-artillery-trace-ids',
+                    'x-finanzapp-testmode',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
