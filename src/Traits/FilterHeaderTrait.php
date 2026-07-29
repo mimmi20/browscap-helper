@@ -681,6 +681,7 @@ trait FilterHeaderTrait
                     'x-fb-fwdproxy-in-browser-crawling-request-id',
                     'propagated-artillery-trace-ids',
                     'x-finanzapp-testmode',
+                    'x-opera-requesttype',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
