@@ -186,7 +186,7 @@ final class CopyTestsCommand extends Command
             $sources[] = $this->addPdoSource(dbname: 'ua');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database</error>',
+                '<error>An error occured while initializing the database ua</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
@@ -195,7 +195,7 @@ final class CopyTestsCommand extends Command
             $sources[] = $this->addPdoSource(dbname: 'ua3');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database</error>',
+                '<error>An error occured while initializing the database ua3</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
@@ -204,7 +204,16 @@ final class CopyTestsCommand extends Command
             $sources[] = $this->addPdoSource(dbname: 'ua4');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database</error>',
+                '<error>An error occured while initializing the database ua4</error>',
+                OutputInterface::VERBOSITY_NORMAL,
+            );
+        }
+
+        try {
+            $sources[] = $this->addPdoSource(dbname: 'ua5');
+        } catch (PDOException) {
+            $output->writeln(
+                '<error>An error occured while initializing the database ua5</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }

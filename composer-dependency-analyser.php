@@ -33,7 +33,6 @@ $config
     ->ignoreErrorsOnPackage('mobiledetect/mobiledetectlib', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('phpstan/phpstan', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('rector/rector', [ErrorType::UNUSED_DEPENDENCY])
-    ->ignoreErrorsOnPackage('rector/type-perfect', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('shipmonk/composer-dependency-analyser', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('symplify/phpstan-rules', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('tomasvotruba/cognitive-complexity', [ErrorType::UNUSED_DEPENDENCY])
