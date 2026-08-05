@@ -682,6 +682,10 @@ trait FilterHeaderTrait
                     'propagated-artillery-trace-ids',
                     'x-finanzapp-testmode',
                     'x-opera-requesttype',
+                    'x-sucuri-clientip',
+                    'x-akamai-edgescape',
+                    'x-ms-entraonly-copilot',
+                    'x-gx-token',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
