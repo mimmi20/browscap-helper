@@ -686,6 +686,7 @@ trait FilterHeaderTrait
                     'x-akamai-edgescape',
                     'x-ms-entraonly-copilot',
                     'x-gx-token',
+                    'x-kms-encrypted',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
