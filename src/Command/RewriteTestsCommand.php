@@ -132,7 +132,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 11;
 
     /**
-     * last update: 2026-08-13
+     * last update: 2026-08-19
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -2895,7 +2895,7 @@ final class RewriteTestsCommand extends Command
                     'slackware linux',
                     'redhat linux',
                     // 'solaris',
-                    'syllable',
+                    // 'syllable',
                     // 'suse linux',
                     // 'kin os',
                     'threadx',
@@ -2914,8 +2914,8 @@ final class RewriteTestsCommand extends Command
                     // 'series 30',
                     'nintendo wii os',
                     // 'windows 2003',
-                    'windows rt',
-                    'tru64 unix',
+                    // 'windows rt',
+                    // 'tru64 unix',
                     // 'cp/m',
                     // 'cygwin',
                     // 'openvms',
@@ -2980,10 +2980,10 @@ final class RewriteTestsCommand extends Command
                     // 'kaios',
                     'vizios',
                     // 'windows mobile os',
-                    'smartisan os',
+                    // 'smartisan os',
                     // 'webos',
                     // 'symbian os',
-                    'mocor os',
+                    // 'mocor os',
                     'horizon',
                     // 'rim os',
                     'lg webos',
