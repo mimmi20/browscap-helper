@@ -687,6 +687,10 @@ trait FilterHeaderTrait
                     'x-ms-entraonly-copilot',
                     'x-gx-token',
                     'x-kms-encrypted',
+                    'cdn-loopcount',
+                    'x-proctorio',
+                    'metadata-flavor',
+                    'metadata',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, true)) {
