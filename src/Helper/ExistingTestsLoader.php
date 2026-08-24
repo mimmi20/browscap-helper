@@ -62,8 +62,8 @@ final class ExistingTestsLoader
 
             $output->write(
                 "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                false,
-                OutputInterface::VERBOSITY_VERBOSE,
+                newline: false,
+                options: OutputInterface::VERBOSITY_VERBOSE,
             );
 
             yield from $source->getProperties($baseMessage, $messageLength);

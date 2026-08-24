@@ -67,8 +67,8 @@ final class JsonNormalizer
 
         $output->write(
             "\r" . mb_str_pad(string: $message2, length: $messageLength),
-            false,
-            OutputInterface::VERBOSITY_VERBOSE,
+            newline: false,
+            options: OutputInterface::VERBOSITY_VERBOSE,
         );
 
         $message2      = $message . ' - define normalizers ...';
@@ -76,8 +76,8 @@ final class JsonNormalizer
 
         $output->write(
             "\r" . mb_str_pad(string: $message2, length: $messageLength),
-            false,
-            OutputInterface::VERBOSITY_VERBOSE,
+            newline: false,
+            options: OutputInterface::VERBOSITY_VERBOSE,
         );
 
         $this->normalizers = [
@@ -88,7 +88,7 @@ final class JsonNormalizer
                     ),
                     Normalizer\Format\Indent::fromSizeAndStyle(2, 'space'),
                     Normalizer\Format\NewLine::fromString("\n"),
-                    true,
+                    hasFinalNewLine: true,
                 ),
             ),
         ];
@@ -123,8 +123,8 @@ final class JsonNormalizer
 
         $output->write(
             "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
-            false,
-            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            newline: false,
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
@@ -162,8 +162,8 @@ final class JsonNormalizer
 
         $output->write(
             "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
-            false,
-            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            newline: false,
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
@@ -174,8 +174,8 @@ final class JsonNormalizer
 
             $output->write(
                 "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
-                false,
-                OutputInterface::VERBOSITY_VERY_VERBOSE,
+                newline: false,
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
             $output->writeln(
                 sprintf(' <bg=red>%d</>', $messageLength),
@@ -192,8 +192,8 @@ final class JsonNormalizer
 
         $output->write(
             "\r" . mb_str_pad(string: $message2, length: $messageLength + $diff),
-            false,
-            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            newline: false,
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 

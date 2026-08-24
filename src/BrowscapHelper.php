@@ -35,7 +35,7 @@ final class BrowscapHelper extends Application
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
 
         $jsonNormalizer       = new JsonNormalizer();
-        $rewriteTestsHelper   = new RewriteTests($jsonNormalizer);
+        $rewriteTests         = new RewriteTests($jsonNormalizer);
         $existingTestsLoader  = new ExistingTestsLoader();
         $existingTestsRemover = new ExistingTestsRemover();
 
@@ -43,7 +43,7 @@ final class BrowscapHelper extends Application
             new Command\CopyTestsCommand(
                 $existingTestsLoader,
                 $existingTestsRemover,
-                $rewriteTestsHelper,
+                $rewriteTests,
                 $sourcesDirectory,
             ),
         );
