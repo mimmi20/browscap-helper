@@ -30,8 +30,8 @@ use function implode;
 use function is_string;
 use function json_encode;
 use function mb_rtrim;
-use function mb_strpos;
 use function preg_match;
+use function str_contains;
 use function str_replace;
 
 use const JSON_PRETTY_PRINT;
@@ -90,12 +90,12 @@ final readonly class FormatNormalizer implements Normalizer
             $tempLine = str_replace($oldIndent, self::PLACE_HOLDER, $matches['ident']);
 
             assert(is_string($tempLine));
-            assert(mb_strpos($tempLine, $oldIndent) === false);
-            assert(mb_strpos($tempLine, self::PLACE_HOLDER) !== false);
+            assert(!str_contains($tempLine, $oldIndent));
+            assert(str_contains($tempLine, self::PLACE_HOLDER));
 
             $tempLine = str_replace(self::PLACE_HOLDER, $newIndent, $tempLine);
 
-            assert(mb_strpos($tempLine, self::PLACE_HOLDER) === false);
+            assert(!str_contains($tempLine, self::PLACE_HOLDER));
 
             $formattedLines[] = $tempLine . $matches[2];
         }

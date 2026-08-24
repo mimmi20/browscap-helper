@@ -50,8 +50,8 @@ final class ExistingTestsRemover
         }
 
         $finder->notName('*.gitkeep');
-        $finder->ignoreDotFiles(true);
-        $finder->ignoreVCS(true);
+        $finder->ignoreDotFiles(ignoreDotFiles: true);
+        $finder->ignoreVCS(ignoreVCS: true);
         $finder->sortByName();
         $finder->ignoreUnreadableDirs();
         $finder->in($testSource);
@@ -67,8 +67,8 @@ final class ExistingTestsRemover
 
             $output->write(
                 "\r" . '<fg=yellow>' . mb_str_pad(string: $message, length: $messageLength) . '</>',
-                false,
-                OutputInterface::VERBOSITY_VERBOSE,
+                newline: false,
+                options: OutputInterface::VERBOSITY_VERBOSE,
             );
 
             if ($dirs) {
@@ -88,8 +88,8 @@ final class ExistingTestsRemover
 
         $output->write(
             "\r" . '<info>' . mb_str_pad(string: $message, length: $messageLength) . '</info>',
-            false,
-            OutputInterface::VERBOSITY_VERBOSE,
+            newline: false,
+            options: OutputInterface::VERBOSITY_VERBOSE,
         );
         $output->writeln('', OutputInterface::VERBOSITY_VERBOSE);
     }

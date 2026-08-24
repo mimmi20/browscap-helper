@@ -115,7 +115,7 @@ trait FilterHeaderTrait
                     'x-client-device',
                 ];
 
-                if (in_array($header, $allowedHeaders, true)) {
+                if (in_array($header, $allowedHeaders, strict: true)) {
                     return true;
                 }
 
@@ -691,9 +691,10 @@ trait FilterHeaderTrait
                     'x-proctorio',
                     'metadata-flavor',
                     'metadata',
+                    'user-agents',
                 ];
 
-                if (in_array($header, $forbiddenHeaders, true)) {
+                if (in_array($header, $forbiddenHeaders, strict: true)) {
                     return false;
                 }
 

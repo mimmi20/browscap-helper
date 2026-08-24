@@ -48,7 +48,7 @@ final readonly class RewriteTests
      */
     public function rewrite(OutputInterface $output, array $txtChecks, string $testSource): void
     {
-        $folderChunks = array_chunk($txtChecks, 1000, true);
+        $folderChunks = array_chunk($txtChecks, 1000, preserve_keys: true);
         $this->jsonNormalizer->init($output);
 
         $baseMessage   = 'rewriting files';
@@ -74,8 +74,8 @@ final readonly class RewriteTests
 
             $output->write(
                 "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
-                false,
-                OutputInterface::VERBOSITY_VERY_VERBOSE,
+                newline: false,
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
 
             foreach ($folderChunk as $headerString => $test) {
@@ -108,8 +108,8 @@ final readonly class RewriteTests
 
             $output->write(
                 "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
-                false,
-                OutputInterface::VERBOSITY_VERY_VERBOSE,
+                newline: false,
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
 
             try {
@@ -144,8 +144,8 @@ final readonly class RewriteTests
 
             $output->write(
                 "\r" . '<info>' . mb_str_pad(string: $message2, length: $messageLength) . '</info>',
-                false,
-                OutputInterface::VERBOSITY_VERY_VERBOSE,
+                newline: false,
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
 
             file_put_contents($fileName, $normalized);

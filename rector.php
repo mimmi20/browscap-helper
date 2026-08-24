@@ -11,32 +11,54 @@
 
 declare(strict_types = 1);
 
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector;
 use Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector;
-use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
+use Rector\DeadCode\Rector\StmtsAwareInterface\RemoveDeadInstanceOfAssertRector;
+use Rector\Naming\Rector\Class_\RenamePropertyToMatchTypeRector;
+use Rector\Naming\Rector\ClassMethod\RenameParamToMatchTypeRector;
 use Rector\Php84\Rector\MethodCall\NewMethodCallWithoutParenthesesRector;
-use Rector\Set\ValueObject\LevelSetList;
-use Rector\Set\ValueObject\SetList;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\NoSetupWithParentCallOverrideRector;
+use Rector\PHPUnit\CodeQuality\Rector\FuncCall\AssertFuncCallToPHPUnitAssertRector;
+use Rector\ValueObject\PhpVersion;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+return RectorConfig::configure()
+    ->withPaths([
         __DIR__ . '/src',
-    ]);
-
-    $rectorConfig->sets([
-        SetList::DEAD_CODE,
-        LevelSetList::UP_TO_PHP_85,
-    ]);
-
-    $rectorConfig->skip(
-        [
-            NullToStrictStringFuncCallArgRector::class,
-            RemoveDeadInstanceOfRector::class,
-            RemoveAlwaysTrueIfConditionRector::class,
-            RemoveParentCallWithoutParentRector::class,
-            NewMethodCallWithoutParenthesesRector::class,
-        ],
-    );
-};
+    ])
+    ->withPhpVersion(PhpVersion::PHP_85)
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true,
+        typeDeclarations: true,
+        typeDeclarationDocblocks: true,
+        naming: true,
+        namedArgs: true,
+        instanceOf: true,
+        if: true,
+        earlyReturn: true,
+        phpunitCodeQuality: true,
+        phpunitNarrowAsserts: true,
+        phpunitMockToStub: true,
+    )
+    ->withPhpSets(php85: true)
+    ->withSkip([
+        RemoveDeadInstanceOfRector::class,
+        RemoveAlwaysTrueIfConditionRector::class,
+        RemoveParentCallWithoutParentRector::class,
+        NewMethodCallWithoutParenthesesRector::class,
+        PreferPHPUnitThisCallRector::class,
+        RemoveDeadInstanceOfAssertRector::class,
+        AssertFuncCallToPHPUnitAssertRector::class,
+        YieldDataProviderRector::class,
+        RenamePropertyToMatchTypeRector::class,
+        RenameParamToMatchTypeRector::class,
+        ExplicitBoolCompareRector::class,
+        NoSetupWithParentCallOverrideRector::class,
+    ])
+    ->withoutParallel()
+    ->withMemoryLimit('2048M');
