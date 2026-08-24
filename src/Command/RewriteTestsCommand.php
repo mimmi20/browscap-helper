@@ -1882,7 +1882,7 @@ final class RewriteTestsCommand extends Command
             $engineVersion = '-';
         }
 
-        if ($versionOs instanceof \BrowserDetector\Version\VersionInterface) {
+        if ($versionOs instanceof VersionInterface) {
             $majorVersion = (int) $versionOs->getMajor();
 
             try {

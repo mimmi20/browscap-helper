@@ -113,6 +113,8 @@ final class CopyTestsCommand extends Command
      * @throws UnexpectedValueException
      * @throws \LogicException
      * @throws RuntimeException
+     *
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
