@@ -114,9 +114,11 @@ parameters:
 
   ignoreErrors:
     - '~expects string,~'
-    - '~mixed given~'
-    - '~will always evaluate to true~'
     - '~is never thrown~'
+    -
+      identifier: symplify.forbiddenNode
+    -
+      identifier: symplify.noReference
 
 services:
   errorFormatter.sarif:

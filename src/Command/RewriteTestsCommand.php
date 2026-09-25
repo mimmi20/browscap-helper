@@ -16,11 +16,9 @@ namespace BrowscapHelper\Command;
 use BrowscapHelper\Entity\TestResult;
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
-use BrowscapHelper\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
-use BrowscapHelper\Source\Ua\UserAgent;
+use BrowscapHelper\Source\YamlFileSource;
 use BrowscapHelper\Traits\FilterHeaderTrait;
-use BrowserDetector\Data\Company;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
@@ -34,16 +32,14 @@ use Ergebnis\Json\Exception\FileCanNotBeRead;
 use Ergebnis\Json\Exception\FileDoesNotContainJson;
 use Ergebnis\Json\Exception\FileDoesNotExist;
 use Ergebnis\Json\Json;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
-use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
-use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
-use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use JsonException;
 use Override;
+use Psr\Log\LogLevel;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\Helper;
@@ -55,6 +51,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Yaml\Yaml;
 use Throwable;
 use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
@@ -111,32 +108,32 @@ use const SORT_STRING;
 use const STR_PAD_LEFT;
 
 /** @phpcs:disable SlevomatCodingStandard.Classes.ClassLength.ClassTooLong */
+#[AsCommand(name: 'rewrite-tests')]
 final class RewriteTestsCommand extends Command
 {
     use FilterHeaderTrait;
 
     private const int DETECT_LOWER_VERSION_ANDROID_IOS = 9;
 
-    private const int DETECT_UPPER_VERSION_ANDROID_IOS = 100;
-
     private const int DETECT_LOWER_VERSION_WINDOWS = 0;
 
     private const float DETECT_LOWER_VERSION_MACOS = 10.5;
+    private const float DETECT_LOWER_VERSION_MACOS = 0;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 13;
+    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 0;
 
     private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 100;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 11;
+    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 0;
 
     /**
-     * last update: 2026-08-24
+     * last update: 2026-09-22
      */
-    private const string COMPARE_DATE_START = '2019-01-01';
+    private const string COMPARE_DATE_START = '2026-08-01';
 
-    private const string COMPARE_DATE_END = '2026-08-31';
+    private const string COMPARE_DATE_END = '2026-09-31';
 
     private const bool COMPARE_ALL = false;
 
@@ -148,7 +145,6 @@ final class RewriteTestsCommand extends Command
     public function __construct(
         private readonly ExistingTestsLoader $existingTestsLoader,
         private readonly ExistingTestsRemover $existingTestsRemover,
-        private readonly JsonNormalizer $jsonNormalizer,
     ) {
         parent::__construct();
 
@@ -186,10 +182,6 @@ final class RewriteTestsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws LogicException
      * @throws DirectoryNotFoundException
-     * @throws InvalidNewLineString
-     * @throws InvalidIndentStyle
-     * @throws InvalidIndentSize
-     * @throws InvalidJsonEncodeOptions
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @throws RuntimeException
@@ -352,8 +344,21 @@ final class RewriteTestsCommand extends Command
             }
         };
 
-        $consoleLogger   = new ConsoleLogger($output);
-        $detectorFactory = new DetectorFactory($detectorCache, $consoleLogger);
+        $consoleLogger   = new ConsoleLogger($output, [
+            LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
+        ]);
+        $detectorFactory = new DetectorFactory(
+            psrCache: $detectorCache,
+            logger: $consoleLogger,
+            autoUpdate: false,
+        );
         $detector        = $detectorFactory();
 
         $output->writeln(messages: 'init Matomo ...', options: OutputInterface::VERBOSITY_NORMAL);
@@ -366,7 +371,7 @@ final class RewriteTestsCommand extends Command
         );
 
         $basePath                = 'vendor/mimmi20/browser-detector/';
-        $detectorTargetDirectory = $basePath . 'tests/data/';
+        $detectorTargetDirectory = $basePath . 'data/tests/';
         $testSource              = 'tests';
 
         $this->existingTestsRemover->remove(output: $output, testSource: $detectorTargetDirectory);
@@ -376,7 +381,7 @@ final class RewriteTestsCommand extends Command
             dirs: true,
         );
 
-        $sources = [new JsonFileSource($testSource)];
+        $sources = [new JsonFileSource($testSource), new YamlFileSource($testSource)];
 
         $output->writeln(
             messages: 'removing old existing files from .build ...',
@@ -393,7 +398,6 @@ final class RewriteTestsCommand extends Command
 
         $txtChecks                  = [];
         $resultChecks               = [];
-        $notFoundCompanies          = [];
         $checkedPlatforms           = [];
         $checkedEngines             = [];
         $notFoundFormfactors        = [];
@@ -597,7 +601,7 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $seachHeader = (string) UserAgent::fromHeaderArray($property['headers']);
+            $seachHeader = Yaml::dump($property['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 ++$skippedBeforeCheck;
@@ -653,7 +657,6 @@ final class RewriteTestsCommand extends Command
                 txtChecks: $txtChecks,
                 checkedPlatforms: $checkedPlatforms,
                 checkedEngines: $checkedEngines,
-                notFoundCompanies: $notFoundCompanies,
                 resultChecks: $resultChecks,
                 counterDifferentFromMatomo: $counterDifferentFromMatomo,
                 counterComparedWithMatomo: $counterComparedWithMatomo,
@@ -665,8 +668,6 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-
-        $this->jsonNormalizer->init($output);
 
         $messageLength = 0;
         $baseMessage   = 're-write test files in directory ';
@@ -1004,40 +1005,6 @@ final class RewriteTestsCommand extends Command
                             number_format(num: $differentFromMatomo, thousands_separator: '.'),
                         ),
                     ],
-                );
-            }
-
-            $table->render();
-
-            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        }
-
-        if ($notFoundCompanies !== []) {
-            $table = new Table($output);
-            $table->setHeaders(['Company, not found in the Enum', 'Counter']);
-            $table->setRows([]);
-
-            $cy = [];
-            $cx = [];
-
-            foreach ($notFoundCompanies as $company => $companyCounter) {
-                $cy[$company] = $companyCounter;
-                $cx[$company] = $company;
-            }
-
-            array_multisort(
-                $cy,
-                SORT_DESC,
-                SORT_NUMERIC,
-                $cx,
-                SORT_ASC,
-                SORT_STRING,
-                $notFoundCompanies,
-            );
-
-            foreach ($notFoundCompanies as $company => $companyCounter) {
-                $table->addRow(
-                    ['<bg=blue>' . $company . '</>', '<error>' . $companyCounter . '</error>'],
                 );
             }
 
@@ -1462,8 +1429,7 @@ final class RewriteTestsCommand extends Command
         try {
             $data = json_decode(
                 $file->getContents(),
-                associative: false,
-                depth: 512,
+                associative: true,
                 flags: JSON_THROW_ON_ERROR,
             );
         } catch (JsonException $e) {
@@ -1482,6 +1448,8 @@ final class RewriteTestsCommand extends Command
             return;
         }
 
+        assert(is_array($data));
+
         foreach (array_chunk($data, 100) as $number => $parts) {
             $this->rewriteFile(
                 output: $output,
@@ -1498,9 +1466,9 @@ final class RewriteTestsCommand extends Command
 
     /**
      * @param array<int|string, string> $matches
-     * @param array<int|string, string> $parts
+     * @param array<int|string, mixed>  $parts
      *
-     * @throws RuntimeException
+     * @throws void
      */
     private function rewriteFile(
         OutputInterface $output,
@@ -1514,7 +1482,7 @@ final class RewriteTestsCommand extends Command
     ): void {
         $path  = $basePath;
         $path .= sprintf(
-            'tests/data/%s/%s/%s/%s/%07d.json',
+            'data/tests/%s/%s/%s/%s/%07d.yaml',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1522,20 +1490,20 @@ final class RewriteTestsCommand extends Command
             $number,
         );
 
-        $p1 = sprintf('tests/data/%s', $matches['deviceManufaturer']);
+        $p1 = sprintf('data/tests/%s', $matches['deviceManufaturer']);
 
         if (!file_exists($basePath . $p1)) {
             mkdir($basePath . $p1);
         }
 
-        $p2 = sprintf('tests/data/%s/%s', $matches['deviceManufaturer'], $matches['deviceType']);
+        $p2 = sprintf('data/tests/%s/%s', $matches['deviceManufaturer'], $matches['deviceType']);
 
         if (!file_exists($basePath . $p2)) {
             mkdir($basePath . $p2);
         }
 
         $p3 = sprintf(
-            'tests/data/%s/%s/%s',
+            'data/tests/%s/%s/%s',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1546,7 +1514,7 @@ final class RewriteTestsCommand extends Command
         }
 
         $p4 = sprintf(
-            'tests/data/%s/%s/%s/%s',
+            'data/tests/%s/%s/%s/%s',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1559,7 +1527,7 @@ final class RewriteTestsCommand extends Command
 
         $message  = $baseMessage;
         $message .= sprintf(
-            'tests/data/%s/%s/%s/%s/%07d.json',
+            'data/tests/%s/%s/%s/%s/%07d.yaml',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1576,25 +1544,11 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        try {
-            $normalized = $this->jsonNormalizer->normalize($output, $parts, $message, $messageLength);
-        } catch (RuntimeException $e) {
-            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERBOSE);
-            $output->writeln(
-                messages: '<error>' . $e . '</error>',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return;
-        }
-
-        if ($normalized === null) {
-            throw new RuntimeException(sprintf('file "%s" contains invalid json', $path));
-        }
+        $normalized = Yaml::dump($parts, 12, 2);
 
         $message  = $baseMessage;
         $message .= sprintf(
-            'tests/data/%s/%s/%s/%s/%07d.json',
+            'data/tests/%s/%s/%s/%s/%07d.yaml',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1633,7 +1587,6 @@ final class RewriteTestsCommand extends Command
      * @param array<string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $txtChecks
      * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedPlatforms
      * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedEngines
-     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
      * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
      * @throws void
@@ -1662,7 +1615,6 @@ final class RewriteTestsCommand extends Command
         array &$txtChecks,
         array &$checkedPlatforms,
         array &$checkedEngines,
-        array &$notFoundCompanies,
         array &$resultChecks,
         int &$counterDifferentFromMatomo,
         int &$counterComparedWithMatomo,
@@ -1897,10 +1849,7 @@ final class RewriteTestsCommand extends Command
                     ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
                     strict: true,
                 )
-                && (
-                    $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
-                    || $majorVersion >= self::DETECT_UPPER_VERSION_ANDROID_IOS
-                )
+                && $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
             ) {
                 ++$skippedVersion;
 
@@ -1994,7 +1943,6 @@ final class RewriteTestsCommand extends Command
                     loopMessage: $loopMessage,
                     messageLength: $messageLength,
                     counterDifferentFromMatomo: $counterDifferentFromMatomo,
-                    notFoundCompanies: $notFoundCompanies,
                     resultChecks: $resultChecks,
                 );
             } catch (UnexpectedValueException $e) {
@@ -2292,7 +2240,6 @@ final class RewriteTestsCommand extends Command
     /**
      * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
      * @param array<string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $headers
-     * @param array<int>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $notFoundCompanies
      * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
      *
      * @throws UnexpectedValueException
@@ -2306,7 +2253,6 @@ final class RewriteTestsCommand extends Command
         string $loopMessage,
         int &$messageLength,
         int &$counterDifferentFromMatomo,
-        array &$notFoundCompanies,
         array &$resultChecks,
     ): void {
         $inputMapper = new InputMapper();
@@ -2335,56 +2281,6 @@ final class RewriteTestsCommand extends Command
         }
 
         $result = $testResult->getResult() ?? [];
-
-        try {
-            Company::fromName($result['device']['brand'] ?? null);
-        } catch (UnexpectedValueException) {
-            if (!array_key_exists($result['device']['brand'] ?? '', $notFoundCompanies)) {
-                $notFoundCompanies[$result['device']['brand'] ?? ''] = 0;
-            }
-
-            ++$notFoundCompanies[$result['device']['brand'] ?? ''];
-        }
-
-        try {
-            Company::fromName($result['device']['manufacturer'] ?? null);
-        } catch (UnexpectedValueException) {
-            if (!array_key_exists($result['device']['manufacturer'] ?? '', $notFoundCompanies)) {
-                $notFoundCompanies[$result['device']['manufacturer'] ?? ''] = 0;
-            }
-
-            ++$notFoundCompanies[$result['device']['manufacturer'] ?? ''];
-        }
-
-        try {
-            Company::fromName($result['os']['manufacturer'] ?? null);
-        } catch (UnexpectedValueException) {
-            if (!array_key_exists($result['os']['manufacturer'] ?? '', $notFoundCompanies)) {
-                $notFoundCompanies[$result['os']['manufacturer'] ?? ''] = 0;
-            }
-
-            ++$notFoundCompanies[$result['os']['manufacturer'] ?? ''];
-        }
-
-        try {
-            Company::fromName($result['engine']['manufacturer'] ?? null);
-        } catch (UnexpectedValueException) {
-            if (!array_key_exists($result['engine']['manufacturer'] ?? '', $notFoundCompanies)) {
-                $notFoundCompanies[$result['engine']['manufacturer'] ?? ''] = 0;
-            }
-
-            ++$notFoundCompanies[$result['engine']['manufacturer'] ?? ''];
-        }
-
-        try {
-            Company::fromName($result['client']['manufacturer'] ?? null);
-        } catch (UnexpectedValueException) {
-            if (!array_key_exists($result['client']['manufacturer'] ?? '', $notFoundCompanies)) {
-                $notFoundCompanies[$result['client']['manufacturer'] ?? ''] = 0;
-            }
-
-            ++$notFoundCompanies[$result['client']['manufacturer'] ?? ''];
-        }
 
         $resultTypeName = $result['device']['type'] ?? '';
 

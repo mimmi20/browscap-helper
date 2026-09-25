@@ -692,6 +692,20 @@ trait FilterHeaderTrait
                     'metadata-flavor',
                     'metadata',
                     'user-agents',
+                    'suffix',
+                    'c1',
+                    'c2',
+                    'x-wf-forwarded-for',
+                    'x-livewire',
+                    'x-iframely-intent',
+                    'x-iframely-contact',
+                    'x-iframely-app',
+                    'x-iframely-customer',
+                    'x-munchmatcher-job',
+                    'x-googapps-allowed-domains',
+                    'x-has-set-referer',
+                    'alt-used',
+                    'cluster-client-ip',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, strict: true)) {
