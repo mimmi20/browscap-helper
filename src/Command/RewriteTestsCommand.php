@@ -3079,6 +3079,9 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '[plm=0]')
                     || preg_match('/gecko\/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}/i', $v)
                     || preg_match('/^veoh-.+ service \(/i', $v)
+                    || str_contains($v, 'dns_get_record(')
+                    || str_contains($v, 'base64 -d')
+                    || str_contains($v, 'xargs getent')
                     || (mb_strlen($v) > 0 && mb_trim($v) === '');
                 // || str_contains($v, '­')
             },
