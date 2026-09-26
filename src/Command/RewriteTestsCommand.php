@@ -117,7 +117,6 @@ final class RewriteTestsCommand extends Command
 
     private const int DETECT_LOWER_VERSION_WINDOWS = 0;
 
-    private const float DETECT_LOWER_VERSION_MACOS = 10.5;
     private const float DETECT_LOWER_VERSION_MACOS = 0;
 
     private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 0;
