@@ -115,10 +115,10 @@ parameters:
   ignoreErrors:
     - '~expects string,~'
     - '~is never thrown~'
-    -
-      identifier: symplify.forbiddenNode
-    -
-      identifier: symplify.noReference
+    #-
+    #  identifier: symplify.forbiddenNode
+    #-
+    #  identifier: symplify.noReference
 
 services:
   errorFormatter.sarif:
