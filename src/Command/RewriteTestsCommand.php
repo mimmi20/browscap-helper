@@ -115,22 +115,20 @@ final class RewriteTestsCommand extends Command
 
     private const int DETECT_LOWER_VERSION_ANDROID_IOS = 9;
 
-    private const int DETECT_LOWER_VERSION_WINDOWS = 0;
+    private const int DETECT_LOWER_VERSION_WINDOWS = 7;
 
-    private const float DETECT_LOWER_VERSION_MACOS = 0;
+    private const float DETECT_LOWER_VERSION_MACOS = 10.5;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 0;
+    private const int COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS = 13;
 
-    private const int COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS = 100;
+    private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 10;
 
-    private const int COMPARE_MATOMO_LOWER_VERSION_WINDOWS = 0;
-
-    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 0;
+    private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 12;
 
     /**
      * last update: 2026-09-22
      */
-    private const string COMPARE_DATE_START = '2026-08-01';
+    private const string COMPARE_DATE_START = '2019-01-01';
 
     private const string COMPARE_DATE_END = '2026-09-31';
 
@@ -2937,7 +2935,6 @@ final class RewriteTestsCommand extends Command
             ) {
                 if (
                     $osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
-                    && $osVersionFloat < self::COMPARE_MATOMO_UPPER_VERSION_ANDROID_IOS
                 ) {
                     $checkedPlatforms[$osName][$osVersion]['checked'] = true;
 
