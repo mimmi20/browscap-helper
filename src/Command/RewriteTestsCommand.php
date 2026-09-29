@@ -2933,9 +2933,7 @@ final class RewriteTestsCommand extends Command
                     strict: true,
                 )
             ) {
-                if (
-                    $osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS
-                ) {
+                if ($osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS) {
                     $checkedPlatforms[$osName][$osVersion]['checked'] = true;
 
                     $resultOs = true;
