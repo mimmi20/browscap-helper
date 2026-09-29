@@ -38,7 +38,6 @@ $config
     ->ignoreErrorsOnPackage('tomasvotruba/cognitive-complexity', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('tomasvotruba/type-coverage', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('tomasvotruba/unused-public', [ErrorType::UNUSED_DEPENDENCY])
-    ->ignoreErrorsOnPackage('symfony/yaml', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('whichbrowser/parser', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage(
         'jbelien/phpstan-sarif-formatter',
