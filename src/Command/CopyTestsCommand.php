@@ -141,7 +141,7 @@ final class CopyTestsCommand extends Command
             $sourcesNew[] = $this->addPdoSource(dbname: 'g');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database ua</error>',
+                '<error>An error occured while initializing the database "g"</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
@@ -150,7 +150,7 @@ final class CopyTestsCommand extends Command
             $sourcesNew[] = $this->addPdoSource(dbname: 'a');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database ua3</error>',
+                '<error>An error occured while initializing the database "a"</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
@@ -159,7 +159,7 @@ final class CopyTestsCommand extends Command
             $sourcesNew[] = $this->addPdoSource(dbname: 'k');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database ua4</error>',
+                '<error>An error occured while initializing the database "k"</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
@@ -168,7 +168,7 @@ final class CopyTestsCommand extends Command
             $sourcesNew[] = $this->addPdoSource(dbname: 's');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database ua5</error>',
+                '<error>An error occured while initializing the database "s"</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
@@ -177,7 +177,7 @@ final class CopyTestsCommand extends Command
             $sourcesNew[] = $this->addPdoSource(dbname: 'v');
         } catch (PDOException) {
             $output->writeln(
-                '<error>An error occured while initializing the database ua6</error>',
+                '<error>An error occured while initializing the database "v"</error>',
                 OutputInterface::VERBOSITY_NORMAL,
             );
         }
