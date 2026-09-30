@@ -706,6 +706,8 @@ trait FilterHeaderTrait
                     'x-has-set-referer',
                     'alt-used',
                     'cluster-client-ip',
+                    'x-requester-dc',
+                    'x-brd-dca-collector-id',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, strict: true)) {
