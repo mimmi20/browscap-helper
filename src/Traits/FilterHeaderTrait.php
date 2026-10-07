@@ -708,6 +708,8 @@ trait FilterHeaderTrait
                     'cluster-client-ip',
                     'x-requester-dc',
                     'x-brd-dca-collector-id',
+                    'x-iframely-processing',
+                    'x-iframely-request-id',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, strict: true)) {
