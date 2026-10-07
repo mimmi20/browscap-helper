@@ -11470,7 +11470,7 @@
     user-agent: '(select(0)from(select(sleep(15)))v)/*''+(select(0)from(select(sleep(15)))v)+''"+(select(0)from(select(sleep(15)))v)+"*/'
     x-requested-with: XMLHttpRequest
   date-first: '2022-09-20'
-  date-last: '2026-09-16'
+  date-last: '2026-09-30'
 -
   headers:
     user-agent: '0"XOR(if(now()=sysdate(),sleep(15),0))XOR"Z'
@@ -11488,7 +11488,7 @@
     user-agent: 'if(now()=sysdate(),sleep(15),0)'
     x-requested-with: XMLHttpRequest
   date-first: '2022-09-20'
-  date-last: '2026-09-16'
+  date-last: '2026-09-30'
 -
   headers:
     sec-ch-prefers-color-scheme: light
