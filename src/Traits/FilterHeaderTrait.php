@@ -710,6 +710,7 @@ trait FilterHeaderTrait
                     'x-brd-dca-collector-id',
                     'x-iframely-processing',
                     'x-iframely-request-id',
+                    'x-sg-e',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, strict: true)) {

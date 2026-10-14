@@ -3076,6 +3076,15 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'dns_get_record(')
                     || str_contains($v, 'base64 -d')
                     || str_contains($v, 'xargs getent')
+                    || str_contains($v, 'require(')
+                    || str_contains($v, 'lookup(')
+                    || str_contains($v, 'tenable.was')
+                    || str_contains($v, 'tenable:was')
+                    || str_contains($v, 'ldap:')
+                    || str_contains($v, '${j${')
+                    || str_contains($v, 'getaddress(')
+                    || str_contains($v, 'inet_aton(')
+                    || str_contains($v, '${env:')
                     || (mb_strlen($v) > 0 && mb_trim($v) === '');
                 // || str_contains($v, '­')
             },
