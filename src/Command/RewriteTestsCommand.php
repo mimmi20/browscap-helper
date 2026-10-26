@@ -466,7 +466,6 @@ final class RewriteTestsCommand extends Command
                     dualOrientation: $expected['device']['dualOrientation'] ?? null,
                     simCount: $expected['device']['simCount'] ?? null,
                     bits: Bits::from($expected['device']['bits'] ?? 0),
-                    isMobile: $expected['device']['ismobile'] ?? false,
                 );
 
                 $c = new Browser(
