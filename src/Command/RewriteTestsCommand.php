@@ -21,6 +21,7 @@ use BrowscapHelper\Source\YamlFileSource;
 use BrowscapHelper\Traits\FilterHeaderTrait;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
+use BrowserDetector\Loader\CompanyLoaderFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
@@ -57,7 +58,14 @@ use UaDataMapper\InputMapper;
 use UaDeviceType\Type;
 use UaNormalizer\Normalizer\NormalizerChain;
 use UaNormalizer\NormalizerFactory;
+use UaResult\Bits\Bits;
+use UaResult\Browser\Browser;
+use UaResult\Device\Architecture;
+use UaResult\Device\Device;
+use UaResult\Device\Display;
 use UaResult\Device\FormFactor;
+use UaResult\Engine\Engine;
+use UaResult\Os\Os;
 use UnexpectedValueException;
 
 use function array_any;
@@ -388,6 +396,124 @@ final class RewriteTestsCommand extends Command
         $this->existingTestsRemover->remove(output: $output, testSource: '.build');
         $this->existingTestsRemover->remove(output: $output, testSource: '.build', dirs: true);
 
+        $integrationTests = [];
+
+        $output->writeln(
+            messages: 'reading already existing integration tests ...',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        $fileFinderIntegration = new Finder();
+        $fileFinderIntegration->notName('*.gitkeep');
+        $fileFinderIntegration->ignoreDotFiles(ignoreDotFiles: true);
+        $fileFinderIntegration->ignoreVCS(ignoreVCS: true);
+        $fileFinderIntegration->sortByName();
+        $fileFinderIntegration->ignoreUnreadableDirs();
+        $fileFinderIntegration->files();
+        $fileFinderIntegration->in($basePath . 'data/integration-tests/');
+
+        $companyLoaderFactory = new CompanyLoaderFactory(logger: $consoleLogger);
+        $companyLoader        = $companyLoaderFactory();
+
+        $versionBuilder = new VersionBuilder();
+
+        foreach ($fileFinderIntegration as $file) {
+            assert($file instanceof SplFileInfo);
+
+            $tests = Yaml::parse($file->getContents());
+
+            if (!is_array($tests)) {
+                continue;
+            }
+
+            foreach ($tests as $test) {
+                if (!is_array($test)) {
+                    continue;
+                }
+
+                $headers = $test['headers'] ?? $test[0];
+
+                if (!is_array($headers)) {
+                    continue;
+                }
+
+                $k = Yaml::dump($headers);
+
+                if (array_key_exists($k, $integrationTests)) {
+                    continue;
+                }
+
+                /** @var array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $expected */
+                $expected = $test['expected'] ?? $test[1];
+
+                if (!is_array($expected)) {
+                    continue;
+                }
+
+                $d = new Device(
+                    architecture: Architecture::from($expected['device']['architecture'] ?? ''),
+                    deviceName: $expected['device']['deviceName'] ?? '',
+                    marketingName: $expected['device']['marketingName'] ?? '',
+                    manufacturer: $companyLoader->load($expected['device']['manufacturer'] ?? ''),
+                    brand: $companyLoader->load($expected['device']['brand'] ?? ''),
+                    type: Type::fromName($expected['device']['type'] ?? ''),
+                    display: new Display(
+                        width: $expected['device']['display']['width'] ?? null,
+                        height: $expected['device']['display']['height'] ?? null,
+                        touch: $expected['device']['display']['touch'] ?? false,
+                        size: $expected['device']['display']['size'] ?? null,
+                    ),
+                    dualOrientation: $expected['device']['dualOrientation'] ?? null,
+                    simCount: $expected['device']['simCount'] ?? null,
+                    bits: Bits::from($expected['device']['bits'] ?? 0),
+                );
+
+                $c = new Browser(
+                    name: $expected['client']['name'] ?? '',
+                    manufacturer: $companyLoader->load($expected['client']['manufacturer'] ?? ''),
+                    version: $versionBuilder->set($expected['client']['version'] ?? ''),
+                    type: \UaBrowserType\Type::fromName($expected['client']['type'] ?? ''),
+                    bits: Bits::from($expected['client']['bits'] ?? 0),
+                    modus: $expected['client']['modus'] ?? null,
+                );
+
+                $o = new Os(
+                    name: $expected['os']['name'] ?? '',
+                    marketingName: $expected['os']['marketingName'] ?? '',
+                    manufacturer: $companyLoader->load($expected['os']['manufacturer'] ?? ''),
+                    version: $versionBuilder->set($expected['os']['version'] ?? ''),
+                    bits: Bits::from($expected['os']['bits'] ?? 0),
+                );
+
+                $e = new Engine(
+                    name: $expected['engine']['name'] ?? '',
+                    manufacturer: $companyLoader->load($expected['engine']['manufacturer'] ?? ''),
+                    version: $versionBuilder->set($expected['engine']['version'] ?? ''),
+                );
+
+                $integrationTests[$k] = [
+                    'headers' => $headers,
+                    'expected' => [
+                        'headers' => $headers,
+                        'device' => $d->toArray(),
+                        'client' => $c->toArray(),
+                        'os' => $o->toArray(),
+                        'engine' => $e->toArray(),
+                    ],
+                ];
+            }
+        }
+
+        $this->existingTestsRemover->remove(
+            output: $output,
+            testSource: $basePath . 'data/integration-tests/',
+        );
+        $this->existingTestsRemover->remove(
+            output: $output,
+            testSource: $basePath . 'data/integration-tests/',
+            dirs: true,
+        );
+
         $output->writeln(
             messages: 'reading already existing tests ...',
             options: OutputInterface::VERBOSITY_NORMAL,
@@ -683,6 +809,7 @@ final class RewriteTestsCommand extends Command
                 $this->rewriteTests(
                     output: $output,
                     file: $file,
+                    integrationTests: $integrationTests,
                     basePath: $basePath,
                     baseMessage: $baseMessage,
                     errors: $errors,
@@ -697,6 +824,35 @@ final class RewriteTestsCommand extends Command
 
                 return 1;
             }
+        }
+
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+        $output->writeln(
+            messages: 'rewrite integration tests ...',
+            options: OutputInterface::VERBOSITY_NORMAL,
+        );
+
+        foreach (array_chunk($integrationTests, 100) as $number => $parts) {
+            $normalized = Yaml::dump($parts, 12, 2);
+
+            $path  = $basePath;
+            $path .= sprintf('data/integration-tests/tests-%07d.yaml', $number);
+
+            $success = @file_put_contents($path, $normalized);
+
+            if ($success !== false) {
+                continue;
+            }
+
+            ++$errors;
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+            $output->writeln(
+                messages: '<error>' . sprintf(
+                    'An error occured while writing file %s',
+                    $path,
+                ) . '</error>',
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
         }
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -1166,7 +1322,7 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         try {
-            /** @var array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $newResult */
+            /** @var array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
             $newResult = $detector->getBrowser($headers);
         } catch (InvalidArgumentException | UnexpectedValueException $e) {
             $output->writeln(
@@ -1191,7 +1347,10 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        if ($newResult['device']['deviceName'] === null && $newResult['client']['isbot'] === false) {
+        if (
+            ($newResult['device']['deviceName'] ?? null) === null
+            && ($newResult['client']['isbot'] ?? false) === false
+        ) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1200,7 +1359,7 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if ($newResult['client']['name'] === null) {
+        if (($newResult['client']['name'] ?? null) === null) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1209,7 +1368,10 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (!is_scalar($newResult['device']['deviceName']) && $newResult['client']['isbot'] === false) {
+        if (
+            !is_scalar($newResult['device']['deviceName'] ?? null)
+            && ($newResult['client']['isbot'] ?? false) === false
+        ) {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1218,7 +1380,7 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if (!is_scalar($newResult['client']['name'])) {
+        if (!is_scalar($newResult['client']['name'] ?? null)) {
             return new TestResult(
                 result: null,
                 status: TestResult::STATUS_OK,
@@ -1236,7 +1398,7 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        if ($newResult['client']['name'] === 'unknown') {
+        if (($newResult['client']['name'] ?? null) === 'unknown') {
             return new TestResult(
                 result: $newResult,
                 status: TestResult::STATUS_OK,
@@ -1246,8 +1408,8 @@ final class RewriteTestsCommand extends Command
         }
 
         if (
-            str_contains((string) $newResult['device']['deviceName'], 'general')
-            && $newResult['client']['isbot'] === false
+            str_contains((string) ($newResult['device']['deviceName'] ?? null), 'general')
+            && ($newResult['client']['isbot'] ?? false) === false
         ) {
             return new TestResult(
                 result: $newResult,
@@ -1258,8 +1420,8 @@ final class RewriteTestsCommand extends Command
         }
 
         if (
-            $newResult['device']['deviceName'] === 'unknown'
-            && $newResult['client']['isbot'] === false
+            ($newResult['device']['deviceName'] ?? null) === 'unknown'
+            && ($newResult['client']['isbot'] ?? false) === false
         ) {
             // only check for unknown device, if it's not a bot
             return new TestResult(
@@ -1272,15 +1434,15 @@ final class RewriteTestsCommand extends Command
 
         if (
             in_array(
-                $newResult['client']['type'],
+                $newResult['client']['type'] ?? null,
                 ['bot', 'crawler', 'search-bot', 'service-agent', 'offline-browser'],
                 strict: true,
             )
-            || $newResult['client']['isbot'] === true
+            || ($newResult['client']['isbot'] ?? false) === true
         ) {
-            assert(is_scalar($newResult['client']['name']));
-            assert(is_scalar($newResult['os']['name']));
-            assert(is_scalar($newResult['device']['deviceName']));
+            assert(is_scalar($newResult['client']['name'] ?? null));
+            assert(is_scalar($newResult['os']['name'] ?? null));
+            assert(is_scalar($newResult['device']['deviceName'] ?? null));
 
             $keys = [
                 (string) $newResult['client']['name'],
@@ -1298,7 +1460,7 @@ final class RewriteTestsCommand extends Command
 
         if (
             in_array(
-                $newResult['device']['deviceName'],
+                $newResult['device']['deviceName'] ?? null,
                 ['general Desktop', 'general Apple Device', 'PC', 'Macintosh', 'Linux Desktop', 'Windows Desktop'],
                 strict: true,
             )
@@ -1348,20 +1510,20 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $newResult
-     * @param array<int, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $keys
-     * @param array<non-empty-string, non-empty-string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            $headers
-     * @param TestResult::EXIT_*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $exit
+     * @param array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult
+     * @param array<int, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           $keys
+     * @param array<non-empty-string, non-empty-string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $headers
+     * @param TestResult::EXIT_*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           $exit
      *
      * @throws void
      */
     private function buildTestResult(array $newResult, array $keys, array $headers, int $exit): TestResult
     {
-        assert(is_scalar($newResult['client']['name']));
-        assert(is_scalar($newResult['engine']['name']));
-        assert(is_scalar($newResult['os']['name']));
-        assert(is_scalar($newResult['device']['deviceName']));
-        assert(is_scalar($newResult['device']['manufacturer']));
+        assert(is_scalar($newResult['client']['name'] ?? null));
+        assert(is_scalar($newResult['engine']['name'] ?? null));
+        assert(is_scalar($newResult['os']['name'] ?? null));
+        assert(is_scalar($newResult['device']['deviceName'] ?? null));
+        assert(is_scalar($newResult['device']['manufacturer'] ?? null));
 
         $keys = [
             ...$keys,
@@ -1393,10 +1555,15 @@ final class RewriteTestsCommand extends Command
         );
     }
 
-    /** @throws RuntimeException */
+    /**
+     * @param array<int<0, max>|string, array<mixed>> $integrationTests
+     *
+     * @throws RuntimeException
+     */
     private function rewriteTests(
         OutputInterface $output,
         SplFileInfo $file,
+        array &$integrationTests,
         string $basePath,
         string $baseMessage,
         int &$errors,
@@ -1424,6 +1591,7 @@ final class RewriteTestsCommand extends Command
         }
 
         try {
+            /** @var array<int|string, array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}> $data */
             $data = json_decode(
                 $file->getContents(),
                 associative: true,
@@ -1454,6 +1622,7 @@ final class RewriteTestsCommand extends Command
                 baseMessage: $baseMessage,
                 matches: $matches,
                 parts: $parts,
+                integrationTests: $integrationTests,
                 number: $number,
                 errors: $errors,
                 messageLength: $messageLength,
@@ -1462,8 +1631,9 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<int|string, string> $matches
-     * @param array<int|string, mixed>  $parts
+     * @param array<int|string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $matches
+     * @param array<int|string, array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}> $parts
+     * @param array<int<0, max>|string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $integrationTests
      *
      * @throws void
      */
@@ -1473,10 +1643,26 @@ final class RewriteTestsCommand extends Command
         string $baseMessage,
         array $matches,
         array $parts,
+        array &$integrationTests,
         int $number,
         int &$errors,
         int &$messageLength,
     ): void {
+        foreach ($parts as $part) {
+            $headers = $part['headers'] ?? [];
+
+            $k = Yaml::dump($headers);
+
+            if (array_key_exists($k, $integrationTests)) {
+                continue;
+            }
+
+            $integrationTests[] = [
+                'headers' => $headers,
+                'expected' => $part,
+            ];
+        }
+
         $path  = $basePath;
         $path .= sprintf(
             'data/tests/%s/%s/%s/%s/%07d.yaml',
@@ -1749,7 +1935,7 @@ final class RewriteTestsCommand extends Command
         $engineName = mb_strtolower($result['engine']['name'] ?? '');
         $versionOs  = null;
 
-        if (is_scalar($result['os']['version'])) {
+        if (is_scalar($result['os']['version'] ?? null)) {
             try {
                 $versionOs = (new VersionBuilder())->set((string) $result['os']['version']);
             } catch (NotNumericException $e) {
@@ -1790,7 +1976,7 @@ final class RewriteTestsCommand extends Command
             $osVersion = '-';
         }
 
-        if (is_scalar($result['engine']['version'])) {
+        if (is_scalar($result['engine']['version'] ?? null)) {
             try {
                 $versionEngine = (new VersionBuilder())->set((string) $result['engine']['version']);
             } catch (NotNumericException $e) {
@@ -2088,7 +2274,7 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}} $result
+     * @param array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $result
      *
      * @throws void
      */
