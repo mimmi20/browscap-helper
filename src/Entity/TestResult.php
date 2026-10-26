@@ -15,44 +15,62 @@ namespace BrowscapHelper\Entity;
 
 final readonly class TestResult
 {
+    /** @api */
     public const int STATUS_OK = 0;
 
+    /** @api */
     public const int STATUS_DUPLICATE = 1;
 
+    /** @api */
     public const int STATUS_SKIPPED = 2;
 
+    /** @api */
     public const int STATUS_ERROR = 3;
 
+    /** @api */
     public const int EXIT_NO_RESULT = 1;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_NULL = 2;
 
+    /** @api */
     public const int EXIT_CLIENT_IS_NULL = 3;
 
+    /** @api */
     public const int EXIT_DEVICE_NOT_SCALAR = 4;
 
+    /** @api */
     public const int EXIT_CLIENT_NOT_SCALAR = 5;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_UNKNOW = 6;
 
+    /** @api */
     public const int EXIT_CLIENT_IS_UNKNOW = 7;
 
+    /** @api */
     public const int EXIT_CLIENT_IS_BOT = 8;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_DESKTOP = 9;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_MOBILE = 10;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_TV = 11;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_OTHER = 12;
 
+    /** @api */
     public const int EXIT_DEVICE_IS_GENERAL = 13;
 
+    /** @api */
     public const int EXIT_CLIENT_IS_GENERAL = 14;
 
     /**
-     * @param array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}|null $result
+     * @param array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}|null $result
      * @phpstan-param self::STATUS_* $status
      * @phpstan-param array<non-empty-string, non-empty-string> $headers
      * @phpstan-param self::EXIT_* $exit
@@ -69,7 +87,7 @@ final readonly class TestResult
     }
 
     /**
-     * @return array{headers: array<non-empty-string, string>, device: array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, type: string|null, ismobile: bool, istv: bool, bits: int|null}, os: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null}, client: array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, isbot: bool}, engine: array{name: string|null, version: string|null, manufacturer: string|null}}|null
+     * @return array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}|null
      *
      * @throws void
      *
