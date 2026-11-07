@@ -13,16 +13,21 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Entity\TestProperties;
 use BrowscapHelper\Entity\TestResult;
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
+use BrowscapHelper\Helper\JsonNormalizer;
 use BrowscapHelper\Source\JsonFileSource;
 use BrowscapHelper\Source\YamlFileSource;
 use BrowscapHelper\Traits\FilterHeaderTrait;
 use BrowserDetector\Detector;
 use BrowserDetector\DetectorFactory;
+use BrowserDetector\Iterator\FilterIterator;
 use BrowserDetector\Loader\CompanyLoaderFactory;
+use BrowserDetector\Loader\CompanyLoaderInterface;
 use BrowserDetector\Version\Exception\NotNumericException;
+use BrowserDetector\Version\NullVersion;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
 use DateInterval;
@@ -33,13 +38,22 @@ use Ergebnis\Json\Exception\FileCanNotBeRead;
 use Ergebnis\Json\Exception\FileDoesNotContainJson;
 use Ergebnis\Json\Exception\FileDoesNotExist;
 use Ergebnis\Json\Json;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use JsonException;
 use Override;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionProperty;
 use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
@@ -51,13 +65,17 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 use Throwable;
+use UaBrowserType\Type as ClientType;
+use UaData\Company;
 use UaDataMapper\InputMapper;
-use UaDeviceType\Type;
+use UaDeviceType\Type as DeviceType;
+use UaLoader\Exception\NotFoundException;
 use UaNormalizer\Normalizer\NormalizerChain;
 use UaNormalizer\NormalizerFactory;
+use UaRequest\Header\HeaderInterface;
+use UaRequest\RequestBuilder;
 use UaResult\Bits\Bits;
 use UaResult\Browser\Browser;
 use UaResult\Device\Architecture;
@@ -66,22 +84,29 @@ use UaResult\Device\Display;
 use UaResult\Device\FormFactor;
 use UaResult\Engine\Engine;
 use UaResult\Os\Os;
+use UaResult\Result\Result;
 use UnexpectedValueException;
 
 use function array_any;
 use function array_chunk;
+use function array_filter;
 use function array_key_exists;
+use function array_map;
 use function array_multisort;
+use function array_walk;
 use function assert;
 use function date;
 use function file_exists;
+use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function in_array;
 use function is_array;
 use function is_scalar;
+use function is_string;
 use function json_decode;
 use function json_encode;
+use function ksort;
 use function max;
 use function mb_str_pad;
 use function mb_strlen;
@@ -104,6 +129,7 @@ use function str_starts_with;
 use function uksort;
 use function var_export;
 
+use const JSON_PRESERVE_ZERO_FRACTION;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -138,23 +164,33 @@ final class RewriteTestsCommand extends Command
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
-    private const string COMPARE_DATE_END = '2026-10-31';
+    private const string COMPARE_DATE_END = '2026-11-30';
 
     private const bool COMPARE_ALL = false;
+
+    private const bool ADD_INTEGRATION_TESTS = false;
 
     /** @var array<string, int> */
     private array $tests = [];
     private NormalizerChain $normalizerChain;
+    private CompanyLoaderInterface $companyLoader;
+    private VersionBuilder $versionBuilder;
+    private LoggerInterface $consoleLogger;
+    private RequestBuilder $requestBuilder;
+    private DeviceDetector $deviceDetector;
+    private Detector $detector;
 
     /** @throws LogicException */
     public function __construct(
         private readonly ExistingTestsLoader $existingTestsLoader,
         private readonly ExistingTestsRemover $existingTestsRemover,
+        private readonly JsonNormalizer $jsonNormalizer,
     ) {
         parent::__construct();
 
         $normalizerFactory     = new NormalizerFactory();
         $this->normalizerChain = $normalizerFactory->build();
+        $this->versionBuilder  = new VersionBuilder();
     }
 
     /**
@@ -187,6 +223,10 @@ final class RewriteTestsCommand extends Command
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws LogicException
      * @throws DirectoryNotFoundException
+     * @throws InvalidNewLineString
+     * @throws InvalidIndentStyle
+     * @throws InvalidIndentSize
+     * @throws InvalidJsonEncodeOptions
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @throws RuntimeException
@@ -349,7 +389,7 @@ final class RewriteTestsCommand extends Command
             }
         };
 
-        $consoleLogger   = new ConsoleLogger($output, [
+        $this->consoleLogger = new ConsoleLogger($output, [
             LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
@@ -359,16 +399,21 @@ final class RewriteTestsCommand extends Command
             LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
         ]);
+
+        $companyLoaderFactory = new CompanyLoaderFactory(logger: $this->consoleLogger);
+        $this->companyLoader  = $companyLoaderFactory();
+
         $detectorFactory = new DetectorFactory(
             psrCache: $detectorCache,
-            logger: $consoleLogger,
+            logger: $this->consoleLogger,
             autoUpdate: false,
         );
-        $detector        = $detectorFactory();
+
+        $this->detector = $detectorFactory();
 
         $output->writeln(messages: 'init Matomo ...', options: OutputInterface::VERBOSITY_NORMAL);
 
-        $deviceDetector = new DeviceDetector();
+        $this->deviceDetector = new DeviceDetector();
 
         $output->writeln(
             messages: 'removing old existing files from vendor ...',
@@ -380,11 +425,6 @@ final class RewriteTestsCommand extends Command
         $testSource              = 'tests';
 
         $this->existingTestsRemover->remove(output: $output, testSource: $detectorTargetDirectory);
-        $this->existingTestsRemover->remove(
-            output: $output,
-            testSource: $detectorTargetDirectory,
-            dirs: true,
-        );
 
         $sources = [new JsonFileSource($testSource), new YamlFileSource($testSource)];
 
@@ -394,8 +434,8 @@ final class RewriteTestsCommand extends Command
         );
 
         $this->existingTestsRemover->remove(output: $output, testSource: '.build');
-        $this->existingTestsRemover->remove(output: $output, testSource: '.build', dirs: true);
 
+        /** @var array<string, Result> $integrationTests */
         $integrationTests = [];
 
         $output->writeln(
@@ -403,115 +443,123 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_NORMAL,
         );
 
-        $fileFinderIntegration = new Finder();
-        $fileFinderIntegration->notName('*.gitkeep');
-        $fileFinderIntegration->ignoreDotFiles(ignoreDotFiles: true);
-        $fileFinderIntegration->ignoreVCS(ignoreVCS: true);
-        $fileFinderIntegration->sortByName();
-        $fileFinderIntegration->ignoreUnreadableDirs();
-        $fileFinderIntegration->files();
-        $fileFinderIntegration->in($basePath . 'data/integration-tests/');
+        $requestBuilder = (new ReflectionProperty($this->detector, 'requestBuilder'))->getValue(
+            $this->detector,
+        );
+        assert($requestBuilder instanceof RequestBuilder);
 
-        $companyLoaderFactory = new CompanyLoaderFactory(logger: $consoleLogger);
-        $companyLoader        = $companyLoaderFactory();
+        $this->requestBuilder = $requestBuilder;
 
-        $versionBuilder = new VersionBuilder();
+        $clonedOutput = clone $output;
+        $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
-        foreach ($fileFinderIntegration as $file) {
-            assert($file instanceof SplFileInfo);
+        try {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($basePath . 'data/integration-tests/'),
+            );
+            $files    = new FilterIterator($iterator, 'yaml');
 
-            $tests = Yaml::parse($file->getContents());
+            foreach ($files as $file) {
+                assert($file instanceof SplFileInfo);
+                $pathName = $file->getPathname();
+                $filepath = str_replace('\\', '/', $pathName);
+                assert(is_string($filepath));
 
-            if (!is_array($tests)) {
-                continue;
+                $content = file_get_contents($filepath);
+
+                if (in_array($content, [false, '', PHP_EOL], strict: true)) {
+                    continue;
+                }
+
+                $data = Yaml::parse($content);
+
+                //            try {
+                //                $data = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
+                //            } catch (JsonException $e) {
+                //                $this->consoleLogger->error($e);
+                //
+                //                continue;
+                //            }
+
+                if (!is_array($data)) {
+                    continue;
+                }
+
+                foreach ($data as $test) {
+                    if (!is_array($test)) {
+                        continue;
+                    }
+
+                    /** @var array<non-empty-string, non-empty-string> $headers */
+                    $headers = $test['headers'] ?? null;
+
+                    if (!is_array($headers)) {
+                        $this->consoleLogger->error('$headers is not an Array');
+
+                        continue;
+                    }
+
+                    /** @var array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}|null $expected */
+                    $expected = $test['expected'] ?? null;
+
+                    if (!is_array($expected)) {
+                        $this->consoleLogger->error('$expected is not an Array');
+
+                        continue;
+                    }
+
+                    if (
+                        array_any($expected, static function (mixed $value, mixed $key): bool {
+                            if (!is_string($value) || $value === '') {
+                                return true;
+                            }
+
+                            return !is_string($key) || $key === '';
+                        })
+                    ) {
+                        $this->consoleLogger->error('$expected is not an expected Array');
+
+                        continue;
+                    }
+
+                    if (
+                        array_any($headers, static function (mixed $v, mixed $k): bool {
+                            if (!is_string($v) || $v === '') {
+                                return true;
+                            }
+
+                            return !is_string($k) || $k === '';
+                        })
+                    ) {
+                        $this->consoleLogger->error('$headers is not an expected Array');
+
+                        continue;
+                    }
+
+                    $result = $this->buildResult(data: $expected, headers: $headers);
+
+                    if ($result instanceof Result) {
+                        $integrationTests = $this->updateIntegrationTests(
+                            result: $result,
+                            integrationTests: $integrationTests,
+                            addIntegrationTests: true,
+                        );
+                    }
+
+                    // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                    //     $output->writeln('');
+                    //     $output->writeln(sprintf('<options=bold,underscore>%s</>', $seachHeader));
+                    //     $output->writeln('');
+                    // }
+                }
             }
-
-            foreach ($tests as $test) {
-                if (!is_array($test)) {
-                    continue;
-                }
-
-                $headers = $test['headers'] ?? $test[0];
-
-                if (!is_array($headers)) {
-                    continue;
-                }
-
-                $k = Yaml::dump($headers);
-
-                if (array_key_exists($k, $integrationTests)) {
-                    continue;
-                }
-
-                /** @var array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $expected */
-                $expected = $test['expected'] ?? $test[1];
-
-                if (!is_array($expected)) {
-                    continue;
-                }
-
-                $d = new Device(
-                    architecture: Architecture::from($expected['device']['architecture'] ?? ''),
-                    deviceName: $expected['device']['deviceName'] ?? '',
-                    marketingName: $expected['device']['marketingName'] ?? '',
-                    manufacturer: $companyLoader->load($expected['device']['manufacturer'] ?? ''),
-                    brand: $companyLoader->load($expected['device']['brand'] ?? ''),
-                    type: Type::fromName($expected['device']['type'] ?? ''),
-                    display: new Display(
-                        width: $expected['device']['display']['width'] ?? null,
-                        height: $expected['device']['display']['height'] ?? null,
-                        touch: $expected['device']['display']['touch'] ?? false,
-                        size: $expected['device']['display']['size'] ?? null,
-                    ),
-                    dualOrientation: $expected['device']['dualOrientation'] ?? null,
-                    simCount: $expected['device']['simCount'] ?? null,
-                    bits: Bits::from($expected['device']['bits'] ?? 0),
-                );
-
-                $c = new Browser(
-                    name: $expected['client']['name'] ?? '',
-                    manufacturer: $companyLoader->load($expected['client']['manufacturer'] ?? ''),
-                    version: $versionBuilder->set($expected['client']['version'] ?? ''),
-                    type: \UaBrowserType\Type::fromName($expected['client']['type'] ?? ''),
-                    bits: Bits::from($expected['client']['bits'] ?? 0),
-                    modus: $expected['client']['modus'] ?? null,
-                );
-
-                $o = new Os(
-                    name: $expected['os']['name'] ?? '',
-                    marketingName: $expected['os']['marketingName'] ?? '',
-                    manufacturer: $companyLoader->load($expected['os']['manufacturer'] ?? ''),
-                    version: $versionBuilder->set($expected['os']['version'] ?? ''),
-                    bits: Bits::from($expected['os']['bits'] ?? 0),
-                );
-
-                $e = new Engine(
-                    name: $expected['engine']['name'] ?? '',
-                    manufacturer: $companyLoader->load($expected['engine']['manufacturer'] ?? ''),
-                    version: $versionBuilder->set($expected['engine']['version'] ?? ''),
-                );
-
-                $integrationTests[$k] = [
-                    'headers' => $headers,
-                    'expected' => [
-                        'headers' => $headers,
-                        'device' => $d->toArray(),
-                        'client' => $c->toArray(),
-                        'os' => $o->toArray(),
-                        'engine' => $e->toArray(),
-                    ],
-                ];
-            }
+        } catch (UnexpectedValueException $e) {
+            $this->consoleLogger->error($e);
         }
 
         $this->existingTestsRemover->remove(
             output: $output,
             testSource: $basePath . 'data/integration-tests/',
-        );
-        $this->existingTestsRemover->remove(
-            output: $output,
-            testSource: $basePath . 'data/integration-tests/',
-            dirs: true,
         );
 
         $output->writeln(
@@ -549,12 +597,35 @@ final class RewriteTestsCommand extends Command
 
         foreach (
             $this->existingTestsLoader->getProperties(
-                $clonedOutput,
-                $sources,
-                $messageLength,
-            ) as $property
+                output: $clonedOutput,
+                logger: $this->consoleLogger,
+                sources: $sources,
+                messageLength: $messageLength,
+            ) as $testProperty
         ) {
             ++$counter;
+
+            $today = date('Y-m-d');
+
+            if (!$testProperty instanceof TestProperties) {
+                ++$skippedBeforeCheck;
+
+                if (!array_key_exists('skippedBeforeCheck', $resultChecks['general'])) {
+                    $resultChecks['general']['skippedBeforeCheck'] = 0;
+                }
+
+                ++$resultChecks['general']['skippedBeforeCheck'];
+
+                if (!array_key_exists('skippedBeforeCheck', $resultChecks[$today])) {
+                    $resultChecks[$today]['skippedBeforeCheck'] = 0;
+                }
+
+                ++$resultChecks[$today]['skippedBeforeCheck'];
+
+                continue;
+            }
+
+            $headers = $this->filterHeaders($output, $testProperty->getResult()->getHeaders());
 
             if (!array_key_exists('general', $resultChecks)) {
                 $resultChecks['general'] = [];
@@ -566,19 +637,15 @@ final class RewriteTestsCommand extends Command
 
             ++$resultChecks['general']['all'];
 
-            if (!array_key_exists('date-last', $property) || $property['date-last'] === null) {
-                $property['date-last'] = date('Y-m-d');
+            if (!array_key_exists($testProperty->getDateLast(), $resultChecks)) {
+                $resultChecks[$testProperty->getDateLast()] = [];
             }
 
-            if (!array_key_exists($property['date-last'], $resultChecks)) {
-                $resultChecks[$property['date-last']] = [];
+            if (!array_key_exists('all', $resultChecks[$testProperty->getDateLast()])) {
+                $resultChecks[$testProperty->getDateLast()]['all'] = 0;
             }
 
-            if (!array_key_exists('all', $resultChecks[$property['date-last']])) {
-                $resultChecks[$property['date-last']]['all'] = 0;
-            }
-
-            ++$resultChecks[$property['date-last']]['all'];
+            ++$resultChecks[$testProperty->getDateLast()]['all'];
 
             $actualTimeExec = new DateTimeImmutable('now');
 
@@ -627,9 +694,25 @@ final class RewriteTestsCommand extends Command
 
             $startTime = microtime(as_float: true);
 
-            $accepted = $this->accept($property, $output, $loopMessage);
+            ksort($headers);
+
+            $seachHeader = Yaml::dump($headers);
+
+            $accepted = array_key_exists($seachHeader, $integrationTests)
+                || $this->acceptByDate($testProperty, $output, $loopMessage);
 
             $timeCheck += microtime(as_float: true) - $startTime;
+
+            // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+            //     $output->writeln('');
+            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($headers, true)));
+            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export(array_key_exists($seachHeader, $integrationTests), true)));
+            //     $output->writeln(sprintf('<options=bold,underscore>$accepted: %s</>', var_export($accepted, true)));
+            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', $seachHeader));
+            //     $output->writeln('');
+            // } else {
+            //     continue;
+            // }
 
             if (!$accepted) {
                 ++$skippedBeforeCheck;
@@ -640,25 +723,29 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks['general']['skippedBeforeCheck'];
 
-                if (!array_key_exists('skippedBeforeCheck', $resultChecks[$property['date-last']])) {
-                    $resultChecks[$property['date-last']]['skippedBeforeCheck'] = 0;
+                if (
+                    !array_key_exists(
+                        'skippedBeforeCheck',
+                        $resultChecks[$testProperty->getDateLast()],
+                    )
+                ) {
+                    $resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'] = 0;
                 }
 
-                ++$resultChecks[$property['date-last']]['skippedBeforeCheck'];
+                ++$resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'];
 
                 continue;
             }
 
-            $property['headers']            = $this->filterHeaders($output, $property['headers']);
-            $property['normalized-headers'] = $this->normalizeHeaders($property['headers']);
+            $normalizedHeaders = $this->normalizeHeaders($headers);
 
-            if (array_key_exists('sec-ch-ua-form-factors', $property['headers'])) {
+            if (array_key_exists('sec-ch-ua-form-factors', $headers)) {
                 $matches = [];
 
                 if (
                     preg_match_all(
                         '~["\']([a-z]+)["\']~i',
-                        $property['headers']['sec-ch-ua-form-factors'],
+                        $headers['sec-ch-ua-form-factors'],
                         $matches,
                     )
                 ) {
@@ -690,8 +777,8 @@ final class RewriteTestsCommand extends Command
             }
 
             if (
-                array_key_exists('x-requested-with', $property['headers'])
-                && array_key_exists('http-x-requested-with', $property['headers'])
+                array_key_exists('x-requested-with', $headers)
+                && array_key_exists('http-x-requested-with', $headers)
             ) {
                 $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
                 $diff    = $this->messageLength($output, $message, $messageLength);
@@ -702,9 +789,8 @@ final class RewriteTestsCommand extends Command
                 );
             }
 
-            $hasInvalidHeaders = $this->hasInvalidHeaders(
-                $property['headers'],
-            ) || $this->hasInvalidHeaders($property['normalized-headers']);
+            $hasInvalidHeaders = $this->hasInvalidHeaders($headers)
+                || $this->hasInvalidHeaders($normalizedHeaders);
 
             if ($hasInvalidHeaders) {
                 ++$skippedInvalidData;
@@ -715,16 +801,19 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks['general']['skippedInvalidData'];
 
-                if (!array_key_exists('skippedInvalidData', $resultChecks[$property['date-last']])) {
-                    $resultChecks[$property['date-last']]['skippedInvalidData'] = 0;
+                if (
+                    !array_key_exists(
+                        'skippedInvalidData',
+                        $resultChecks[$testProperty->getDateLast()],
+                    )
+                ) {
+                    $resultChecks[$testProperty->getDateLast()]['skippedInvalidData'] = 0;
                 }
 
-                ++$resultChecks[$property['date-last']]['skippedInvalidData'];
+                ++$resultChecks[$testProperty->getDateLast()]['skippedInvalidData'];
 
                 continue;
             }
-
-            $seachHeader = Yaml::dump($property['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
                 ++$skippedBeforeCheck;
@@ -735,11 +824,16 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks['general']['skippedBeforeCheck'];
 
-                if (!array_key_exists('skippedBeforeCheck', $resultChecks[$property['date-last']])) {
-                    $resultChecks[$property['date-last']]['skippedBeforeCheck'] = 0;
+                if (
+                    !array_key_exists(
+                        'skippedBeforeCheck',
+                        $resultChecks[$testProperty->getDateLast()],
+                    )
+                ) {
+                    $resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'] = 0;
                 }
 
-                ++$resultChecks[$property['date-last']]['skippedBeforeCheck'];
+                ++$resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'];
 
                 continue;
             }
@@ -752,38 +846,432 @@ final class RewriteTestsCommand extends Command
 
             ++$resultChecks['general']['checked'];
 
-            if (!array_key_exists('checked', $resultChecks[$property['date-last']])) {
-                $resultChecks[$property['date-last']]['checked'] = 0;
+            if (!array_key_exists('checked', $resultChecks[$testProperty->getDateLast()])) {
+                $resultChecks[$testProperty->getDateLast()]['checked'] = 0;
             }
 
-            ++$resultChecks[$property['date-last']]['checked'];
+            ++$resultChecks[$testProperty->getDateLast()]['checked'];
 
-            $this->handleTestCase(
+            $txtChecks[$seachHeader] = true;
+
+            if (!array_key_exists('skippedHeaderCheck', $resultChecks['general'])) {
+                $resultChecks['general']['skippedHeaderCheck'] = 0;
+            }
+
+            // $resultChecks['general']['skippedHeaderCheck']++;
+
+            if (!array_key_exists('skippedHeaderCheck', $resultChecks[$testProperty->getDateLast()])) {
+                $resultChecks[$testProperty->getDateLast()]['skippedHeaderCheck'] = 0;
+            }
+
+            // $resultChecks[$testProperty->getDateLast()]['skippedHeaderCheck']++;
+
+            // if (
+            //    !array_key_exists('x-requested-with', $headers)
+            //    && !array_key_exists('http-x-requested-with', $headers)
+            // ) {
+            //    ++$skippedHeaderCheck;
+            //
+            //    return;
+            // }
+            //
+            // if (
+            //    !array_key_exists('sec-ch-ua-platform', $headers)
+            // ) {
+            //    ++$skippedHeaderCheck;
+            //
+            //    return;
+            // }
+            //
+            // if (
+            //    !array_key_exists('sec-ch-ua-model', $headers)
+            // ) {
+            //    ++$skippedHeaderCheck;
+            //
+            //    return;
+            // }
+            //
+            // if (
+            //    !array_key_exists('x-puffin-ua', $headers)
+            // ) {
+            //    ++$skippedHeaderCheck;
+            //
+            //    return;
+            // }
+
+            $message = $loopMessage . 'redetect';
+            $diff    = $this->messageLength($output, $message, $messageLength);
+
+            $output->write(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
+            );
+
+            $startTime = microtime(as_float: true);
+
+            $testResult = $this->handleTest(
                 output: $output,
-                detector: $detector,
-                deviceDetector: $deviceDetector,
-                test: $property,
-                loopMessage: $loopMessage,
-                seachHeader: $seachHeader,
-                compareWithMatomo: self::COMPARE_ALL,
-                skippedAfterCheck: $skippedAfterCheck,
-                skippedVersion: $skippedVersion,
-                skippedHeaderCheck: $skippedHeaderCheck,
-                duplicates: $duplicates,
-                errors: $errors,
-                testCount: $testCount,
+                headers: $headers,
+                parentMessage: $message,
                 messageLength: $messageLength,
-                timeDetect: $timeDetect,
+            );
+
+            $timeDetect += microtime(as_float: true) - $startTime;
+
+            $result = $testResult->getResult();
+
+            if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
+                ++$skippedAfterCheck;
+
+                if (!array_key_exists('skippedAfterCheck', $resultChecks['general'])) {
+                    $resultChecks['general']['skippedAfterCheck'] = 0;
+                }
+
+                ++$resultChecks['general']['skippedAfterCheck'];
+
+                if (
+                    !array_key_exists(
+                        'skippedAfterCheck',
+                        $resultChecks[$testProperty->getDateLast()],
+                    )
+                ) {
+                    $resultChecks[$testProperty->getDateLast()]['skippedAfterCheck'] = 0;
+                }
+
+                ++$resultChecks[$testProperty->getDateLast()]['skippedAfterCheck'];
+
+                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                //     $output->writeln('');
+                //     $output->writeln('<options=bold,blink>1</>');
+                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln('');
+                // }
+
+                continue;
+            }
+
+            if ($testResult->getStatus() === TestResult::STATUS_DUPLICATE) {
+                ++$duplicates;
+
+                if (!array_key_exists('duplicates', $resultChecks['general'])) {
+                    $resultChecks['general']['duplicates'] = 0;
+                }
+
+                ++$resultChecks['general']['duplicates'];
+
+                if (!array_key_exists('duplicates', $resultChecks[$testProperty->getDateLast()])) {
+                    $resultChecks[$testProperty->getDateLast()]['duplicates'] = 0;
+                }
+
+                ++$resultChecks[$testProperty->getDateLast()]['duplicates'];
+
+                if ($result instanceof Result) {
+                    try {
+                        $integrationTests = $this->updateIntegrationTests(
+                            result: $result,
+                            integrationTests: $integrationTests,
+                            addIntegrationTests: self::ADD_INTEGRATION_TESTS,
+                        );
+                    } catch (UnexpectedValueException | NotNumericException $e) {
+                        $this->consoleLogger->error($e);
+                    }
+                }
+
+                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                //     $output->writeln('');
+                //     $output->writeln('<options=bold,blink>2</>');
+                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln('');
+                // }
+
+                continue;
+            }
+
+            if ($testResult->getStatus() === TestResult::STATUS_ERROR || !$result instanceof Result) {
+                ++$errors;
+
+                if (!array_key_exists('errors', $resultChecks['general'])) {
+                    $resultChecks['general']['errors'] = 0;
+                }
+
+                ++$resultChecks['general']['errors'];
+
+                if (!array_key_exists('errors', $resultChecks[$testProperty->getDateLast()])) {
+                    $resultChecks[$testProperty->getDateLast()]['errors'] = 0;
+                }
+
+                ++$resultChecks[$testProperty->getDateLast()]['errors'];
+
+                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                //     $output->writeln('');
+                //     $output->writeln('<options=bold,blink>3</>');
+                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln('');
+                // }
+
+                continue;
+            }
+
+            $headers = $testResult->getHeaders();
+
+            $osName     = mb_strtolower($result->getOs()->getName() ?? '');
+            $engineName = mb_strtolower($result->getEngine()->getName() ?? '');
+            $versionOs  = $result->getOs()->getVersion();
+
+            try {
+                $osVersion = $versionOs->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
+            } catch (UnexpectedValueException) {
+                $osVersion = 'e';
+            }
+
+            $versionEngine = $result->getEngine()->getVersion();
+
+            try {
+                $engineVersion = $versionEngine->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
+            } catch (UnexpectedValueException) {
+                $engineVersion = 'e';
+            }
+
+            $isSkipped = $this->isVersionskipped(
+                versionOs: $versionOs,
+                osName: $osName,
+                testProperties: $testProperty,
+                resultChecks: $resultChecks,
+                skippedVersion: $skippedVersion,
+            );
+
+            if ($isSkipped) {
+                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                //     $output->writeln('');
+                //     $output->writeln('<options=bold,blink>6</>');
+                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln('');
+                // }
+
+                continue;
+            }
+
+            $compareWithMatomo = self::COMPARE_ALL;
+
+            if (!$compareWithMatomo) {
+                $compareWithMatomo = $this->compareWithMatomo(
+                    osName: $osName,
+                    osVersion: $osVersion,
+                    engineName: $engineName,
+                    engineVersion: $engineVersion,
+                    checkedPlatforms: $checkedPlatforms,
+                    checkedEngines: $checkedEngines,
+                );
+            }
+
+            if ($compareWithMatomo) {
+                $startTime = microtime(as_float: true);
+
+                try {
+                    $this->compareDeviceWithMapper(
+                        output: $output,
+                        testProperties: $testProperty,
+                        testResult: $testResult,
+                        headers: $headers,
+                        loopMessage: $loopMessage,
+                        messageLength: $messageLength,
+                        counterDifferentFromMatomo: $counterDifferentFromMatomo,
+                        resultChecks: $resultChecks,
+                    );
+                } catch (UnexpectedValueException $e) {
+                    ++$errors;
+
+                    if (!array_key_exists('errors', $resultChecks['general'])) {
+                        $resultChecks['general']['errors'] = 0;
+                    }
+
+                    ++$resultChecks['general']['errors'];
+
+                    if (!array_key_exists('errors', $resultChecks[$testProperty->getDateLast()])) {
+                        $resultChecks[$testProperty->getDateLast()]['errors'] = 0;
+                    }
+
+                    ++$resultChecks[$testProperty->getDateLast()]['errors'];
+
+                    $exception = new Exception('An error occured while comparing a result', 0, $e);
+
+                    $addMessage = sprintf('<error>%s</error>', (string) $exception);
+
+                    $message = $loopMessage . $addMessage;
+
+                    $output->writeln(
+                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+
+                    // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                    //     $output->writeln('');
+                    //     $output->writeln('<options=bold,blink>7</>');
+                    //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                    //     $output->writeln('');
+                    // }
+
+                    continue;
+                }
+
+                $timeCompare += microtime(as_float: true) - $startTime;
+
+                ++$counterComparedWithMatomo;
+
+                if (!array_key_exists('comparedWithMatomo', $resultChecks['general'])) {
+                    $resultChecks['general']['comparedWithMatomo'] = 0;
+                }
+
+                ++$resultChecks['general']['comparedWithMatomo'];
+
+                if (
+                    !array_key_exists(
+                        'comparedWithMatomo',
+                        $resultChecks[$testProperty->getDateLast()],
+                    )
+                ) {
+                    $resultChecks[$testProperty->getDateLast()]['comparedWithMatomo'] = 0;
+                }
+
+                ++$resultChecks[$testProperty->getDateLast()]['comparedWithMatomo'];
+            }
+
+            $deviceManufaturer = mb_strtolower(
+                str_replace(
+                    [' ', 'ü'],
+                    ['-', 'ue'],
+                    $result->getDevice()->getManufacturer()->getName() ?? '',
+                ),
+            );
+            $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
+                ['.', ' '],
+                ['', '-'],
+                $deviceManufaturer,
+            );
+
+            $clientManufaturer = mb_strtolower(
+                str_replace(
+                    [' ', 'ü'],
+                    ['-', 'ue'],
+                    $result->getBrowser()->getManufacturer()->getBrandname() ?? '',
+                ),
+            );
+            $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
+                ['.', ' '],
+                ['', '-'],
+                $clientManufaturer,
+            );
+
+            $deviceType = mb_strtolower($result->getDevice()->getType()->getType());
+            $clientType = mb_strtolower($result->getBrowser()->getType()->getType());
+
+            if (!file_exists(sprintf('.build/%s', $deviceManufaturer))) {
+                mkdir(sprintf('.build/%s', $deviceManufaturer));
+            }
+
+            if (!file_exists(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType))) {
+                mkdir(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType));
+            }
+
+            if (
+                !file_exists(
+                    sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer),
+                )
+            ) {
+                mkdir(sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer));
+            }
+
+            $file = sprintf(
+                '.build/%s/%s/%s/%s.json',
+                $deviceManufaturer,
+                $deviceType,
+                $clientManufaturer,
+                $clientType,
+            );
+
+            $saved = $this->saveResult(
+                output: $output,
+                result: $result,
+                file: $file,
+                loopMessage: $loopMessage,
+                errors: $errors,
+                messageLength: $messageLength,
                 timeRead: $timeRead,
                 timeWrite: $timeWrite,
-                timeCompare: $timeCompare,
-                txtChecks: $txtChecks,
-                checkedPlatforms: $checkedPlatforms,
-                checkedEngines: $checkedEngines,
-                resultChecks: $resultChecks,
-                counterDifferentFromMatomo: $counterDifferentFromMatomo,
-                counterComparedWithMatomo: $counterComparedWithMatomo,
             );
+
+            if ($saved === false) {
+                ++$errors;
+
+                $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
+                $message    = $loopMessage . $addMessage;
+                $diff       = $this->messageLength($output, $message, $messageLength);
+
+                $output->writeln(
+                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+                //     $output->writeln('');
+                //     $output->writeln('<options=bold,blink>8</>');
+                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln('');
+                // }
+
+                continue;
+            }
+
+            $addMessage = sprintf('write to temporary file %s - <info>done</info>', $file);
+
+            unset($file);
+
+            $message = $loopMessage . $addMessage;
+            $diff    = $this->messageLength($output, $message, $messageLength);
+
+            $output->write(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+            $output->writeln(
+                sprintf(' <bg=red>%d</>', $messageLength),
+                OutputInterface::VERBOSITY_DEBUG,
+            );
+
+            ++$testCount;
+
+            if (!array_key_exists('test', $resultChecks['general'])) {
+                $resultChecks['general']['test'] = 0;
+            }
+
+            ++$resultChecks['general']['test'];
+
+            if (!array_key_exists('test', $resultChecks[$testProperty->getDateLast()])) {
+                $resultChecks[$testProperty->getDateLast()]['test'] = 0;
+            }
+
+            ++$resultChecks[$testProperty->getDateLast()]['test'];
+
+            try {
+                $integrationTests = $this->updateIntegrationTests(
+                    result: $result,
+                    integrationTests: $integrationTests,
+                    addIntegrationTests: self::ADD_INTEGRATION_TESTS,
+                );
+            } catch (UnexpectedValueException | NotNumericException $e) {
+                $this->consoleLogger->error($e);
+            }
+
+            // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+            //     $output->writeln('');
+            //     $output->writeln('<options=bold,blink>9</>');
+            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+            //     $output->writeln('');
+            // }
 
             //            if ($counterDifferentFromMatomo >= 10) {
             //                exit;
@@ -791,6 +1279,8 @@ final class RewriteTestsCommand extends Command
         }
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+
+        $this->jsonNormalizer->init($output);
 
         $messageLength = 0;
         $baseMessage   = 're-write test files in directory ';
@@ -805,24 +1295,112 @@ final class RewriteTestsCommand extends Command
         $fileFinder->in('.build');
 
         foreach ($fileFinder as $file) {
-            try {
-                $this->rewriteTests(
-                    output: $output,
-                    file: $file,
-                    integrationTests: $integrationTests,
-                    basePath: $basePath,
-                    baseMessage: $baseMessage,
-                    errors: $errors,
-                    messageLength: $messageLength,
-                );
-            } catch (RuntimeException $e) {
+            $matches = [];
+
+            if (
+                !preg_match(
+                    '/\.build\\\(?P<deviceManufaturer>[^\\\]+)\\\(?P<deviceType>[^\\\]+)\\\(?P<clientManufaturer>[^\\\]+)\\\(?P<clientType>[^\\\]+)\.json/',
+                    $file->getPathname(),
+                    $matches,
+                )
+            ) {
+                ++$errors;
+
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $output->writeln(
-                    messages: '<error>' . $e . '</error>',
-                    options: OutputInterface::VERBOSITY_NORMAL,
+                $this->consoleLogger->error(
+                    sprintf(
+                        'the path "%s" does not match required structure',
+                        $file->getPathname(),
+                    ),
                 );
 
                 return 1;
+            }
+
+            try {
+                /** @var non-empty-list<array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}, date-first?: string, date-last?: string}> $data */
+                $data = json_decode(
+                    $file->getContents(),
+                    associative: false,
+                    flags: JSON_THROW_ON_ERROR,
+                );
+            } catch (JsonException $e) {
+                ++$errors;
+
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+                $this->consoleLogger->error(
+                    new Exception(
+                        'An error occured while encoding a resultset',
+                        0,
+                        $e,
+                    ),
+                );
+
+                return 1;
+            }
+
+            /** @var non-empty-list<Result> $tests */
+            $tests = array_filter(
+                array_map(
+                    function (mixed $xpart): Result | null {
+                        if (!is_array($xpart)) {
+                            $this->consoleLogger->error('$part is not an Array');
+
+                            return null;
+                        }
+
+                        $headers = $xpart['headers'] ?? null;
+
+                        if (!is_array($headers)) {
+                            $this->consoleLogger->error('$headers is not an Array');
+
+                            return null;
+                        }
+
+                        return $this->buildResult(
+                            data: $xpart,
+                            headers: $headers,
+                        );
+                    },
+                    $data,
+                ),
+                static fn (mixed $xpart): bool => $xpart !== null,
+            );
+
+            array_walk(
+                $tests,
+                function (Result $result) use (&$integrationTests): void {
+                    try {
+                        $integrationTests = $this->updateIntegrationTests(
+                            result: $result,
+                            integrationTests: $integrationTests,
+                            addIntegrationTests: self::ADD_INTEGRATION_TESTS,
+                        );
+                    } catch (UnexpectedValueException | NotNumericException $e) {
+                        $this->consoleLogger->error($e);
+                    }
+                },
+            );
+
+            foreach (array_chunk($tests, 100) as $number => $results) {
+                try {
+                    $this->rewriteFile(
+                        output: $output,
+                        basePath: $basePath,
+                        baseMessage: $baseMessage,
+                        matches: $matches,
+                        results: $results,
+                        number: $number,
+                        messageLength: $messageLength,
+                    );
+                } catch (RuntimeException $e) {
+                    ++$errors;
+                    $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
+                    $output->writeln(
+                        messages: '<error>' . $e . '</error>',
+                        options: OutputInterface::VERBOSITY_NORMAL,
+                    );
+                }
             }
         }
 
@@ -833,10 +1411,29 @@ final class RewriteTestsCommand extends Command
         );
 
         foreach (array_chunk($integrationTests, 100) as $number => $parts) {
-            $normalized = Yaml::dump($parts, 12, 2);
+            try {
+                $normalized = $this->jsonNormalizer->normalize(
+                    output: $output,
+                    testCases: $parts,
+                    message: 'normalizing',
+                    messageLength: $messageLength,
+                );
+            } catch (RuntimeException $e) {
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERBOSE);
+                $output->writeln(
+                    messages: '<error>' . $e . '</error>',
+                    options: OutputInterface::VERBOSITY_NORMAL,
+                );
+
+                continue;
+            }
 
             $path  = $basePath;
-            $path .= sprintf('data/integration-tests/tests-%07d.yaml', $number);
+            $path .= sprintf('data/integration-tests/tests-%07d.json', $number);
+
+            if ($normalized === null) {
+                throw new RuntimeException(sprintf('file "%s" contains invalid json', $path));
+            }
 
             $success = @file_put_contents($path, $normalized);
 
@@ -846,12 +1443,11 @@ final class RewriteTestsCommand extends Command
 
             ++$errors;
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-            $output->writeln(
-                messages: '<error>' . sprintf(
+            $this->consoleLogger->error(
+                sprintf(
                     'An error occured while writing file %s',
                     $path,
-                ) . '</error>',
-                options: OutputInterface::VERBOSITY_NORMAL,
+                ),
             );
         }
 
@@ -1307,7 +1903,6 @@ final class RewriteTestsCommand extends Command
      */
     private function handleTest(
         OutputInterface $output,
-        Detector $detector,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
@@ -1322,13 +1917,10 @@ final class RewriteTestsCommand extends Command
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         try {
-            /** @var array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
-            $newResult = $detector->getBrowser($headers);
+            /** @var array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
+            $newResult = $this->detector->getBrowser($headers);
         } catch (InvalidArgumentException | UnexpectedValueException $e) {
-            $output->writeln(
-                messages: sprintf('<error>%s</error>', $e),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $this->consoleLogger->error($e);
 
             return new TestResult(
                 result: null,
@@ -1352,7 +1944,10 @@ final class RewriteTestsCommand extends Command
             && ($newResult['client']['isbot'] ?? false) === false
         ) {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_IS_NULL,
@@ -1361,7 +1956,10 @@ final class RewriteTestsCommand extends Command
 
         if (($newResult['client']['name'] ?? null) === null) {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_CLIENT_IS_NULL,
@@ -1373,7 +1971,10 @@ final class RewriteTestsCommand extends Command
             && ($newResult['client']['isbot'] ?? false) === false
         ) {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_NOT_SCALAR,
@@ -1391,7 +1992,10 @@ final class RewriteTestsCommand extends Command
 
         if (str_contains((string) $newResult['client']['name'], 'general')) {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_CLIENT_IS_GENERAL,
@@ -1400,7 +2004,10 @@ final class RewriteTestsCommand extends Command
 
         if (($newResult['client']['name'] ?? null) === 'unknown') {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_CLIENT_IS_UNKNOW,
@@ -1412,7 +2019,10 @@ final class RewriteTestsCommand extends Command
             && ($newResult['client']['isbot'] ?? false) === false
         ) {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_IS_GENERAL,
@@ -1425,7 +2035,10 @@ final class RewriteTestsCommand extends Command
         ) {
             // only check for unknown device, if it's not a bot
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_OK,
                 headers: $headers,
                 exit: TestResult::EXIT_DEVICE_IS_UNKNOW,
@@ -1475,7 +2088,7 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        $deviceType = Type::fromName($newResult['device']['type'] ?? 'unknown');
+        $deviceType = DeviceType::fromName($newResult['device']['type'] ?? 'unknown');
 
         if ($deviceType->isMobile() || $deviceType->isTablet()) {
             $keys = ['mobile'];
@@ -1510,10 +2123,10 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult
-     * @param array<int, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           $keys
-     * @param array<non-empty-string, non-empty-string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $headers
-     * @param TestResult::EXIT_*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           $exit
+     * @param array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult
+     * @param array<int, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $keys
+     * @param array<non-empty-string, non-empty-string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        $headers
+     * @param TestResult::EXIT_*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $exit
      *
      * @throws void
      */
@@ -1538,7 +2151,10 @@ final class RewriteTestsCommand extends Command
 
         if (array_key_exists($key, $this->tests)) {
             return new TestResult(
-                result: $newResult,
+                result: $this->buildResult(
+                    data: $newResult,
+                    headers: $headers,
+                ),
                 status: TestResult::STATUS_DUPLICATE,
                 headers: $headers,
                 exit: $exit,
@@ -1548,7 +2164,10 @@ final class RewriteTestsCommand extends Command
         $this->tests[$key] = 1;
 
         return new TestResult(
-            result: $newResult,
+            result: $this->buildResult(
+                data: $newResult,
+                headers: $headers,
+            ),
             status: TestResult::STATUS_OK,
             headers: $headers,
             exit: $exit,
@@ -1556,116 +2175,23 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<int<0, max>|string, array<mixed>> $integrationTests
+     * @param array<int|string, string> $matches
+     * @param non-empty-list<Result>    $results
      *
      * @throws RuntimeException
-     */
-    private function rewriteTests(
-        OutputInterface $output,
-        SplFileInfo $file,
-        array &$integrationTests,
-        string $basePath,
-        string $baseMessage,
-        int &$errors,
-        int &$messageLength = 0,
-    ): void {
-        if (
-            !preg_match(
-                '/\.build\\\(?P<deviceManufaturer>[^\\\]+)\\\(?P<deviceType>[^\\\]+)\\\(?P<clientManufaturer>[^\\\]+)\\\(?P<clientType>[^\\\]+)\.json/',
-                $file->getPathname(),
-                $matches,
-            )
-        ) {
-            ++$errors;
-
-            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-            $output->writeln(
-                messages: sprintf(
-                    '<error>the path "%s" does not match required structure</error>',
-                    $file->getPathname(),
-                ),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return;
-        }
-
-        try {
-            /** @var array<int|string, array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}> $data */
-            $data = json_decode(
-                $file->getContents(),
-                associative: true,
-                flags: JSON_THROW_ON_ERROR,
-            );
-        } catch (JsonException $e) {
-            ++$errors;
-
-            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-            $output->writeln(
-                messages: '<error>' . (new Exception(
-                    'An error occured while encoding a resultset',
-                    0,
-                    $e,
-                )) . '</error>',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return;
-        }
-
-        assert(is_array($data));
-
-        foreach (array_chunk($data, 100) as $number => $parts) {
-            $this->rewriteFile(
-                output: $output,
-                basePath: $basePath,
-                baseMessage: $baseMessage,
-                matches: $matches,
-                parts: $parts,
-                integrationTests: $integrationTests,
-                number: $number,
-                errors: $errors,
-                messageLength: $messageLength,
-            );
-        }
-    }
-
-    /**
-     * @param array<int|string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $matches
-     * @param array<int|string, array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}> $parts
-     * @param array<int<0, max>|string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $integrationTests
-     *
-     * @throws void
      */
     private function rewriteFile(
         OutputInterface $output,
         string $basePath,
         string $baseMessage,
         array $matches,
-        array $parts,
-        array &$integrationTests,
+        array $results,
         int $number,
-        int &$errors,
         int &$messageLength,
     ): void {
-        foreach ($parts as $part) {
-            $headers = $part['headers'] ?? [];
-
-            $k = Yaml::dump($headers);
-
-            if (array_key_exists($k, $integrationTests)) {
-                continue;
-            }
-
-            $integrationTests[] = [
-                'headers' => $headers,
-                'expected' => $part,
-            ];
-        }
-
         $path  = $basePath;
         $path .= sprintf(
-            'data/tests/%s/%s/%s/%s/%07d.yaml',
+            'data/tests/%s/%s/%s/%s/%07d.json',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1676,12 +2202,18 @@ final class RewriteTestsCommand extends Command
         $p1 = sprintf('data/tests/%s', $matches['deviceManufaturer']);
 
         if (!file_exists($basePath . $p1)) {
+            $output->write(
+                messages: sprintf('create directory %s', $basePath . $p1),
+            );
             mkdir($basePath . $p1);
         }
 
         $p2 = sprintf('data/tests/%s/%s', $matches['deviceManufaturer'], $matches['deviceType']);
 
         if (!file_exists($basePath . $p2)) {
+            $output->write(
+                messages: sprintf('create directory %s', $basePath . $p2),
+            );
             mkdir($basePath . $p2);
         }
 
@@ -1693,6 +2225,9 @@ final class RewriteTestsCommand extends Command
         );
 
         if (!file_exists($basePath . $p3)) {
+            $output->write(
+                messages: sprintf('create directory %s', $basePath . $p3),
+            );
             mkdir($basePath . $p3);
         }
 
@@ -1705,12 +2240,15 @@ final class RewriteTestsCommand extends Command
         );
 
         if (!file_exists($basePath . $p4)) {
+            $output->write(
+                messages: sprintf('create directory %s', $basePath . $p4),
+            );
             mkdir($basePath . $p4);
         }
 
         $message  = $baseMessage;
         $message .= sprintf(
-            'data/tests/%s/%s/%s/%s/%07d.yaml',
+            'data/tests/%s/%s/%s/%s/%07d.json',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1727,11 +2265,20 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        $normalized = Yaml::dump($parts, 12, 2);
+        $normalized = $this->jsonNormalizer->normalize(
+            output: $output,
+            testCases: $results,
+            message: $message,
+            messageLength: $messageLength,
+        );
+
+        if ($normalized === null) {
+            throw new RuntimeException(sprintf('file "%s" contains invalid json', $path));
+        }
 
         $message  = $baseMessage;
         $message .= sprintf(
-            'data/tests/%s/%s/%s/%s/%07d.yaml',
+            'data/tests/%s/%s/%s/%s/%07d.json',
             $matches['deviceManufaturer'],
             $matches['deviceType'],
             $matches['clientManufaturer'],
@@ -1754,533 +2301,18 @@ final class RewriteTestsCommand extends Command
             return;
         }
 
-        ++$errors;
-        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-        $output->writeln(
-            messages: '<error>' . sprintf(
+        throw new RuntimeException(
+            sprintf(
                 'An error occured while writing file %s',
                 $path,
-            ) . '</error>',
-            options: OutputInterface::VERBOSITY_NORMAL,
+            ),
         );
     }
 
-    /**
-     * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
-     * @param array<string, array<mixed>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   $txtChecks
-     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedPlatforms
-     * @param array<string, array<string, array{count: int, checked?: bool}>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               $checkedEngines
-     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
-     *
-     * @throws void
-     *
-     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
-     */
-    private function handleTestCase(
-        OutputInterface $output,
-        Detector $detector,
-        DeviceDetector $deviceDetector,
-        array $test,
-        string $loopMessage,
-        string $seachHeader,
-        bool $compareWithMatomo,
-        int &$skippedAfterCheck,
-        int &$skippedVersion,
-        int &$skippedHeaderCheck,
-        int &$duplicates,
-        int &$errors,
-        int &$testCount,
-        int &$messageLength,
-        float &$timeDetect,
-        float &$timeRead,
-        float &$timeWrite,
-        float &$timeCompare,
-        array &$txtChecks,
-        array &$checkedPlatforms,
-        array &$checkedEngines,
-        array &$resultChecks,
-        int &$counterDifferentFromMatomo,
-        int &$counterComparedWithMatomo,
-    ): void {
-        $txtChecks[$seachHeader] = $test;
-
-        ++$skippedHeaderCheck;
-        --$skippedHeaderCheck;
-
-        if (!array_key_exists('skippedHeaderCheck', $resultChecks['general'])) {
-            $resultChecks['general']['skippedHeaderCheck'] = 0;
-        }
-
-        // $resultChecks['general']['skippedHeaderCheck']++;
-
-        if (!array_key_exists('skippedHeaderCheck', $resultChecks[$test['date-last']])) {
-            $resultChecks[$test['date-last']]['skippedHeaderCheck'] = 0;
-        }
-
-        // $resultChecks[$test['date-last']]['skippedHeaderCheck']++;
-
-        // if (
-        //    !array_key_exists('x-requested-with', $test['headers'])
-        //    && !array_key_exists('http-x-requested-with', $test['headers'])
-        // ) {
-        //    ++$skippedHeaderCheck;
-        //
-        //    return;
-        // }
-        //
-        // if (
-        //    !array_key_exists('sec-ch-ua-platform', $test['headers'])
-        // ) {
-        //    ++$skippedHeaderCheck;
-        //
-        //    return;
-        // }
-        //
-        // if (
-        //    !array_key_exists('sec-ch-ua-model', $test['headers'])
-        // ) {
-        //    ++$skippedHeaderCheck;
-        //
-        //    return;
-        // }
-        //
-        // if (
-        //    !array_key_exists('x-puffin-ua', $test['headers'])
-        // ) {
-        //    ++$skippedHeaderCheck;
-        //
-        //    return;
-        // }
-
-        $message = $loopMessage . 'redetect';
-        $diff    = $this->messageLength($output, $message, $messageLength);
-
-        $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
-
-        $startTime = microtime(as_float: true);
-
-        $testResult = $this->handleTest(
-            output: $output,
-            detector: $detector,
-            headers: $test['headers'],
-            parentMessage: $message,
-            messageLength: $messageLength,
-        );
-
-        $timeDetect += microtime(as_float: true) - $startTime;
-
-        $result = $testResult->getResult();
-
-        if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
-            ++$skippedAfterCheck;
-
-            if (!array_key_exists('skippedAfterCheck', $resultChecks['general'])) {
-                $resultChecks['general']['skippedAfterCheck'] = 0;
-            }
-
-            ++$resultChecks['general']['skippedAfterCheck'];
-
-            if (!array_key_exists('skippedAfterCheck', $resultChecks[$test['date-last']])) {
-                $resultChecks[$test['date-last']]['skippedAfterCheck'] = 0;
-            }
-
-            ++$resultChecks[$test['date-last']]['skippedAfterCheck'];
-
-            return;
-        }
-
-        if ($testResult->getStatus() === TestResult::STATUS_DUPLICATE) {
-            ++$duplicates;
-
-            if (!array_key_exists('duplicates', $resultChecks['general'])) {
-                $resultChecks['general']['duplicates'] = 0;
-            }
-
-            ++$resultChecks['general']['duplicates'];
-
-            if (!array_key_exists('duplicates', $resultChecks[$test['date-last']])) {
-                $resultChecks[$test['date-last']]['duplicates'] = 0;
-            }
-
-            ++$resultChecks[$test['date-last']]['duplicates'];
-
-            return;
-        }
-
-        if ($testResult->getStatus() === TestResult::STATUS_ERROR || $result === null) {
-            ++$errors;
-
-            if (!array_key_exists('errors', $resultChecks['general'])) {
-                $resultChecks['general']['errors'] = 0;
-            }
-
-            ++$resultChecks['general']['errors'];
-
-            if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
-                $resultChecks[$test['date-last']]['errors'] = 0;
-            }
-
-            ++$resultChecks[$test['date-last']]['errors'];
-
-            return;
-        }
-
-        $headers = $testResult->getHeaders();
-
-        $osName     = mb_strtolower($result['os']['name'] ?? '');
-        $engineName = mb_strtolower($result['engine']['name'] ?? '');
-        $versionOs  = null;
-
-        if (is_scalar($result['os']['version'] ?? null)) {
-            try {
-                $versionOs = (new VersionBuilder())->set((string) $result['os']['version']);
-            } catch (NotNumericException $e) {
-                ++$errors;
-
-                if (!array_key_exists('errors', $resultChecks['general'])) {
-                    $resultChecks['general']['errors'] = 0;
-                }
-
-                ++$resultChecks['general']['errors'];
-
-                if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
-                    $resultChecks[$test['date-last']]['errors'] = 0;
-                }
-
-                ++$resultChecks[$test['date-last']]['errors'];
-
-                $exception = new Exception('An error occured while decoding a result', 0, $e);
-
-                $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                $message = $loopMessage . $addMessage;
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return;
-            }
-
-            try {
-                $osVersion = $versionOs->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
-            } catch (UnexpectedValueException) {
-                $osVersion = 'e';
-            }
-        } else {
-            $osVersion = '-';
-        }
-
-        if (is_scalar($result['engine']['version'] ?? null)) {
-            try {
-                $versionEngine = (new VersionBuilder())->set((string) $result['engine']['version']);
-            } catch (NotNumericException $e) {
-                ++$errors;
-
-                if (!array_key_exists('errors', $resultChecks['general'])) {
-                    $resultChecks['general']['errors'] = 0;
-                }
-
-                ++$resultChecks['general']['errors'];
-
-                if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
-                    $resultChecks[$test['date-last']]['errors'] = 0;
-                }
-
-                ++$resultChecks[$test['date-last']]['errors'];
-
-                $exception = new Exception('An error occured while decoding a result', 0, $e);
-
-                $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                $message = $loopMessage . $addMessage;
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return;
-            }
-
-            try {
-                $engineVersion = $versionEngine->getVersion(VersionInterface::IGNORE_MICRO) ?? '-';
-            } catch (UnexpectedValueException) {
-                $engineVersion = 'e';
-            }
-        } else {
-            $engineVersion = '-';
-        }
-
-        if ($versionOs instanceof VersionInterface) {
-            $majorVersion = (int) $versionOs->getMajor();
-
-            try {
-                $majorMinorVersion = (float) $versionOs->getVersion(VersionInterface::IGNORE_MICRO);
-            } catch (UnexpectedValueException) {
-                $majorMinorVersion = 0.0;
-            }
-
-            if (
-                in_array(
-                    $osName,
-                    ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
-                    strict: true,
-                )
-                && $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
-            ) {
-                ++$skippedVersion;
-
-                if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
-                    $resultChecks['general']['skippedVersion'] = 0;
-                }
-
-                ++$resultChecks['general']['skippedVersion'];
-
-                if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
-                    $resultChecks[$test['date-last']]['skippedVersion'] = 0;
-                }
-
-                ++$resultChecks[$test['date-last']]['skippedVersion'];
-
-                return;
-            }
-
-            if (
-                in_array(
-                    $osName,
-                    ['windows', 'windows rt'],
-                    strict: true,
-                )
-                && $majorVersion < self::DETECT_LOWER_VERSION_WINDOWS
-            ) {
-                ++$skippedVersion;
-
-                if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
-                    $resultChecks['general']['skippedVersion'] = 0;
-                }
-
-                ++$resultChecks['general']['skippedVersion'];
-
-                if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
-                    $resultChecks[$test['date-last']]['skippedVersion'] = 0;
-                }
-
-                ++$resultChecks[$test['date-last']]['skippedVersion'];
-
-                return;
-            }
-
-            if (
-                in_array(
-                    $osName,
-                    ['mac os x', 'macintosh'],
-                    strict: true,
-                )
-                && $majorMinorVersion < self::DETECT_LOWER_VERSION_MACOS
-            ) {
-                ++$skippedVersion;
-
-                if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
-                    $resultChecks['general']['skippedVersion'] = 0;
-                }
-
-                ++$resultChecks['general']['skippedVersion'];
-
-                if (!array_key_exists('skippedVersion', $resultChecks[$test['date-last']])) {
-                    $resultChecks[$test['date-last']]['skippedVersion'] = 0;
-                }
-
-                ++$resultChecks[$test['date-last']]['skippedVersion'];
-
-                return;
-            }
-        }
-
-        if (!$compareWithMatomo) {
-            $compareWithMatomo = $this->compareWithMatomo(
-                osName: $osName,
-                osVersion: $osVersion,
-                engineName: $engineName,
-                engineVersion: $engineVersion,
-                checkedPlatforms: $checkedPlatforms,
-                checkedEngines: $checkedEngines,
-            );
-        }
-
-        if ($compareWithMatomo) {
-            $startTime = microtime(as_float: true);
-
-            try {
-                $this->compareDeviceWithMapper(
-                    output: $output,
-                    deviceDetector: $deviceDetector,
-                    test: $test,
-                    testResult: $testResult,
-                    headers: $headers,
-                    loopMessage: $loopMessage,
-                    messageLength: $messageLength,
-                    counterDifferentFromMatomo: $counterDifferentFromMatomo,
-                    resultChecks: $resultChecks,
-                );
-            } catch (UnexpectedValueException $e) {
-                ++$errors;
-
-                if (!array_key_exists('errors', $resultChecks['general'])) {
-                    $resultChecks['general']['errors'] = 0;
-                }
-
-                ++$resultChecks['general']['errors'];
-
-                if (!array_key_exists('errors', $resultChecks[$test['date-last']])) {
-                    $resultChecks[$test['date-last']]['errors'] = 0;
-                }
-
-                ++$resultChecks[$test['date-last']]['errors'];
-
-                $exception = new Exception('An error occured while comparing a result', 0, $e);
-
-                $addMessage = sprintf('<error>%s</error>', (string) $exception);
-
-                $message = $loopMessage . $addMessage;
-
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
-
-                return;
-            }
-
-            $timeCompare += microtime(as_float: true) - $startTime;
-
-            ++$counterComparedWithMatomo;
-
-            if (!array_key_exists('comparedWithMatomo', $resultChecks['general'])) {
-                $resultChecks['general']['comparedWithMatomo'] = 0;
-            }
-
-            ++$resultChecks['general']['comparedWithMatomo'];
-
-            if (!array_key_exists('comparedWithMatomo', $resultChecks[$test['date-last']])) {
-                $resultChecks[$test['date-last']]['comparedWithMatomo'] = 0;
-            }
-
-            ++$resultChecks[$test['date-last']]['comparedWithMatomo'];
-        }
-
-        $deviceManufaturer = mb_strtolower(
-            str_replace([' ', 'ü'], ['-', 'ue'], $result['device']['manufacturer'] ?? ''),
-        );
-        $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
-            ['.', ' '],
-            ['', '-'],
-            $deviceManufaturer,
-        );
-
-        $clientManufaturer = mb_strtolower(
-            str_replace([' ', 'ü'], ['-', 'ue'], $result['client']['manufacturer'] ?? ''),
-        );
-        $clientManufaturer = $clientManufaturer === '' ? 'unknown' : str_replace(
-            ['.', ' '],
-            ['', '-'],
-            $clientManufaturer,
-        );
-
-        $deviceType = mb_strtolower($result['device']['type'] ?? 'unknown');
-        $clientType = mb_strtolower($result['client']['type'] ?? 'unknown');
-
-        if (!file_exists(sprintf('.build/%s', $deviceManufaturer))) {
-            mkdir(sprintf('.build/%s', $deviceManufaturer));
-        }
-
-        if (!file_exists(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType))) {
-            mkdir(sprintf('.build/%s/%s', $deviceManufaturer, $deviceType));
-        }
-
-        if (
-            !file_exists(
-                sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer),
-            )
-        ) {
-            mkdir(sprintf('.build/%s/%s/%s', $deviceManufaturer, $deviceType, $clientManufaturer));
-        }
-
-        $file = sprintf(
-            '.build/%s/%s/%s/%s.json',
-            $deviceManufaturer,
-            $deviceType,
-            $clientManufaturer,
-            $clientType,
-        );
-
-        $saved = $this->saveResult(
-            output: $output,
-            result: $result,
-            file: $file,
-            loopMessage: $loopMessage,
-            errors: $errors,
-            messageLength: $messageLength,
-            timeRead: $timeRead,
-            timeWrite: $timeWrite,
-        );
-
-        if ($saved === false) {
-            ++$errors;
-
-            $addMessage = sprintf('<error>An error occured while saving file %s</error>', $file);
-            $message    = $loopMessage . $addMessage;
-            $diff       = $this->messageLength($output, $message, $messageLength);
-
-            $output->writeln(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return;
-        }
-
-        $addMessage = sprintf('write to temporary file %s - <info>done</info>', $file);
-
-        unset($file);
-
-        $message = $loopMessage . $addMessage;
-        $diff    = $this->messageLength($output, $message, $messageLength);
-
-        $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
-
-        ++$testCount;
-
-        if (!array_key_exists('test', $resultChecks['general'])) {
-            $resultChecks['general']['test'] = 0;
-        }
-
-        ++$resultChecks['general']['test'];
-
-        if (!array_key_exists('test', $resultChecks[$test['date-last']])) {
-            $resultChecks[$test['date-last']]['test'] = 0;
-        }
-
-        ++$resultChecks[$test['date-last']]['test'];
-    }
-
-    /**
-     * @param array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $result
-     *
-     * @throws void
-     */
+    /** @throws void */
     private function saveResult(
         OutputInterface $output,
-        array $result,
+        Result $result,
         string $file,
         string $loopMessage,
         int &$errors,
@@ -2367,7 +2399,22 @@ final class RewriteTestsCommand extends Command
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
-        $tests[] = $result;
+        try {
+            $tests[] = $result->toArray();
+        } catch (UnexpectedValueException) {
+            ++$errors;
+
+            $addMessage = sprintf('<error>An error occured while handling file %s</error>', $file);
+            $message    = $loopMessage . $addMessage;
+            $diff       = $this->messageLength($output, $message, $messageLength);
+
+            $output->writeln(
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                options: OutputInterface::VERBOSITY_NORMAL,
+            );
+
+            return false;
+        }
 
         $startTime = microtime(as_float: true);
 
@@ -2376,7 +2423,7 @@ final class RewriteTestsCommand extends Command
                 filename: $file,
                 data: json_encode(
                     $tests,
-                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR,
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION,
                 ),
             );
         } catch (JsonException) {
@@ -2421,16 +2468,14 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string, raw: mixed} $test
-     * @param array<string, string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $headers
-     * @param array<string, array<string, int>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $resultChecks
+     * @param array<string, string>             $headers
+     * @param array<string, array<string, int>> $resultChecks
      *
      * @throws UnexpectedValueException
      */
     private function compareDeviceWithMapper(
         OutputInterface $output,
-        DeviceDetector $deviceDetector,
-        array $test,
+        TestProperties $testProperties,
         TestResult $testResult,
         array $headers,
         string $loopMessage,
@@ -2442,18 +2487,18 @@ final class RewriteTestsCommand extends Command
 
         $clientHints = ClientHints::factory($headers);
 
-        $deviceDetector->setUserAgent($headers['user-agent'] ?? '');
-        $deviceDetector->setClientHints($clientHints);
-        $deviceDetector->parse();
+        $this->deviceDetector->setUserAgent($headers['user-agent'] ?? '');
+        $this->deviceDetector->setClientHints($clientHints);
+        $this->deviceDetector->parse();
 
-        $ddDeviceType = $inputMapper->mapDeviceType($deviceDetector->getDeviceName());
+        $ddDeviceType = $inputMapper->mapDeviceType($this->deviceDetector->getDeviceName());
 
-        if ($deviceDetector->getDeviceName() !== '' && $ddDeviceType === Type::Unknown) {
+        if ($this->deviceDetector->getDeviceName() !== '' && $ddDeviceType === DeviceType::Unknown) {
             $output->writeln(
                 messages: "\n" . mb_str_pad(
                     string: sprintf(
                         'The device type "<fg=magenta>%s (%s)</>" from Matomo for user-agent Header "%s" was not found in the Enum. Please add it.',
-                        $deviceDetector->getDeviceName(),
+                        $this->deviceDetector->getDeviceName(),
                         $ddDeviceType->getType(),
                         $headers['user-agent'] ?? '',
                     ),
@@ -2463,19 +2508,23 @@ final class RewriteTestsCommand extends Command
             );
         }
 
-        $result = $testResult->getResult() ?? [];
+        $result = $testResult->getResult();
 
-        $resultTypeName = $result['device']['type'] ?? '';
+        if (!$result instanceof Result) {
+            return;
+        }
+
+        $resultTypeName = $result->getDevice()->getType()->getType();
 
         if ($resultTypeName !== 'unknown') {
-            $resultType = Type::fromName($resultTypeName);
+            $resultType = DeviceType::fromName($resultTypeName);
 
-            if ($resultType === Type::Unknown) {
+            if ($resultType === DeviceType::Unknown) {
                 $output->writeln(
                     messages: "\n" . mb_str_pad(
                         string: sprintf(
                             'The device type "<fg=magenta>%s</>" for user-agent Header "%s" was not found in the Enum. Please add it.',
-                            $result['device']['type'] ?? '',
+                            $result->getDevice()->getType()->getType(),
                             $headers['user-agent'] ?? '',
                         ),
                         length: $messageLength,
@@ -2484,7 +2533,7 @@ final class RewriteTestsCommand extends Command
                 );
             }
 
-            if ($resultType->hasTouch() && ($result['device']['display']['touch'] ?? null) !== true) {
+            if ($resultType->hasTouch() && $result->getDevice()->getDisplay()->hasTouch() !== true) {
                 $output->writeln(
                     messages: "\n" . mb_str_pad(
                         string: sprintf(
@@ -2498,7 +2547,7 @@ final class RewriteTestsCommand extends Command
                 );
             }
 
-            if (!$resultType->hasTouch() && ($result['device']['display']['touch'] ?? null) === true) {
+            if (!$resultType->hasTouch() && $result->getDevice()->getDisplay()->hasTouch() === true) {
                 $output->writeln(
                     messages: "\n" . mb_str_pad(
                         string: sprintf(
@@ -2513,20 +2562,20 @@ final class RewriteTestsCommand extends Command
             }
         }
 
-        $ddModel = $inputMapper->mapDeviceMarketingName($deviceDetector->getModel());
-        $ddBrand = $inputMapper->mapDeviceBrandName($deviceDetector->getBrandName());
+        $ddModel = $inputMapper->mapDeviceMarketingName($this->deviceDetector->getModel());
+        $ddBrand = $inputMapper->mapDeviceBrandName($this->deviceDetector->getBrandName());
 
-        $isBot      = $deviceDetector->isBot();
-        $osInfo     = $deviceDetector->getOs();
-        $clientInfo = $deviceDetector->getClient();
-        $botInfo    = $deviceDetector->getBot();
+        $isBot      = $this->deviceDetector->isBot();
+        $osInfo     = $this->deviceDetector->getOs();
+        $clientInfo = $this->deviceDetector->getClient();
+        $botInfo    = $this->deviceDetector->getBot();
 
         $ddOsName = $inputMapper->mapOsName($osInfo['name'] ?? null);
 
         try {
             $ddOsVersion = $inputMapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
         } catch (NotNumericException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
@@ -2538,7 +2587,7 @@ final class RewriteTestsCommand extends Command
                 $isBot ? null : ($clientInfo['engine_version'] ?? null),
             );
         } catch (NotNumericException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
@@ -2552,7 +2601,7 @@ final class RewriteTestsCommand extends Command
                 $isBot ? null : ($clientInfo['version'] ?? null),
             );
         } catch (NotNumericException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
@@ -2561,56 +2610,63 @@ final class RewriteTestsCommand extends Command
             $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
         );
 
-        $brModel      = $inputMapper->mapDeviceName($result['device']['deviceName'] ?? null);
+        $brModel      = $inputMapper->mapDeviceName($result->getDevice()->getDeviceName());
         $brModel2     = $inputMapper->mapDeviceMarketingName(
-            $result['device']['marketingName'] ?? null,
+            $result->getDevice()->getMarketingName(),
         );
-        $brBrand      = $inputMapper->mapDeviceBrandName($result['device']['brand'] ?? null);
-        $brDeviceType = $inputMapper->mapDeviceType($result['device']['type'] ?? null);
-        $brOsName     = $inputMapper->mapOsName($result['os']['name'] ?? null);
-        $brOsMName    = $inputMapper->mapOsName($result['os']['marketingName'] ?? null);
+        $brBrand      = $inputMapper->mapDeviceBrandName(
+            $result->getDevice()->getBrand()->getBrandname(),
+        );
+        $brDeviceType = $inputMapper->mapDeviceType($result->getDevice()->getType()->getType());
+        $brOsName     = $inputMapper->mapOsName($result->getOs()->getName());
+        $brOsMName    = $inputMapper->mapOsName($result->getOs()->getMarketingName());
 
         try {
-            $brOsVersion = $inputMapper->mapOsVersion($result['os']['version'] ?? null, $brOsName);
+            $brOsVersion = $inputMapper->mapOsVersion(
+                $result->getOs()->getVersion()->getVersion(),
+                $brOsName,
+            );
         } catch (NotNumericException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
 
-        $brEngineName = $inputMapper->mapEngineName($result['engine']['name'] ?? null);
+        $brEngineName = $inputMapper->mapEngineName($result->getEngine()->getName());
 
         try {
-            $brEngineVersion = $inputMapper->mapEngineVersion($result['engine']['version'] ?? null);
+            $brEngineVersion = $inputMapper->mapEngineVersion(
+                $result->getEngine()->getVersion()->getVersion(),
+            );
         } catch (NotNumericException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
 
-        $brClientName = $inputMapper->mapBrowserName($result['client']['name'] ?? null);
+        $brClientName = $inputMapper->mapBrowserName($result->getBrowser()->getName());
 
         try {
-            $brClientVersion = $inputMapper->mapBrowserVersion($result['client']['version'] ?? null);
+            $brClientVersion = $inputMapper->mapBrowserVersion(
+                $result->getBrowser()->getVersion()->getVersion(),
+            );
         } catch (NotNumericException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
 
-        $brClientType = $inputMapper->mapBrowserType($result['client']['type'] ?? null);
+        $brClientType = $inputMapper->mapBrowserType($result->getBrowser()->getType()->getType());
 
         $deviceBrandCheck   = $ddBrand !== $brBrand && $ddBrand !== null;
-        $deviceNameCheck    = $ddModel !== null && mb_strtolower($ddModel) !== mb_strtolower(
-            $brModel ?? '',
-        )
+        $deviceNameCheck    = $ddModel !== null
+            && mb_strtolower($ddModel) !== mb_strtolower($brModel ?? '')
             && mb_strtolower($ddModel) !== mb_strtolower($brModel2 ?? '')
             && $ddModel !== 'K';
         $deviceTypeCheck    = $ddDeviceType->getType() !== $brDeviceType->getType()
-            && $ddDeviceType !== Type::Unknown;
-        $osNameCheck        = $ddOsName !== null && mb_strtolower($ddOsName) !== mb_strtolower(
-            $brOsName ?? '',
-        )
+            && $ddDeviceType !== DeviceType::Unknown;
+        $osNameCheck        = $ddOsName !== null
+            && mb_strtolower($ddOsName) !== mb_strtolower($brOsName ?? '')
             && mb_strtolower($ddOsName) !== mb_strtolower($brOsMName ?? '');
         $osVersionCheck     = $ddOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
             !== $brOsVersion->getVersion(VersionInterface::IGNORE_MICRO)
@@ -2619,14 +2675,12 @@ final class RewriteTestsCommand extends Command
         $engineVersionCheck = $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
             !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
             && $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null;
-        $clientNameCheck    = $ddClientName !== null && mb_strtolower($ddClientName) !== mb_strtolower(
-            $brClientName ?? '',
-        );
+        $clientNameCheck    = mb_strtolower($ddClientName ?? '') !== mb_strtolower($brClientName ?? '');
         $clientVersionCheck = $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
             !== $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
             && $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) !== null;
         $clientTypeCheck    = $ddClientType !== $brClientType
-            && $ddClientType !== \UaBrowserType\Type::Unknown;
+            && $ddClientType !== ClientType::Unknown;
 
         try {
             $checks = [
@@ -2642,7 +2696,7 @@ final class RewriteTestsCommand extends Command
                 '$clientTypeCheck' => !$clientTypeCheck,
             ];
         } catch (Throwable $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
@@ -2665,13 +2719,13 @@ final class RewriteTestsCommand extends Command
 
         ++$resultChecks['general']['differentFromMatomo'];
 
-        if (!array_key_exists('differentFromMatomo', $resultChecks[$test['date-last']])) {
-            $resultChecks[$test['date-last']]['differentFromMatomo'] = 0;
+        if (!array_key_exists('differentFromMatomo', $resultChecks[$testProperties->getDateLast()])) {
+            $resultChecks[$testProperties->getDateLast()]['differentFromMatomo'] = 0;
         }
 
-        ++$resultChecks[$test['date-last']]['differentFromMatomo'];
+        ++$resultChecks[$testProperties->getDateLast()]['differentFromMatomo'];
 
-        $getMessage = function (DeviceDetector $deviceDetector) use ($output, $checks, $deviceBrandCheck, $deviceNameCheck, $deviceTypeCheck, $osNameCheck, $osVersionCheck, $engineNameCheck, $engineVersionCheck, $clientNameCheck, $clientVersionCheck, $clientTypeCheck, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
+        $getMessage = function () use ($output, $checks, $deviceBrandCheck, $deviceNameCheck, $deviceTypeCheck, $osNameCheck, $osVersionCheck, $engineNameCheck, $engineVersionCheck, $clientNameCheck, $clientVersionCheck, $clientTypeCheck, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
             $message        = $loopMessage;
             $someDifference = false;
 
@@ -2758,7 +2812,7 @@ final class RewriteTestsCommand extends Command
 
             if (!$someDifference) {
                 $output->writeln('');
-                $output->writeln(sprintf('<error>%s</error>', var_export($checks, return: true)));
+                $this->consoleLogger->error(var_export($checks, return: true));
                 $output->writeln('');
             }
 
@@ -2776,32 +2830,32 @@ final class RewriteTestsCommand extends Command
                 . '        but Matomo detected it as "%s%s -> %s</>" "%s%s -> %s</>" (%s%s -> %s</>)',
                 implode(PHP_EOL, $headerList),
                 $format1b,
-                $result['device']['brand'] ?? '<n/a>',
+                $result->getDevice()->getBrand()->getBrandname() ?? '<n/a>',
                 $brBrand,
                 $format2b,
-                $result['device']['deviceName'] ?? '<n/a>',
-                $result['device']['marketingName'] ?? '<n/a>',
+                $result->getDevice()->getDeviceName() ?? '<n/a>',
+                $result->getDevice()->getMarketingName() ?? '<n/a>',
                 $brModel,
                 $brModel2,
                 $format3b,
-                $result['device']['type'] ?? '<n/a>',
+                $result->getDevice()->getType()->getName() ?? '<n/a>',
                 $brDeviceType->getType(),
                 $format1d,
-                $deviceDetector->getBrandName(),
+                $this->deviceDetector->getBrandName(),
                 $ddBrand,
                 $format2d,
-                $deviceDetector->getModel(),
+                $this->deviceDetector->getModel(),
                 $ddModel,
                 $format3d,
-                $deviceDetector->getDeviceName(),
+                $this->deviceDetector->getDeviceName(),
                 $ddDeviceType->getType(),
                 $format4b,
-                $result['os']['name'] ?? '<n/a>',
-                $result['os']['marketingName'] ?? '<n/a>',
+                $result->getOs()->getName() ?? '<n/a>',
+                $result->getOs()->getMarketingName() ?? '<n/a>',
                 $brOsName,
                 $brOsMName,
                 $format5b,
-                $result['os']['version'] ?? '<n/a>',
+                $result->getOs()->getVersion()->getVersion() ?? '<n/a>',
                 $brOsVersion->getVersion(),
                 $format4d,
                 $osInfo['name'] ?? '',
@@ -2810,10 +2864,10 @@ final class RewriteTestsCommand extends Command
                 $osInfo['version'] ?? '',
                 $ddOsVersion->getVersion(),
                 $format6b,
-                $result['engine']['name'] ?? '',
+                $result->getEngine()->getName() ?? '',
                 $brEngineName,
                 $format7b,
-                $result['engine']['version'] ?? '',
+                $result->getEngine()->getVersion()->getVersion() ?? '',
                 $brEngineVersion->getVersion(),
                 $format6d,
                 $isBot ? '' : ($clientInfo['engine'] ?? ''),
@@ -2822,13 +2876,13 @@ final class RewriteTestsCommand extends Command
                 $isBot ? '' : ($clientInfo['engine_version'] ?? ''),
                 $ddEngineVersion->getVersion(),
                 $format8b,
-                $result['client']['name'] ?? '',
+                $result->getBrowser()->getName() ?? '',
                 $brClientName,
                 $format9b,
-                $result['client']['version'] ?? '',
+                $result->getBrowser()->getVersion()->getVersion() ?? '',
                 $brClientVersion->getVersion(),
                 $format10b,
-                $result['client']['type'] ?? '',
+                $result->getBrowser()->getType()->getType(),
                 $brClientType->getType(),
                 $format8d,
                 $isBot ? ($botInfo['name'] ?? '') : ($clientInfo['name'] ?? ''),
@@ -2843,9 +2897,9 @@ final class RewriteTestsCommand extends Command
         };
 
         try {
-            $message = $getMessage($deviceDetector);
+            $message = $getMessage();
         } catch (UnexpectedValueException $e) {
-            $output->writeln(sprintf('<error>%s</error>', (string) $e));
+            $this->consoleLogger->error($e);
 
             return;
         }
@@ -2880,25 +2934,11 @@ final class RewriteTestsCommand extends Command
         return $headerList;
     }
 
-    /**
-     * @param array{headers: array<non-empty-string, non-empty-string>, normalized-headers?: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string|null, raw: mixed} $test
-     *
-     * @throws void
-     */
-    private function accept(array $test, OutputInterface $output, string $loopMessage): bool
+    /** @throws void */
+    private function acceptByDate(TestProperties $testProperties, OutputInterface $output, string $loopMessage): bool
     {
-        if ($test['date-last'] === null) {
-            $output->writeln('');
-            $output->writeln(
-                messages: $loopMessage . ' <error>"data-last" field missing or null</error>',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
-
-            return true;
-        }
-
         try {
-            $date = new DateTimeImmutable($test['date-last']);
+            $date = new DateTimeImmutable($testProperties->getDateLast());
         } catch (Throwable $e) {
             $output->writeln('');
             $output->writeln(
@@ -3271,6 +3311,10 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'getaddress(')
                     || str_contains($v, 'inet_aton(')
                     || str_contains($v, '${env:')
+                    || str_contains($v, 'tostring(')
+                    || str_contains($v, 'substring(')
+                    || str_contains($v, '.get(')
+                    || str_contains($v, 'nessus.org')
                     || (mb_strlen($v) > 0 && mb_trim($v) === '');
                 // || str_contains($v, '­')
             },
@@ -3303,5 +3347,237 @@ final class RewriteTestsCommand extends Command
         }
 
         return $normalized;
+    }
+
+    /**
+     * @param array<string, array<string, int>> $resultChecks
+     *
+     * @throws void
+     */
+    private function skipVersion(TestProperties $testProperties, array &$resultChecks, int &$skippedVersion): void
+    {
+        ++$skippedVersion;
+
+        if (!array_key_exists('skippedVersion', $resultChecks['general'])) {
+            $resultChecks['general']['skippedVersion'] = 0;
+        }
+
+        ++$resultChecks['general']['skippedVersion'];
+
+        if (!array_key_exists('skippedVersion', $resultChecks[$testProperties->getDateLast()])) {
+            $resultChecks[$testProperties->getDateLast()]['skippedVersion'] = 0;
+        }
+
+        ++$resultChecks[$testProperties->getDateLast()]['skippedVersion'];
+    }
+
+    /**
+     * @param array<string, array<string, int>> $resultChecks
+     *
+     * @throws void
+     */
+    private function isVersionskipped(
+        VersionInterface | null $versionOs,
+        string $osName,
+        TestProperties $testProperties,
+        array &$resultChecks,
+        int &$skippedVersion,
+    ): bool {
+        if (!$versionOs instanceof VersionInterface) {
+            return false;
+        }
+
+        $majorVersion = (int) $versionOs->getMajor();
+
+        try {
+            $majorMinorVersion = (float) $versionOs->getVersion(VersionInterface::IGNORE_MICRO);
+        } catch (UnexpectedValueException) {
+            $majorMinorVersion = 0.0;
+        }
+
+        if (
+            in_array(
+                $osName,
+                ['android', 'ios', 'android tv', 'ipados', 'android opensource project'],
+                strict: true,
+            )
+            && $majorVersion < self::DETECT_LOWER_VERSION_ANDROID_IOS
+        ) {
+            $this->skipVersion(
+                testProperties: $testProperties,
+                resultChecks: $resultChecks,
+                skippedVersion: $skippedVersion,
+            );
+
+            return true;
+        }
+
+        if (
+            in_array(
+                $osName,
+                ['windows', 'windows rt'],
+                strict: true,
+            )
+            && $majorVersion < self::DETECT_LOWER_VERSION_WINDOWS
+        ) {
+            $this->skipVersion(
+                testProperties: $testProperties,
+                resultChecks: $resultChecks,
+                skippedVersion: $skippedVersion,
+            );
+
+            return true;
+        }
+
+        if (
+            in_array(
+                $osName,
+                ['mac os x', 'macintosh'],
+                strict: true,
+            )
+            && $majorMinorVersion < self::DETECT_LOWER_VERSION_MACOS
+        ) {
+            $this->skipVersion(
+                testProperties: $testProperties,
+                resultChecks: $resultChecks,
+                skippedVersion: $skippedVersion,
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array<string, Result> $integrationTests
+     *
+     * @return array<string, Result>
+     *
+     * @throws void
+     */
+    private function updateIntegrationTests(Result $result, array $integrationTests, bool $addIntegrationTests): array
+    {
+        $headers = $result->getHeaders();
+        $k       = Yaml::dump($headers);
+
+        if ($addIntegrationTests || array_key_exists($k, $integrationTests)) {
+            $integrationTests[$k] = $result;
+
+            // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
+            //     var_dump($headers, $k, $part, $result);exit;
+            // }
+        }
+
+        return $integrationTests;
+    }
+
+    /**
+     * @param array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}, date-first?: string, date-last?: string} $data
+     * @param array<non-empty-string, non-empty-string>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $headers
+     *
+     * @throws void
+     */
+    private function buildResult(array $data, array $headers): Result | null
+    {
+        try {
+            $osVersion = $this->versionBuilder->set($data['os']['version'] ?? '');
+        } catch (NotNumericException) {
+            $osVersion = new NullVersion();
+        }
+
+        try {
+            $clientVersion = $this->versionBuilder->set($data['client']['version'] ?? '');
+        } catch (NotNumericException) {
+            $clientVersion = new NullVersion();
+        }
+
+        try {
+            $engineVersion = $this->versionBuilder->set($data['engine']['version'] ?? '');
+        } catch (NotNumericException) {
+            $engineVersion = new NullVersion();
+        }
+
+        try {
+            $deviceManufacturer = $this->companyLoader->load($data['device']['manufacturer'] ?? '');
+        } catch (NotFoundException) {
+            $deviceManufacturer = Company::unknown;
+        }
+
+        try {
+            $deviceBrand = $this->companyLoader->load($data['device']['brand'] ?? '');
+        } catch (NotFoundException) {
+            $deviceBrand = Company::unknown;
+        }
+
+        try {
+            $osManufacturer = $this->companyLoader->load($data['os']['manufacturer'] ?? '');
+        } catch (NotFoundException) {
+            $osManufacturer = Company::unknown;
+        }
+
+        try {
+            $clientManufacturer = $this->companyLoader->load($data['client']['manufacturer'] ?? '');
+        } catch (NotFoundException) {
+            $clientManufacturer = Company::unknown;
+        }
+
+        try {
+            $engineManufacturer = $this->companyLoader->load($data['engine']['manufacturer'] ?? '');
+        } catch (NotFoundException) {
+            $engineManufacturer = Company::unknown;
+        }
+
+        try {
+            $genericRequest = $this->requestBuilder->buildRequest($headers);
+        } catch (UnexpectedValueException $e) {
+            $this->consoleLogger->error($e);
+
+            return null;
+        }
+
+        return new Result(
+            headers: array_map(
+                callback: static fn (HeaderInterface $header): string => $header->getValue(),
+                array: $genericRequest->getHeaders(),
+            ),
+            device: new Device(
+                architecture: Architecture::unknown,
+                deviceName: $data['device']['deviceName'] ?? null,
+                marketingName: $data['device']['marketingName'] ?? null,
+                manufacturer: $deviceManufacturer,
+                brand: $deviceBrand,
+                type: DeviceType::fromName($data['device']['type'] ?? null),
+                display: new Display(
+                    width: $data['device']['display']['width'] ?? null,
+                    height: $data['device']['display']['height'] ?? null,
+                    touch: $data['device']['display']['touch'] ?? null,
+                    size: $data['device']['display']['size'] ?? null,
+                ),
+                dualOrientation: $data['device']['dualOrientation'] ?? null,
+                simCount: $data['device']['simCount'] ?? null,
+                bits: Bits::tryFrom($data['device']['bits'] ?? 0) ?? Bits::unknown,
+            ),
+            os: new Os(
+                name: $data['os']['name'] ?? null,
+                marketingName: $data['os']['marketingName'] ?? null,
+                manufacturer: $osManufacturer,
+                version: $osVersion,
+                bits: Bits::tryFrom($data['os']['bits'] ?? 0) ?? Bits::unknown,
+            ),
+            browser: new Browser(
+                name: $data['client']['name'] ?? null,
+                manufacturer: $clientManufacturer,
+                version: $clientVersion,
+                type: ClientType::fromName($data['client']['type'] ?? null),
+                bits: Bits::tryFrom($data['client']['bits'] ?? 0) ?? Bits::unknown,
+                modus: $data['client']['modus'] ?? null,
+            ),
+            engine: new Engine(
+                name: $data['engine']['name'] ?? null,
+                manufacturer: $engineManufacturer,
+                version: $engineVersion,
+            ),
+        );
     }
 }

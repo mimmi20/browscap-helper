@@ -15,6 +15,7 @@ namespace BrowscapHelper;
 
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
+use BrowscapHelper\Helper\JsonNormalizer;
 use BrowscapHelper\Helper\RewriteTests;
 use Exception;
 use Symfony\Component\Console\Application;
@@ -33,7 +34,8 @@ final class BrowscapHelper extends Application
 
         $sourcesDirectory = (string) realpath(__DIR__ . '/../sources/');
 
-        $rewriteTests         = new RewriteTests();
+        $jsonNormalizer       = new JsonNormalizer();
+        $rewriteTests         = new RewriteTests($jsonNormalizer);
         $existingTestsLoader  = new ExistingTestsLoader();
         $existingTestsRemover = new ExistingTestsRemover();
 
@@ -49,6 +51,7 @@ final class BrowscapHelper extends Application
             new Command\RewriteTestsCommand(
                 existingTestsLoader: $existingTestsLoader,
                 existingTestsRemover: $existingTestsRemover,
+                jsonNormalizer: $jsonNormalizer,
             ),
         );
     }

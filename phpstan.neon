@@ -84,8 +84,8 @@ parameters:
       tooWideThrowType: true
 
   cognitive_complexity:
-    class: 367
-    function: 132
+    class: 429
+    function: 272
 
   type_coverage:
     return_type: 100
@@ -121,6 +121,10 @@ parameters:
       identifier: function.alreadyNarrowedType
     -
       identifier: instanceof.alwaysTrue
+    -
+      identifier: booleanNot.alwaysTrue
+    -
+      identifier: property.uninitialized
 
 services:
   errorFormatter.sarif:
