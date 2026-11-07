@@ -3481,7 +3481,7 @@ final class RewriteTestsCommand extends Command
     private function buildResult(array $data, array $headers): Result | null
     {
         try {
-            $osVersion = $this->versionBuilder->set($data['platform']['version'] ?? '');
+            $osVersion = $this->versionBuilder->set($data['os']['version'] ?? '');
         } catch (NotNumericException) {
             $osVersion = new NullVersion();
         }
@@ -3511,7 +3511,7 @@ final class RewriteTestsCommand extends Command
         }
 
         try {
-            $osManufacturer = $this->companyLoader->load($data['platform']['manufacturer'] ?? '');
+            $osManufacturer = $this->companyLoader->load($data['os']['manufacturer'] ?? '');
         } catch (NotFoundException) {
             $osManufacturer = Company::unknown;
         }
@@ -3560,11 +3560,11 @@ final class RewriteTestsCommand extends Command
                 isMobile: $data['device']['isMobile'] ?? null,
             ),
             os: new Os(
-                name: $data['platform']['name'] ?? null,
-                marketingName: $data['platform']['marketingName'] ?? null,
+                name: $data['os']['name'] ?? null,
+                marketingName: $data['os']['marketingName'] ?? null,
                 manufacturer: $osManufacturer,
                 version: $osVersion,
-                bits: Bits::tryFrom($data['platform']['bits'] ?? 0) ?? Bits::unknown,
+                bits: Bits::tryFrom($data['os']['bits'] ?? 0) ?? Bits::unknown,
             ),
             browser: new Browser(
                 name: $data['client']['name'] ?? null,

@@ -25,7 +25,9 @@ use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use UaBrowserType\Type as ClientType;
+use UaData\Company;
 use UaDeviceType\Type as DeviceType;
+use UaLoader\Exception\NotFoundException;
 use UaResult\Bits\Bits;
 use UaResult\Browser\Browser;
 use UaResult\Device\Architecture;
@@ -110,6 +112,36 @@ final class ExistingTestsLoader
                     $engineVersion = new NullVersion();
                 }
 
+                try {
+                    $deviceManufacturer = $companyLoader->load($data['device']['manufacturer'] ?? '');
+                } catch (NotFoundException) {
+                    $deviceManufacturer = Company::unknown;
+                }
+
+                try {
+                    $deviceBrand = $companyLoader->load($data['device']['brand'] ?? '');
+                } catch (NotFoundException) {
+                    $deviceBrand = Company::unknown;
+                }
+
+                try {
+                    $osManufacturer = $companyLoader->load($data['platform']['manufacturer'] ?? '');
+                } catch (NotFoundException) {
+                    $osManufacturer = Company::unknown;
+                }
+
+                try {
+                    $clientManufacturer = $companyLoader->load($data['client']['manufacturer'] ?? '');
+                } catch (NotFoundException) {
+                    $clientManufacturer = Company::unknown;
+                }
+
+                try {
+                    $engineManufacturer = $companyLoader->load($data['engine']['manufacturer'] ?? '');
+                } catch (NotFoundException) {
+                    $engineManufacturer = Company::unknown;
+                }
+
                 yield $uid => new TestProperties(
                     result: new Result(
                         headers: $data['headers'],
@@ -117,8 +149,8 @@ final class ExistingTestsLoader
                             architecture: Architecture::unknown,
                             deviceName: $data['device']['deviceName'] ?? null,
                             marketingName: $data['device']['marketingName'] ?? null,
-                            manufacturer: $companyLoader->load($data['device']['manufacturer'] ?? ''),
-                            brand: $companyLoader->load($data['device']['brand'] ?? ''),
+                            manufacturer: $deviceManufacturer,
+                            brand: $deviceBrand,
                             type: DeviceType::fromName($data['device']['type'] ?? null),
                             display: new Display(
                                 width: $data['device']['display']['width'] ?? null,
@@ -134,13 +166,13 @@ final class ExistingTestsLoader
                         os: new Os(
                             name: $data['platform']['name'] ?? null,
                             marketingName: $data['platform']['marketingName'] ?? null,
-                            manufacturer: $companyLoader->load($data['platform']['manufacturer'] ?? ''),
+                            manufacturer: $osManufacturer,
                             version: $osVersion,
                             bits: Bits::from($data['platform']['bits'] ?? 0),
                         ),
                         browser: new Browser(
                             name: $data['client']['name'] ?? null,
-                            manufacturer: $companyLoader->load($data['client']['manufacturer'] ?? ''),
+                            manufacturer: $clientManufacturer,
                             version: $clientVersion,
                             type: ClientType::fromName($data['client']['type'] ?? null),
                             bits: Bits::from($data['client']['bits'] ?? 0),
@@ -148,7 +180,7 @@ final class ExistingTestsLoader
                         ),
                         engine: new Engine(
                             name: $data['engine']['name'] ?? null,
-                            manufacturer: $companyLoader->load($data['engine']['manufacturer'] ?? ''),
+                            manufacturer: $engineManufacturer,
                             version: $engineVersion,
                         ),
                     ),
