@@ -3557,7 +3557,6 @@ final class RewriteTestsCommand extends Command
                 dualOrientation: $data['device']['dualOrientation'] ?? null,
                 simCount: $data['device']['simCount'] ?? null,
                 bits: Bits::tryFrom($data['device']['bits'] ?? 0) ?? Bits::unknown,
-                isMobile: $data['device']['isMobile'] ?? null,
             ),
             os: new Os(
                 name: $data['os']['name'] ?? null,

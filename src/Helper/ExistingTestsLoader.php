@@ -37,6 +37,7 @@ use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
 
+use function date;
 use function max;
 use function mb_str_pad;
 use function min;
@@ -50,6 +51,8 @@ final class ExistingTestsLoader
      * @return iterable<non-empty-string, TestProperties>
      *
      * @throws RuntimeException
+     *
+     * @phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
      */
     public function getProperties(
         OutputInterface $output,
@@ -161,7 +164,6 @@ final class ExistingTestsLoader
                             dualOrientation: $data['device']['dualOrientation'] ?? null,
                             simCount: $data['device']['simCount'] ?? null,
                             bits: Bits::from($data['device']['bits'] ?? 0),
-                            isMobile: $data['device']['isMobile'] ?? null,
                         ),
                         os: new Os(
                             name: $data['platform']['name'] ?? null,
@@ -185,8 +187,8 @@ final class ExistingTestsLoader
                         ),
                     ),
                     file: $data['file'],
-                    dateFirst: $data['date-first'],
-                    dateLast: $data['date-last'],
+                    dateFirst: $data['date-first'] ?? date('Y-m-d'),
+                    dateLast: $data['date-last'] ?? date('Y-m-d'),
                     raw: $data['raw'],
                 );
             }
