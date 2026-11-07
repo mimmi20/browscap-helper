@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Command;
 
+use BrowscapHelper\Entity\TestData;
 use BrowscapHelper\Helper\ExistingTestsLoader;
 use BrowscapHelper\Helper\ExistingTestsRemover;
 use BrowscapHelper\Helper\RewriteTests;
@@ -30,10 +31,17 @@ use BrowscapHelper\Source\WootheeSource;
 use BrowscapHelper\Source\YamlFileSource;
 use BrowscapHelper\Traits\FilterHeaderTrait;
 use DateTimeImmutable;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentSize;
+use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
+use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
+use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
+use JsonException;
 use Override;
 use PDO;
 use Pdo\Mysql;
 use PDOException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -41,6 +49,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use UnexpectedValueException;
@@ -48,7 +57,10 @@ use UnexpectedValueException;
 use function array_key_exists;
 use function count;
 use function is_string;
+use function json_encode;
 use function sprintf;
+
+use const JSON_THROW_ON_ERROR;
 
 #[AsCommand(name: 'copy-tests')]
 final class CopyTestsCommand extends Command
@@ -101,6 +113,10 @@ final class CopyTestsCommand extends Command
      *
      * @throws LogicException           When this abstract method is not implemented
      * @throws InvalidArgumentException
+     * @throws InvalidJsonEncodeOptions
+     * @throws InvalidNewLineString
+     * @throws InvalidIndentStyle
+     * @throws InvalidIndentSize
      * @throws UnexpectedValueException
      * @throws \LogicException
      * @throws RuntimeException
@@ -110,15 +126,34 @@ final class CopyTestsCommand extends Command
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $consoleLogger = new ConsoleLogger($output, [
+            LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
+        ]);
+
         $testSource      = 'tests';
-        $txtChecks       = [];
         $txtTotalCounter = 0;
+
+        /** @var array<TestData> $txtChecks */
+        $txtChecks = [];
 
         $sourcesExisting = [new JsonFileSource($testSource), new YamlFileSource($testSource)];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $txtChecks = $this->readTests($output, $sourcesExisting, $txtChecks, $txtTotalCounter);
+        $txtChecks = $this->readTests(
+            $output,
+            $consoleLogger,
+            $sourcesExisting,
+            $txtChecks,
+            $txtTotalCounter,
+        );
 
         $sourcesDirectory = $input->getOption('resources');
 
@@ -185,11 +220,19 @@ final class CopyTestsCommand extends Command
         $output->writeln('copy tests from sources ...', OutputInterface::VERBOSITY_NORMAL);
         $txtTotalCounter = 0;
 
-        $txtChecks = $this->readTests($output, $sourcesNew, $txtChecks, $txtTotalCounter);
+        $txtChecks = $this->readTests(
+            $output,
+            $consoleLogger,
+            $sourcesNew,
+            $txtChecks,
+            $txtTotalCounter,
+        );
 
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);
 
-        $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
+        if ($txtChecks !== []) {
+            $this->rewriteTests->rewrite($output, $txtChecks, $testSource);
+        }
 
         $output->writeln('', OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(
@@ -231,77 +274,97 @@ final class CopyTestsCommand extends Command
     }
 
     /**
-     * @param array<int, SourceInterface>                                                                 $sources
-     * @param array<string, array{headers: array<string, string>, date-first: string, date-last: string}> $txtChecks
+     * @param array<int, SourceInterface> $sources
+     * @param array<string, TestData>     $txtChecks
      *
-     * @return array<string, array{headers: array<string, string>, date-first: string, date-last: string}>
+     * @return array<string, TestData>
      *
      * @throws RuntimeException
      */
-    private function readTests(OutputInterface $output, array $sources, array $txtChecks, int &$txtTotalCounter): array
-    {
-        foreach ($this->existingTestsLoader->getProperties($output, $sources) as $property) {
-            $property['headers'] = $this->filterHeaders($output, $property['headers']);
+    private function readTests(
+        OutputInterface $output,
+        LoggerInterface $logger,
+        array $sources,
+        array $txtChecks,
+        int &$txtTotalCounter,
+    ): array {
+        foreach (
+            $this->existingTestsLoader->getProperties($output, $logger, $sources) as $testProperty
+        ) {
+            $property = [
+                'headers' => $this->filterHeaders($output, $testProperty->getResult()->getHeaders()),
+                'date-first' => $testProperty->getDateFirst(),
+                'date-last' => $testProperty->getDateLast(),
+            ];
 
             $seachHeader = Yaml::dump($property['headers']);
 
             if (array_key_exists($seachHeader, $txtChecks)) {
-                if (array_key_exists('date-first', $property) && is_string($property['date-first'])) {
-                    $dateOld = DateTimeImmutable::createFromFormat(
-                        'Y-m-d',
-                        $txtChecks[$seachHeader]['date-first'],
-                    );
+                if (is_string($property['date-first'])) {
+                    $dateOld = $txtChecks[$seachHeader]->getDateFirst();
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-first']);
 
-                    if ($dateOld !== false && $dateNew !== false && $dateOld > $dateNew) {
-                        $txtChecks[$seachHeader]['date-first'] = $dateNew->format('Y-m-d');
+                    if ($dateNew !== false && $dateOld > $dateNew) {
+                        $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateFirst($dateNew);
                     }
                 }
 
-                if (array_key_exists('date-last', $property) && is_string($property['date-last'])) {
-                    $dateOld = DateTimeImmutable::createFromFormat(
-                        'Y-m-d',
-                        $txtChecks[$seachHeader]['date-last'],
-                    );
+                if (is_string($property['date-last'])) {
+                    $dateOld = $txtChecks[$seachHeader]->getDateLast();
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-last']);
 
-                    if ($dateOld !== false && $dateNew !== false && $dateOld < $dateNew) {
-                        $txtChecks[$seachHeader]['date-last'] = $dateNew->format('Y-m-d');
+                    if ($dateNew !== false && $dateOld < $dateNew) {
+                        $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateLast($dateNew);
                     }
                 }
 
                 continue;
             }
 
-            if (array_key_exists('date-first', $property)) {
-                if (is_string($property['date-first'])) {
-                    $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-first']);
+            try {
+                json_encode($seachHeader, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                $output->writeln(
+                    '<comment>' . sprintf(
+                        'Header "%s" contained illegal characters --> skipped',
+                        $seachHeader,
+                    ) . '</comment>',
+                    OutputInterface::VERBOSITY_VERY_VERBOSE,
+                );
 
-                    $property['date-first'] = $dateNew === false
-                        ? (new DateTimeImmutable('now'))->format('Y-m-d')
-                        : $dateNew->format('Y-m-d');
-                } else {
-                    $property['date-first'] = (new DateTimeImmutable('now'))->format('Y-m-d');
-                }
+                continue;
             }
 
-            if (array_key_exists('date-last', $property)) {
-                if (is_string($property['date-last'])) {
-                    $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-last']);
+            if (is_string($property['date-first'])) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-first']);
 
-                    $property['date-last'] = $dateNew === false
-                        ? (new DateTimeImmutable('now'))->format('Y-m-d')
-                        : $dateNew->format('Y-m-d');
-                } else {
-                    $property['date-last'] = (new DateTimeImmutable('now'))->format('Y-m-d');
+                if ($date === false) {
+                    $date = new DateTimeImmutable('now');
                 }
+
+                $property['date-first'] = $date;
+            } else {
+                $property['date-first'] = new DateTimeImmutable('now');
             }
 
-            $txtChecks[$seachHeader] = [
-                'headers' => $property['headers'],
-                'date-first' => $property['date-first'],
-                'date-last' => $property['date-last'],
-            ];
+            if (is_string($property['date-last'])) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-last']);
+
+                if ($date === false) {
+                    $date = new DateTimeImmutable('now');
+                }
+
+                $property['date-last'] = $date;
+            } else {
+                $property['date-last'] = new DateTimeImmutable('now');
+            }
+
+            $txtChecks[$seachHeader] = new TestData(
+                headers: $property['headers'],
+                dateFirst: $property['date-first'],
+                dateLast: $property['date-last'],
+            );
+
             ++$txtTotalCounter;
         }
 

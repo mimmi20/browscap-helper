@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace BrowscapHelper\Entity;
 
+use UaResult\Result\Result;
+
 final readonly class TestResult
 {
     /** @api */
@@ -70,15 +72,14 @@ final readonly class TestResult
     public const int EXIT_CLIENT_IS_GENERAL = 14;
 
     /**
-     * @param array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}|null $result
-     * @phpstan-param self::STATUS_* $status
-     * @phpstan-param array<non-empty-string, non-empty-string> $headers
-     * @phpstan-param self::EXIT_* $exit
+     * @param self::STATUS_*                            $status
+     * @param array<non-empty-string, non-empty-string> $headers
+     * @param self::EXIT_*                              $exit
      *
      * @throws void
      */
     public function __construct(
-        private array | null $result,
+        private Result | null $result,
         private int $status,
         private array $headers,
         private int $exit,
@@ -87,19 +88,17 @@ final readonly class TestResult
     }
 
     /**
-     * @return array{headers?: array<string, string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}}|null
-     *
      * @throws void
      *
      * @api
      */
-    public function getResult(): array | null
+    public function getResult(): Result | null
     {
         return $this->result;
     }
 
     /**
-     * @phpstan-return self::STATUS_*
+     * @return self::STATUS_*
      *
      * @throws void
      *
@@ -111,7 +110,7 @@ final readonly class TestResult
     }
 
     /**
-     * @phpstan-return array<non-empty-string, non-empty-string>
+     * @return array<non-empty-string, non-empty-string>
      *
      * @throws void
      *
@@ -123,7 +122,7 @@ final readonly class TestResult
     }
 
     /**
-     * @phpstan-return self::EXIT_*
+     * @return self::EXIT_*
      *
      * @throws void
      *
