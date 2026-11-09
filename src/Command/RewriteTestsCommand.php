@@ -1144,7 +1144,7 @@ final class RewriteTestsCommand extends Command
                 str_replace(
                     [' ', 'ü'],
                     ['-', 'ue'],
-                    $result->getDevice()->getManufacturer()->getName() ?? '',
+                    $result->getDevice()->getManufacturer()->getBrandname() ?? '',
                 ),
             );
             $deviceManufaturer = $deviceManufaturer === '' ? 'unknown' : str_replace(
