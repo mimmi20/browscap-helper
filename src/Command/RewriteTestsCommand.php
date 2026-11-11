@@ -450,7 +450,7 @@ final class RewriteTestsCommand extends Command
 
         $this->requestBuilder = $requestBuilder;
 
-        $output->writeln('reading path ' . $basePath . 'data/integration-tests/', OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $output->writeln(
 
         try {
             $iterator = new RecursiveIteratorIterator(
@@ -464,12 +464,12 @@ final class RewriteTestsCommand extends Command
                 $filepath = str_replace('\\', '/', $pathName);
                 assert(is_string($filepath));
 
-                $output->write("\r" . 'reading file ' . $filepath, false,OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 $content = file_get_contents($filepath);
 
                 if (in_array($content, [false, '', PHP_EOL], strict: true)) {
                     $consoleLogger->error('no content');
+
                     continue;
                 }
 
@@ -483,12 +483,14 @@ final class RewriteTestsCommand extends Command
 
                 if (!is_array($data)) {
                     $consoleLogger->error('$data is not an Array');
+
                     continue;
                 }
 
                 foreach ($data as $test) {
                     if (!is_array($test)) {
                         $consoleLogger->error('$test is not an Array');
+
                         continue;
                     }
 
@@ -511,9 +513,11 @@ final class RewriteTestsCommand extends Command
                     }
 
                     if (
-                        array_any($expected, static function (mixed $value, mixed $key): bool {
-                            return !is_string($key) || $key === '';
-                        })
+                        array_any(
+                            $expected,
+                            static fn (mixed $value, mixed $key): bool => !is_string($key)
+                            || $key === '',
+                        )
                     ) {
                         $consoleLogger->error('$expected is not an expected Array');
 
@@ -534,7 +538,11 @@ final class RewriteTestsCommand extends Command
                         continue;
                     }
 
-                    $result = $this->buildResult(consoleLogger: $consoleLogger, data: $expected, headers: $headers);
+                    $result = $this->buildResult(
+                        consoleLogger: $consoleLogger,
+                        data: $expected,
+                        headers: $headers,
+                    );
 
                     if ($result instanceof Result) {
                         $integrationTests = $this->updateIntegrationTests(
@@ -1367,7 +1375,7 @@ final class RewriteTestsCommand extends Command
 
             array_walk(
                 $tests,
-                function (Result $result) use (&$integrationTests, $output, $consoleLogger): void {
+                function (Result $result) use (&$integrationTests, $consoleLogger): void {
                     try {
                         $integrationTests = $this->updateIntegrationTests(
                             result: $result,
@@ -2141,8 +2149,13 @@ final class RewriteTestsCommand extends Command
      *
      * @throws void
      */
-    private function buildTestResult(LoggerInterface $consoleLogger, array $newResult, array $keys, array $headers, int $exit): TestResult
-    {
+    private function buildTestResult(
+        LoggerInterface $consoleLogger,
+        array $newResult,
+        array $keys,
+        array $headers,
+        int $exit,
+    ): TestResult {
         assert(is_scalar($newResult['client']['name'] ?? null));
         assert(is_scalar($newResult['engine']['name'] ?? null));
         assert(is_scalar($newResult['os']['name'] ?? null));
