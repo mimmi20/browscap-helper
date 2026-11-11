@@ -711,6 +711,14 @@ trait FilterHeaderTrait
                     'x-iframely-processing',
                     'x-iframely-request-id',
                     'x-sg-e',
+                    'x-tidio-website-scraper',
+                    'x-tidio-lyro-scraper',
+                    'x-php2s-audit-id',
+                    'x-incap-client-ip',
+                    'incap-client-ip',
+                    'x-amz-cf-id',
+                    'screenheight',
+                    'zm-trace-upstream',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, strict: true)) {
