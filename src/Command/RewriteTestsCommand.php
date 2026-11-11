@@ -161,7 +161,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 12;
 
     /**
-     * last update: 2026-10-20
+     * last update: 2026-11-11
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -451,6 +451,9 @@ final class RewriteTestsCommand extends Command
         $this->requestBuilder = $requestBuilder;
 
         $output->writeln(
+            messages: 'reading path ' . $basePath . 'data/integration-tests/',
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
 
         try {
             $iterator = new RecursiveIteratorIterator(
@@ -464,6 +467,11 @@ final class RewriteTestsCommand extends Command
                 $filepath = str_replace('\\', '/', $pathName);
                 assert(is_string($filepath));
 
+                $output->write(
+                    messages: "\r" . 'reading file ' . $filepath,
+                    newline: false,
+                    options: OutputInterface::VERBOSITY_VERY_VERBOSE,
+                );
 
                 $content = file_get_contents($filepath);
 
@@ -553,9 +561,9 @@ final class RewriteTestsCommand extends Command
                     }
 
                     // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                    //     $output->writeln('');
-                    //     $output->writeln(sprintf('<options=bold,underscore>%s</>', $seachHeader));
-                    //     $output->writeln('');
+                    //     $output->writeln(messages: '');
+                    //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', $seachHeader));
+                    //     $output->writeln(messages: '');
                     // }
                 }
             }
@@ -691,8 +699,8 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->writeln(
-                sprintf(' <bg=red>%d</>', $messageLength),
-                OutputInterface::VERBOSITY_DEBUG,
+                messages: sprintf(' <bg=red>%d</>', $messageLength),
+                options: OutputInterface::VERBOSITY_DEBUG,
             );
 
             $startTime = microtime(as_float: true);
@@ -707,12 +715,12 @@ final class RewriteTestsCommand extends Command
             $timeCheck += microtime(as_float: true) - $startTime;
 
             // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-            //     $output->writeln('');
-            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($headers, true)));
-            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export(array_key_exists($seachHeader, $integrationTests), true)));
-            //     $output->writeln(sprintf('<options=bold,underscore>$accepted: %s</>', var_export($accepted, true)));
-            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', $seachHeader));
-            //     $output->writeln('');
+            //     $output->writeln(messages: '');
+            //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($headers, true)));
+            //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export(array_key_exists($seachHeader, $integrationTests), true)));
+            //     $output->writeln(messages: sprintf('<options=bold,underscore>$accepted: %s</>', var_export($accepted, true)));
+            //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', $seachHeader));
+            //     $output->writeln(messages: '');
             // } else {
             //     continue;
             // }
@@ -910,8 +918,8 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->writeln(
-                sprintf(' <bg=red>%d</>', $messageLength),
-                OutputInterface::VERBOSITY_DEBUG,
+                messages: sprintf(' <bg=red>%d</>', $messageLength),
+                options: OutputInterface::VERBOSITY_DEBUG,
             );
 
             $startTime = microtime(as_float: true);
@@ -949,10 +957,10 @@ final class RewriteTestsCommand extends Command
                 ++$resultChecks[$testProperty->getDateLast()]['skippedAfterCheck'];
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln('');
-                //     $output->writeln('<options=bold,blink>1</>');
-                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln('');
+                //     $output->writeln(messages: '');
+                //     $output->writeln(messages: '<options=bold,blink>1</>');
+                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln(messages: '');
                 // }
 
                 continue;
@@ -986,10 +994,10 @@ final class RewriteTestsCommand extends Command
                 }
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln('');
-                //     $output->writeln('<options=bold,blink>2</>');
-                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln('');
+                //     $output->writeln(messages: '');
+                //     $output->writeln(messages: '<options=bold,blink>2</>');
+                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln(messages: '');
                 // }
 
                 continue;
@@ -1011,10 +1019,10 @@ final class RewriteTestsCommand extends Command
                 ++$resultChecks[$testProperty->getDateLast()]['errors'];
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln('');
-                //     $output->writeln('<options=bold,blink>3</>');
-                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln('');
+                //     $output->writeln(messages: '');
+                //     $output->writeln(messages: '<options=bold,blink>3</>');
+                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln(messages: '');
                 // }
 
                 continue;
@@ -1050,10 +1058,10 @@ final class RewriteTestsCommand extends Command
 
             if ($isSkipped) {
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln('');
-                //     $output->writeln('<options=bold,blink>6</>');
-                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln('');
+                //     $output->writeln(messages: '');
+                //     $output->writeln(messages: '<options=bold,blink>6</>');
+                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln(messages: '');
                 // }
 
                 continue;
@@ -1114,10 +1122,10 @@ final class RewriteTestsCommand extends Command
                     );
 
                     // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                    //     $output->writeln('');
-                    //     $output->writeln('<options=bold,blink>7</>');
-                    //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                    //     $output->writeln('');
+                    //     $output->writeln(messages: '');
+                    //     $output->writeln(messages: '<options=bold,blink>7</>');
+                    //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                    //     $output->writeln(messages: '');
                     // }
 
                     continue;
@@ -1222,10 +1230,10 @@ final class RewriteTestsCommand extends Command
                 );
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln('');
-                //     $output->writeln('<options=bold,blink>8</>');
-                //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln('');
+                //     $output->writeln(messages: '');
+                //     $output->writeln(messages: '<options=bold,blink>8</>');
+                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+                //     $output->writeln(messages: '');
                 // }
 
                 continue;
@@ -1243,8 +1251,8 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->writeln(
-                sprintf(' <bg=red>%d</>', $messageLength),
-                OutputInterface::VERBOSITY_DEBUG,
+                messages: sprintf(' <bg=red>%d</>', $messageLength),
+                options: OutputInterface::VERBOSITY_DEBUG,
             );
 
             ++$testCount;
@@ -1272,10 +1280,10 @@ final class RewriteTestsCommand extends Command
             }
 
             // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-            //     $output->writeln('');
-            //     $output->writeln('<options=bold,blink>9</>');
-            //     $output->writeln(sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-            //     $output->writeln('');
+            //     $output->writeln(messages: '');
+            //     $output->writeln(messages: '<options=bold,blink>9</>');
+            //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
+            //     $output->writeln(messages: '');
             // }
 
             //            if ($counterDifferentFromMatomo >= 10) {
@@ -1921,7 +1929,7 @@ final class RewriteTestsCommand extends Command
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln(
 
         try {
             /** @var array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
@@ -1944,7 +1952,10 @@ final class RewriteTestsCommand extends Command
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln(
+            messages: sprintf(' <bg=red>%d</>', $messageLength),
+            options: OutputInterface::VERBOSITY_DEBUG,
+        );
 
         if (
             ($newResult['device']['deviceName'] ?? null) === null
@@ -2290,6 +2301,8 @@ final class RewriteTestsCommand extends Command
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+            options: OutputInterface::VERBOSITY_DEBUG,
+        );
 
         $normalized = $this->jsonNormalizer->normalize(
             output: $output,
@@ -2319,7 +2332,9 @@ final class RewriteTestsCommand extends Command
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln(
+            messages: sprintf(' <bg=red>%d</>', $messageLength),
+            options: OutputInterface::VERBOSITY_DEBUG,
 
         $success = @file_put_contents($path, $normalized);
 
@@ -2358,8 +2373,7 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->writeln(
-                sprintf(' <bg=red>%d</>', $messageLength),
-                OutputInterface::VERBOSITY_DEBUG,
+                messages: sprintf(' <bg=red>%d</>', $messageLength),
             );
 
             $startTime = microtime(as_float: true);
@@ -2379,8 +2393,7 @@ final class RewriteTestsCommand extends Command
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
                 $output->writeln(
-                    sprintf(' <bg=red>%d</>', $messageLength),
-                    OutputInterface::VERBOSITY_DEBUG,
+                    messages: sprintf(' <bg=red>%d</>', $messageLength),
                 );
             } catch (FileCanNotBeRead | FileDoesNotContainJson | FileDoesNotExist $e) {
                 ++$errors;
@@ -2410,7 +2423,6 @@ final class RewriteTestsCommand extends Command
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->writeln(
-                sprintf(' <bg=red>%d</>', $messageLength),
                 OutputInterface::VERBOSITY_DEBUG,
             );
         }
@@ -2423,7 +2435,7 @@ final class RewriteTestsCommand extends Command
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
-        $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln(
 
         try {
             $tests[] = $result->toArray();
@@ -2838,9 +2850,9 @@ final class RewriteTestsCommand extends Command
             }
 
             if (!$someDifference) {
-                $output->writeln('');
+                $output->writeln(messages: '');
                 $consoleLogger->error(var_export($checks, return: true));
-                $output->writeln('');
+                $output->writeln(messages: '');
             }
 
             $headerList = $this->getHeaderList($headers);
@@ -2967,7 +2979,7 @@ final class RewriteTestsCommand extends Command
         try {
             $date = new DateTimeImmutable($testProperties->getDateLast());
         } catch (Throwable $e) {
-            $output->writeln('');
+            $output->writeln(messages: '');
             $output->writeln(
                 messages: sprintf('%s <error>invalid date: %s</error>', $loopMessage, $e),
                 options: OutputInterface::VERBOSITY_NORMAL,
