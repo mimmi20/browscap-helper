@@ -62,6 +62,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
@@ -175,7 +176,6 @@ final class RewriteTestsCommand extends Command
     private NormalizerChain $normalizerChain;
     private CompanyLoaderInterface $companyLoader;
     private VersionBuilder $versionBuilder;
-    private LoggerInterface $consoleLogger;
     private RequestBuilder $requestBuilder;
     private DeviceDetector $deviceDetector;
     private Detector $detector;
@@ -389,7 +389,7 @@ final class RewriteTestsCommand extends Command
             }
         };
 
-        $this->consoleLogger = new ConsoleLogger($output, [
+        $consoleLogger = new ConsoleLogger($output, [
             LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
@@ -400,12 +400,12 @@ final class RewriteTestsCommand extends Command
             LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
         ]);
 
-        $companyLoaderFactory = new CompanyLoaderFactory(logger: $this->consoleLogger);
+        $companyLoaderFactory = new CompanyLoaderFactory(logger: $consoleLogger);
         $this->companyLoader  = $companyLoaderFactory();
 
         $detectorFactory = new DetectorFactory(
             psrCache: $detectorCache,
-            logger: $this->consoleLogger,
+            logger: $consoleLogger,
             autoUpdate: false,
         );
 
@@ -450,14 +450,13 @@ final class RewriteTestsCommand extends Command
 
         $this->requestBuilder = $requestBuilder;
 
-        $clonedOutput = clone $output;
-        $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+        $output->writeln('reading path ' . $basePath . 'data/integration-tests/', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         try {
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($basePath . 'data/integration-tests/'),
             );
-            $files    = new FilterIterator($iterator, 'yaml');
+            $files    = new FilterIterator($iterator, 'json');
 
             foreach ($files as $file) {
                 assert($file instanceof SplFileInfo);
@@ -465,28 +464,31 @@ final class RewriteTestsCommand extends Command
                 $filepath = str_replace('\\', '/', $pathName);
                 assert(is_string($filepath));
 
+                $output->write("\r" . 'reading file ' . $filepath, false,OutputInterface::VERBOSITY_VERY_VERBOSE);
+
                 $content = file_get_contents($filepath);
 
                 if (in_array($content, [false, '', PHP_EOL], strict: true)) {
+                    $consoleLogger->error('no content');
                     continue;
                 }
 
-                $data = Yaml::parse($content);
+                try {
+                    $data = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
+                } catch (JsonException $e) {
+                    $consoleLogger->error($e);
 
-                //            try {
-                //                $data = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
-                //            } catch (JsonException $e) {
-                //                $this->consoleLogger->error($e);
-                //
-                //                continue;
-                //            }
+                    continue;
+                }
 
                 if (!is_array($data)) {
+                    $consoleLogger->error('$data is not an Array');
                     continue;
                 }
 
                 foreach ($data as $test) {
                     if (!is_array($test)) {
+                        $consoleLogger->error('$test is not an Array');
                         continue;
                     }
 
@@ -494,7 +496,7 @@ final class RewriteTestsCommand extends Command
                     $headers = $test['headers'] ?? null;
 
                     if (!is_array($headers)) {
-                        $this->consoleLogger->error('$headers is not an Array');
+                        $consoleLogger->error('$headers is not an Array');
 
                         continue;
                     }
@@ -503,21 +505,17 @@ final class RewriteTestsCommand extends Command
                     $expected = $test['expected'] ?? null;
 
                     if (!is_array($expected)) {
-                        $this->consoleLogger->error('$expected is not an Array');
+                        $consoleLogger->error('$expected is not an Array');
 
                         continue;
                     }
 
                     if (
                         array_any($expected, static function (mixed $value, mixed $key): bool {
-                            if (!is_string($value) || $value === '') {
-                                return true;
-                            }
-
                             return !is_string($key) || $key === '';
                         })
                     ) {
-                        $this->consoleLogger->error('$expected is not an expected Array');
+                        $consoleLogger->error('$expected is not an expected Array');
 
                         continue;
                     }
@@ -531,12 +529,12 @@ final class RewriteTestsCommand extends Command
                             return !is_string($k) || $k === '';
                         })
                     ) {
-                        $this->consoleLogger->error('$headers is not an expected Array');
+                        $consoleLogger->error('$headers is not an expected Array');
 
                         continue;
                     }
 
-                    $result = $this->buildResult(data: $expected, headers: $headers);
+                    $result = $this->buildResult(consoleLogger: $consoleLogger, data: $expected, headers: $headers);
 
                     if ($result instanceof Result) {
                         $integrationTests = $this->updateIntegrationTests(
@@ -554,7 +552,7 @@ final class RewriteTestsCommand extends Command
                 }
             }
         } catch (UnexpectedValueException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
         }
 
         $this->existingTestsRemover->remove(
@@ -592,13 +590,10 @@ final class RewriteTestsCommand extends Command
         $counterDifferentFromMatomo = 0;
         $counterComparedWithMatomo  = 0;
 
-        $clonedOutput = clone $output;
-        $clonedOutput->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-
         foreach (
             $this->existingTestsLoader->getProperties(
-                output: $clonedOutput,
-                logger: $this->consoleLogger,
+                output: new NullOutput(),
+                logger: $consoleLogger,
                 sources: $sources,
                 messageLength: $messageLength,
             ) as $testProperty
@@ -915,6 +910,7 @@ final class RewriteTestsCommand extends Command
 
             $testResult = $this->handleTest(
                 output: $output,
+                consoleLogger: $consoleLogger,
                 headers: $headers,
                 parentMessage: $message,
                 messageLength: $messageLength,
@@ -977,7 +973,7 @@ final class RewriteTestsCommand extends Command
                             addIntegrationTests: self::ADD_INTEGRATION_TESTS,
                         );
                     } catch (UnexpectedValueException | NotNumericException $e) {
-                        $this->consoleLogger->error($e);
+                        $consoleLogger->error($e);
                     }
                 }
 
@@ -1074,6 +1070,7 @@ final class RewriteTestsCommand extends Command
                 try {
                     $this->compareDeviceWithMapper(
                         output: $output,
+                        consoleLogger: $consoleLogger,
                         testProperties: $testProperty,
                         testResult: $testResult,
                         headers: $headers,
@@ -1263,7 +1260,7 @@ final class RewriteTestsCommand extends Command
                     addIntegrationTests: self::ADD_INTEGRATION_TESTS,
                 );
             } catch (UnexpectedValueException | NotNumericException $e) {
-                $this->consoleLogger->error($e);
+                $consoleLogger->error($e);
             }
 
             // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
@@ -1307,7 +1304,7 @@ final class RewriteTestsCommand extends Command
                 ++$errors;
 
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $this->consoleLogger->error(
+                $consoleLogger->error(
                     sprintf(
                         'the path "%s" does not match required structure',
                         $file->getPathname(),
@@ -1321,14 +1318,14 @@ final class RewriteTestsCommand extends Command
                 /** @var non-empty-list<array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}, date-first?: string, date-last?: string}> $data */
                 $data = json_decode(
                     $file->getContents(),
-                    associative: false,
+                    associative: true,
                     flags: JSON_THROW_ON_ERROR,
                 );
             } catch (JsonException $e) {
                 ++$errors;
 
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-                $this->consoleLogger->error(
+                $consoleLogger->error(
                     new Exception(
                         'An error occured while encoding a resultset',
                         0,
@@ -1342,9 +1339,9 @@ final class RewriteTestsCommand extends Command
             /** @var non-empty-list<Result> $tests */
             $tests = array_filter(
                 array_map(
-                    function (mixed $xpart): Result | null {
+                    function (mixed $xpart) use ($consoleLogger): Result | null {
                         if (!is_array($xpart)) {
-                            $this->consoleLogger->error('$part is not an Array');
+                            $consoleLogger->error('$part is not an Array');
 
                             return null;
                         }
@@ -1352,12 +1349,13 @@ final class RewriteTestsCommand extends Command
                         $headers = $xpart['headers'] ?? null;
 
                         if (!is_array($headers)) {
-                            $this->consoleLogger->error('$headers is not an Array');
+                            $consoleLogger->error('$headers is not an Array');
 
                             return null;
                         }
 
                         return $this->buildResult(
+                            consoleLogger: $consoleLogger,
                             data: $xpart,
                             headers: $headers,
                         );
@@ -1369,7 +1367,7 @@ final class RewriteTestsCommand extends Command
 
             array_walk(
                 $tests,
-                function (Result $result) use (&$integrationTests): void {
+                function (Result $result) use (&$integrationTests, $output, $consoleLogger): void {
                     try {
                         $integrationTests = $this->updateIntegrationTests(
                             result: $result,
@@ -1377,7 +1375,7 @@ final class RewriteTestsCommand extends Command
                             addIntegrationTests: self::ADD_INTEGRATION_TESTS,
                         );
                     } catch (UnexpectedValueException | NotNumericException $e) {
-                        $this->consoleLogger->error($e);
+                        $consoleLogger->error($e);
                     }
                 },
             );
@@ -1443,7 +1441,7 @@ final class RewriteTestsCommand extends Command
 
             ++$errors;
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
-            $this->consoleLogger->error(
+            $consoleLogger->error(
                 sprintf(
                     'An error occured while writing file %s',
                     $path,
@@ -1903,6 +1901,7 @@ final class RewriteTestsCommand extends Command
      */
     private function handleTest(
         OutputInterface $output,
+        LoggerInterface $consoleLogger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
@@ -1920,7 +1919,7 @@ final class RewriteTestsCommand extends Command
             /** @var array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
             $newResult = $this->detector->getBrowser($headers);
         } catch (InvalidArgumentException | UnexpectedValueException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return new TestResult(
                 result: null,
@@ -1945,6 +1944,7 @@ final class RewriteTestsCommand extends Command
         ) {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -1957,6 +1957,7 @@ final class RewriteTestsCommand extends Command
         if (($newResult['client']['name'] ?? null) === null) {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -1972,6 +1973,7 @@ final class RewriteTestsCommand extends Command
         ) {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -1993,6 +1995,7 @@ final class RewriteTestsCommand extends Command
         if (str_contains((string) $newResult['client']['name'], 'general')) {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2005,6 +2008,7 @@ final class RewriteTestsCommand extends Command
         if (($newResult['client']['name'] ?? null) === 'unknown') {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2020,6 +2024,7 @@ final class RewriteTestsCommand extends Command
         ) {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2036,6 +2041,7 @@ final class RewriteTestsCommand extends Command
             // only check for unknown device, if it's not a bot
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2064,6 +2070,7 @@ final class RewriteTestsCommand extends Command
             ];
 
             return $this->buildTestResult(
+                consoleLogger: $consoleLogger,
                 newResult: $newResult,
                 keys: $keys,
                 headers: $headers,
@@ -2081,6 +2088,7 @@ final class RewriteTestsCommand extends Command
             $keys = ['desktop'];
 
             return $this->buildTestResult(
+                consoleLogger: $consoleLogger,
                 newResult: $newResult,
                 keys: $keys,
                 headers: $headers,
@@ -2094,6 +2102,7 @@ final class RewriteTestsCommand extends Command
             $keys = ['mobile'];
 
             return $this->buildTestResult(
+                consoleLogger: $consoleLogger,
                 newResult: $newResult,
                 keys: $keys,
                 headers: $headers,
@@ -2105,6 +2114,7 @@ final class RewriteTestsCommand extends Command
             $keys = ['tv'];
 
             return $this->buildTestResult(
+                consoleLogger: $consoleLogger,
                 newResult: $newResult,
                 keys: $keys,
                 headers: $headers,
@@ -2115,6 +2125,7 @@ final class RewriteTestsCommand extends Command
         $keys = ['other'];
 
         return $this->buildTestResult(
+            consoleLogger: $consoleLogger,
             newResult: $newResult,
             keys: $keys,
             headers: $headers,
@@ -2130,7 +2141,7 @@ final class RewriteTestsCommand extends Command
      *
      * @throws void
      */
-    private function buildTestResult(array $newResult, array $keys, array $headers, int $exit): TestResult
+    private function buildTestResult(LoggerInterface $consoleLogger, array $newResult, array $keys, array $headers, int $exit): TestResult
     {
         assert(is_scalar($newResult['client']['name'] ?? null));
         assert(is_scalar($newResult['engine']['name'] ?? null));
@@ -2152,6 +2163,7 @@ final class RewriteTestsCommand extends Command
         if (array_key_exists($key, $this->tests)) {
             return new TestResult(
                 result: $this->buildResult(
+                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2165,6 +2177,7 @@ final class RewriteTestsCommand extends Command
 
         return new TestResult(
             result: $this->buildResult(
+                consoleLogger: $consoleLogger,
                 data: $newResult,
                 headers: $headers,
             ),
@@ -2475,6 +2488,7 @@ final class RewriteTestsCommand extends Command
      */
     private function compareDeviceWithMapper(
         OutputInterface $output,
+        LoggerInterface $consoleLogger,
         TestProperties $testProperties,
         TestResult $testResult,
         array $headers,
@@ -2575,7 +2589,7 @@ final class RewriteTestsCommand extends Command
         try {
             $ddOsVersion = $inputMapper->mapOsVersion($osInfo['version'] ?? null, $ddOsName);
         } catch (NotNumericException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2587,7 +2601,7 @@ final class RewriteTestsCommand extends Command
                 $isBot ? null : ($clientInfo['engine_version'] ?? null),
             );
         } catch (NotNumericException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2601,7 +2615,7 @@ final class RewriteTestsCommand extends Command
                 $isBot ? null : ($clientInfo['version'] ?? null),
             );
         } catch (NotNumericException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2627,7 +2641,7 @@ final class RewriteTestsCommand extends Command
                 $brOsName,
             );
         } catch (NotNumericException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2639,7 +2653,7 @@ final class RewriteTestsCommand extends Command
                 $result->getEngine()->getVersion()->getVersion(),
             );
         } catch (NotNumericException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2651,7 +2665,7 @@ final class RewriteTestsCommand extends Command
                 $result->getBrowser()->getVersion()->getVersion(),
             );
         } catch (NotNumericException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2696,7 +2710,7 @@ final class RewriteTestsCommand extends Command
                 '$clientTypeCheck' => !$clientTypeCheck,
             ];
         } catch (Throwable $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -2725,7 +2739,7 @@ final class RewriteTestsCommand extends Command
 
         ++$resultChecks[$testProperties->getDateLast()]['differentFromMatomo'];
 
-        $getMessage = function () use ($output, $checks, $deviceBrandCheck, $deviceNameCheck, $deviceTypeCheck, $osNameCheck, $osVersionCheck, $engineNameCheck, $engineVersionCheck, $clientNameCheck, $clientVersionCheck, $clientTypeCheck, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType): string {
+        $getMessage = function () use ($output, $checks, $deviceBrandCheck, $deviceNameCheck, $deviceTypeCheck, $osNameCheck, $osVersionCheck, $engineNameCheck, $engineVersionCheck, $clientNameCheck, $clientVersionCheck, $clientTypeCheck, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType, $consoleLogger): string {
             $message        = $loopMessage;
             $someDifference = false;
 
@@ -2812,7 +2826,7 @@ final class RewriteTestsCommand extends Command
 
             if (!$someDifference) {
                 $output->writeln('');
-                $this->consoleLogger->error(var_export($checks, return: true));
+                $consoleLogger->error(var_export($checks, return: true));
                 $output->writeln('');
             }
 
@@ -2899,7 +2913,7 @@ final class RewriteTestsCommand extends Command
         try {
             $message = $getMessage();
         } catch (UnexpectedValueException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return;
         }
@@ -3462,7 +3476,10 @@ final class RewriteTestsCommand extends Command
         $k       = Yaml::dump($headers);
 
         if ($addIntegrationTests || array_key_exists($k, $integrationTests)) {
-            $integrationTests[$k] = $result;
+            $integrationTests[$k] = [
+                'headers' => $headers,
+                'expected' => $result,
+            ];
 
             // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
             //     var_dump($headers, $k, $part, $result);exit;
@@ -3478,7 +3495,7 @@ final class RewriteTestsCommand extends Command
      *
      * @throws void
      */
-    private function buildResult(array $data, array $headers): Result | null
+    private function buildResult(LoggerInterface $consoleLogger, array $data, array $headers): Result | null
     {
         try {
             $osVersion = $this->versionBuilder->set($data['os']['version'] ?? '');
@@ -3531,7 +3548,7 @@ final class RewriteTestsCommand extends Command
         try {
             $genericRequest = $this->requestBuilder->buildRequest($headers);
         } catch (UnexpectedValueException $e) {
-            $this->consoleLogger->error($e);
+            $consoleLogger->error($e);
 
             return null;
         }
