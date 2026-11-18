@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Entity\TestProperties;
-use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\SourceInterface;
 use BrowserDetector\Loader\CompanyLoaderFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
@@ -37,7 +36,7 @@ use UaResult\Engine\Engine;
 use UaResult\Os\Os;
 use UaResult\Result\Result;
 
-use function date;
+use function assert;
 use function max;
 use function mb_str_pad;
 use function min;
@@ -74,10 +73,6 @@ final class ExistingTestsLoader
         $versionBuilder       = new VersionBuilder();
 
         foreach ($sources as $source) {
-            if ($source instanceof OutputAwareInterface) {
-                $source->setOutput($output);
-            }
-
             $baseMessage = sprintf('reading from source %s ', $source->getName());
 
             if (!$source->isReady($baseMessage)) {
@@ -95,101 +90,121 @@ final class ExistingTestsLoader
             );
 
             foreach ($source->getProperties($baseMessage, $messageLength) as $uid => $data) {
-                /** @var array{headers: array<non-empty-string, non-empty-string>, device: array{deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, display: array{width: int|null, height: int|null, touch: bool|null, type: string|null, size: float|int|null}, type: string|null, ismobile: bool|null}, client: array{name: string|null, modus: string|null, version: string|null, manufacturer: string|null, bits: int|null, type: string|null, isbot: bool|null}, platform: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null}, engine: array{name: string|null, version: string|null, manufacturer: string|null}, file: string|null, date-first: string|null, date-last: string|null, raw: mixed} $data */
+                assert($data instanceof \BrowscapHelper\Source\Entity\TestProperties);
+
+                /** @var array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string|null, bits: int|null} $os */
+                $os = $data->getOs();
 
                 try {
-                    $osVersion = $versionBuilder->set($data['platform']['version'] ?? '');
+                    $osVersion = $versionBuilder->set($os['version'] ?? '');
                 } catch (NotNumericException) {
                     $osVersion = new NullVersion();
                 }
 
+                /** @var array{name: string|null, version: string|null, manufacturer: string|null, type: string|null, bits: int|null, modus: string|null} $client */
+                $client = $data->getClient();
+
                 try {
-                    $clientVersion = $versionBuilder->set($data['client']['version'] ?? '');
+                    $clientVersion = $versionBuilder->set($client['version'] ?? '');
                 } catch (NotNumericException) {
                     $clientVersion = new NullVersion();
                 }
 
+                /** @var array{name: string|null, version: string|null, manufacturer: string|null} $engine */
+                $engine = $data->getEngine();
+
                 try {
-                    $engineVersion = $versionBuilder->set($data['engine']['version'] ?? '');
+                    $engineVersion = $versionBuilder->set($engine['version'] ?? '');
                 } catch (NotNumericException) {
                     $engineVersion = new NullVersion();
                 }
 
+                /** @var array{architecture: string|null, deviceName: string|null, marketingName: string|null, manufacturer: string|null, brand: string|null, dualOrientation: bool|null, simCount: int|null, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null, type?: string|null}, type: string|null, ismobile: bool|null, istv: bool|null, bits: int|null} $device */
+                $device = $data->getDevice();
+
                 try {
-                    $deviceManufacturer = $companyLoader->load($data['device']['manufacturer'] ?? '');
+                    $deviceManufacturer = $companyLoader->load($device['manufacturer'] ?? '');
                 } catch (NotFoundException) {
                     $deviceManufacturer = Company::unknown;
                 }
 
                 try {
-                    $deviceBrand = $companyLoader->load($data['device']['brand'] ?? '');
+                    $deviceBrand = $companyLoader->load($device['brand'] ?? '');
                 } catch (NotFoundException) {
                     $deviceBrand = Company::unknown;
                 }
 
                 try {
-                    $osManufacturer = $companyLoader->load($data['platform']['manufacturer'] ?? '');
+                    $osManufacturer = $companyLoader->load($os['manufacturer'] ?? '');
                 } catch (NotFoundException) {
                     $osManufacturer = Company::unknown;
                 }
 
                 try {
-                    $clientManufacturer = $companyLoader->load($data['client']['manufacturer'] ?? '');
+                    $clientManufacturer = $companyLoader->load($client['manufacturer'] ?? '');
                 } catch (NotFoundException) {
                     $clientManufacturer = Company::unknown;
                 }
 
                 try {
-                    $engineManufacturer = $companyLoader->load($data['engine']['manufacturer'] ?? '');
+                    $engineManufacturer = $companyLoader->load($engine['manufacturer'] ?? '');
                 } catch (NotFoundException) {
                     $engineManufacturer = Company::unknown;
                 }
 
                 yield $uid => new TestProperties(
                     result: new Result(
-                        headers: $data['headers'],
+                        headers: $data->getHeaders(),
                         device: new Device(
-                            architecture: Architecture::unknown,
-                            deviceName: $data['device']['deviceName'] ?? null,
-                            marketingName: $data['device']['marketingName'] ?? null,
+                            architecture: Architecture::tryFrom($device['architecture'] ?? '')
+                                ?? Architecture::unknown,
+                            deviceName: $device['deviceName'] ?? null,
+                            marketingName: $device['marketingName'] ?? null,
                             manufacturer: $deviceManufacturer,
                             brand: $deviceBrand,
-                            type: DeviceType::fromName($data['device']['type'] ?? null),
+                            type: DeviceType::fromName($device['type'] ?? null),
                             display: new Display(
-                                width: $data['device']['display']['width'] ?? null,
-                                height: $data['device']['display']['height'] ?? null,
-                                touch: $data['device']['display']['touch'] ?? null,
-                                size: $data['device']['display']['size'] ?? null,
+                                width: $device['display']['width'] ?? null,
+                                height: $device['display']['height'] ?? null,
+                                touch: $device['display']['touch'] ?? null,
+                                size: $device['display']['size'] ?? null,
                             ),
-                            dualOrientation: $data['device']['dualOrientation'] ?? null,
-                            simCount: $data['device']['simCount'] ?? null,
-                            bits: Bits::from($data['device']['bits'] ?? 0),
+                            dualOrientation: $device['dualOrientation'] ?? null,
+                            simCount: $device['simCount'] ?? null,
+                            bits: Bits::from($device['bits'] ?? 0),
                         ),
                         os: new Os(
-                            name: $data['platform']['name'] ?? null,
-                            marketingName: $data['platform']['marketingName'] ?? null,
+                            name: $os['name'] ?? null,
+                            marketingName: $os['marketingName'] ?? null,
                             manufacturer: $osManufacturer,
                             version: $osVersion,
-                            bits: Bits::from($data['platform']['bits'] ?? 0),
+                            bits: Bits::from($os['bits'] ?? 0),
                         ),
                         browser: new Browser(
-                            name: $data['client']['name'] ?? null,
+                            name: $client['name'] ?? null,
                             manufacturer: $clientManufacturer,
                             version: $clientVersion,
-                            type: ClientType::fromName($data['client']['type'] ?? null),
-                            bits: Bits::from($data['client']['bits'] ?? 0),
-                            modus: $data['client']['modus'] ?? null,
+                            type: ClientType::fromName($client['type'] ?? null),
+                            bits: Bits::from($client['bits'] ?? 0),
+                            modus: $client['modus'] ?? null,
                         ),
                         engine: new Engine(
-                            name: $data['engine']['name'] ?? null,
+                            name: $engine['name'] ?? null,
                             manufacturer: $engineManufacturer,
                             version: $engineVersion,
                         ),
                     ),
-                    file: $data['file'],
-                    dateFirst: $data['date-first'] ?? date('Y-m-d'),
-                    dateLast: $data['date-last'] ?? date('Y-m-d'),
-                    raw: $data['raw'],
+                    file: $data->getFile(),
+                    dateFirst: $data->getDateFirst(),
+                    dateLast: $data->getDateLast(),
+                    raw: $data->getRaw(),
+                    sourceName: $source->getName(),
+                    sources: [
+                        $source->getName() => [
+                            'date-first' => $data->getDateFirst(),
+                            'date-last' => $data->getDateLast(),
+                        ],
+                    ],
                 );
             }
 

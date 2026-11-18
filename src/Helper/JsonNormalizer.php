@@ -106,7 +106,7 @@ final class JsonNormalizer
     }
 
     /**
-     * @param non-empty-list<array{headers?: array<non-empty-string, non-empty-string>, date-first?: string, date-last?: string}|Result|null> $testCases
+     * @param non-empty-list<array{headers?: array<non-empty-string, non-empty-string>, expected?: Result, date-first?: string|null, date-last?: string|null}|Result|null> $testCases
      *
      * @throws SchemaUriReferencesInvalidJsonDocument
      * @throws SchemaUriReferencesDocumentWithInvalidMediaType

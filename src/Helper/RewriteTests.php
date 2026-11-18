@@ -84,7 +84,7 @@ final readonly class RewriteTests
                 options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
 
-            /** @var non-empty-list<array{headers: non-empty-array<non-empty-string, non-empty-string>, date-first: non-falsy-string, date-last: non-falsy-string}|null> $testCases */
+            /** @var non-empty-list<array{headers: non-empty-array<non-empty-string, non-empty-string>, date-first: non-empty-string, date-last: non-empty-string, sources: array<non-empty-string, array{date-first: non-empty-string, date-last: non-empty-string}>}|null> $testCases */
             $testCases = array_map(
                 static function (string $headerString, TestData $test) use ($output, $messageLength): array | null {
                     try {
@@ -137,10 +137,19 @@ final readonly class RewriteTests
                         return null;
                     }
 
+                    /** @var non-empty-string $firstDate */
+                    // @phpstan-ignore-next-line varTag.type
+                    $firstDate = $test->getDateFirst()->format('Y-m-d');
+
+                    /** @var non-empty-string $lastDate */
+                    // @phpstan-ignore-next-line varTag.type
+                    $lastDate = $test->getDateLast()->format('Y-m-d');
+
                     return [
                         'headers' => $test->getHeaders(),
-                        'date-first' => $test->getDateFirst()->format('Y-m-d'),
-                        'date-last' => $test->getDateLast()->format('Y-m-d'),
+                        'date-first' => $firstDate,
+                        'date-last' => $lastDate,
+                        'sources' => $test->getSources(),
                     ];
                 },
                 array_keys($fileChunk),
