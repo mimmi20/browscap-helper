@@ -470,7 +470,7 @@ final class RewriteTestsCommand extends Command
                 assert(is_string($filepath));
 
                 $output->write(
-                    messages: "\r" . 'reading file ' . $filepath,
+                    messages: 'reading file ' . $filepath,
                     newline: false,
                     options: OutputInterface::VERBOSITY_VERY_VERBOSE,
                 );
@@ -693,12 +693,16 @@ final class RewriteTestsCommand extends Command
             $diff    = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(
+                messages: '',
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
 
             $startTime = microtime(as_float: true);
@@ -793,7 +797,7 @@ final class RewriteTestsCommand extends Command
                 $diff    = $this->messageLength($output, $message, $messageLength);
 
                 $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
             }
@@ -917,12 +921,16 @@ final class RewriteTestsCommand extends Command
             $diff    = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(
+                messages: '',
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
 
             $startTime = microtime(as_float: true);
@@ -1153,7 +1161,7 @@ final class RewriteTestsCommand extends Command
                     $message = $loopMessage . $addMessage;
 
                     $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        messages: mb_str_pad(string: $message, length: $messageLength),
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
 
@@ -1261,7 +1269,7 @@ final class RewriteTestsCommand extends Command
                 $diff       = $this->messageLength($output, $message, $messageLength);
 
                 $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
@@ -1283,12 +1291,16 @@ final class RewriteTestsCommand extends Command
             $diff    = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(
+                messages: '',
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
 
             ++$testCount;
@@ -1956,12 +1968,16 @@ final class RewriteTestsCommand extends Command
         $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
+        );
+        $output->writeln(
+            messages: '',
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
         try {
@@ -1982,12 +1998,16 @@ final class RewriteTestsCommand extends Command
         $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
+        );
+        $output->writeln(
+            messages: '',
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
         if (
@@ -2325,12 +2345,16 @@ final class RewriteTestsCommand extends Command
         $diff = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
+        );
+        $output->writeln(
+            messages: '',
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
         $normalized = $this->jsonNormalizer->normalize(
@@ -2358,12 +2382,16 @@ final class RewriteTestsCommand extends Command
         $diff = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
+        );
+        $output->writeln(
+            messages: '',
+            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
         $success = @file_put_contents($path, $normalized);
@@ -2399,12 +2427,16 @@ final class RewriteTestsCommand extends Command
             $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(
+                messages: '',
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
 
             $startTime = microtime(as_float: true);
@@ -2420,12 +2452,16 @@ final class RewriteTestsCommand extends Command
                 $diff       = $this->messageLength($output, $message, $messageLength);
 
                 $output->write(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                    messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
-                $output->writeln(
+                $output->write(
                     messages: sprintf(' <bg=red>%d</>', $messageLength),
                     options: OutputInterface::VERBOSITY_DEBUG,
+                );
+                $output->writeln(
+                    messages: '',
+                    options: OutputInterface::VERBOSITY_NORMAL,
                 );
             } catch (FileCanNotBeRead | FileDoesNotContainJson | FileDoesNotExist $e) {
                 ++$errors;
@@ -2437,7 +2473,7 @@ final class RewriteTestsCommand extends Command
                 $message = $loopMessage . $addMessage;
 
                 $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                    messages: mb_str_pad(string: $message, length: $messageLength),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
 
@@ -2451,12 +2487,16 @@ final class RewriteTestsCommand extends Command
             $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(
+                messages: '',
+                options: OutputInterface::VERBOSITY_NORMAL,
             );
         }
 
@@ -2465,12 +2505,16 @@ final class RewriteTestsCommand extends Command
         $diff       = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
+        );
+        $output->writeln(
+            messages: '',
+            options: OutputInterface::VERBOSITY_NORMAL,
         );
 
         try {
@@ -2483,7 +2527,7 @@ final class RewriteTestsCommand extends Command
             $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
@@ -2508,7 +2552,7 @@ final class RewriteTestsCommand extends Command
             $diff       = $this->messageLength($output, $message, $messageLength);
 
             $output->writeln(
-                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
 
