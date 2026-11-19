@@ -3615,7 +3615,7 @@ final class RewriteTestsCommand extends Command
         if ($addIntegrationTests || array_key_exists($k, $integrationTests)) {
             $integrationTests[$k] = [
                 'headers' => $lowerHeaders,
-                'expected' => $result,
+                'expected' => $result->toArray(),
             ];
 
             // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
