@@ -801,10 +801,7 @@ final class RewriteTestsCommand extends Command
                     messages: sprintf(' <bg=red>%d</>', $messageLength),
                     options: OutputInterface::VERBOSITY_DEBUG,
                 );
-                $output->writeln(
-                    messages: '',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
             }
 
             $hasInvalidHeaders = $this->hasInvalidHeaders($headers)
@@ -1279,10 +1276,7 @@ final class RewriteTestsCommand extends Command
                     messages: sprintf(' <bg=red>%d</>', $messageLength),
                     options: OutputInterface::VERBOSITY_DEBUG,
                 );
-                $output->writeln(
-                    messages: '',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
                 //     $output->writeln(messages: '');
@@ -2519,10 +2513,7 @@ final class RewriteTestsCommand extends Command
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
             return false;
         }
@@ -2552,10 +2543,7 @@ final class RewriteTestsCommand extends Command
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
             return false;
         } finally {
@@ -3615,7 +3603,7 @@ final class RewriteTestsCommand extends Command
         if ($addIntegrationTests || array_key_exists($k, $integrationTests)) {
             $integrationTests[$k] = [
                 'headers' => $lowerHeaders,
-                'expected' => $result->toArray(),
+                'expected' => $result,
             ];
 
             // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {

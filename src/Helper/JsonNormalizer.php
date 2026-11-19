@@ -36,8 +36,10 @@ use UaResult\Result\Result;
 use UnexpectedValueException;
 
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function assert;
+use function is_array;
 use function json_encode;
 use function max;
 use function mb_str_pad;
@@ -133,12 +135,16 @@ final class JsonNormalizer
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         $mapped = array_map(
-            static function (array | Result | null $testCase): array | null {
-                if ($testCase instanceof Result) {
+            static function (array | null $testCase): array | null {
+                if (
+                    is_array($testCase)
+                    && array_key_exists('expected', $testCase)
+                    && $testCase['expected'] instanceof Result
+                ) {
                     try {
-                        return $testCase->toArray();
+                        $testCase['expected'] = $testCase['expected']->toArray();
                     } catch (UnexpectedValueException) {
-                        return null;
+                        $testCase['expected'] = null;
                     }
                 }
 
