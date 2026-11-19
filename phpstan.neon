@@ -140,10 +140,10 @@ parameters:
       identifier: instanceof.alwaysTrue
     -
       identifier: property.uninitialized
-    -
-      identifier: booleanNot.alwaysFalse
-    -
-      identifier: if.alwaysTrue
+    #-
+    #  identifier: booleanNot.alwaysFalse
+    #-
+    #  identifier: if.alwaysTrue
 
 services:
   errorFormatter.sarif:
