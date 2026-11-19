@@ -50,12 +50,12 @@ use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use UnexpectedValueException;
 
 use function array_key_exists;
+use function assert;
 use function count;
 use function is_string;
 use function json_encode;
@@ -145,8 +145,8 @@ final class CopyTestsCommand extends Command
         $txtChecks = [];
 
         $sourcesExisting = [
-            new JsonFileSource(consoleLogger: $consoleLogger, dir: $testSource),
-            new YamlFileSource(consoleLogger: $consoleLogger, dir: $testSource),
+            new JsonFileSource(dir: $testSource),
+            new YamlFileSource(dir: $testSource),
         ];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
@@ -166,18 +166,18 @@ final class CopyTestsCommand extends Command
         $output->writeln('init sources ...', OutputInterface::VERBOSITY_NORMAL);
 
         $sourcesNew = [
-            new CrawlerDetectSource(consoleLogger: $consoleLogger),
-            new DonatjSource(consoleLogger: $consoleLogger),
-            new MatomoSource(consoleLogger: $consoleLogger),
-            new MobileDetectSource(consoleLogger: $consoleLogger),
-            new WhichBrowserSource(consoleLogger: $consoleLogger),
-            new WootheeSource(consoleLogger: $consoleLogger),
-            new TxtFileSource(consoleLogger: $consoleLogger, dir: $sourcesDirectory),
-            new TxtCounterFileSource(consoleLogger: $consoleLogger, dir: $sourcesDirectory),
+            new CrawlerDetectSource(),
+            new DonatjSource(),
+            new MatomoSource(),
+            new MobileDetectSource(),
+            new WhichBrowserSource(),
+            new WootheeSource(),
+            new TxtFileSource(dir: $sourcesDirectory),
+            new TxtCounterFileSource(dir: $sourcesDirectory),
         ];
 
         try {
-            $sourcesNew[] = $this->addPdoSource(consoleLogger: $consoleLogger, dbname: 'g');
+            $sourcesNew[] = $this->addPdoSource(dbname: 'g');
         } catch (PDOException) {
             $output->writeln(
                 '<error>An error occured while initializing the database "g"</error>',
@@ -186,7 +186,7 @@ final class CopyTestsCommand extends Command
         }
 
         try {
-            $sourcesNew[] = $this->addPdoSource(consoleLogger: $consoleLogger, dbname: 'a');
+            $sourcesNew[] = $this->addPdoSource(dbname: 'a');
         } catch (PDOException) {
             $output->writeln(
                 '<error>An error occured while initializing the database "a"</error>',
@@ -195,7 +195,7 @@ final class CopyTestsCommand extends Command
         }
 
         try {
-            $sourcesNew[] = $this->addPdoSource(consoleLogger: $consoleLogger, dbname: 'k');
+            $sourcesNew[] = $this->addPdoSource(dbname: 'k');
         } catch (PDOException) {
             $output->writeln(
                 '<error>An error occured while initializing the database "k"</error>',
@@ -204,7 +204,7 @@ final class CopyTestsCommand extends Command
         }
 
         try {
-            $sourcesNew[] = $this->addPdoSource(consoleLogger: $consoleLogger, dbname: 's');
+            $sourcesNew[] = $this->addPdoSource(dbname: 's');
         } catch (PDOException) {
             $output->writeln(
                 '<error>An error occured while initializing the database "s"</error>',
@@ -213,7 +213,7 @@ final class CopyTestsCommand extends Command
         }
 
         try {
-            $sourcesNew[] = $this->addPdoSource(consoleLogger: $consoleLogger, dbname: 'v');
+            $sourcesNew[] = $this->addPdoSource(dbname: 'v');
         } catch (PDOException) {
             $output->writeln(
                 '<error>An error occured while initializing the database "v"</error>',
@@ -253,7 +253,6 @@ final class CopyTestsCommand extends Command
 
     /** @throws PDOException */
     private function addPdoSource(
-        ConsoleLogger $consoleLogger,
         string $dbname,
         string $host = 'localhost',
         int $port = 3306,
@@ -275,7 +274,7 @@ final class CopyTestsCommand extends Command
             $driverOptions,
         );
 
-        return new PdoSource(pdo: $pdo, consoleLogger: $consoleLogger, dbName: $dbname);
+        return new PdoSource(pdo: $pdo, dbName: $dbname);
     }
 
     /**
@@ -295,7 +294,7 @@ final class CopyTestsCommand extends Command
     ): array {
         foreach (
             $this->existingTestsLoader->getProperties(
-                output: new NullOutput(),
+                output: $output,
                 logger: $logger,
                 sources: $sources,
             ) as $testProperty
@@ -314,13 +313,11 @@ final class CopyTestsCommand extends Command
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-first']);
 
                     if ($dateNew !== false && $dateOld > $dateNew) {
-                        /** @var non-empty-string $firstDate */
-                        // @phpstan-ignore-next-line varTag.type
                         $firstDate = $dateNew->format('Y-m-d');
+                        assert(is_string($firstDate) && $firstDate !== '');
 
-                        /** @var non-empty-string $lastDate */
-                        // @phpstan-ignore-next-line varTag.type
                         $lastDate = $txtChecks[$seachHeader]->getDateLast()->format('Y-m-d');
+                        assert(is_string($lastDate) && $lastDate !== '');
 
                         $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateLast($dateNew);
                         $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withSources(
@@ -339,13 +336,11 @@ final class CopyTestsCommand extends Command
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-last']);
 
                     if ($dateNew !== false && $dateOld < $dateNew) {
-                        /** @var non-empty-string $firstDate */
-                        // @phpstan-ignore-next-line varTag.type
                         $firstDate = $txtChecks[$seachHeader]->getDateFirst()->format('Y-m-d');
+                        assert(is_string($firstDate) && $firstDate !== '');
 
-                        /** @var non-empty-string $lastDate */
-                        // @phpstan-ignore-next-line varTag.type
                         $lastDate = $dateNew->format('Y-m-d');
+                        assert(is_string($lastDate) && $lastDate !== '');
 
                         $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateLast($dateNew);
                         $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withSources(
@@ -400,13 +395,11 @@ final class CopyTestsCommand extends Command
                 $property['date-last'] = new DateTimeImmutable('now');
             }
 
-            /** @var non-empty-string $firstDate */
-            // @phpstan-ignore-next-line varTag.type
             $firstDate = $property['date-first']->format('Y-m-d');
+            assert(is_string($firstDate) && $firstDate !== '');
 
-            /** @var non-empty-string $lastDate */
-            // @phpstan-ignore-next-line varTag.type
             $lastDate = $property['date-last']->format('Y-m-d');
+            assert(is_string($lastDate) && $lastDate !== '');
 
             $txtChecks[$seachHeader] = new TestData(
                 headers: $property['headers'],

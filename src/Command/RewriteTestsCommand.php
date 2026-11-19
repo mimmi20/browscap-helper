@@ -426,8 +426,8 @@ final class RewriteTestsCommand extends Command
         $this->existingTestsRemover->remove(output: $output, testSource: $detectorTargetDirectory);
 
         $sources = [
-            new JsonFileSource(consoleLogger: $consoleLogger, dir: $testSource),
-            new YamlFileSource(consoleLogger: $consoleLogger, dir: $testSource),
+            new JsonFileSource(dir: $testSource),
+            new YamlFileSource(dir: $testSource),
         ];
 
         $output->writeln(
@@ -693,17 +693,14 @@ final class RewriteTestsCommand extends Command
             $diff    = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $startTime = microtime(as_float: true);
 
@@ -921,17 +918,14 @@ final class RewriteTestsCommand extends Command
             $diff    = $this->messageLength($output, $message, $messageLength);
 
             $output->write(
-                messages: mb_str_pad(string: $message, length: $messageLength + $diff),
+                messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
             $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $startTime = microtime(as_float: true);
 
@@ -1298,10 +1292,7 @@ final class RewriteTestsCommand extends Command
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
             ++$testCount;
 
@@ -1975,10 +1966,7 @@ final class RewriteTestsCommand extends Command
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
-        $output->writeln(
-            messages: '',
-            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
-        );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         try {
             /** @var array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
@@ -2005,10 +1993,7 @@ final class RewriteTestsCommand extends Command
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
-        $output->writeln(
-            messages: '',
-            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
-        );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         if (
             ($newResult['device']['deviceName'] ?? null) === null
@@ -2352,10 +2337,7 @@ final class RewriteTestsCommand extends Command
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
-        $output->writeln(
-            messages: '',
-            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
-        );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $normalized = $this->jsonNormalizer->normalize(
             output: $output,
@@ -2389,10 +2371,7 @@ final class RewriteTestsCommand extends Command
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
-        $output->writeln(
-            messages: '',
-            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
-        );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $success = @file_put_contents($path, $normalized);
 
@@ -2434,10 +2413,7 @@ final class RewriteTestsCommand extends Command
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
             $startTime = microtime(as_float: true);
 
@@ -2459,10 +2435,7 @@ final class RewriteTestsCommand extends Command
                     messages: sprintf(' <bg=red>%d</>', $messageLength),
                     options: OutputInterface::VERBOSITY_DEBUG,
                 );
-                $output->writeln(
-                    messages: '',
-                    options: OutputInterface::VERBOSITY_NORMAL,
-                );
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
             } catch (FileCanNotBeRead | FileDoesNotContainJson | FileDoesNotExist $e) {
                 ++$errors;
 
@@ -2494,10 +2467,7 @@ final class RewriteTestsCommand extends Command
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
-            $output->writeln(
-                messages: '',
-                options: OutputInterface::VERBOSITY_NORMAL,
-            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         }
 
         $addMessage = sprintf('write to temporary file %s', $file);
@@ -2512,10 +2482,7 @@ final class RewriteTestsCommand extends Command
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
-        $output->writeln(
-            messages: '',
-            options: OutputInterface::VERBOSITY_NORMAL,
-        );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
         try {
             $tests[] = $result->toArray();

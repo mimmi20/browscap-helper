@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace BrowscapHelper\Helper;
 
 use BrowscapHelper\Entity\TestProperties;
+use BrowscapHelper\Source\OutputAwareInterface;
 use BrowscapHelper\Source\SourceInterface;
 use BrowserDetector\Loader\CompanyLoaderFactory;
 use BrowserDetector\Version\Exception\NotNumericException;
@@ -73,6 +74,10 @@ final class ExistingTestsLoader
         $versionBuilder       = new VersionBuilder();
 
         foreach ($sources as $source) {
+            if ($source instanceof OutputAwareInterface) {
+                $source->setOutput($output);
+            }
+
             $baseMessage = sprintf('reading from source %s ', $source->getName());
 
             if (!$source->isReady($baseMessage)) {
