@@ -1100,7 +1100,7 @@ final class RewriteTestsCommand extends Command
             $resultOs          = self::COMPARE_ALL;
             $resultEngine      = self::COMPARE_ALL;
 
-            // @phpstan-ignore booleanOr.alwaysTrue
+            // @phpstan-ignore booleanNot.alwaysTrue
             if (!$compareWithMatomo) {
                 ['os' => $resultOs, 'engine' => $resultEngine] = $this->compareWithMatomo(
                     osName: $osName,
