@@ -55,6 +55,7 @@ use Symfony\Component\Yaml\Yaml;
 use UnexpectedValueException;
 
 use function array_key_exists;
+use function assert;
 use function count;
 use function is_string;
 use function json_encode;
@@ -132,9 +133,9 @@ final class CopyTestsCommand extends Command
             LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_VERBOSE,
+            LogLevel::INFO => OutputInterface::VERBOSITY_VERBOSE,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
         ]);
 
         $testSource      = 'tests';
@@ -143,7 +144,10 @@ final class CopyTestsCommand extends Command
         /** @var array<TestData> $txtChecks */
         $txtChecks = [];
 
-        $sourcesExisting = [new JsonFileSource($testSource), new YamlFileSource($testSource)];
+        $sourcesExisting = [
+            new JsonFileSource(dir: $testSource),
+            new YamlFileSource(dir: $testSource),
+        ];
 
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
@@ -168,8 +172,8 @@ final class CopyTestsCommand extends Command
             new MobileDetectSource(),
             new WhichBrowserSource(),
             new WootheeSource(),
-            new TxtFileSource($sourcesDirectory),
-            new TxtCounterFileSource($sourcesDirectory),
+            new TxtFileSource(dir: $sourcesDirectory),
+            new TxtCounterFileSource(dir: $sourcesDirectory),
         ];
 
         try {
@@ -270,7 +274,7 @@ final class CopyTestsCommand extends Command
             $driverOptions,
         );
 
-        return new PdoSource($pdo);
+        return new PdoSource(pdo: $pdo, dbName: $dbname);
     }
 
     /**
@@ -289,7 +293,11 @@ final class CopyTestsCommand extends Command
         int &$txtTotalCounter,
     ): array {
         foreach (
-            $this->existingTestsLoader->getProperties($output, $logger, $sources) as $testProperty
+            $this->existingTestsLoader->getProperties(
+                output: $output,
+                logger: $logger,
+                sources: $sources,
+            ) as $testProperty
         ) {
             $property = [
                 'headers' => $this->filterHeaders($output, $testProperty->getResult()->getHeaders()),
@@ -305,7 +313,21 @@ final class CopyTestsCommand extends Command
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-first']);
 
                     if ($dateNew !== false && $dateOld > $dateNew) {
-                        $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateFirst($dateNew);
+                        $firstDate = $dateNew->format('Y-m-d');
+                        assert(is_string($firstDate) && $firstDate !== '');
+
+                        $lastDate = $txtChecks[$seachHeader]->getDateLast()->format('Y-m-d');
+                        assert(is_string($lastDate) && $lastDate !== '');
+
+                        $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateLast($dateNew);
+                        $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withSources(
+                            [
+                                $testProperty->getSourceName() => [
+                                    'date-first' => $firstDate,
+                                    'date-last' => $lastDate,
+                                ],
+                            ],
+                        );
                     }
                 }
 
@@ -314,7 +336,21 @@ final class CopyTestsCommand extends Command
                     $dateNew = DateTimeImmutable::createFromFormat('Y-m-d', $property['date-last']);
 
                     if ($dateNew !== false && $dateOld < $dateNew) {
+                        $firstDate = $txtChecks[$seachHeader]->getDateFirst()->format('Y-m-d');
+                        assert(is_string($firstDate) && $firstDate !== '');
+
+                        $lastDate = $dateNew->format('Y-m-d');
+                        assert(is_string($lastDate) && $lastDate !== '');
+
                         $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withDateLast($dateNew);
+                        $txtChecks[$seachHeader] = $txtChecks[$seachHeader]->withSources(
+                            [
+                                $testProperty->getSourceName() => [
+                                    'date-first' => $firstDate,
+                                    'date-last' => $lastDate,
+                                ],
+                            ],
+                        );
                     }
                 }
 
@@ -359,10 +395,22 @@ final class CopyTestsCommand extends Command
                 $property['date-last'] = new DateTimeImmutable('now');
             }
 
+            $firstDate = $property['date-first']->format('Y-m-d');
+            assert(is_string($firstDate) && $firstDate !== '');
+
+            $lastDate = $property['date-last']->format('Y-m-d');
+            assert(is_string($lastDate) && $lastDate !== '');
+
             $txtChecks[$seachHeader] = new TestData(
                 headers: $property['headers'],
                 dateFirst: $property['date-first'],
                 dateLast: $property['date-last'],
+                sources: [
+                    $testProperty->getSourceName() => [
+                        'date-first' => $firstDate,
+                        'date-last' => $lastDate,
+                    ],
+                ],
             );
 
             ++$txtTotalCounter;

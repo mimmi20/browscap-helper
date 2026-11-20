@@ -45,7 +45,6 @@ use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use JsonException;
 use Override;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -161,7 +160,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 12;
 
     /**
-     * last update: 2026-11-11
+     * last update: 2026-11-18
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -395,9 +394,9 @@ final class RewriteTestsCommand extends Command
             LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_VERBOSE,
+            LogLevel::INFO => OutputInterface::VERBOSITY_VERBOSE,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
         ]);
 
         $companyLoaderFactory = new CompanyLoaderFactory(logger: $consoleLogger);
@@ -426,7 +425,10 @@ final class RewriteTestsCommand extends Command
 
         $this->existingTestsRemover->remove(output: $output, testSource: $detectorTargetDirectory);
 
-        $sources = [new JsonFileSource($testSource), new YamlFileSource($testSource)];
+        $sources = [
+            new JsonFileSource(dir: $testSource),
+            new YamlFileSource(dir: $testSource),
+        ];
 
         $output->writeln(
             messages: 'removing old existing files from .build ...',
@@ -435,7 +437,7 @@ final class RewriteTestsCommand extends Command
 
         $this->existingTestsRemover->remove(output: $output, testSource: '.build');
 
-        /** @var array<string, Result> $integrationTests */
+        /** @var array<string, array{headers: array<non-empty-string, non-empty-string>, expected: Result}> $integrationTests */
         $integrationTests = [];
 
         $output->writeln(
@@ -468,7 +470,7 @@ final class RewriteTestsCommand extends Command
                 assert(is_string($filepath));
 
                 $output->write(
-                    messages: "\r" . 'reading file ' . $filepath,
+                    messages: 'reading file ' . $filepath,
                     newline: false,
                     options: OutputInterface::VERBOSITY_VERY_VERBOSE,
                 );
@@ -546,11 +548,7 @@ final class RewriteTestsCommand extends Command
                         continue;
                     }
 
-                    $result = $this->buildResult(
-                        consoleLogger: $consoleLogger,
-                        data: $expected,
-                        headers: $headers,
-                    );
+                    $result = $this->buildResult(data: $expected, headers: $headers);
 
                     if ($result instanceof Result) {
                         $integrationTests = $this->updateIntegrationTests(
@@ -648,15 +646,15 @@ final class RewriteTestsCommand extends Command
 
             ++$resultChecks['general']['all'];
 
-            if (!array_key_exists($testProperty->getDateLast(), $resultChecks)) {
-                $resultChecks[$testProperty->getDateLast()] = [];
+            if (!array_key_exists((string) $testProperty->getDateLast(), $resultChecks)) {
+                $resultChecks[(string) $testProperty->getDateLast()] = [];
             }
 
-            if (!array_key_exists('all', $resultChecks[$testProperty->getDateLast()])) {
-                $resultChecks[$testProperty->getDateLast()]['all'] = 0;
+            if (!array_key_exists('all', $resultChecks[(string) $testProperty->getDateLast()])) {
+                $resultChecks[(string) $testProperty->getDateLast()]['all'] = 0;
             }
 
-            ++$resultChecks[$testProperty->getDateLast()]['all'];
+            ++$resultChecks[(string) $testProperty->getDateLast()]['all'];
 
             $actualTimeExec = new DateTimeImmutable('now');
 
@@ -698,10 +696,11 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $startTime = microtime(as_float: true);
 
@@ -737,13 +736,13 @@ final class RewriteTestsCommand extends Command
                 if (
                     !array_key_exists(
                         'skippedBeforeCheck',
-                        $resultChecks[$testProperty->getDateLast()],
+                        $resultChecks[(string) $testProperty->getDateLast()],
                     )
                 ) {
-                    $resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'] = 0;
+                    $resultChecks[(string) $testProperty->getDateLast()]['skippedBeforeCheck'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['skippedBeforeCheck'];
 
                 continue;
             }
@@ -794,10 +793,15 @@ final class RewriteTestsCommand extends Command
                 $message = $loopMessage . '<error>"x-requested-with" header is available twice</error>';
                 $diff    = $this->messageLength($output, $message, $messageLength);
 
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                $output->write(
+                    messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
+                $output->write(
+                    messages: sprintf(' <bg=red>%d</>', $messageLength),
+                    options: OutputInterface::VERBOSITY_DEBUG,
+                );
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
             }
 
             $hasInvalidHeaders = $this->hasInvalidHeaders($headers)
@@ -815,13 +819,13 @@ final class RewriteTestsCommand extends Command
                 if (
                     !array_key_exists(
                         'skippedInvalidData',
-                        $resultChecks[$testProperty->getDateLast()],
+                        $resultChecks[(string) $testProperty->getDateLast()],
                     )
                 ) {
-                    $resultChecks[$testProperty->getDateLast()]['skippedInvalidData'] = 0;
+                    $resultChecks[(string) $testProperty->getDateLast()]['skippedInvalidData'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['skippedInvalidData'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['skippedInvalidData'];
 
                 continue;
             }
@@ -838,13 +842,13 @@ final class RewriteTestsCommand extends Command
                 if (
                     !array_key_exists(
                         'skippedBeforeCheck',
-                        $resultChecks[$testProperty->getDateLast()],
+                        $resultChecks[(string) $testProperty->getDateLast()],
                     )
                 ) {
-                    $resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'] = 0;
+                    $resultChecks[(string) $testProperty->getDateLast()]['skippedBeforeCheck'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['skippedBeforeCheck'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['skippedBeforeCheck'];
 
                 continue;
             }
@@ -857,11 +861,11 @@ final class RewriteTestsCommand extends Command
 
             ++$resultChecks['general']['checked'];
 
-            if (!array_key_exists('checked', $resultChecks[$testProperty->getDateLast()])) {
-                $resultChecks[$testProperty->getDateLast()]['checked'] = 0;
+            if (!array_key_exists('checked', $resultChecks[(string) $testProperty->getDateLast()])) {
+                $resultChecks[(string) $testProperty->getDateLast()]['checked'] = 0;
             }
 
-            ++$resultChecks[$testProperty->getDateLast()]['checked'];
+            ++$resultChecks[(string) $testProperty->getDateLast()]['checked'];
 
             $txtChecks[$seachHeader] = true;
 
@@ -871,11 +875,16 @@ final class RewriteTestsCommand extends Command
 
             // $resultChecks['general']['skippedHeaderCheck']++;
 
-            if (!array_key_exists('skippedHeaderCheck', $resultChecks[$testProperty->getDateLast()])) {
-                $resultChecks[$testProperty->getDateLast()]['skippedHeaderCheck'] = 0;
+            if (
+                !array_key_exists(
+                    'skippedHeaderCheck',
+                    $resultChecks[(string) $testProperty->getDateLast()],
+                )
+            ) {
+                $resultChecks[(string) $testProperty->getDateLast()]['skippedHeaderCheck'] = 0;
             }
 
-            // $resultChecks[$testProperty->getDateLast()]['skippedHeaderCheck']++;
+            // $resultChecks[(string) $testProperty->getDateLast()]['skippedHeaderCheck']++;
 
             // if (
             //    !array_key_exists('x-requested-with', $headers)
@@ -917,10 +926,11 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $startTime = microtime(as_float: true);
 
@@ -948,13 +958,13 @@ final class RewriteTestsCommand extends Command
                 if (
                     !array_key_exists(
                         'skippedAfterCheck',
-                        $resultChecks[$testProperty->getDateLast()],
+                        $resultChecks[(string) $testProperty->getDateLast()],
                     )
                 ) {
-                    $resultChecks[$testProperty->getDateLast()]['skippedAfterCheck'] = 0;
+                    $resultChecks[(string) $testProperty->getDateLast()]['skippedAfterCheck'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['skippedAfterCheck'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['skippedAfterCheck'];
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
                 //     $output->writeln(messages: '');
@@ -975,11 +985,16 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks['general']['duplicates'];
 
-                if (!array_key_exists('duplicates', $resultChecks[$testProperty->getDateLast()])) {
-                    $resultChecks[$testProperty->getDateLast()]['duplicates'] = 0;
+                if (
+                    !array_key_exists(
+                        'duplicates',
+                        $resultChecks[(string) $testProperty->getDateLast()],
+                    )
+                ) {
+                    $resultChecks[(string) $testProperty->getDateLast()]['duplicates'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['duplicates'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['duplicates'];
 
                 if ($result instanceof Result) {
                     try {
@@ -1012,11 +1027,11 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks['general']['errors'];
 
-                if (!array_key_exists('errors', $resultChecks[$testProperty->getDateLast()])) {
-                    $resultChecks[$testProperty->getDateLast()]['errors'] = 0;
+                if (!array_key_exists('errors', $resultChecks[(string) $testProperty->getDateLast()])) {
+                    $resultChecks[(string) $testProperty->getDateLast()]['errors'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['errors'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['errors'];
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
                 //     $output->writeln(messages: '');
@@ -1067,20 +1082,44 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $compareWithMatomo = self::COMPARE_ALL;
+            if (!isset($checkedPlatforms[$osName][$osVersion])) {
+                $checkedPlatforms[$osName][$osVersion]['count']   = 1;
+                $checkedPlatforms[$osName][$osVersion]['checked'] = false;
+            } else {
+                ++$checkedPlatforms[$osName][$osVersion]['count'];
+            }
 
+            if (!isset($checkedEngines[$engineName][$engineVersion])) {
+                $checkedEngines[$engineName][$engineVersion]['count']   = 1;
+                $checkedEngines[$engineName][$engineVersion]['checked'] = false;
+            } else {
+                ++$checkedEngines[$engineName][$engineVersion]['count'];
+            }
+
+            $compareWithMatomo = self::COMPARE_ALL;
+            $resultOs          = self::COMPARE_ALL;
+            $resultEngine      = self::COMPARE_ALL;
+
+            // @phpstan-ignore booleanNot.alwaysTrue
             if (!$compareWithMatomo) {
-                $compareWithMatomo = $this->compareWithMatomo(
+                ['os' => $resultOs, 'engine' => $resultEngine] = $this->compareWithMatomo(
                     osName: $osName,
                     osVersion: $osVersion,
                     engineName: $engineName,
-                    engineVersion: $engineVersion,
-                    checkedPlatforms: $checkedPlatforms,
-                    checkedEngines: $checkedEngines,
                 );
+
+                $compareWithMatomo = $resultOs && $resultEngine;
             }
 
             if ($compareWithMatomo) {
+                if ($resultOs) {
+                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
+                }
+
+                if ($resultEngine) {
+                    $checkedEngines[$engineName][$engineVersion]['checked'] = true;
+                }
+
                 $startTime = microtime(as_float: true);
 
                 try {
@@ -1104,11 +1143,16 @@ final class RewriteTestsCommand extends Command
 
                     ++$resultChecks['general']['errors'];
 
-                    if (!array_key_exists('errors', $resultChecks[$testProperty->getDateLast()])) {
-                        $resultChecks[$testProperty->getDateLast()]['errors'] = 0;
+                    if (
+                        !array_key_exists(
+                            'errors',
+                            $resultChecks[(string) $testProperty->getDateLast()],
+                        )
+                    ) {
+                        $resultChecks[(string) $testProperty->getDateLast()]['errors'] = 0;
                     }
 
-                    ++$resultChecks[$testProperty->getDateLast()]['errors'];
+                    ++$resultChecks[(string) $testProperty->getDateLast()]['errors'];
 
                     $exception = new Exception('An error occured while comparing a result', 0, $e);
 
@@ -1117,7 +1161,7 @@ final class RewriteTestsCommand extends Command
                     $message = $loopMessage . $addMessage;
 
                     $output->writeln(
-                        messages: "\r" . mb_str_pad(string: $message, length: $messageLength),
+                        messages: mb_str_pad(string: $message, length: $messageLength),
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
 
@@ -1144,13 +1188,13 @@ final class RewriteTestsCommand extends Command
                 if (
                     !array_key_exists(
                         'comparedWithMatomo',
-                        $resultChecks[$testProperty->getDateLast()],
+                        $resultChecks[(string) $testProperty->getDateLast()],
                     )
                 ) {
-                    $resultChecks[$testProperty->getDateLast()]['comparedWithMatomo'] = 0;
+                    $resultChecks[(string) $testProperty->getDateLast()]['comparedWithMatomo'] = 0;
                 }
 
-                ++$resultChecks[$testProperty->getDateLast()]['comparedWithMatomo'];
+                ++$resultChecks[(string) $testProperty->getDateLast()]['comparedWithMatomo'];
             }
 
             $deviceManufaturer = mb_strtolower(
@@ -1224,10 +1268,15 @@ final class RewriteTestsCommand extends Command
                 $message    = $loopMessage . $addMessage;
                 $diff       = $this->messageLength($output, $message, $messageLength);
 
-                $output->writeln(
-                    messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+                $output->write(
+                    messages: mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
+                $output->write(
+                    messages: sprintf(' <bg=red>%d</>', $messageLength),
+                    options: OutputInterface::VERBOSITY_DEBUG,
+                );
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
                 // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
                 //     $output->writeln(messages: '');
@@ -1250,10 +1299,11 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             ++$testCount;
 
@@ -1263,11 +1313,11 @@ final class RewriteTestsCommand extends Command
 
             ++$resultChecks['general']['test'];
 
-            if (!array_key_exists('test', $resultChecks[$testProperty->getDateLast()])) {
-                $resultChecks[$testProperty->getDateLast()]['test'] = 0;
+            if (!array_key_exists('test', $resultChecks[(string) $testProperty->getDateLast()])) {
+                $resultChecks[(string) $testProperty->getDateLast()]['test'] = 0;
             }
 
-            ++$resultChecks[$testProperty->getDateLast()]['test'];
+            ++$resultChecks[(string) $testProperty->getDateLast()]['test'];
 
             try {
                 $integrationTests = $this->updateIntegrationTests(
@@ -1371,7 +1421,6 @@ final class RewriteTestsCommand extends Command
                         }
 
                         return $this->buildResult(
-                            consoleLogger: $consoleLogger,
                             data: $xpart,
                             headers: $headers,
                         );
@@ -1383,16 +1432,12 @@ final class RewriteTestsCommand extends Command
 
             array_walk(
                 $tests,
-                function (Result $result) use (&$integrationTests, $consoleLogger): void {
-                    try {
-                        $integrationTests = $this->updateIntegrationTests(
-                            result: $result,
-                            integrationTests: $integrationTests,
-                            addIntegrationTests: self::ADD_INTEGRATION_TESTS,
-                        );
-                    } catch (UnexpectedValueException | NotNumericException $e) {
-                        $consoleLogger->error($e);
-                    }
+                function (Result $result) use (&$integrationTests): void {
+                    $integrationTests = $this->updateIntegrationTests(
+                        result: $result,
+                        integrationTests: $integrationTests,
+                        addIntegrationTests: self::ADD_INTEGRATION_TESTS,
+                    );
                 },
             );
 
@@ -1583,7 +1628,7 @@ final class RewriteTestsCommand extends Command
 
                 foreach ($versions as $version => $counterVersions) {
                     $count     = $counterVersions['count'];
-                    $checkmark = $counterVersions['checked'] ?? false
+                    $checkmark = $counterVersions['checked']
                         ? ' <fg=green>+</>'
                         : ' <fg=red>-</>';
                     $table->addRow(
@@ -1641,7 +1686,7 @@ final class RewriteTestsCommand extends Command
 
                 foreach ($versions as $version => $counterVersions) {
                     $count     = $counterVersions['count'];
-                    $checkmark = $counterVersions['checked'] ?? false
+                    $checkmark = $counterVersions['checked']
                         ? ' <fg=green>+</>'
                         : ' <fg=red>-</>';
                     $table->addRow(
@@ -1743,7 +1788,7 @@ final class RewriteTestsCommand extends Command
                 $differentFromMatomo = $data['differentFromMatomo'] ?? 0;
                 $comparedWithMatomo  = $data['comparedWithMatomo'] ?? 0;
 
-                /* @phpstan-ignore booleanNot.alwaysTrue, booleanOr.alwaysTrue */
+                // @phpstan-ignore booleanNot.alwaysTrue, booleanOr.alwaysTrue
                 if ((!self::COMPARE_ALL || $comparedWithMatomo === 0) && $differentFromMatomo === 0) {
                     continue;
                 }
@@ -1917,7 +1962,7 @@ final class RewriteTestsCommand extends Command
      */
     private function handleTest(
         OutputInterface $output,
-        LoggerInterface $consoleLogger,
+        ConsoleLogger $consoleLogger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
@@ -1926,13 +1971,14 @@ final class RewriteTestsCommand extends Command
         $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         try {
             /** @var array{headers?: array<non-empty-string, non-empty-string>, device?: array{architecture: string, deviceName: string|null, marketingName: string|null, manufacturer: string, brand: string, type: string, ismobile: bool, istv: bool, display: array{width: int|null, height: int|null, touch: bool|null, size: float|null}, dualOrientation: bool|null, simCount: int|null, bits: int}, client?: array{name: string|null, modus: string|null, version: string|null, manufacturer: string, type: string, isbot: bool, bits: int}, os?: array{name: string|null, marketingName: string|null, version: string|null, manufacturer: string, bits: int}, engine?: array{name: string|null, version: string|null, manufacturer: string}} $newResult */
@@ -1952,13 +1998,14 @@ final class RewriteTestsCommand extends Command
         $diff    = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         if (
             ($newResult['device']['deviceName'] ?? null) === null
@@ -1966,7 +2013,6 @@ final class RewriteTestsCommand extends Command
         ) {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -1979,7 +2025,6 @@ final class RewriteTestsCommand extends Command
         if (($newResult['client']['name'] ?? null) === null) {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -1995,7 +2040,6 @@ final class RewriteTestsCommand extends Command
         ) {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2017,7 +2061,6 @@ final class RewriteTestsCommand extends Command
         if (str_contains((string) $newResult['client']['name'], 'general')) {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2030,7 +2073,6 @@ final class RewriteTestsCommand extends Command
         if (($newResult['client']['name'] ?? null) === 'unknown') {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2046,7 +2088,6 @@ final class RewriteTestsCommand extends Command
         ) {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2063,7 +2104,6 @@ final class RewriteTestsCommand extends Command
             // only check for unknown device, if it's not a bot
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2164,7 +2204,7 @@ final class RewriteTestsCommand extends Command
      * @throws void
      */
     private function buildTestResult(
-        LoggerInterface $consoleLogger,
+        ConsoleLogger $consoleLogger,
         array $newResult,
         array $keys,
         array $headers,
@@ -2190,7 +2230,6 @@ final class RewriteTestsCommand extends Command
         if (array_key_exists($key, $this->tests)) {
             return new TestResult(
                 result: $this->buildResult(
-                    consoleLogger: $consoleLogger,
                     data: $newResult,
                     headers: $headers,
                 ),
@@ -2204,7 +2243,6 @@ final class RewriteTestsCommand extends Command
 
         return new TestResult(
             result: $this->buildResult(
-                consoleLogger: $consoleLogger,
                 data: $newResult,
                 headers: $headers,
             ),
@@ -2242,8 +2280,9 @@ final class RewriteTestsCommand extends Command
         $p1 = sprintf('data/tests/%s', $matches['deviceManufaturer']);
 
         if (!file_exists($basePath . $p1)) {
-            $output->write(
+            $output->writeln(
                 messages: sprintf('create directory %s', $basePath . $p1),
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
             mkdir($basePath . $p1);
         }
@@ -2251,8 +2290,9 @@ final class RewriteTestsCommand extends Command
         $p2 = sprintf('data/tests/%s/%s', $matches['deviceManufaturer'], $matches['deviceType']);
 
         if (!file_exists($basePath . $p2)) {
-            $output->write(
+            $output->writeln(
                 messages: sprintf('create directory %s', $basePath . $p2),
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
             mkdir($basePath . $p2);
         }
@@ -2265,8 +2305,9 @@ final class RewriteTestsCommand extends Command
         );
 
         if (!file_exists($basePath . $p3)) {
-            $output->write(
+            $output->writeln(
                 messages: sprintf('create directory %s', $basePath . $p3),
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
             mkdir($basePath . $p3);
         }
@@ -2280,8 +2321,9 @@ final class RewriteTestsCommand extends Command
         );
 
         if (!file_exists($basePath . $p4)) {
-            $output->write(
+            $output->writeln(
                 messages: sprintf('create directory %s', $basePath . $p4),
+                options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
             mkdir($basePath . $p4);
         }
@@ -2300,13 +2342,14 @@ final class RewriteTestsCommand extends Command
         $diff = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $normalized = $this->jsonNormalizer->normalize(
             output: $output,
@@ -2333,13 +2376,14 @@ final class RewriteTestsCommand extends Command
         $diff = $this->messageLength($output, $message, $messageLength);
 
         $output->write(
-            messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
+            messages: mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $success = @file_put_contents($path, $normalized);
 
@@ -2377,10 +2421,11 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $startTime = microtime(as_float: true);
 
@@ -2398,10 +2443,11 @@ final class RewriteTestsCommand extends Command
                     messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                     options: OutputInterface::VERBOSITY_NORMAL,
                 );
-                $output->writeln(
+                $output->write(
                     messages: sprintf(' <bg=red>%d</>', $messageLength),
                     options: OutputInterface::VERBOSITY_DEBUG,
                 );
+                $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
             } catch (FileCanNotBeRead | FileDoesNotContainJson | FileDoesNotExist $e) {
                 ++$errors;
 
@@ -2429,10 +2475,11 @@ final class RewriteTestsCommand extends Command
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
-            $output->writeln(
+            $output->write(
                 messages: sprintf(' <bg=red>%d</>', $messageLength),
                 options: OutputInterface::VERBOSITY_DEBUG,
             );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
         }
 
         $addMessage = sprintf('write to temporary file %s', $file);
@@ -2443,10 +2490,11 @@ final class RewriteTestsCommand extends Command
             messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
             options: OutputInterface::VERBOSITY_NORMAL,
         );
-        $output->writeln(
+        $output->write(
             messages: sprintf(' <bg=red>%d</>', $messageLength),
             options: OutputInterface::VERBOSITY_DEBUG,
         );
+        $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         try {
             $tests[] = $result->toArray();
@@ -2457,10 +2505,15 @@ final class RewriteTestsCommand extends Command
             $message    = $loopMessage . $addMessage;
             $diff       = $this->messageLength($output, $message, $messageLength);
 
-            $output->writeln(
+            $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
+            $output->write(
+                messages: sprintf(' <bg=red>%d</>', $messageLength),
+                options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
             return false;
         }
@@ -2482,10 +2535,15 @@ final class RewriteTestsCommand extends Command
             $message    = $loopMessage . $addMessage;
             $diff       = $this->messageLength($output, $message, $messageLength);
 
-            $output->writeln(
+            $output->write(
                 messages: "\r" . mb_str_pad(string: $message, length: $messageLength + $diff),
                 options: OutputInterface::VERBOSITY_NORMAL,
             );
+            $output->write(
+                messages: sprintf(' <bg=red>%d</>', $messageLength),
+                options: OutputInterface::VERBOSITY_DEBUG,
+            );
+            $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
             return false;
         } finally {
@@ -2524,7 +2582,7 @@ final class RewriteTestsCommand extends Command
      */
     private function compareDeviceWithMapper(
         OutputInterface $output,
-        LoggerInterface $consoleLogger,
+        ConsoleLogger $consoleLogger,
         TestProperties $testProperties,
         TestResult $testResult,
         array $headers,
@@ -2726,11 +2784,32 @@ final class RewriteTestsCommand extends Command
             !== $brEngineVersion->getVersion(VersionInterface::IGNORE_MICRO)
             && $ddEngineVersion->getVersion(VersionInterface::IGNORE_MICRO) !== null;
         $clientNameCheck    = mb_strtolower($ddClientName ?? '') !== mb_strtolower($brClientName ?? '');
+
+        // if ($clientNameCheck && $ddClientName === null && !in_array(mb_strtolower($brClientName ?? ''), ['', 'mozilla application suite'])) {
+        //     $clientNameCheck = false;
+        // }
+
+        if (
+            $clientNameCheck
+            && $ddClientName === null
+            && !in_array(
+                mb_strtolower($brClientName ?? ''),
+                ['', 'mozilla application suite', 'nbot', 'frontpage', 'curl'],
+                strict: true,
+            )
+        ) {
+            $clientNameCheck = false;
+        }
+
         $clientVersionCheck = $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
             !== $brClientVersion->getVersion(VersionInterface::IGNORE_MINOR)
             && $ddClientVersion->getVersion(VersionInterface::IGNORE_MINOR) !== null;
         $clientTypeCheck    = $ddClientType !== $brClientType
             && $ddClientType !== ClientType::Unknown;
+
+        if (mb_strtolower($brClientName ?? '') === 'samsung browser') {
+            $clientVersionCheck = false;
+        }
 
         try {
             $checks = [
@@ -2769,11 +2848,16 @@ final class RewriteTestsCommand extends Command
 
         ++$resultChecks['general']['differentFromMatomo'];
 
-        if (!array_key_exists('differentFromMatomo', $resultChecks[$testProperties->getDateLast()])) {
-            $resultChecks[$testProperties->getDateLast()]['differentFromMatomo'] = 0;
+        if (
+            !array_key_exists(
+                'differentFromMatomo',
+                $resultChecks[(string) $testProperties->getDateLast()],
+            )
+        ) {
+            $resultChecks[(string) $testProperties->getDateLast()]['differentFromMatomo'] = 0;
         }
 
-        ++$resultChecks[$testProperties->getDateLast()]['differentFromMatomo'];
+        ++$resultChecks[(string) $testProperties->getDateLast()]['differentFromMatomo'];
 
         $getMessage = function () use ($output, $checks, $deviceBrandCheck, $deviceNameCheck, $deviceTypeCheck, $osNameCheck, $osVersionCheck, $engineNameCheck, $engineVersionCheck, $clientNameCheck, $clientVersionCheck, $clientTypeCheck, $loopMessage, $result, $headers, $ddModel, $ddBrand, $ddDeviceType, $isBot, $osInfo, $clientInfo, $botInfo, $ddOsName, $ddOsVersion, $ddEngineName, $ddEngineVersion, $ddClientName, $ddClientVersion, $ddClientType, $brModel, $brModel2, $brBrand, $brDeviceType, $brOsName, $brOsMName, $brOsVersion, $brEngineName, $brEngineVersion, $brClientName, $brClientVersion, $brClientType, $consoleLogger): string {
             $message        = $loopMessage;
@@ -2843,9 +2927,22 @@ final class RewriteTestsCommand extends Command
             }
 
             if ($clientNameCheck) {
+                // @todo:
                 $format8b       = '<fg=green>';
                 $format8d       = '<fg=red>';
                 $someDifference = true;
+
+                if (
+                    $ddClientName === null
+                    && !in_array(
+                        mb_strtolower($brClientName ?? ''),
+                        ['', 'mozilla application suite', 'nbot', 'frontpage', 'curl'],
+                        strict: true,
+                    )
+                ) {
+                    $format8b = '<fg=magenta>';
+                    $format8d = '<fg=bright-red>';
+                }
             }
 
             if ($clientVersionCheck) {
@@ -2956,12 +3053,16 @@ final class RewriteTestsCommand extends Command
 
         $diff = $this->messageLength($output, $message, $messageLength);
 
-        $output->writeln(
-            messages: "\n" . mb_str_pad(
+        $output->write(
+            messages: "\r" . mb_str_pad(
                 string: $message,
                 length: $messageLength + $diff,
             ),
             options: OutputInterface::VERBOSITY_NORMAL,
+        );
+        $output->write(
+            messages: sprintf(' <bg=red>%d</>', $messageLength),
+            options: OutputInterface::VERBOSITY_DEBUG,
         );
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
     }
@@ -2988,7 +3089,7 @@ final class RewriteTestsCommand extends Command
     private function acceptByDate(TestProperties $testProperties, OutputInterface $output, string $loopMessage): bool
     {
         try {
-            $date = new DateTimeImmutable($testProperties->getDateLast());
+            $date = new DateTimeImmutable($testProperties->getDateLast() ?? 'now');
         } catch (Throwable $e) {
             $output->writeln(messages: '');
             $output->writeln(
@@ -3006,33 +3107,12 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedPlatforms
-     * @param array<string, array<string, array{count: int, checked?: bool}>> $checkedEngines
+     * @return array{os: bool, engine: bool}
      *
      * @throws void
      */
-    private function compareWithMatomo(
-        string $osName,
-        string $osVersion,
-        string $engineName,
-        string $engineVersion,
-        array &$checkedPlatforms,
-        array &$checkedEngines,
-    ): bool {
-        if (!isset($checkedPlatforms[$osName][$osVersion])) {
-            $checkedPlatforms[$osName][$osVersion]['count']   = 1;
-            $checkedPlatforms[$osName][$osVersion]['checked'] = false;
-        } else {
-            ++$checkedPlatforms[$osName][$osVersion]['count'];
-        }
-
-        if (!isset($checkedEngines[$engineName][$engineVersion])) {
-            $checkedEngines[$engineName][$engineVersion]['count']   = 1;
-            $checkedEngines[$engineName][$engineVersion]['checked'] = false;
-        } else {
-            ++$checkedEngines[$engineName][$engineVersion]['count'];
-        }
-
+    private function compareWithMatomo(string $osName, string $osVersion, string $engineName): array
+    {
         $resultOs     = false;
         $resultEngine = false;
 
@@ -3210,25 +3290,17 @@ final class RewriteTestsCommand extends Command
                 )
             ) {
                 if ($osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_ANDROID_IOS) {
-                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
-
                     $resultOs = true;
                 }
             } elseif (in_array($osName, ['windows', 'windows rt'], strict: true)) {
                 if ($osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_WINDOWS) {
-                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
-
                     $resultOs = true;
                 }
             } elseif (in_array($osName, ['mac os x', 'macintosh'], strict: true)) {
                 if ($osVersionFloat >= self::COMPARE_MATOMO_LOWER_VERSION_MACOS) {
-                    $checkedPlatforms[$osName][$osVersion]['checked'] = true;
-
                     $resultOs = true;
                 }
             } else {
-                $checkedPlatforms[$osName][$osVersion]['checked'] = true;
-
                 $resultOs = true;
             }
         }
@@ -3252,12 +3324,10 @@ final class RewriteTestsCommand extends Command
                 strict: true,
             )
         ) {
-            $checkedEngines[$engineName][$engineVersion]['checked'] = true;
-
             $resultEngine = true;
         }
 
-        return $resultOs && $resultEngine;
+        return ['os' => $resultOs, 'engine' => $resultEngine];
     }
 
     /**
@@ -3275,14 +3345,12 @@ final class RewriteTestsCommand extends Command
                 return str_starts_with($v, '-1')
                     || str_ends_with($v, '\\')
                     || str_starts_with($v, '@@')
-                    || str_contains($v, '{${print(')
                     || str_contains($v, '<?=print(')
                     || str_contains($v, '+print(')
                     || str_contains($v, ' print(')
                     || str_contains($v, 'gethostbyname(')
                     || str_contains($v, ' http/1.')
                     || str_contains($v, 'nslookup')
-                    || str_contains($v, '${jndi')
                     || str_contains($v, 'pg_sleep(')
                     || str_contains($v, 'concat(')
                     || str_contains($v, 'waitfor delay ')
@@ -3308,6 +3376,7 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, '<source')
                     || str_contains($v, '<script')
                     || str_contains($v, '<a ')
+                    || str_contains($v, '<textarea')
                     || str_contains($v, 'file_put_contents(')
                     || str_contains($v, 'file_get_contents(')
                     || str_contains($v, 'fromcharcode(')
@@ -3319,7 +3388,6 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, ' if(')
                     || str_contains($v, '78.29.51.27')
                     || str_contains($v, 'blockchain')
-                    || str_contains($v, '${:')
                     || str_contains($v, '<![cdata[')
                     || str_contains($v, 'now(')
                     || str_contains($v, 'sysdate(')
@@ -3357,14 +3425,16 @@ final class RewriteTestsCommand extends Command
                     || str_contains($v, 'tenable.was')
                     || str_contains($v, 'tenable:was')
                     || str_contains($v, 'ldap:')
-                    || str_contains($v, '${j${')
                     || str_contains($v, 'getaddress(')
                     || str_contains($v, 'inet_aton(')
-                    || str_contains($v, '${env:')
                     || str_contains($v, 'tostring(')
                     || str_contains($v, 'substring(')
                     || str_contains($v, '.get(')
                     || str_contains($v, 'nessus.org')
+                    || str_contains($v, '${')
+                    || str_contains($v, 'data:')
+                    || str_contains($v, '-->')
+                    || str_contains($v, '/>')
                     || (mb_strlen($v) > 0 && mb_trim($v) === '');
                 // || str_contains($v, '­')
             },
@@ -3414,11 +3484,16 @@ final class RewriteTestsCommand extends Command
 
         ++$resultChecks['general']['skippedVersion'];
 
-        if (!array_key_exists('skippedVersion', $resultChecks[$testProperties->getDateLast()])) {
-            $resultChecks[$testProperties->getDateLast()]['skippedVersion'] = 0;
+        if (
+            !array_key_exists(
+                'skippedVersion',
+                $resultChecks[(string) $testProperties->getDateLast()],
+            )
+        ) {
+            $resultChecks[(string) $testProperties->getDateLast()]['skippedVersion'] = 0;
         }
 
-        ++$resultChecks[$testProperties->getDateLast()]['skippedVersion'];
+        ++$resultChecks[(string) $testProperties->getDateLast()]['skippedVersion'];
     }
 
     /**
@@ -3500,20 +3575,34 @@ final class RewriteTestsCommand extends Command
     }
 
     /**
-     * @param array<string, Result> $integrationTests
+     * @param array<string, array{headers: array<non-empty-string, non-empty-string>, expected: Result}> $integrationTests
      *
-     * @return array<string, Result>
+     * @return array<string, array{headers: array<non-empty-string, non-empty-string>, expected: Result}>
      *
      * @throws void
      */
     private function updateIntegrationTests(Result $result, array $integrationTests, bool $addIntegrationTests): array
     {
-        $headers = $result->getHeaders();
-        $k       = Yaml::dump($headers);
+        $headers      = $result->getHeaders();
+        $lowerHeaders = [];
+
+        foreach ($headers as $key => $value) {
+            if (!is_string($key) || $key === '') {
+                continue;
+            }
+
+            if (!is_string($value) || $value === '') {
+                continue;
+            }
+
+            $lowerHeaders[mb_strtolower($key)] = $value;
+        }
+
+        $k = Yaml::dump($lowerHeaders);
 
         if ($addIntegrationTests || array_key_exists($k, $integrationTests)) {
             $integrationTests[$k] = [
-                'headers' => $headers,
+                'headers' => $lowerHeaders,
                 'expected' => $result,
             ];
 
@@ -3531,7 +3620,7 @@ final class RewriteTestsCommand extends Command
      *
      * @throws void
      */
-    private function buildResult(LoggerInterface $consoleLogger, array $data, array $headers): Result | null
+    private function buildResult(array $data, array $headers): Result
     {
         try {
             $osVersion = $this->versionBuilder->set($data['os']['version'] ?? '');
@@ -3581,13 +3670,7 @@ final class RewriteTestsCommand extends Command
             $engineManufacturer = Company::unknown;
         }
 
-        try {
-            $genericRequest = $this->requestBuilder->buildRequest($headers);
-        } catch (UnexpectedValueException $e) {
-            $consoleLogger->error($e);
-
-            return null;
-        }
+        $genericRequest = $this->requestBuilder->buildRequest($headers);
 
         return new Result(
             headers: array_map(
@@ -3610,6 +3693,7 @@ final class RewriteTestsCommand extends Command
                 dualOrientation: $data['device']['dualOrientation'] ?? null,
                 simCount: $data['device']['simCount'] ?? null,
                 bits: Bits::tryFrom($data['device']['bits'] ?? 0) ?? Bits::unknown,
+                isMobile: $data['device']['isMobile'] ?? null,
             ),
             os: new Os(
                 name: $data['os']['name'] ?? null,

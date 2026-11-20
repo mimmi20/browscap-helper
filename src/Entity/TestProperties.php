@@ -15,15 +15,24 @@ namespace BrowscapHelper\Entity;
 
 use UaResult\Result\Result;
 
+use function array_merge_recursive;
+
 final class TestProperties
 {
-    /** @throws void */
+    /**
+     * @param non-empty-string                                                                                    $sourceName
+     * @param array<non-empty-string, array{date-first: non-empty-string|null, date-last: non-empty-string|null}> $sources
+     *
+     * @throws void
+     */
     public function __construct(
         private readonly Result $result,
         private readonly string | null $file,
-        private string $dateFirst,
-        private string $dateLast,
+        private string | null $dateFirst,
+        private string | null $dateLast,
         private readonly mixed $raw,
+        private string $sourceName,
+        private array $sources,
     ) {
         // nothing to do
     }
@@ -43,7 +52,7 @@ final class TestProperties
      *
      * @api
      */
-    public function getDateFirst(): string
+    public function getDateFirst(): string | null
     {
         return $this->dateFirst;
     }
@@ -53,7 +62,7 @@ final class TestProperties
      *
      * @api
      */
-    public function getDateLast(): string
+    public function getDateLast(): string | null
     {
         return $this->dateLast;
     }
@@ -76,6 +85,30 @@ final class TestProperties
     public function getRaw(): mixed
     {
         return $this->raw;
+    }
+
+    /**
+     * @return non-empty-string
+     *
+     * @throws void
+     *
+     * @api
+     */
+    public function getSourceName(): string
+    {
+        return $this->sourceName;
+    }
+
+    /**
+     * @return array<non-empty-string, array{date-first: non-empty-string|null, date-last: non-empty-string|null}>
+     *
+     * @throws void
+     *
+     * @api
+     */
+    public function getSources(): array
+    {
+        return $this->sources;
     }
 
     /**
@@ -102,5 +135,29 @@ final class TestProperties
         $cloned->dateLast = $dateLast;
 
         return $cloned;
+    }
+
+    /**
+     * @param non-empty-string $sourceName
+     *
+     * @throws void
+     *
+     * @api
+     */
+    public function withSourceName(string $sourceName): self
+    {
+        return clone ($this, ['sourceName' => $sourceName]);
+    }
+
+    /**
+     * @param array<non-empty-string, array{date-first: non-empty-string|null, date-last: non-empty-string|null}> $sources
+     *
+     * @throws void
+     *
+     * @api
+     */
+    public function withSources(array $sources): self
+    {
+        return clone ($this, ['sources' => array_merge_recursive($this->sources, $sources)]);
     }
 }

@@ -28,12 +28,15 @@ use function array_chunk;
 use function array_keys;
 use function array_map;
 use function array_values;
+use function assert;
 use function file_put_contents;
+use function is_string;
 use function mb_str_pad;
 use function mb_strlen;
 use function sprintf;
 use function var_export;
 
+/** @phpcs:disable SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable */
 final readonly class RewriteTests
 {
     /** @throws void */
@@ -84,7 +87,8 @@ final readonly class RewriteTests
                 options: OutputInterface::VERBOSITY_VERY_VERBOSE,
             );
 
-            /** @var non-empty-list<array{headers: non-empty-array<non-empty-string, non-empty-string>, date-first: non-falsy-string, date-last: non-falsy-string}|null> $testCases */
+            /** @var non-empty-list<array{headers: non-empty-array<non-empty-string, non-empty-string>, date-first: non-empty-string, date-last: non-empty-string, sources: array<non-empty-string, array{date-first: non-empty-string, date-last: non-empty-string}>}|null> $testCases */
+            // @phpstan-ignore-next-line varTag.type
             $testCases = array_map(
                 static function (string $headerString, TestData $test) use ($output, $messageLength): array | null {
                     try {
@@ -137,10 +141,17 @@ final readonly class RewriteTests
                         return null;
                     }
 
+                    $firstDate = $test->getDateFirst()->format('Y-m-d');
+                    assert(is_string($firstDate) && $firstDate !== '');
+
+                    $lastDate = $test->getDateLast()->format('Y-m-d');
+                    assert(is_string($lastDate) && $lastDate !== '');
+
                     return [
                         'headers' => $test->getHeaders(),
-                        'date-first' => $test->getDateFirst()->format('Y-m-d'),
-                        'date-last' => $test->getDateLast()->format('Y-m-d'),
+                        'date-first' => $firstDate,
+                        'date-last' => $lastDate,
+                        'sources' => $test->getSources(),
                     ];
                 },
                 array_keys($fileChunk),

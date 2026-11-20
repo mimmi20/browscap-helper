@@ -36,8 +36,10 @@ use UaResult\Result\Result;
 use UnexpectedValueException;
 
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function assert;
+use function is_array;
 use function json_encode;
 use function max;
 use function mb_str_pad;
@@ -106,7 +108,7 @@ final class JsonNormalizer
     }
 
     /**
-     * @param non-empty-list<array{headers?: array<non-empty-string, non-empty-string>, date-first?: string, date-last?: string}|Result|null> $testCases
+     * @param non-empty-list<array{headers?: array<non-empty-string, non-empty-string>, expected?: Result, date-first?: string|null, date-last?: string|null}|Result|null> $testCases
      *
      * @throws SchemaUriReferencesInvalidJsonDocument
      * @throws SchemaUriReferencesDocumentWithInvalidMediaType
@@ -134,11 +136,23 @@ final class JsonNormalizer
 
         $mapped = array_map(
             static function (array | Result | null $testCase): array | null {
-                if ($testCase instanceof Result) {
-                    try {
+                try {
+                    if ($testCase instanceof Result) {
                         return $testCase->toArray();
+                    }
+                } catch (UnexpectedValueException) {
+                    return null;
+                }
+
+                if (
+                    is_array($testCase)
+                    && array_key_exists('expected', $testCase)
+                    && $testCase['expected'] instanceof Result
+                ) {
+                    try {
+                        $testCase['expected'] = $testCase['expected']->toArray();
                     } catch (UnexpectedValueException) {
-                        return null;
+                        $testCase['expected'] = null;
                     }
                 }
 

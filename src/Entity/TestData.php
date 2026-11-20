@@ -15,10 +15,13 @@ namespace BrowscapHelper\Entity;
 
 use DateTimeImmutable;
 
+use function array_merge_recursive;
+
 final readonly class TestData
 {
     /**
-     * @param array<non-empty-string, non-empty-string> $headers
+     * @param array<non-empty-string, non-empty-string>                                                 $headers
+     * @param array<non-empty-string, array{date-first: non-empty-string, date-last: non-empty-string}> $sources
      *
      * @throws void
      */
@@ -26,6 +29,7 @@ final readonly class TestData
         private array $headers,
         private DateTimeImmutable $dateFirst,
         private DateTimeImmutable $dateLast,
+        private array $sources,
     ) {
         // nothing to do
     }
@@ -63,6 +67,18 @@ final readonly class TestData
     }
 
     /**
+     * @return array<non-empty-string, array{date-first: non-empty-string, date-last: non-empty-string}>
+     *
+     * @throws void
+     *
+     * @api
+     */
+    public function getSources(): array
+    {
+        return $this->sources;
+    }
+
+    /**
      * @throws void
      *
      * @api
@@ -80,5 +96,17 @@ final readonly class TestData
     public function withDateLast(DateTimeImmutable $dateLast): self
     {
         return clone ($this, ['dateLast' => $dateLast]);
+    }
+
+    /**
+     * @param array<non-empty-string, array{date-first: non-empty-string, date-last: non-empty-string}> $sources
+     *
+     * @throws void
+     *
+     * @api
+     */
+    public function withSources(array $sources): self
+    {
+        return clone ($this, ['sources' => array_merge_recursive($this->sources, $sources)]);
     }
 }
