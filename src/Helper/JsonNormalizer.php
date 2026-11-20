@@ -135,8 +135,15 @@ final class JsonNormalizer
         $output->writeln(sprintf(' <bg=red>%d</>', $messageLength), OutputInterface::VERBOSITY_DEBUG);
 
         $mapped = array_map(
-            // @phpstan-ignore argument.type
-            static function (array | null $testCase): array | null {
+            static function (array | Result | null $testCase): array | null {
+                try {
+                    if ($testCase instanceof Result) {
+                        return $testCase->toArray();
+                    }
+                } catch (UnexpectedValueException) {
+                    return null;
+                }
+
                 if (
                     is_array($testCase)
                     && array_key_exists('expected', $testCase)
