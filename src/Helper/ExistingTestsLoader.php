@@ -177,6 +177,7 @@ final class ExistingTestsLoader
                             dualOrientation: $device['dualOrientation'] ?? null,
                             simCount: $device['simCount'] ?? null,
                             bits: Bits::from($device['bits'] ?? 0),
+                            isMobile: $device['ismobile'] ?? null,
                         ),
                         os: new Os(
                             name: $os['name'] ?? null,
