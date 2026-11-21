@@ -3678,7 +3678,8 @@ final class RewriteTestsCommand extends Command
                 array: $genericRequest->getHeaders(),
             ),
             device: new Device(
-                architecture: Architecture::unknown,
+                architecture: Architecture::tryFrom($data['device']['architecture'] ?? '')
+                    ?? Architecture::unknown,
                 deviceName: $data['device']['deviceName'] ?? null,
                 marketingName: $data['device']['marketingName'] ?? null,
                 manufacturer: $deviceManufacturer,
