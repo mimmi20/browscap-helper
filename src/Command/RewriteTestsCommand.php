@@ -30,8 +30,8 @@ use BrowserDetector\Version\Exception\NotNumericException;
 use BrowserDetector\Version\NullVersion;
 use BrowserDetector\Version\VersionBuilder;
 use BrowserDetector\Version\VersionInterface;
-use DateInterval;
 use DateTimeImmutable;
+use DeviceDetector\Cache\PSR16Bridge;
 use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
 use Ergebnis\Json\Exception\FileCanNotBeRead;
@@ -44,17 +44,20 @@ use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use Exception;
 use JsonException;
+use Monolog\Handler\BufferHandler;
+use Monolog\Handler\PsrHandler;
+use Monolog\Logger;
 use Override;
-use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionProperty;
 use RuntimeException;
 use SplFileInfo;
-use Stringable;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
@@ -108,7 +111,6 @@ use function is_scalar;
 use function is_string;
 use function json_decode;
 use function json_encode;
-use function ksort;
 use function max;
 use function mb_str_pad;
 use function mb_strlen;
@@ -177,7 +179,6 @@ final class RewriteTestsCommand extends Command
     private NormalizerChain $normalizerChain;
     private CompanyLoaderInterface $companyLoader;
     private VersionBuilder $versionBuilder;
-    private RequestBuilder $requestBuilder;
     private DeviceDetector $deviceDetector;
     private Detector $detector;
 
@@ -244,151 +245,7 @@ final class RewriteTestsCommand extends Command
 
         $output->writeln(messages: 'init Detector ...', options: OutputInterface::VERBOSITY_NORMAL);
 
-        $detectorCache = new class () implements CacheInterface {
-            /**
-             * Fetches a value from the cache.
-             *
-             * @param string $key     the unique key of this item in the cache
-             * @param mixed  $default default value to return if the key does not exist
-             *
-             * @return mixed the value of the item from the cache, or $default in case of cache miss
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function get(string $key, mixed $default = null): mixed
-            {
-                return null;
-            }
-
-            /**
-             * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
-             *
-             * @param string                $key   the key of the item to store
-             * @param mixed                 $value the value of the item to store, must be serializable
-             * @param DateInterval|int|null $ttl   Optional. The TTL value of this item. If no value is sent and
-             *   the driver supports TTL then the library may set a default value
-             *   for it or let the driver take care of that.
-             *
-             * @return bool true on success and false on failure
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function set(string $key, mixed $value, int | DateInterval | null $ttl = null): bool
-            {
-                return false;
-            }
-
-            /**
-             * Delete an item from the cache by its unique key.
-             *
-             * @param string $key the unique cache key of the item to delete
-             *
-             * @return bool True if the item was successfully removed. False if there was an error.
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function delete(string $key): bool
-            {
-                return false;
-            }
-
-            /**
-             * Wipes clean the entire cache's keys.
-             *
-             * @return bool true on success and false on failure
-             *
-             * @throws void
-             */
-            #[Override]
-            public function clear(): bool
-            {
-                return false;
-            }
-
-            /**
-             * Obtains multiple cache items by their unique keys.
-             *
-             * @param iterable<string> $keys    a list of keys that can obtained in a single operation
-             * @param mixed            $default default value to return for keys that do not exist
-             *
-             * @return iterable<string, mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function getMultiple(iterable $keys, mixed $default = null): iterable
-            {
-                return [];
-            }
-
-            /**
-             * Persists a set of key => value pairs in the cache, with an optional TTL.
-             *
-             * @param iterable<string, mixed> $values a list of key => value pairs for a multiple-set operation
-             * @param DateInterval|int|null   $ttl    Optional. The TTL value of this item. If no value is sent and
-             *      the driver supports TTL then the library may set a default value
-             *      for it or let the driver take care of that.
-             *
-             * @return bool true on success and false on failure
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function setMultiple(iterable $values, int | DateInterval | null $ttl = null): bool
-            {
-                return false;
-            }
-
-            /**
-             * Deletes multiple cache items in a single operation.
-             *
-             * @param iterable<string> $keys a list of string-based keys to be deleted
-             *
-             * @return bool True if the items were successfully removed. False if there was an error.
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function deleteMultiple(iterable $keys): bool
-            {
-                return false;
-            }
-
-            /**
-             * Determines whether an item is present in the cache.
-             *
-             * NOTE: It is recommended that has() is only to be used for cache warming type purposes
-             * and not to be used within your live applications operations for get/set, as this method
-             * is subject to a race condition where your has() will return true and immediately after,
-             * another script can remove it making the state of your app out of date.
-             *
-             * @param string $key the cache item key
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             */
-            #[Override]
-            public function has(string $key): bool
-            {
-                return false;
-            }
-        };
+        $detectorCache = new Psr16Cache(new NullAdapter());
 
         $consoleLogger = new ConsoleLogger($output, [
             LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
@@ -401,86 +258,18 @@ final class RewriteTestsCommand extends Command
             LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
         ]);
 
-        $logger = new class ($consoleLogger) extends AbstractLogger {
-            /** @var array<LogLevel::*, array<int, array{message: string|Stringable, context: array<mixed>}>> */
-            private array $logEntries = [];
-
-            /** @throws void */
-            public function __construct(private readonly ConsoleLogger $consoleLogger)
-            {
-                // nothing to do
-            }
-
-            /** @throws void */
-            #[Override]
-            public function debug(Stringable | string $message, array $context = []): void
-            {
-                // do nothing
-            }
-
-            /** @throws void */
-            #[Override]
-            public function info(Stringable | string $message, array $context = []): void
-            {
-                // do nothing
-            }
-
-            /** @throws void */
-            #[Override]
-            public function notice(Stringable | string $message, array $context = []): void
-            {
-                // do nothing
-            }
-
-            /**
-             * Logs with an arbitrary level.
-             *
-             * @param LogLevel::*  $level
-             * @param array<mixed> $context
-             *
-             * @throws void
-             *
-             * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-             * @phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-             */
-            #[Override]
-            public function log($level, string | Stringable $message, array $context = []): void
-            {
-                try {
-                    $this->consoleLogger->log($level, $message, $context);
-                } catch (\Psr\Log\InvalidArgumentException $e) {
-                    if (!array_key_exists(LogLevel::ALERT, $this->logEntries)) {
-                        $this->logEntries[LogLevel::ALERT] = [];
-                    }
-
-                    $this->logEntries[LogLevel::ALERT][] = [
-                        'message' => $e,
-                        'context' => $context,
-                    ];
-                }
-
-                if (!array_key_exists($level, $this->logEntries)) {
-                    $this->logEntries[$level] = [];
-                }
-
-                $this->logEntries[$level][] = [
-                    'message' => $message,
-                    'context' => $context,
-                ];
-            }
-
-            /**
-             * @return array<LogLevel::*, array<int, array{message: string|Stringable, context: array<mixed>}>>
-             *
-             * @throws void
-             *
-             * @api
-             */
-            public function getLogEntries(): array
-            {
-                return $this->logEntries;
-            }
-        };
+        $logger = new Logger(
+            name: 'browscap-helper',
+            handlers: [
+                new BufferHandler(
+                    handler: new PsrHandler($consoleLogger),
+                    bufferLimit: 0,
+                    level: LogLevel::WARNING,
+                    bubble: false,
+                    flushOnOverflow: false,
+                ),
+            ],
+        );
 
         $companyLoaderFactory = new CompanyLoaderFactory(logger: $logger);
         $this->companyLoader  = $companyLoaderFactory();
@@ -493,9 +282,15 @@ final class RewriteTestsCommand extends Command
 
         $this->detector = $detectorFactory();
 
+        $requestBuilder = (new ReflectionProperty($this->detector, 'requestBuilder'))->getValue(
+            $this->detector,
+        );
+        assert($requestBuilder instanceof RequestBuilder);
+
         $output->writeln(messages: 'init Matomo ...', options: OutputInterface::VERBOSITY_NORMAL);
 
         $this->deviceDetector = new DeviceDetector();
+        $this->deviceDetector->setCache(new PSR16Bridge($detectorCache));
 
         $output->writeln(
             messages: 'removing old existing files from vendor ...',
@@ -526,18 +321,6 @@ final class RewriteTestsCommand extends Command
         $output->writeln(
             messages: 'reading already existing integration tests ...',
             options: OutputInterface::VERBOSITY_NORMAL,
-        );
-
-        $requestBuilder = (new ReflectionProperty($this->detector, 'requestBuilder'))->getValue(
-            $this->detector,
-        );
-        assert($requestBuilder instanceof RequestBuilder);
-
-        $this->requestBuilder = $requestBuilder;
-
-        $output->writeln(
-            messages: 'reading path ' . $basePath . 'data/integration-tests/',
-            options: OutputInterface::VERBOSITY_VERY_VERBOSE,
         );
 
         try {
@@ -631,15 +414,19 @@ final class RewriteTestsCommand extends Command
                         continue;
                     }
 
-                    $result = $this->buildResult(data: $expected, headers: $headers);
+                    $headersFromIntegrationTest = $this->getHeaders(
+                        output: $output,
+                        requestBuilder: $requestBuilder,
+                        headers: $headers,
+                    );
 
-                    if ($result instanceof Result) {
-                        $integrationTests = $this->updateIntegrationTests(
-                            result: $result,
-                            integrationTests: $integrationTests,
-                            addIntegrationTests: true,
-                        );
-                    }
+                    $result = $this->buildResult(data: $expected, headers: $headersFromIntegrationTest);
+
+                    $integrationTests = $this->updateIntegrationTests(
+                        result: $result,
+                        integrationTests: $integrationTests,
+                        addIntegrationTests: true,
+                    );
 
                     // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
                     //     $output->writeln(messages: '');
@@ -717,8 +504,6 @@ final class RewriteTestsCommand extends Command
                 continue;
             }
 
-            $headers = $this->filterHeaders($output, $testProperty->getResult()->getHeaders());
-
             if (!array_key_exists('general', $resultChecks)) {
                 $resultChecks['general'] = [];
             }
@@ -785,9 +570,13 @@ final class RewriteTestsCommand extends Command
             );
             $output->writeln(messages: '', options: OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $startTime = microtime(as_float: true);
+            $headers = $this->getHeaders(
+                output: $output,
+                requestBuilder: $requestBuilder,
+                headers: $testProperty->getResult()->getHeaders(),
+            );
 
-            ksort($headers);
+            $startTime = microtime(as_float: true);
 
             $seachHeader = Yaml::dump($headers);
 
@@ -1116,17 +905,37 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks[(string) $testProperty->getDateLast()]['errors'];
 
-                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln(messages: '');
-                //     $output->writeln(messages: '<options=bold,blink>3</>');
-                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln(messages: '');
-                // }
+                //         if (($headers['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //             $output->writeln(messages: '');
+                //             $output->writeln(messages: '<options=bold,blink>3</>');
+                //
+                //             var_export($headers, return: true)
+                //                 |> (static fn (string $x): string => sprintf(
+                //                     '<options=bold,underscore>%s</>',
+                //                     $x,
+                //                 ))
+                //                 |> (static fn (string $x) => $output->writeln($x));
+                //             array_key_exists($seachHeader, $integrationTests)
+                //                 |> (static fn (bool $x): string => var_export($x, return: true))
+                //                 |> (static fn (string $x): string => sprintf(
+                //                     '<options=bold,underscore>%s</>',
+                //                     $x,
+                //                 ))
+                //                 |> (static fn (string $x) => $output->writeln($x));
+                //             var_export($result, return: true)
+                //                 |> (static fn (string $x): string => sprintf(
+                //                     '<options=bold,underscore>%s</>',
+                //                     $x,
+                //                 ))
+                //                 |> (static fn (string $x) => $output->writeln($x));
+                //
+                //             $output->writeln(messages: '');
+                //         }
 
                 continue;
             }
 
-            $headers = $testResult->getHeaders();
+            $headersFromTest = $testResult->getHeaders();
 
             $osName     = mb_strtolower($result->getOs()->getName() ?? '');
             $engineName = mb_strtolower($result->getEngine()->getName() ?? '');
@@ -1146,7 +955,8 @@ final class RewriteTestsCommand extends Command
                 $engineVersion = 'e';
             }
 
-            $isSkipped = $this->isVersionskipped(
+            $isSkippedBySearch  = !array_key_exists($seachHeader, $integrationTests);
+            $isSkippedByVersion = $this->isVersionskipped(
                 versionOs: $versionOs,
                 osName: $osName,
                 testProperties: $testProperty,
@@ -1154,16 +964,109 @@ final class RewriteTestsCommand extends Command
                 skippedVersion: $skippedVersion,
             );
 
-            if ($isSkipped) {
-                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln(messages: '');
-                //     $output->writeln(messages: '<options=bold,blink>6</>');
-                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln(messages: '');
+            if ($isSkippedBySearch && $isSkippedByVersion) {
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>4</>');
+                //
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //            '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //            $x,
+                //        ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isSkippedByVersion, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //            '<options=bold,underscore>$isSkippedByVersion: %s</>',
+                //            $x,
+                //        ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //            '<options=bold,underscore>%s</>',
+                //            $x,
+                //        ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //            '<options=bold,underscore>$headers: %s</>',
+                //            $x,
+                //        ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //            '<options=bold,underscore>$headersFromTest: %s</>',
+                //            $x,
+                //        ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //            '<options=bold,underscore>%s</>',
+                //            $x,
+                //        ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
                 // }
 
                 continue;
             }
+
+            // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+            //    $output->writeln(messages: '');
+            //    $output->writeln(messages: '<options=bold,blink>5</>');
+            //
+            //    var_export($isSkippedBySearch, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($isSkippedByVersion, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedByVersion: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    array_key_exists($seachHeader, $integrationTests)
+            //        |> (static fn (bool $x): string => var_export($x, return: true))
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headers, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headers: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headersFromTest, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headersFromTest: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($result, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    $output->writeln(messages: '');
+            // }
 
             if (!isset($checkedPlatforms[$osName][$osVersion])) {
                 $checkedPlatforms[$osName][$osVersion]['count']   = 1;
@@ -1211,7 +1114,7 @@ final class RewriteTestsCommand extends Command
                         logger: $logger,
                         testProperties: $testProperty,
                         testResult: $testResult,
-                        headers: $headers,
+                        headers: $headersFromTest,
                         loopMessage: $loopMessage,
                         messageLength: $messageLength,
                         counterDifferentFromMatomo: $counterDifferentFromMatomo,
@@ -1248,11 +1151,54 @@ final class RewriteTestsCommand extends Command
                         options: OutputInterface::VERBOSITY_NORMAL,
                     );
 
-                    // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                    //     $output->writeln(messages: '');
-                    //     $output->writeln(messages: '<options=bold,blink>7</>');
-                    //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                    //     $output->writeln(messages: '');
+                    // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                    //    $output->writeln(messages: '');
+                    //    $output->writeln(messages: '<options=bold,blink>6</>');
+                    //
+                    //    var_export($isSkippedBySearch, return: true)
+                    //        |> (static fn (string $x): string => sprintf(
+                    //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                    //        $x,
+                    //    ))
+                    //        |> (static fn (string $x) => $output->writeln($x));
+                    //
+                    //    var_export($isSkippedByVersion, return: true)
+                    //        |> (static fn (string $x): string => sprintf(
+                    //        '<options=bold,underscore>$isSkippedByVersion: %s</>',
+                    //        $x,
+                    //    ))
+                    //        |> (static fn (string $x) => $output->writeln($x));
+                    //
+                    //    array_key_exists($seachHeader, $integrationTests)
+                    //        |> (static fn (bool $x): string => var_export($x, return: true))
+                    //        |> (static fn (string $x): string => sprintf(
+                    //        '<options=bold,underscore>%s</>',
+                    //        $x,
+                    //    ))
+                    //        |> (static fn (string $x) => $output->writeln($x));
+                    //
+                    //    var_export($headers, return: true)
+                    //        |> (static fn (string $x): string => sprintf(
+                    //        '<options=bold,underscore>$headers: %s</>',
+                    //        $x,
+                    //    ))
+                    //        |> (static fn (string $x) => $output->writeln($x));
+                    //
+                    //    var_export($headersFromTest, return: true)
+                    //        |> (static fn (string $x): string => sprintf(
+                    //        '<options=bold,underscore>$headersFromTest: %s</>',
+                    //        $x,
+                    //    ))
+                    //        |> (static fn (string $x) => $output->writeln($x));
+                    //
+                    //    var_export($result, return: true)
+                    //        |> (static fn (string $x): string => sprintf(
+                    //        '<options=bold,underscore>%s</>',
+                    //        $x,
+                    //    ))
+                    //        |> (static fn (string $x) => $output->writeln($x));
+                    //
+                    //    $output->writeln(messages: '');
                     // }
 
                     continue;
@@ -1333,6 +1279,56 @@ final class RewriteTestsCommand extends Command
                 $clientType,
             );
 
+            // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+            //    $output->writeln(messages: '');
+            //    $output->writeln(messages: '<options=bold,blink>7</>');
+            //
+            //    var_export($isSkippedBySearch, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($isSkippedByVersion, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedByVersion: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    array_key_exists($seachHeader, $integrationTests)
+            //        |> (static fn (bool $x): string => var_export($x, return: true))
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headers, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headers: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headersFromTest, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headersFromTest: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($result, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    $output->writeln(messages: '');
+            // }
+
             $saved = $this->saveResult(
                 output: $output,
                 result: $result,
@@ -1361,11 +1357,54 @@ final class RewriteTestsCommand extends Command
                 );
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
-                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln(messages: '');
-                //     $output->writeln(messages: '<options=bold,blink>8</>');
-                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln(messages: '');
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>8</>');
+                //
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isSkippedByVersion, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedByVersion: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headers: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headersFromTest: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
                 // }
 
                 continue;
@@ -1402,6 +1441,56 @@ final class RewriteTestsCommand extends Command
 
             ++$resultChecks[(string) $testProperty->getDateLast()]['test'];
 
+            // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+            //    $output->writeln(messages: '');
+            //    $output->writeln(messages: '<options=bold,blink>9</>');
+            //
+            //    var_export($isSkippedBySearch, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($isSkippedByVersion, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedByVersion: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    array_key_exists($seachHeader, $integrationTests)
+            //        |> (static fn (bool $x): string => var_export($x, return: true))
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headers, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headers: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headersFromTest, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headersFromTest: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($result, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    $output->writeln(messages: '');
+            // }
+
             try {
                 $integrationTests = $this->updateIntegrationTests(
                     result: $result,
@@ -1412,16 +1501,59 @@ final class RewriteTestsCommand extends Command
                 $logger->error($e);
             }
 
-            // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-            //     $output->writeln(messages: '');
-            //     $output->writeln(messages: '<options=bold,blink>9</>');
-            //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-            //     $output->writeln(messages: '');
+            // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+            //    $output->writeln(messages: '');
+            //    $output->writeln(messages: '<options=bold,blink>10</>');
+            //
+            //    var_export($isSkippedBySearch, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($isSkippedByVersion, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$isSkippedByVersion: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    array_key_exists($seachHeader, $integrationTests)
+            //        |> (static fn (bool $x): string => var_export($x, return: true))
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headers, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headers: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($headersFromTest, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>$headersFromTest: %s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    var_export($result, return: true)
+            //        |> (static fn (string $x): string => sprintf(
+            //        '<options=bold,underscore>%s</>',
+            //        $x,
+            //    ))
+            //        |> (static fn (string $x) => $output->writeln($x));
+            //
+            //    $output->writeln(messages: '');
             // }
 
-            //            if ($counterDifferentFromMatomo >= 10) {
-            //                exit;
-            //            }
+            //     if ($counterDifferentFromMatomo >= 10) {
+            //  exit;
+            //     }
         }
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -1496,17 +1628,17 @@ final class RewriteTestsCommand extends Command
                             return null;
                         }
 
-                        $headers = $xpart['headers'] ?? null;
+                        $headersFromPart = $xpart['headers'] ?? null;
 
-                        if (!is_array($headers)) {
-                            $logger->error('$headers is not an Array');
+                        if (!is_array($headersFromPart)) {
+                            $logger->error('$headersFromPart is not an Array');
 
                             return null;
                         }
 
                         return $this->buildResult(
                             data: $xpart,
-                            headers: $headers,
+                            headers: $headersFromPart,
                         );
                     },
                     $data,
@@ -1996,13 +2128,7 @@ final class RewriteTestsCommand extends Command
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
 
-        $logEntries = $logger->getLogEntries();
-
-        foreach ($logEntries as $level => $innerEntries) {
-            foreach ($innerEntries as $logEntry) {
-                $consoleLogger->log($level, $logEntry['message'], $logEntry['context']);
-            }
-        }
+        unset($logger);
 
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
         $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
@@ -2058,7 +2184,7 @@ final class RewriteTestsCommand extends Command
      */
     private function handleTest(
         OutputInterface $output,
-        AbstractLogger $logger,
+        LoggerInterface $logger,
         array $headers,
         string $parentMessage,
         int &$messageLength = 0,
@@ -2089,6 +2215,20 @@ final class RewriteTestsCommand extends Command
                 exit: TestResult::EXIT_NO_RESULT,
             );
         }
+
+        // if (!(($headers['user-agent'] ?? '') === 'PrivacyBrowser/1.0')) {
+        //    return new TestResult(
+        //        result: $this->buildResult(
+        //            data: $newResult,
+        //            headers: $headers,
+        //        ),
+        //        status: TestResult::STATUS_SKIPPED,
+        //        headers: $headers,
+        //        exit: TestResult::EXIT_NO_RESULT,
+        //    );
+        // }
+
+        // var_dump($headers, $newResult);
 
         $message = $parentMessage . ' - <info>analyze new result ...</info>';
         $diff    = $this->messageLength($output, $message, $messageLength);
@@ -2668,7 +2808,7 @@ final class RewriteTestsCommand extends Command
      */
     private function compareDeviceWithMapper(
         OutputInterface $output,
-        AbstractLogger $logger,
+        LoggerInterface $logger,
         TestProperties $testProperties,
         TestResult $testResult,
         array $headers,
@@ -3756,13 +3896,8 @@ final class RewriteTestsCommand extends Command
             $engineManufacturer = Company::unknown;
         }
 
-        $genericRequest = $this->requestBuilder->buildRequest($headers);
-
         return new Result(
-            headers: array_map(
-                callback: static fn (HeaderInterface $header): string => $header->getValue(),
-                array: $genericRequest->getHeaders(),
-            ),
+            headers: $headers,
             device: new Device(
                 architecture: Architecture::tryFrom($data['device']['architecture'] ?? '')
                     ?? Architecture::unknown,
@@ -3780,7 +3915,7 @@ final class RewriteTestsCommand extends Command
                 dualOrientation: $data['device']['dualOrientation'] ?? null,
                 simCount: $data['device']['simCount'] ?? null,
                 bits: Bits::tryFrom($data['device']['bits'] ?? 0) ?? Bits::unknown,
-                isMobile: $data['device']['isMobile'] ?? null,
+                isMobile: $data['device']['ismobile'] ?? null,
             ),
             os: new Os(
                 name: $data['os']['name'] ?? null,
@@ -3803,5 +3938,26 @@ final class RewriteTestsCommand extends Command
                 version: $engineVersion,
             ),
         );
+    }
+
+    /**
+     * @param array<string> $headers
+     *
+     * @return array<non-empty-string, non-empty-string>
+     *
+     * @throws void
+     */
+    private function getHeaders(OutputInterface $output, RequestBuilder $requestBuilder, array $headers): array
+    {
+        $genericRequest = $requestBuilder->buildRequest(
+            $this->filterHeaders($output, $headers),
+        );
+
+        $headers = array_map(
+            callback: static fn (HeaderInterface $header): string => $header->getValue(),
+            array: $genericRequest->getHeaders(),
+        );
+
+        return $this->filterHeaders($output, $headers);
     }
 }
