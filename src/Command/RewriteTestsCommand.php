@@ -164,7 +164,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 12;
 
     /**
-     * last update: 2026-11-18
+     * last update: 2026-11-25
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -676,10 +676,12 @@ final class RewriteTestsCommand extends Command
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
             }
 
-            $hasInvalidHeaders = $this->hasInvalidHeaders($headers)
-                || $this->hasInvalidHeaders($normalizedHeaders);
+            $isSkippedBySearch = !array_key_exists($seachHeader, $integrationTests);
 
-            if ($hasInvalidHeaders) {
+            $isInvalidByHeaders           = $this->hasInvalidHeaders($headers);
+            $isInvalidByNormalizedHeaders = $this->hasInvalidHeaders($normalizedHeaders);
+
+            if ($isSkippedBySearch && ($isInvalidByHeaders || $isInvalidByNormalizedHeaders)) {
                 ++$skippedInvalidData;
 
                 if (!array_key_exists('skippedInvalidData', $resultChecks['general'])) {
@@ -699,10 +701,69 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks[(string) $testProperty->getDateLast()]['skippedInvalidData'];
 
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>1</>');
+                //
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isInvalidByHeaders, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isInvalidByHeaders: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isInvalidByNormalizedHeaders, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isInvalidByNormalizedHeaders: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headers: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headersFromTest: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
+                // }
+
                 continue;
             }
 
-            if (array_key_exists($seachHeader, $txtChecks)) {
+            $isDuplicate = array_key_exists($seachHeader, $txtChecks);
+
+            if ($isSkippedBySearch && $isDuplicate) {
                 ++$skippedBeforeCheck;
 
                 if (!array_key_exists('skippedBeforeCheck', $resultChecks['general'])) {
@@ -721,6 +782,56 @@ final class RewriteTestsCommand extends Command
                 }
 
                 ++$resultChecks[(string) $testProperty->getDateLast()]['skippedBeforeCheck'];
+
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>2</>');
+                //
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isDuplicate, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isDuplicate: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headers: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headersFromTest: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
+                // }
 
                 continue;
             }
@@ -818,7 +929,11 @@ final class RewriteTestsCommand extends Command
 
             $result = $testResult->getResult();
 
-            if ($testResult->getStatus() === TestResult::STATUS_SKIPPED) {
+            $isStatusSkipped   = $testResult->getStatus() === TestResult::STATUS_SKIPPED;
+            $isStatusDuplicate = $testResult->getStatus() === TestResult::STATUS_DUPLICATE;
+            $isStatusError     = $testResult->getStatus() === TestResult::STATUS_ERROR || !$result instanceof Result;
+
+            if ($isSkippedBySearch && $isStatusSkipped) {
                 ++$skippedAfterCheck;
 
                 if (!array_key_exists('skippedAfterCheck', $resultChecks['general'])) {
@@ -838,17 +953,60 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks[(string) $testProperty->getDateLast()]['skippedAfterCheck'];
 
-                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln(messages: '');
-                //     $output->writeln(messages: '<options=bold,blink>1</>');
-                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln(messages: '');
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>3</>');
+                //
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isStatusSkipped, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isStatusSkipped: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headers: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headersFromTest: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
                 // }
 
                 continue;
             }
 
-            if ($testResult->getStatus() === TestResult::STATUS_DUPLICATE) {
+            if ($isSkippedBySearch && $isStatusDuplicate) {
                 ++$duplicates;
 
                 if (!array_key_exists('duplicates', $resultChecks['general'])) {
@@ -880,17 +1038,60 @@ final class RewriteTestsCommand extends Command
                     }
                 }
 
-                // if (($headers['user-agent'] ?? '') === 'Lightpanda/1.0 internal-testing-crawler') {
-                //     $output->writeln(messages: '');
-                //     $output->writeln(messages: '<options=bold,blink>2</>');
-                //     $output->writeln(messages: sprintf('<options=bold,underscore>%s</>', var_export($result, true)));
-                //     $output->writeln(messages: '');
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>4</>');
+                //
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($isStatusDuplicate, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isStatusDuplicate: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headers: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headersFromTest: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
                 // }
 
                 continue;
             }
 
-            if ($testResult->getStatus() === TestResult::STATUS_ERROR || !$result instanceof Result) {
+            if ($isSkippedBySearch && $isStatusError) {
                 ++$errors;
 
                 if (!array_key_exists('errors', $resultChecks['general'])) {
@@ -905,32 +1106,55 @@ final class RewriteTestsCommand extends Command
 
                 ++$resultChecks[(string) $testProperty->getDateLast()]['errors'];
 
-                //         if (($headers['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
-                //             $output->writeln(messages: '');
-                //             $output->writeln(messages: '<options=bold,blink>3</>');
+                // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
+                //    $output->writeln(messages: '');
+                //    $output->writeln(messages: '<options=bold,blink>5</>');
                 //
-                //             var_export($headers, return: true)
-                //                 |> (static fn (string $x): string => sprintf(
-                //                     '<options=bold,underscore>%s</>',
-                //                     $x,
-                //                 ))
-                //                 |> (static fn (string $x) => $output->writeln($x));
-                //             array_key_exists($seachHeader, $integrationTests)
-                //                 |> (static fn (bool $x): string => var_export($x, return: true))
-                //                 |> (static fn (string $x): string => sprintf(
-                //                     '<options=bold,underscore>%s</>',
-                //                     $x,
-                //                 ))
-                //                 |> (static fn (string $x) => $output->writeln($x));
-                //             var_export($result, return: true)
-                //                 |> (static fn (string $x): string => sprintf(
-                //                     '<options=bold,underscore>%s</>',
-                //                     $x,
-                //                 ))
-                //                 |> (static fn (string $x) => $output->writeln($x));
+                //    var_export($isSkippedBySearch, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isSkippedBySearch: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
                 //
-                //             $output->writeln(messages: '');
-                //         }
+                //    var_export($isStatusError, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$isStatusError: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    array_key_exists($seachHeader, $integrationTests)
+                //        |> (static fn (bool $x): string => var_export($x, return: true))
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headers, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headers: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($headersFromTest, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>$headersFromTest: %s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    var_export($result, return: true)
+                //        |> (static fn (string $x): string => sprintf(
+                //        '<options=bold,underscore>%s</>',
+                //        $x,
+                //    ))
+                //        |> (static fn (string $x) => $output->writeln($x));
+                //
+                //    $output->writeln(messages: '');
+                // }
 
                 continue;
             }
@@ -955,7 +1179,6 @@ final class RewriteTestsCommand extends Command
                 $engineVersion = 'e';
             }
 
-            $isSkippedBySearch  = !array_key_exists($seachHeader, $integrationTests);
             $isSkippedByVersion = $this->isVersionskipped(
                 versionOs: $versionOs,
                 osName: $osName,
@@ -967,7 +1190,7 @@ final class RewriteTestsCommand extends Command
             if ($isSkippedBySearch && $isSkippedByVersion) {
                 // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
                 //    $output->writeln(messages: '');
-                //    $output->writeln(messages: '<options=bold,blink>4</>');
+                //    $output->writeln(messages: '<options=bold,blink>6</>');
                 //
                 //    var_export($isSkippedBySearch, return: true)
                 //        |> (static fn (string $x): string => sprintf(
@@ -1020,7 +1243,7 @@ final class RewriteTestsCommand extends Command
 
             // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
             //    $output->writeln(messages: '');
-            //    $output->writeln(messages: '<options=bold,blink>5</>');
+            //    $output->writeln(messages: '<options=bold,blink>7</>');
             //
             //    var_export($isSkippedBySearch, return: true)
             //        |> (static fn (string $x): string => sprintf(
@@ -1153,7 +1376,7 @@ final class RewriteTestsCommand extends Command
 
                     // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
                     //    $output->writeln(messages: '');
-                    //    $output->writeln(messages: '<options=bold,blink>6</>');
+                    //    $output->writeln(messages: '<options=bold,blink>8</>');
                     //
                     //    var_export($isSkippedBySearch, return: true)
                     //        |> (static fn (string $x): string => sprintf(
@@ -1281,7 +1504,7 @@ final class RewriteTestsCommand extends Command
 
             // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
             //    $output->writeln(messages: '');
-            //    $output->writeln(messages: '<options=bold,blink>7</>');
+            //    $output->writeln(messages: '<options=bold,blink>9</>');
             //
             //    var_export($isSkippedBySearch, return: true)
             //        |> (static fn (string $x): string => sprintf(
@@ -1359,7 +1582,7 @@ final class RewriteTestsCommand extends Command
 
                 // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
                 //    $output->writeln(messages: '');
-                //    $output->writeln(messages: '<options=bold,blink>8</>');
+                //    $output->writeln(messages: '<options=bold,blink>10</>');
                 //
                 //    var_export($isSkippedBySearch, return: true)
                 //        |> (static fn (string $x): string => sprintf(
@@ -1443,7 +1666,7 @@ final class RewriteTestsCommand extends Command
 
             // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
             //    $output->writeln(messages: '');
-            //    $output->writeln(messages: '<options=bold,blink>9</>');
+            //    $output->writeln(messages: '<options=bold,blink>11</>');
             //
             //    var_export($isSkippedBySearch, return: true)
             //        |> (static fn (string $x): string => sprintf(
@@ -1503,7 +1726,7 @@ final class RewriteTestsCommand extends Command
 
             // if (($headersFromTest['user-agent'] ?? '') === 'PrivacyBrowser/1.0') {
             //    $output->writeln(messages: '');
-            //    $output->writeln(messages: '<options=bold,blink>10</>');
+            //    $output->writeln(messages: '<options=bold,blink>12</>');
             //
             //    var_export($isSkippedBySearch, return: true)
             //        |> (static fn (string $x): string => sprintf(

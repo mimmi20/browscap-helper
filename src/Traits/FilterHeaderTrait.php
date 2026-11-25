@@ -113,6 +113,8 @@ trait FilterHeaderTrait
                     'x-client-os',
                     'x-client-type',
                     'x-client-device',
+                    'x-device-model',
+                    'x-device-type',
                 ];
 
                 if (in_array($header, $allowedHeaders, strict: true)) {
@@ -719,6 +721,14 @@ trait FilterHeaderTrait
                     'x-amz-cf-id',
                     'screenheight',
                     'zm-trace-upstream',
+                    'cf-ipregion',
+                    'cf-isp',
+                    'cf-ipcity',
+                    'cf-connection-type',
+                    'cf-carrier',
+                    'cf-asn',
+                    'x-identity',
+                    'x-datacenter',
                 ];
 
                 if (in_array($header, $forbiddenHeaders, strict: true)) {
