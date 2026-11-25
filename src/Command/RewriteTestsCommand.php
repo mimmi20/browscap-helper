@@ -164,7 +164,7 @@ final class RewriteTestsCommand extends Command
     private const int COMPARE_MATOMO_LOWER_VERSION_MACOS = 12;
 
     /**
-     * last update: 2026-11-18
+     * last update: 2026-11-25
      */
     private const string COMPARE_DATE_START = '2019-01-01';
 
@@ -676,7 +676,7 @@ final class RewriteTestsCommand extends Command
                 $output->writeln(messages: '', options: OutputInterface::VERBOSITY_NORMAL);
             }
 
-            $isSkippedBySearch  = !array_key_exists($seachHeader, $integrationTests);
+            $isSkippedBySearch = !array_key_exists($seachHeader, $integrationTests);
 
             $isInvalidByHeaders           = $this->hasInvalidHeaders($headers);
             $isInvalidByNormalizedHeaders = $this->hasInvalidHeaders($normalizedHeaders);
