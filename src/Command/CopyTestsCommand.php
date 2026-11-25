@@ -36,6 +36,9 @@ use Ergebnis\Json\Normalizer\Exception\InvalidIndentStyle;
 use Ergebnis\Json\Normalizer\Exception\InvalidJsonEncodeOptions;
 use Ergebnis\Json\Normalizer\Exception\InvalidNewLineString;
 use JsonException;
+use Monolog\Handler\BufferHandler;
+use Monolog\Handler\PsrHandler;
+use Monolog\Logger;
 use Override;
 use PDO;
 use Pdo\Mysql;
@@ -138,6 +141,19 @@ final class CopyTestsCommand extends Command
             LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
         ]);
 
+        $logger = new Logger(
+            name: 'browscap-helper',
+            handlers: [
+                new BufferHandler(
+                    handler: new PsrHandler($consoleLogger),
+                    bufferLimit: 0,
+                    level: LogLevel::WARNING,
+                    bubble: false,
+                    flushOnOverflow: false,
+                ),
+            ],
+        );
+
         $testSource      = 'tests';
         $txtTotalCounter = 0;
 
@@ -152,11 +168,11 @@ final class CopyTestsCommand extends Command
         $output->writeln('reading already existing tests ...', OutputInterface::VERBOSITY_NORMAL);
 
         $txtChecks = $this->readTests(
-            $output,
-            $consoleLogger,
-            $sourcesExisting,
-            $txtChecks,
-            $txtTotalCounter,
+            output: $output,
+            logger: $logger,
+            sources: $sourcesExisting,
+            txtChecks: $txtChecks,
+            txtTotalCounter: $txtTotalCounter,
         );
 
         $sourcesDirectory = $input->getOption('resources');
@@ -225,11 +241,11 @@ final class CopyTestsCommand extends Command
         $txtTotalCounter = 0;
 
         $txtChecks = $this->readTests(
-            $output,
-            $consoleLogger,
-            $sourcesNew,
-            $txtChecks,
-            $txtTotalCounter,
+            output: $output,
+            logger: $logger,
+            sources: $sourcesNew,
+            txtChecks: $txtChecks,
+            txtTotalCounter: $txtTotalCounter,
         );
 
         $output->writeln('rewrite tests ...', OutputInterface::VERBOSITY_NORMAL);

@@ -84,8 +84,8 @@ parameters:
       tooWideThrowType: true
 
   cognitive_complexity:
-    class: 433
-    function: 272
+    class: 450
+    function: 283
 
   type_coverage:
     return_type: 100
@@ -140,8 +140,8 @@ parameters:
       identifier: instanceof.alwaysTrue
     -
       identifier: property.uninitialized
-    #-
-    #  identifier: booleanNot.alwaysFalse
+    -
+      identifier: typePerfect.narrowPrivateClassMethodParamType
     #-
     #  identifier: if.alwaysTrue
 
